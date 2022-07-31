@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: BattleRenderer_Scene
+  m_EditorClassIdentifier: 
+  m_GroupName: BattleRenderer_Scene
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 37d93d84fdbbb694cbc6e8671374b44d
+  m_SerializeEntries: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: a35ac12a81f6e3147a9a4b80a78e6668, type: 2}
+    - {fileID: 11400000, guid: 59e7303eb7181c24f85b4f72e565c8ae, type: 2}
