@@ -5,6 +5,7 @@ using System.Threading;
 using UnityEngine;
 using ZeroFrame.Network;
 using ZeroFrame.Protocol;
+using Game.Network;
 
 namespace Game.Client
 {
@@ -35,17 +36,17 @@ namespace Game.Client
             if (Input.GetKeyDown(KeyCode.F) && networkClient.Connected)
             {
                 var msg = new ChatSendReqMessage();
-                msg.msg = "ÁË½âÄãµÄº´ÎÀÕß";
+                msg.msg = "ï¿½Ë½ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½";
                 networkClient.SendMsg(1, 1, msg);
-                Debug.Log($"Client: ·¢ËÍÐÅÏ¢:{msg.msg}");
+                Debug.Log($"Client: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢:{msg.msg}");
             }
 
             if (serverRevQueue.Count > 0)
             {
                 ChatSendReqMessage revMsg = (ChatSendReqMessage)serverRevQueue[serverRevQueue.Count - 1];
-                Debug.Log($"Server: ÊÕµ½¿Í»§¶ËÏûÏ¢£º{revMsg.msg}");
+                Debug.Log($"Server: ï¿½Õµï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½{revMsg.msg}");
                 ChatSendReqMessage sendMsg = new ChatSendReqMessage();
-                sendMsg.msg = "ÕâÊÇÄãµÄº´ÎÀÕß£ºÎ¢Ð¦»úÆ÷ÈË level 4 20 4000";
+                sendMsg.msg = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½ï¿½ß£ï¿½Î¢Ð¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ level 4 20 4000";
                 networkServer.SendMsg(1, 1, sendMsg, 1);
                 serverRevQueue.RemoveAt(serverRevQueue.Count - 1);
             }
@@ -53,7 +54,7 @@ namespace Game.Client
             if (clientRevQueue.Count > 0)
             {
                 ChatSendReqMessage revMsg = (ChatSendReqMessage)clientRevQueue[clientRevQueue.Count - 1];
-                Debug.Log($"Client: ÊÕµ½ÁË·þÎñÆ÷µÄ»Ø¸´ÐÅÏ¢£º{revMsg.msg}");
+                Debug.Log($"Client: ï¿½Õµï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»Ø¸ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½{revMsg.msg}");
                 clientRevQueue.RemoveAt(clientRevQueue.Count - 1);
             }
 
@@ -65,11 +66,11 @@ namespace Game.Client
             networkServer.StartListen(port);
             networkServer.OnConnectedHandle += (connId) =>
             {
-                Debug.Log($"Server: connId:{connId} ¿Í»§¶ËÁ¬½Ó³É¹¦£¡");
+                Debug.Log($"Server: connId:{connId} ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó³É¹ï¿½ï¿½ï¿½");
             };
             networkServer.OnDisconnectedHandle += (connId) =>
             {
-                Debug.Log($"Server: connId:{connId} ¿Í»§¶Ë¶Ï¿ªÁ¬½Ó£¡");
+                Debug.Log($"Server: connId:{connId} ï¿½Í»ï¿½ï¿½Ë¶Ï¿ï¿½ï¿½ï¿½ï¿½Ó£ï¿½");
             };
             networkServer.AddRegister(1, 1, () => new ChatSendReqMessage(), (connID, msg) =>
             {
@@ -97,7 +98,7 @@ namespace Game.Client
             networkClient.Connect(host, port);
             networkClient.OnConnectedHandle += () =>
             {
-                Debug.Log($"Client: ¿Í»§¶ËÁ¬½Ó host:{host} port:{port} ³É¹¦£¡");
+                Debug.Log($"Client: ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ host:{host} port:{port} ï¿½É¹ï¿½ï¿½ï¿½");
             };
             networkClient.AddRegister(1, 1, () => new ChatSendReqMessage(), (msg) =>
             {
