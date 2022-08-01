@@ -18,10 +18,10 @@ MonoBehaviour:
   m_GUID: ae0db4d0b238d99459ddd0fd48f4465a
   m_SerializeEntries:
   - m_GUID: 8b74d5088900ce8428906a7b35a71049
-    m_Address: LoginPanel
+    m_Address: Home_LoginPanel
     m_ReadOnly: 0
     m_SerializedLabels:
-    - UI
+    - UIAssets
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

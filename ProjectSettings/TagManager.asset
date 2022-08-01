@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Billboard
+    uniqueID: 886395827
+    locked: 0
+  - name: Home
+    uniqueID: 232742525
+    locked: 0
+  - name: Pop
+    uniqueID: 3831929155
+    locked: 0
+  - name: Tips
+    uniqueID: 3327802891
+    locked: 0
