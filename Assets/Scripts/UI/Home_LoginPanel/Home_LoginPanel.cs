@@ -12,8 +12,8 @@ namespace Game.UI
 
         void Awake()
         {
-            _Account = GetComponent<InputField>("AccountInputField");
-            _Pwd = GetComponent<InputField>("PasswardInputField");
+            _Account = GetComponentFromChild<InputField>("AccountInputField");
+            _Pwd = GetComponentFromChild<InputField>("PasswardInputField");
 
             SetOnClick("ConfirmBtn", (obj) =>
             {
