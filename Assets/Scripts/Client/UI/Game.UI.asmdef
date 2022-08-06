@@ -1,12 +1,12 @@
 {
-    "name": "Game.Client",
+    "name": "Game.UI",
     "rootNamespace": "",
     "references": [
-        "GUID:1b75f1632e6a60c439f79793677c037a",
-        "GUID:1b512d1f987df04438fba1626a3efcb2",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:84651a3751eca9349aac36a66bba901b",
+        "GUID:aca395109ad97fd43aa40683dee65616",
         "GUID:d80fa457ebb21b649b37e6d7c8549c0a",
-        "GUID:d07025f71720976439ae17e3ef0dd6cc",
-        "GUID:66341e694cc554f4b9e77fa9fc347c55"
+        "GUID:3dc3b54824ca1d145b37d71e87cfdad9"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,94 +1,71 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Game.Manager;
 using Game.Facades;
-using Game.Client.Network;
+using Game.Infrastructure.Network.Client.Facades;
 
 namespace Game.Client
 {
 
     public class ClientApp : MonoBehaviour
     {
-
+        string host = "localhost";
+        int port = 4000;
         async void Awake()
         {
+            DontDestroyOnLoad(this.gameObject);
+
             Debug.Log("Asset Load---------------");
             // Asset Load
             AllAssets.Ctor();
             await AllAssets.LoadAll();
 
             Debug.Log("Manager Init---------------");
-            // Manager Init
 
-            // == CameraMgr
+            // ==Manager Init
+            // CameraMgr
             CameraMgr.Init();
             var uiCamTrans = CameraMgr.UICamTrans;
             DontDestroyOnLoad(uiCamTrans);
 
-            // == UIMgr
+            // UIMgr
             UIMgr.Init();
 
-            Debug.Log("Load Login Scene---------------");
             // Load Login Scene
             SceneManager.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
             SceneManager.sceneLoaded -= LoginSceneLoaded;
             SceneManager.sceneLoaded += LoginSceneLoaded;
 
             //Network
+            AllClientNetwork.Ctor();
             StartClient();
-
         }
 
         void Update()
         {
-            // Tick
-
 
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
             UIMgr.OpenUI("Home_LoginPanel");
-        }
-
-        void StartServer()
-        {
+            Debug.Log($"[Scene Loaded]: {scene.name}");
         }
 
         void StartClient()
         {
-            Debug.Log("StartClient");
-            string host = "localhost";
-            int port = 4000;
-            AllNetwork.Ctor();
-            var networkClient = AllNetwork.networkClient;
-            var networkServer = AllNetwork.networkServer;
+            Debug.Log("Start Client---------------------------------");
 
-            networkServer.OnConnectedHandle += (connID) =>
-                    {
-                        Debug.Log($"Server: connID:{connID} 客户端连接成功");
-                    };
-
+            var networkClient = AllClientNetwork.networkClient;
 
             networkClient.OnConnectedHandle += () =>
             {
-                Debug.Log("Client: 客户端连接成功");
+                Debug.Log("客户端: 连接成功");
             };
 
-
-            networkServer.StartListen(port);
             networkClient.Connect(host, port);
-
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    networkServer.Tick();
-                }
-            }).Start();
 
             new Thread(() =>
             {
