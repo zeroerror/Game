@@ -1,9 +1,7 @@
 {
     "name": "Game.Facades",
     "rootNamespace": "",
-    "references": [
-        "GUID:9daf5703d68c2d946b1ee5335be9c140"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

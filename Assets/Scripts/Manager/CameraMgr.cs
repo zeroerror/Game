@@ -3,13 +3,13 @@ using UnityEngine;
 namespace Game.Manager
 {
 
-    public class CameraMgr
+    public static class CameraManager
     {
 
         public static Transform UICamTrans;
         public static Transform WorldCamTrans;
 
-        public static void Init()
+        public static void Ctor()
         {
             int layer = LayerMask.NameToLayer("UI");
             UICamTrans = new GameObject("UICamera", typeof(Camera)).transform;

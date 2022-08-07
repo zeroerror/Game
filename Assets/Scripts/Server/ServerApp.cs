@@ -17,6 +17,7 @@ namespace Game.Server
             public string userToken;
         }
         public List<LoginEvent> loginEventList;
+
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
@@ -44,8 +45,8 @@ namespace Game.Server
 
         void StartServer()
         {
+            Debug.Log("服务端启动！");
             var networkServer = AllServerNetwork.networkServer;
-
             networkServer.OnConnectedHandle += (connID) =>
             {
                 Debug.Log($"服务端: connID:{connID} 客户端连接成功-------------------------");

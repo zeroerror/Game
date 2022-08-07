@@ -16,7 +16,32 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 37d93d84fdbbb694cbc6e8671374b44d
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 282898bbb90a5c143ab087d2287bc8a4
+    m_Address: WorldRendererScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BattleRenderer_Scene
+  - m_GUID: 251c388429026704581fe26af7fab62a
+    m_Address: WorldChooseScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BattleRenderer_Scene
+  - m_GUID: 04c32e747247e0341989a765fba1568f
+    m_Address: LoginScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BattleRenderer_Scene
+  - m_GUID: ddecd5858106b934ab3b08447af5f135
+    m_Address: ClientApp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BattleRenderer_Scene
+  - m_GUID: c7e7bfcab55d9f142af601d085aaf870
+    m_Address: BattleRendererScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - BattleRenderer_Scene
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

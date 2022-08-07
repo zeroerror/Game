@@ -1,57 +1,76 @@
 using System;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
-using Game.Manager;
-using Game.Facades;
+using Game.UI.Facades;
+using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Client.Facades;
+using Game.Client.Bussiness.LoginBussiness;
+using Game.Client.Bussiness.WorldBussiness;
+using Game.Client.Bussiness.EventCenter.Facades;
+using Game.Manager;
+using Game.UI;
 
 namespace Game.Client
 {
 
     public class ClientApp : MonoBehaviour
     {
-        string host = "localhost";
-        int port = 4000;
-        async void Awake()
+        public string CurrentSceneName { get; private set; }
+        void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
 
-            Debug.Log("Asset Load---------------");
-            // Asset Load
-            AllAssets.Ctor();
-            await AllAssets.LoadAll();
-
-            Debug.Log("Manager Init---------------");
-
-            // ==Manager Init
-            // CameraMgr
-            CameraMgr.Init();
-            var uiCamTrans = CameraMgr.UICamTrans;
-            DontDestroyOnLoad(uiCamTrans);
-
-            // UIMgr
-            UIMgr.Init();
-
-            // Load Login Scene
-            SceneManager.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
-            SceneManager.sceneLoaded -= LoginSceneLoaded;
-            SceneManager.sceneLoaded += LoginSceneLoaded;
-
-            //Network
+            // == Network ==
             AllClientNetwork.Ctor();
+            AllBussinessEvent.Ctor();
             StartClient();
+
+            // == Entry ==
+            // Login
+            LoginEntry.Ctor();
+            LoginEntry.Inject(AllClientNetwork.networkClient);
+            LoginEntry.Init();
+            // World
+            WorldEntry.Ctor();
+            WorldEntry.Inject(AllClientNetwork.networkClient);
+            WorldEntry.Init();
+
+            Action action = async () =>
+            {
+                // == Manager Init ==
+                // UI
+                UIManager.Ctor();
+                AllUIAssets.Ctor();
+                await AllUIAssets.LoadAll();
+                // Camera
+                CameraManager.Ctor();
+                var uiCamTrans = CameraManager.UICamTrans;
+                uiCamTrans.SetParent(UIManager.UIRoot.transform, false);
+                DontDestroyOnLoad(uiCamTrans);
+                // == Load Login Scene ==
+                Addressables.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
+                SceneManager.sceneLoaded -= LoginSceneLoaded;
+                SceneManager.sceneLoaded += LoginSceneLoaded;
+            };
+
+            action.Invoke();
         }
 
         void Update()
         {
-
+            LoginEntry.Tick();
+            WorldEntry.Tick();
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
-            UIMgr.OpenUI("Home_LoginPanel");
-            Debug.Log($"[Scene Loaded]: {scene.name}");
+            CurrentSceneName = scene.name;
+            if (CurrentSceneName == "LoginScene")
+            {
+                UIManager.OpenUI("Home_LoginPanel");
+            }
         }
 
         void StartClient()
@@ -62,10 +81,10 @@ namespace Game.Client
 
             networkClient.OnConnectedHandle += () =>
             {
-                Debug.Log("客户端: 连接成功");
+                Debug.Log("Connect Success");
             };
 
-            networkClient.Connect(host, port);
+            networkClient.Connect(NetworkConfig.host, NetworkConfig.port);
 
             new Thread(() =>
             {
@@ -75,6 +94,11 @@ namespace Game.Client
                 }
             }).Start();
 
+        }
+
+        void OnDestroy()
+        {
+            WorldEntry.TearDown();
         }
 
     }

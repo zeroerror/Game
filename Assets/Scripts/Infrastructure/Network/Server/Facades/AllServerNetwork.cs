@@ -1,4 +1,4 @@
-using Game.Infrastructure.Network.Server;
+using UnityEngine;
 
 namespace Game.Infrastructure.Network.Server.Facades
 {

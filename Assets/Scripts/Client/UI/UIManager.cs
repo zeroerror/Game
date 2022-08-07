@@ -5,34 +5,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Game.Generic;
-using Game.Facades;
+using Game.UI.Facades;
 
-namespace Game.Manager
+namespace Game.UI
 {
 
-    public class UIMgr
+    public static class UIManager
     {
-        public static void Init()
+        public static void Ctor()
         {
             int layer = LayerMask.NameToLayer("UI");
-            _uiRoot = new GameObject("UICanvas", typeof(Canvas), typeof(CanvasScaler));
-            _uiRootCanvas = _uiRoot.GetComponent<Canvas>();
+            UIRoot = new GameObject("UICanvas", typeof(Canvas), typeof(CanvasScaler));
+            _uiRootCanvas = UIRoot.GetComponent<Canvas>();
             _uiRootCanvas.renderMode = RenderMode.ScreenSpaceCamera;
             _uiRootCanvas.sortingLayerID = SortingLayer.NameToID("Billboard");
-            _uiRoot.layer = layer;
-            _uiRootRt = _uiRoot.GetComponent<RectTransform>();
-            GameObject.DontDestroyOnLoad(_uiRoot);
-            CanvasScaler tempScale = _uiRoot.GetComponent<CanvasScaler>();
+            UIRoot.layer = layer;
+            _uiRootRt = UIRoot.GetComponent<RectTransform>();
+            GameObject.DontDestroyOnLoad(UIRoot);
+            CanvasScaler tempScale = UIRoot.GetComponent<CanvasScaler>();
             tempScale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             tempScale.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             tempScale.referenceResolution = UIDef.UIResolution;
             _uiRootRt.position = Vector3.zero;//CanvasScaler 会进行重置坐标 等其加载完成
-            CameraMgr.UICamTrans.SetParent(_uiRoot.transform, false);
-
 
             _uiMainView = new GameObject("UIMainView", typeof(RectTransform)).GetComponent<RectTransform>();
             _SetRectTransform(ref _uiMainView);
-            _uiMainView.transform.SetParent(_uiRoot.transform, false);
+            _uiMainView.transform.SetParent(UIRoot.transform, false);
 
             foreach (var item in SortingLayer.layers)
             {
@@ -52,7 +50,7 @@ namespace Game.Manager
             }
 
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule), typeof(BaseInput));
-            eventSystem.transform.SetParent(_uiRoot.transform, false);
+            eventSystem.transform.SetParent(UIRoot.transform, false);
         }
 
         public static bool IsActive(string uiName)
@@ -152,7 +150,7 @@ namespace Game.Manager
 
         private static bool _TryCreateUI(string uiName, ref Transform ui)
         {
-            GameObject go = AllAssets.UIASSETS.Get(uiName);
+            GameObject go = AllUIAssets.UIAssets.Get(uiName);
             if (!go) return false;
 
             go.SetActive(false);
@@ -172,9 +170,9 @@ namespace Game.Manager
 
         private static bool _CheckUI(string uiName, ref Transform ui)
         {
-            if (UIMgr._uiDic.ContainsKey(uiName))
+            if (UIManager._uiDic.ContainsKey(uiName))
             {
-                ui = UIMgr._uiDic[uiName];
+                ui = UIManager._uiDic[uiName];
                 return true;
             }
 
@@ -190,17 +188,17 @@ namespace Game.Manager
             rct.offsetMin = Vector2.zero;
         }
 
-        private static GameObject _uiRoot;
-        private static Canvas _uiRootCanvas;
-        private static RectTransform _uiRootRt;
-        private static GameObject _worldUIRoot;
-        private static Canvas _worldUIRootCanvas;
-        private static RectTransform _worldUIRootRt;
-        private static RectTransform _uiMainView;
-        private static Dictionary<string, Transform> _uiLayerDic = new Dictionary<string, Transform>();
-        private static Dictionary<string, Transform> _uiDic = new Dictionary<string, Transform>();
-        private static int _curSortingOrder = 0;
-        private static Dictionary<string, int2> _layerSortingDic = new Dictionary<string, int2>();
+        public static GameObject UIRoot { get; private set; }
+        static Canvas _uiRootCanvas;
+        static RectTransform _uiRootRt;
+        static GameObject _worldUIRoot;
+        static Canvas _worldUIRootCanvas;
+        static RectTransform _worldUIRootRt;
+        static RectTransform _uiMainView;
+        static Dictionary<string, Transform> _uiLayerDic = new Dictionary<string, Transform>();
+        static Dictionary<string, Transform> _uiDic = new Dictionary<string, Transform>();
+        static int _curSortingOrder = 0;
+        static Dictionary<string, int2> _layerSortingDic = new Dictionary<string, int2>();
 
     }
 

@@ -611,7 +611,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2160215608105840694}
-  - component: {fileID: 6059887256957660705}
+  - component: {fileID: 6183734160653714611}
   m_Layer: 5
   m_Name: Home_LoginPanel
   m_TagString: Untagged
@@ -641,7 +641,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &6059887256957660705
+--- !u!114 &6183734160653714611
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -650,7 +650,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2160215608105840693}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4bbdd6302800154b840c9d16a89ebc0, type: 3}
+  m_Script: {fileID: 11500000, guid: fb7e7601082fcdb41961b4e4db62652a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7614560805875138207
