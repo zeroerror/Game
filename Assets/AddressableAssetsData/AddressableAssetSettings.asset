@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: AddressableAssetSettings
   m_EditorClassIdentifier: 
   m_DefaultGroup: daf1aaa36520dcf4ab9e585d6c86fa47
+  m_CachedHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -42,6 +45,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 23f59a0cf0c951f41b8cb55ae6b2f4a8, type: 2}
   - {fileID: 11400000, guid: a8d85b9f7df584b40beddf803a31bd6e, type: 2}
   - {fileID: 11400000, guid: 995f101229f617547a58380ab0991b57, type: 2}
+  - {fileID: 11400000, guid: 3b1d30a405f6ae344893e0ab12ec99a8, type: 2}
+  - {fileID: 11400000, guid: 15c0f3baf1502e246b7f68b4f7184529, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -83,8 +88,10 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - default
-    - BattleRenderer_Scene
+    - Scene
     - UI
+    - Camera
+    - Role
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 7bd76f96a6249af4ea39e86aeb76659e, type: 2}

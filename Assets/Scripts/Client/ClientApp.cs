@@ -1,16 +1,17 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
-using Game.UI.Facades;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Client.Facades;
+using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.WorldBussiness;
-using Game.Client.Bussiness.EventCenter.Facades;
-using Game.Manager;
 using Game.UI;
+using Game.UI.Assets;
+using Game.UI.Manager;
 
 namespace Game.Client
 {
@@ -18,14 +19,18 @@ namespace Game.Client
     public class ClientApp : MonoBehaviour
     {
         public string CurrentSceneName { get; private set; }
+
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
 
             // == Network ==
             AllClientNetwork.Ctor();
-            AllBussinessEvent.Ctor();
             StartClient();
+
+            // == EventCenter ==
+            NetworkEventCenter.Ctor();
+            LocalEventCenter.Ctor();
 
             // == Entry ==
             // Login
@@ -36,19 +41,22 @@ namespace Game.Client
             WorldEntry.Ctor();
             WorldEntry.Inject(AllClientNetwork.networkClient);
             WorldEntry.Init();
+            // UI
+            UIEntry.Ctor();
+
+            // == Manager ==
+            UIManager.Ctor();
+            CameraManager.Ctor();
 
             Action action = async () =>
             {
-                // == Manager Init ==
-                // UI
-                UIManager.Ctor();
-                AllUIAssets.Ctor();
-                await AllUIAssets.LoadAll();
-                // Camera
-                CameraManager.Ctor();
+                // == All Asset ==
+                await LoadAllAsset();
+
                 var uiCamTrans = CameraManager.UICamTrans;
                 uiCamTrans.SetParent(UIManager.UIRoot.transform, false);
                 DontDestroyOnLoad(uiCamTrans);
+
                 // == Load Login Scene ==
                 Addressables.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
                 SceneManager.sceneLoaded -= LoginSceneLoaded;
@@ -60,8 +68,14 @@ namespace Game.Client
 
         void Update()
         {
+            // == Entry ==
             LoginEntry.Tick();
             WorldEntry.Tick();
+            UIEntry.Tick();
+            
+            // == EventCenter ==
+            NetworkEventCenter.Tick();
+            LocalEventCenter.Tick();
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
@@ -96,9 +110,16 @@ namespace Game.Client
 
         }
 
+        async Task LoadAllAsset()
+        {
+            await UIPanelAssets.LoadAll();
+        }
+
         void OnDestroy()
         {
+            LoginEntry.TearDown();
             WorldEntry.TearDown();
+            UIEntry.TearDown();
         }
 
     }

@@ -8,33 +8,41 @@ namespace Game.Client.Bussiness.WorldBussiness
     public static class WorldEntry
     {
 
+
+        // Facades
+        static WorldFacades worldFacades;
+
+        // Controller
+        static WorldController worldController;
+
+
         #region [Life Cycle]
 
         public static void Ctor()
         {
-            // == Asset ==
-            AllWorldAsset.Ctor();
+            // == Facades ==
+            worldFacades = new WorldFacades();
+            // == Controller ==
+            worldController = new WorldController();
         }
 
         public static void Init()
         {
-
+            worldFacades.Init();
         }
 
         public static void Inject(NetworkClient client)
         {
-            // == Network ==
-
+              // == Facades ==
+            worldFacades.Inject();
             // == Controller ==
-            WorldController.Inject(client, AllWorldAsset.WorldReqAndRes);
-            WorldRoleController.Inject(client, AllWorldAsset.WorldRoleReqAndRes);
+            worldController.Inject(worldFacades);
         }
 
         public static void Tick()
         {
             // == Controller ==
-            WorldController.Tick();
-            WorldRoleController.Tick();
+            worldController.Tick();
         }
 
         public static void TearDown()

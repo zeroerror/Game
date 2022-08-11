@@ -1,39 +1,32 @@
-using Game.Client.Bussiness.WorldBussiness.Network;
-using Game.Infrastructure.Network.Client;
-using Game.Client.Bussiness.EventCenter.Facades;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
+using Game.Infrastructure.Input;
+using Game.Client.Bussiness.EventCenter;
+using Game.Client.Bussiness.WorldBussiness.Facades;
+
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
 
-    public static class WorldController
+    public class WorldController
     {
+        WorldFacades worldFacades;
 
-        static WorldReqAndRes _worldReqAndRes;
-
-        public static void Inject(NetworkClient client, WorldReqAndRes worldReqAndRes)
+        public WorldController()
         {
-            _worldReqAndRes = worldReqAndRes;
-            _worldReqAndRes.Inject(client);
-            _worldReqAndRes.RegistWorldEnterRes();
-            _worldReqAndRes.RegistWorldEnterRes();
         }
 
-        public static void Tick()
+        public void Inject(WorldFacades worldFacades)
         {
-            OnLogin2WorldEvent();
+            this.worldFacades = worldFacades;
         }
 
-        static void OnLogin2WorldEvent()
+        public void Tick()
         {
-            var ev = AllBussinessEvent.LoginToWorldEvent;
-            if (!ev.IsTrigger) return;
-            ev.SetIsTrigger(false);
 
-            Addressables.LoadSceneAsync("WorldChooseScene", LoadSceneMode.Single);
         }
-
+        
     }
 
 }

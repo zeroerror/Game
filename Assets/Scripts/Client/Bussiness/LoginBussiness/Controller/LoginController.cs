@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using Game.Client.Bussiness.EventCenter.Facades;
+using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness.Facades;
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Client2World;
@@ -44,7 +44,7 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
             if (msg.status == 1)
             {
                 Debug.Log("登录成功!");
-                AllBussinessEvent.LoginToWorldEvent.SetIsTrigger(true);
+                NetworkEventCenter.InvokeLoginSuccessHandler();
                 status = msg.status;
             }
         }
