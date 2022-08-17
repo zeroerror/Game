@@ -21,12 +21,12 @@ namespace Game.Client.Bussiness.LoginBussiness.Network
                 pwd = pwd
             };
             Debug.Log("SendLoginMsg");
-            _client.SendMessage(1, 1, msg);
+            _client.SendMsg<LoginReqMessage>(msg);
         }
 
         public void RegistLoginRes(Action<LoginResMessage> action)
         {
-            _client.RegistMsg<LoginResMessage>(1, 1, action);
+            _client.RegistMsg<LoginResMessage>(action);
         }
 
     }

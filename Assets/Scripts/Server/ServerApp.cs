@@ -34,7 +34,7 @@ namespace Game.Server
             {
                 var ev = loginEventList[0];
                 var networkServer = AllServerNetwork.networkServer;
-                networkServer.SendMsg<LoginResMessage>(1, 1, ev.connID, new LoginResMessage
+                networkServer.SendMsg<LoginResMessage>(ev.connID, new LoginResMessage
                 {
                     status = 1,
                     userToken = "testusertoken"
@@ -52,7 +52,7 @@ namespace Game.Server
                 Debug.Log($"服务端: connID:{connID} 客户端连接成功-------------------------");
             };
 
-            networkServer.RegistMsg<LoginReqMessage>(1, 1, (connId, msg) =>
+            networkServer.AddRegister<LoginReqMessage>((connId, msg) =>
             {
                 Debug.Log($"服务端: 账户登录请求 connId:{connId}  account:{msg.account}  pwd:{msg.pwd}");
 

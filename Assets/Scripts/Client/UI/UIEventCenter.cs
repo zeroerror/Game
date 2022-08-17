@@ -25,6 +25,12 @@ namespace Game.UI.Event
             uiTearDownQueue = null;
         }
 
+        public static bool TryDequeue<T>(this Queue<T> queue, out T t)
+        {
+            t = queue.Dequeue();
+            return t != null;
+        }
+
 
     }
 
