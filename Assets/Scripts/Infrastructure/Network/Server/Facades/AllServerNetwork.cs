@@ -2,12 +2,12 @@ using UnityEngine;
 
 namespace Game.Infrastructure.Network.Server.Facades
 {
-
-    public static class AllServerNetwork
+    // TODO:登录服、世界服、战斗服区分
+    public class AllServerNetwork
     {
-        public static NetworkServer networkServer;
+        public NetworkServer networkServer;
 
-        public static void Ctor()
+        public AllServerNetwork()
         {
             networkServer = new NetworkServer(4096);
         }

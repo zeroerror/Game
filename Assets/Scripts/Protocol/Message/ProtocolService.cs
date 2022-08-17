@@ -1,5 +1,7 @@
 using ZeroFrame.Protocol;
 using Game.Protocol.Client2World;
+using Game.Protocol.World;
+
 using System;using System.Collections.Generic;namespace Game.Protocol
 {
 
@@ -13,6 +15,8 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(LoginResMessage), 1);
             messageInfoDic.Add(typeof(WolrdEnterBroadcastResMessage), 2);
             messageInfoDic.Add(typeof(WolrdEnterReqMessage), 3);
+            messageInfoDic.Add(typeof(FrameReqOptMsg), 4);
+            messageInfoDic.Add(typeof(FrameResOptMsg), 5);
 
         }
 

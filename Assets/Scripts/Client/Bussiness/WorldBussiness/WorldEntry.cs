@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public static void Inject(NetworkClient client)
         {
               // == Facades ==
-            worldFacades.Inject();
+            worldFacades.Inject(client);
             // == Controller ==
             worldController.Inject(worldFacades);
         }

@@ -1,5 +1,6 @@
 using Game.Infrastructure.Input;
 using Game.Client.Bussiness.WorldBussiness.Controller.Domain;
+using Game.Infrastructure.Network.Client;
 
 namespace Game.Client.Bussiness.WorldBussiness.Facades
 {
@@ -24,9 +25,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             Assets = new AllWorldAssets();
         }
 
-        public void Inject()
+        public void Inject(NetworkClient client)
         {
             Domain.Inject(this);
+            Network.Inject(client);
         }
 
         public void Init()

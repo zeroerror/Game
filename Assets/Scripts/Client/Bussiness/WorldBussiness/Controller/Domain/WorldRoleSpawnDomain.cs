@@ -37,8 +37,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 worldFacades.Assets.WorldRoleAssets.TryGetByName("player", out GameObject go);
                 go = GameObject.Instantiate(go);
                 var entity = go.GetComponent<WorldRoleEntity>();
+                entity.SetRid(1);
+                
                 var repo = worldFacades.Repo.WorldRoleRepo;
                 repo.Add(entity);
+                repo.SetOwner(entity);//temp
                 worldFacades.CinemachineExtra.FollowSolo(entity.CamTrackingObj, 3f);
                 worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
 

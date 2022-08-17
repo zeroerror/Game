@@ -4,12 +4,20 @@ using UnityEngine;
 using Game.Protocol.Client2World;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Server.Facades;
+using Game.Server.Bussiness.WorldBussiness;
+using Game.Server.Bussiness.WorldBussiness.Facades;
 
 namespace Game.Server
 {
 
     public class ServerApp : MonoBehaviour
     {
+
+        // Network
+        AllServerNetwork allServerNetwork;
+
+        WorldEntry worldEntry;
+
         public class LoginEvent
         {
             public int connID;
@@ -21,10 +29,16 @@ namespace Game.Server
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
-
             loginEventList = new List<LoginEvent>();
 
-            AllServerNetwork.Ctor();
+            // == Network ==
+            allServerNetwork = new AllServerNetwork();
+
+            // == Entry ==
+            // WorldEntry
+            worldEntry = new WorldEntry();
+            worldEntry.Inject(allServerNetwork.networkServer);
+
             StartServer();
         }
 
@@ -33,7 +47,7 @@ namespace Game.Server
             if (loginEventList.GetEnumerator().MoveNext())
             {
                 var ev = loginEventList[0];
-                var networkServer = AllServerNetwork.networkServer;
+                var networkServer = allServerNetwork.networkServer;
                 networkServer.SendMsg<LoginResMessage>(ev.connID, new LoginResMessage
                 {
                     status = 1,
@@ -41,12 +55,16 @@ namespace Game.Server
                 });
                 loginEventList.Remove(ev);
             }
+
+            // == Entry ==
+            worldEntry.Tick();
+
         }
 
         void StartServer()
         {
             Debug.Log("服务端启动！");
-            var networkServer = AllServerNetwork.networkServer;
+            var networkServer = allServerNetwork.networkServer;
             networkServer.OnConnectedHandle += (connID) =>
             {
                 Debug.Log($"服务端: connID:{connID} 客户端连接成功-------------------------");

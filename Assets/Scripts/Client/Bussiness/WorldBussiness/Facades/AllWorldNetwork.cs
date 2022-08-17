@@ -1,4 +1,5 @@
 using Game.Client.Bussiness.WorldBussiness.Network;
+using Game.Infrastructure.Network.Client;
 
 namespace Game.Client.Bussiness.WorldBussiness.Facades
 {
@@ -14,6 +15,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         {
             WorldReqAndRes = new WorldReqAndRes();
             WorldRoleReqAndRes = new WorldRoleReqAndRes();
+        }
+
+        public void Inject(NetworkClient client)
+        {
+            WorldReqAndRes.Inject(client);
+            WorldRoleReqAndRes.Inject(client);
         }
 
     }
