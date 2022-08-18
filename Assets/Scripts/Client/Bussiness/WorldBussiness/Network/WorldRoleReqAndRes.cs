@@ -22,25 +22,49 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
-        public void SendReq_WorldRoleMove(int frameIndex, sbyte rid, Vector3 dir)
+        public void SendReq_WorldRoleMove(int frameIndex, byte rid, Vector3 dir)
         {
             int msg = rid << 24;
             msg |= (byte)dir.x << 16;
             msg |= (byte)dir.y << 8;
             msg |= (byte)dir.z;
 
-            FrameReqOptMsg frameOptReqMsg = new FrameReqOptMsg
+            FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {
-                clientFrameIndex = 1,
+                clientFrameIndex = frameIndex,
                 optTypeId = 1,
                 msg = msg
             };
-            _client.SendMsg<FrameReqOptMsg>(frameOptReqMsg);
+            _client.SendMsg<FrameOptReqMsg>(frameOptReqMsg);
         }
 
-        public void RegistRes_WorldRoleMove(Action<FrameResOptMsg> action)
+        public void RegistRes_WorldRoleOpt(Action<FrameOptResMsg> action)
         {
-            _client.RegistMsg<FrameResOptMsg>(action);
+            _client.RegistMsg<FrameOptResMsg>(action);
+        }
+
+        public void SendReq_WolrdRoleSpawn(int frameIndex)
+        {
+            FrameWRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameWRoleSpawnReqMsg
+            {
+                clientFrameIndex = frameIndex
+            };
+            _client.SendMsg<FrameWRoleSpawnReqMsg>(frameReqWRoleSpawnMsg);
+        }
+
+        public void RegistRes_WorldRoleSpawn(Action<FrameWRoleSpawnResMsg> action)
+        {
+            _client.RegistMsg<FrameWRoleSpawnResMsg>(action);
+        }
+
+        public void RegistResResend_WorldRoleSpawn(Action<FrameWRoleSpawnResResendMsg> action)
+        {
+            _client.RegistMsg<FrameWRoleSpawnResResendMsg>(action);
+        }
+
+        public void RegistResResend_Opt(Action<FrameOptResResendMsg> action)
+        {
+            _client.RegistMsg<FrameOptResResendMsg>(action);
         }
 
     }

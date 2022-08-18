@@ -28,21 +28,21 @@ namespace Game.Server
 
         void Awake()
         {
-            DontDestroyOnLoad(this.gameObject);
-            loginEventList = new List<LoginEvent>();
-
             // == Network ==
             allServerNetwork = new AllServerNetwork();
+            StartServer();
 
             // == Entry ==
             // WorldEntry
             worldEntry = new WorldEntry();
             worldEntry.Inject(allServerNetwork.networkServer);
 
-            StartServer();
+            DontDestroyOnLoad(this.gameObject);
+            loginEventList = new List<LoginEvent>();
+
         }
 
-        void Update()
+        void FixedUpdate()
         {
             if (loginEventList.GetEnumerator().MoveNext())
             {

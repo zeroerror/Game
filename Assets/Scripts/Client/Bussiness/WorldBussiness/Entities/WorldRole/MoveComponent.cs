@@ -13,9 +13,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             this.rb = rb;
         }
 
-        public void Move()
+        public void Move(Vector3 velocity)
         {
-            rb.velocity = new Vector3(0, 0, 5);
+            rb.velocity += velocity;
         }
 
     }

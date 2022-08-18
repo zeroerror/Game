@@ -13,9 +13,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         WorldRoleReqAndRes _worldRoleReqAndRes;
 
+        byte tempRidIndex;
+
         public WorldRoleSpawnDomain()
         {
-            LocalEventCenter.Regist_SceneLoadedHandler(OnSceneLoaded);
         }
 
         public void Inject(WorldFacades facades)
@@ -29,24 +30,19 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         }
 
-        public void OnSceneLoaded(string name)
+        public WorldRoleEntity SpawnWorldRole(Transform parent)
         {
-            if (name == "WorldChooseScene")
+            if (worldFacades.Assets.WorldRoleAssets.TryGetByName("player", out GameObject prefabAsset))
             {
-                Debug.Log("生成角色");
-                worldFacades.Assets.WorldRoleAssets.TryGetByName("player", out GameObject go);
-                go = GameObject.Instantiate(go);
-                var entity = go.GetComponent<WorldRoleEntity>();
-                entity.SetRid(1);
-                
-                var repo = worldFacades.Repo.WorldRoleRepo;
-                repo.Add(entity);
-                repo.SetOwner(entity);//temp
-                worldFacades.CinemachineExtra.FollowSolo(entity.CamTrackingObj, 3f);
-                worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
+                prefabAsset = GameObject.Instantiate(prefabAsset, parent);
+                var entity = prefabAsset.GetComponent<WorldRoleEntity>();
+                entity.SetRid(++tempRidIndex);
 
-                // LocalEventCenter.Invoke_WorldRoleSpawnHandler(entity);
+                return entity;
             }
+
+            return null;
+
         }
 
     }

@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 using Game.Infrastructure.Input;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.WorldBussiness.Facades;
-
+using System.Threading.Tasks;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 {
@@ -15,7 +15,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public WorldSpawnDomain()
         {
-            NetworkEventCenter.RegistLoginSuccess(EnterWorldChooseScene);
         }
 
         public void Inject(WorldFacades worldFacades)
@@ -23,23 +22,22 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             this.worldFacades = worldFacades;
         }
 
-        async void EnterWorldChooseScene()
+        public async Task<FieldEntity> SpawnWorldChooseScene()
         {
             var result = await Addressables.LoadSceneAsync("WorldChooseScene", LoadSceneMode.Single).Task;
             var scene = result.Scene;
             var sceneObjs = scene.GetRootGameObjects();
-            var cinemachineExtra = sceneObjs[0].transform.GetComponentInChildren<CinemachineExtra>();
+            var fieldTrans = sceneObjs[0].transform;
+            var fieldEntity = fieldTrans.GetComponent<FieldEntity>();
+            var cinemachineExtra = fieldTrans.GetComponentInChildren<CinemachineExtra>();
 
             Debug.Assert(cinemachineExtra != null, "cinemachineExtra 找不到");
             worldFacades.SetCinemachineExtra(cinemachineExtra);
 
-            if (worldFacades.Assets.WorldRoleAssets.TryGetByName("player", out GameObject prefabAsset))
-            {
-                prefabAsset = GameObject.Instantiate(prefabAsset, sceneObjs[0].transform);
-            }
-
-            Debug.Log("进入选择世界场景");
+            Debug.Log("Enter WorldChooseScene");
             LocalEventCenter.Invoke_SceneLoadedHandler(scene.name);
+
+            return fieldEntity;
         }
 
     }

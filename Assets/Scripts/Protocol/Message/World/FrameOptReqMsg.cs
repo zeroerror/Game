@@ -1,12 +1,10 @@
-using ZeroFrame.Protocol;
 using System;
-using ZeroFrame.Buffer;
-namespace Game.Protocol.World
+using ZeroFrame.Protocol;
+using ZeroFrame.Buffer;namespace Game.Protocol.World
 {
 
     [ZeroMessage]
-    public class FrameReqOptMsg
-:IZeroMessage<FrameReqOptMsg>    {
+    public class FrameOptReqMsg:IZeroMessage<FrameOptReqMsg>{
         public int clientFrameIndex;
         public sbyte optTypeId;
         public int msg;

@@ -19,11 +19,16 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
             list = new List<WorldRoleEntity>();
         }
 
+        public WorldRoleEntity Get(byte wRid)
+        {
+            return list.Find((entity) => entity.WRid == wRid);
+        }
+
         public void Add(WorldRoleEntity entity)
         {
-            Debug.Log($"创建世界角色 entity: {entity.name}");
             list.Add(entity);
         }
+
 
         public void Remove(WorldRoleEntity entity)
         {

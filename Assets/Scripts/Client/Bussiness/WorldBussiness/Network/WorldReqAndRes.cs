@@ -1,5 +1,6 @@
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Client2World;
+using Game.Protocol.World;
 
 namespace Game.Client.Bussiness.WorldBussiness.Network
 {
@@ -10,18 +11,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         public void Inject(NetworkClient client)
         {
             _client = client;
-        }
-
-        public void SendWorldEnterReq()
-        {
-            WolrdEnterReqMessage msg = new WolrdEnterReqMessage
-            {
-
-            };
-        }
-
-        public void RegistWorldEnterRes()
-        {
         }
 
     }
