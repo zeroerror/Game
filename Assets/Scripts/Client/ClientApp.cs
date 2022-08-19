@@ -12,6 +12,8 @@ using Game.Client.Bussiness.WorldBussiness;
 using Game.UI;
 using Game.UI.Assets;
 using Game.UI.Manager;
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Game.Client
 {
@@ -23,6 +25,18 @@ namespace Game.Client
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
+
+            // MySQL
+            string connStr = "server=127.0.0.1;port=3306;user=root;password=123456; database=game;";
+            string sql = "select * from students";
+            var firstRow = MySqlHelper.ExecuteDataRow(connStr, sql);
+            var rows = firstRow.Table.Rows;
+            Debug.Log("MySQL查询Start=============================================");
+            foreach (DataRow row in rows)
+            {
+                Debug.Log($"{row.ItemArray[0]},{row.ItemArray[1]},{row.ItemArray[2]},{row.ItemArray[3]},{row.ItemArray[4]}");
+            }
+            Debug.Log("MySQL查询End=============================================");
 
             // == Network ==
             AllClientNetwork.Ctor();
@@ -72,7 +86,7 @@ namespace Game.Client
             LoginEntry.Tick();
             WorldEntry.Tick();
             UIEntry.Tick();
-            
+
             // == EventCenter ==
             NetworkEventCenter.Tick();
             LocalEventCenter.Tick();

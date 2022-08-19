@@ -68,7 +68,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 connIdList.ForEach((connId) =>
                 {
                     rqs.SendRes_WorldRoleMove(connId, worldServeFrameIndex, msg);
-                    Debug.Log($"clientFrameIndex:{msg.clientFrameIndex} connId:{connId} ---->确认人物移动  rid:{rid}  dir:{dir}");
+                    Debug.Log($"worldServeFrameIndex:{worldServeFrameIndex} connId:{connId} ---->确认人物移动  rid:{rid}  dir:{dir}");
                 });
 
             }
@@ -120,7 +120,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 }
                 else
                 {
-                    Debug.Log($"服务端回复消息[生成帧]--------------------------------------------------------------------------");
+                    Debug.Log($"服务端回复消息[生成帧] {worldServeFrameIndex}--------------------------------------------------------------------------");
                     rqs.SendRes_WorldRoleSpawn(connId, worldServeFrameIndex, ++wRoleId, true);
                 }
 
