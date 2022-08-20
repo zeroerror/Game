@@ -9,16 +9,17 @@ namespace Game.UI.Panel
 
     public class Home_LoginPanel : UIBehavior
     {
-        InputField _Account;
+        InputField _name;
         InputField _Pwd;
 
         void Awake()
         {
-            _Account = GetComponentFromChild<InputField>("AccountInputField");
+            _name = GetComponentFromChild<InputField>("AccountInputField");
             _Pwd = GetComponentFromChild<InputField>("PasswardInputField");
 
-            SetOnClick("ConfirmBtn", SendLoginMsg);
-            LoginController.AddLoginResRegist((status) =>
+            SetOnClick("LoginBtn", SendLoginMsg);
+            SetOnClick("RegistBtn", SendRegistAccountMsg);
+            LoginController.AddRegister_LoginRes((status) =>
             {
                 if (status == 1)
                 {
@@ -30,7 +31,12 @@ namespace Game.UI.Panel
         // == UI Click ==
         void SendLoginMsg(params object[] args)
         {
-            LoginController.SendLoginMsg(_Account.text, _Pwd.text);
+            LoginController.SendLoginMsg(_name.text, _Pwd.text);
+        }
+
+        void SendRegistAccountMsg(params object[] args)
+        {
+            LoginController.SendRegistAccountMsg(_name.text, _Pwd.text);
         }
 
     }

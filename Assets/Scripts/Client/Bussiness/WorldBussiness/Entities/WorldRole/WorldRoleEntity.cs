@@ -24,8 +24,8 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Move(Vector3 v)
         {
-            transform.position += v;
-            // transform.position = Vector3.Lerp(transform.position, transform.position + v, 0.5f);
+            var offset = v * MoveComponent.speed;
+            transform.position += offset;
         }
 
     }

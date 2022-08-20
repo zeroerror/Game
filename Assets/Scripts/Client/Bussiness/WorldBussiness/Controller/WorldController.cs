@@ -65,12 +65,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     var realMsg = opt.msg;
                     var rid = (byte)(realMsg >> 24);
                     Vector3 dir = new Vector3((sbyte)(realMsg >> 16), (sbyte)(realMsg >> 8), (sbyte)realMsg);
-                    float fixedSpeed = 1f;
-                    Vector3 velocity = fixedSpeed * dir;
                     var roleEntity = worldFacades.Repo.WorldRoleRepo.Get(rid);
 
-                    roleEntity.Move(velocity);
-                    Debug.Log($"移动  WRid:{rid}  velocity: {velocity}");
+                    roleEntity.Move(dir);
                 }
             }
 
