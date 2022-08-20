@@ -31,11 +31,15 @@ namespace Game.Server
             // WorldEntry
             worldEntry = new WorldEntry();
             worldEntry.Inject(allServerNetwork.networkServer);
+            worldEntry.Init();
             // LoginEntry
             loginEntry = new LoginEntry();
             loginEntry.Inject(allServerNetwork.networkServer);
 
             DontDestroyOnLoad(this.gameObject);
+
+
+
 
         }
 

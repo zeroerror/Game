@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
+using UnityEngine.SceneManagement;
 
 namespace Game.Server.Bussiness.WorldBussiness
 {
@@ -32,6 +33,8 @@ namespace Game.Server.Bussiness.WorldBussiness
         }
         Dictionary<int, FrameReqWRoleSpawnMsgStruct> spawnDic;
 
+        bool sceneSpawnTrigger;
+        bool isSceneSpawn;
 
         public WorldController()
         {
@@ -51,6 +54,14 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         public void Tick()
         {
+            if (sceneSpawnTrigger && !isSceneSpawn)
+            {
+                SpawWorldChooseScene();
+                sceneSpawnTrigger = false;
+            }
+
+            if (!isSceneSpawn) return;
+
             int nextFrameIndex = worldServeFrameIndex + 1;
             if (optDic.TryGetValue(nextFrameIndex, out var opt))
             {
@@ -71,6 +82,14 @@ namespace Game.Server.Bussiness.WorldBussiness
                     Debug.Log($"worldServeFrameIndex:{worldServeFrameIndex} connId:{connId} ---->确认人物移动  rid:{rid}  dir:{dir}");
                 });
 
+                // 服务器逻辑
+                var optTypeId = opt.msg.optTypeId;
+                if (optTypeId == 1)
+                {
+                    var roleEntity = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(rid);
+                    roleEntity.Move(dir);
+                }
+                Debug.Log($"服务器逻辑[Opt] frame:{worldServeFrameIndex}");
             }
 
             // 目前流程是会先生成唯一的控制角色，所以这里相当于入口，在这里判断是否是中途加入，是否需要补发数据包
@@ -82,7 +101,12 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var connId = spawn.connId;
                 var clientFrameIndex = msg.clientFrameIndex;
 
+                var clientFacades = worldFacades.ClientWorldFacades;
+                var repo = clientFacades.Repo;
+                var fieldEntity = repo.FiledEntityRepo.Get(1);
                 var rqs = worldFacades.AllWorldNetwork.WorldRoleReqAndRes;
+                var roleRepo = repo.WorldRoleRepo;
+
                 if (clientFrameIndex + 1 < worldServeFrameIndex)
                 {
 
@@ -90,12 +114,13 @@ namespace Game.Server.Bussiness.WorldBussiness
                     Debug.Log($"中途加入，补发数据包：connId:{connId} clientFrameIndex:{clientFrameIndex} 到 worldServeFrameIndex:{worldServeFrameIndex}");
 
                     Debug.Log("所有人物生成包数据========================================");
-                    byte wRoleId = 0;
+                    var allEntity = roleRepo.GetAll();
+                    int index = 0;
                     for (int frameIndex = clientFrameIndex + 1; frameIndex < worldServeFrameIndex; frameIndex++)
                     {
                         if (!spawnDic.TryGetValue(frameIndex, out var spawnMsgStruct)) continue;
 
-                        rqs.ResendRes_WorldRoleSpawn(connId, frameIndex, ++wRoleId, false);
+                        rqs.ResendRes_WorldRoleSpawn(connId, frameIndex, allEntity[index++].WRid, false);
                     }
                     // 加上当前帧
                     rqs.ResendRes_WorldRoleSpawn(connId, worldServeFrameIndex, ++wRoleId, true);
@@ -113,9 +138,11 @@ namespace Game.Server.Bussiness.WorldBussiness
                     {
                         if (otherConnId != connId)
                         {
-                            rqs.SendRes_WorldRoleSpawn(otherConnId,worldServeFrameIndex,wRoleId,false);
+                            rqs.SendRes_WorldRoleSpawn(otherConnId, worldServeFrameIndex, wRoleId, false);
                         }
                     });
+
+
 
                 }
                 else
@@ -124,6 +151,11 @@ namespace Game.Server.Bussiness.WorldBussiness
                     rqs.SendRes_WorldRoleSpawn(connId, worldServeFrameIndex, ++wRoleId, true);
                 }
 
+                // 服务器逻辑
+                var entity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
+                entity.SetRid(wRoleId);
+                roleRepo.Add(entity);
+                Debug.Log($"服务器逻辑[Spawn] frame:{worldServeFrameIndex}");
             }
 
         }
@@ -139,6 +171,19 @@ namespace Game.Server.Bussiness.WorldBussiness
             spawnDic.TryAdd(nextFrameIndex, new FrameReqWRoleSpawnMsgStruct { connId = connId, msg = msg });
             // TODO:连接服和世界服分离
             connIdList.Add(connId);
+            // 创建场景
+            sceneSpawnTrigger = true;
+        }
+
+        async void SpawWorldChooseScene()
+        {
+            // Load Scene And Spawn Field
+            var domain = worldFacades.ClientWorldFacades.Domain;
+            var fieldEntity = await domain.WorldSpawnDomain.SpawnWorldChooseScene();
+            fieldEntity.SetFieldId(1);
+            var fieldEntityRepo = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo;
+            fieldEntityRepo.Add(fieldEntity);
+            isSceneSpawn = true;
         }
 
     }

@@ -21,13 +21,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             Network = new AllWorldNetwork();
             Repo = new AllWorldRepo();
             Domain = new AllDomains();
-
             Assets = new AllWorldAssets();
+            Domain.Inject(this);
         }
 
         public void Inject(NetworkClient client)
         {
-            Domain.Inject(this);
             Network.Inject(client);
         }
 

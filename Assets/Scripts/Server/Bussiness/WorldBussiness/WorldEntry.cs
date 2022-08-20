@@ -25,6 +25,11 @@ namespace Game.Server.Bussiness.WorldBussiness
             worldController.Inject(worldFacades);
         }
 
+        public void Init()
+        {
+            worldFacades.ClientWorldFacades.Init();
+        }
+
         public void Tick()
         {
             worldController.Tick();

@@ -21,11 +21,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public WorldRoleEntity Get(byte wRid)
         {
+            Debug.Log($"Get ENTITY ID:{wRid}");
             return list.Find((entity) => entity.WRid == wRid);
+        }
+
+        public WorldRoleEntity[] GetAll()
+        {
+            return list.ToArray();
         }
 
         public void Add(WorldRoleEntity entity)
         {
+            Debug.Log($"ADD ENTITY ID:{entity.WRid}");
             list.Add(entity);
         }
 

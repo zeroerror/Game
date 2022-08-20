@@ -56,10 +56,11 @@ namespace Game.Server.Bussiness.LoginBussiness
             {
                 var ev = e1.Current;
                 loginEventList.Remove(ev);
-                if (ev.msg.name == null) return;
-                if (ev.msg.pwd == null) return;
-
                 var msg = ev.msg;
+
+                if (msg.name == null) return;
+                if (msg.pwd == null) return;
+
                 byte status = 0;
                 // MYSQL OPARATION
                 try
@@ -115,8 +116,11 @@ namespace Game.Server.Bussiness.LoginBussiness
                             break;
                         }
                     }
-                    Debug.Log($"MySQL插入game_account表 value('{ev.name}','{ev.pwd}')============================================");
-                    reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, $"insert into game_account value('{ev.name}','{ev.pwd}')");
+                    if (status == 1)
+                    {
+                        Debug.Log($"MySQL插入game_account表 value('{ev.name}','{ev.pwd}')============================================");
+                        reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, $"insert into game_account value('{ev.name}','{ev.pwd}')");
+                    }
                 }
                 catch (MySqlException exc)
                 {
