@@ -20,6 +20,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         Queue<FrameWRoleSpawnResMsg> spawnQueue;
         List<FrameWRoleSpawnResResendMsg> resendList_Spawn;
 
+        // 人物状态同步队列
+        Queue<WRoleStateUpdateMsg> stateQueue;
 
         public WorldController()
         {
@@ -31,6 +33,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             spawnQueue = new Queue<FrameWRoleSpawnResMsg>();
             resendList_Spawn = new List<FrameWRoleSpawnResResendMsg>();
+
+            stateQueue = new Queue<WRoleStateUpdateMsg>();
         }
 
         public void Inject(WorldFacades worldFacades)
@@ -41,6 +45,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             req.RegistRes_WorldRoleSpawn(OnWorldRoleSpawn);
             req.RegistResResend_WorldRoleSpawn(OnWorldRoleSpawnResend);
             req.RegistResResend_Opt(OnWorldRoleOptResend);
+            req.RegistUpdate_WRole(OnWRoleSync);
         }
 
         public void Tick()
@@ -51,11 +56,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         void Tick_ServerRes()
         {
-            if (optQueue.TryPeek(out var opt) && worldClientFrameIndex + 1 == opt.serverFrameIndex)
+            int nextFrameIndex = worldClientFrameIndex + 1;
+            if (optQueue.TryPeek(out var opt) && nextFrameIndex == opt.serverFrameIndex)
             {
                 optQueue.Dequeue();
-                worldClientFrameIndex++;
-                Debug.Log($"操作帧 FrameIndex:{worldClientFrameIndex}");
+                worldClientFrameIndex = nextFrameIndex;
+                Debug.Log($"操作帧 : {worldClientFrameIndex}");
 
                 var optTypeId = opt.optTypeId;
                 // 解析操作
@@ -67,21 +73,21 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     Vector3 dir = new Vector3((sbyte)(realMsg >> 16), (sbyte)(realMsg >> 8), (sbyte)realMsg);
                     var roleEntity = worldFacades.Repo.WorldRoleRepo.Get(rid);
 
-                    roleEntity.Move(dir);
+                    roleEntity.MoveComponent.Move(dir);
                 }
             }
 
-            if (spawnQueue.TryPeek(out var spawn) && worldClientFrameIndex + 1 == spawn.serverFrameIndex)
+            if (spawnQueue.TryPeek(out var spawn) && nextFrameIndex == spawn.serverFrameIndex)
             {
                 spawnQueue.Dequeue();
-                worldClientFrameIndex++;
-                Debug.Log($"生成帧 FrameIndex:{worldClientFrameIndex}");
+                worldClientFrameIndex = nextFrameIndex;
+                Debug.Log($"生成帧 : {worldClientFrameIndex}");
                 var wRoleId = spawn.wRoleId;
                 var repo = worldFacades.Repo;
                 var fieldEntity = repo.FiledEntityRepo.Get(1);
                 var domain = worldFacades.Domain.WorldRoleSpawnDomain;
                 var entity = domain.SpawnWorldRole(fieldEntity.transform);
-                entity.SetRid(wRoleId);
+                entity.SetWRid(wRoleId);
 
                 var roleRepo = repo.WorldRoleRepo;
                 roleRepo.Add(entity);
@@ -93,6 +99,23 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 }
 
                 Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{entity.WRid}" : $"生成其他角色 : WRid:{entity.WRid}");
+            }
+
+            if (stateQueue.TryPeek(out var stateMsg))
+            {
+                stateQueue.Dequeue();
+                worldClientFrameIndex = stateMsg.serverFrameIndex;
+                RoleState roleState = (RoleState)stateMsg.roleState;
+                float x = stateMsg.x / 10000f;
+                float y = stateMsg.y / 10000f;
+                float z = stateMsg.z / 10000f;
+                Vector3 pos = new Vector3(x, y, z);
+                var entity = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
+                if (entity != null)
+                {
+                    entity.transform.position = pos;
+                    Debug.Log($"人物状态同步帧 : {worldClientFrameIndex}    wRid:{stateMsg.wRid}  {roleState.ToString()} {pos}");
+                }
             }
 
         }
@@ -134,6 +157,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         }
 
         // == Server Response ==
+        // ROLE STATE SYNC
+        void OnWRoleSync(WRoleStateUpdateMsg msg)
+        {
+            stateQueue.Enqueue(msg);
+        }
+
         // OPT & SPAWN
         void OnWorldRoleOpt(FrameOptResMsg msg)
         {

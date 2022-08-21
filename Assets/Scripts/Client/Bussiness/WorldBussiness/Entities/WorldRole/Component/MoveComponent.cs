@@ -8,16 +8,17 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         Rigidbody rb;
         public float speed;
+        public Vector3 Velocity => rb.velocity;
         
         public MoveComponent(Rigidbody rb)
         {
             this.rb = rb;
-            speed = 0.2f;
+            speed = 1f;
         }
 
         public void Move(Vector3 velocity)
         {
-            rb.velocity += velocity;
+            rb.velocity += velocity*speed;
         }
 
     }

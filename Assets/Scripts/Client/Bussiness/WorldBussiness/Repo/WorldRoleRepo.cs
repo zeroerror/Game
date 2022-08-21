@@ -21,7 +21,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public WorldRoleEntity Get(byte wRid)
         {
-            Debug.Log($"Get ENTITY ID:{wRid}");
             return list.Find((entity) => entity.WRid == wRid);
         }
 
@@ -32,7 +31,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public void Add(WorldRoleEntity entity)
         {
-            Debug.Log($"ADD ENTITY ID:{entity.WRid}");
             list.Add(entity);
         }
 

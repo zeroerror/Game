@@ -23,6 +23,7 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(FrameWRoleSpawnReqMsg), 9);
             messageInfoDic.Add(typeof(FrameWRoleSpawnResMsg), 10);
             messageInfoDic.Add(typeof(FrameWRoleSpawnResResendMsg), 11);
+            messageInfoDic.Add(typeof(WRoleStateUpdateMsg), 12);
 
         }
 

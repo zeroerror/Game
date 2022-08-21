@@ -3,7 +3,7 @@ using UnityEngine;
 using Game.Infrastructure.Network.Server;
 using Game.Protocol.Client2World;
 using Game.Protocol.World;
-
+using Game.Client.Bussiness.WorldBussiness;
 
 namespace Game.Server.Bussiness.WorldBussiness.Network
 {
@@ -17,6 +17,25 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
+        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, byte wRid, RoleState roleStatus, Vector3 pos)
+        {
+            Debug.Log($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{wRid} RoleStatus:{roleStatus.ToString()} POS :{pos}");
+            int x = (int)(pos.x * 10000);
+            int y = (int)(pos.y * 10000);
+            int z = (int)(pos.z * 10000);
+
+            WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
+            {
+                serverFrameIndex = serverFrameIndex,
+                wRid = wRid,
+                roleState = (int)roleStatus,
+                x = x,
+                y = y,
+                z = z
+            };
+            _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);
+        }
+
         // == OPT ==
         public void RegistReq_WorldRoleMove(Action<int, FrameOptReqMsg> action)
         {
@@ -25,6 +44,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
 
         public void SendRes_WorldRoleMove(int connId, int frameIndex, FrameOptReqMsg msg)
         {
+            return;
             FrameOptResMsg frameOptResMsg = new FrameOptResMsg
             {
                 serverFrameIndex = frameIndex,
@@ -55,7 +75,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.AddRegister<FrameWRoleSpawnReqMsg>(action);
         }
 
-        public void SendRes_WorldRoleSpawn(int connId, int frameIndex, byte wRoleId,bool isOwner)
+        public void SendRes_WorldRoleSpawn(int connId, int frameIndex, byte wRoleId, bool isOwner)
         {
             FrameWRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameWRoleSpawnResMsg
             {

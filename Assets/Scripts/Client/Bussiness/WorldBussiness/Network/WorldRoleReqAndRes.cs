@@ -22,6 +22,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
+        public void RegistUpdate_WRole(Action<WRoleStateUpdateMsg> action)
+        {
+            _client.RegistMsg<WRoleStateUpdateMsg>(action);
+        }
+
         public void SendReq_WorldRoleMove(int frameIndex, byte rid, Vector3 dir)
         {
             int msg = rid << 24;
