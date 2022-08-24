@@ -17,7 +17,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
-        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, byte wRid, RoleState roleStatus, Vector3 pos)
+        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, byte wRid, RoleState roleStatus, Vector3 pos, bool isOwner = false)
         {
             Debug.Log($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{wRid} RoleStatus:{roleStatus.ToString()} POS :{pos}");
             int x = (int)(pos.x * 10000);
@@ -31,7 +31,8 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
                 roleState = (int)roleStatus,
                 x = x,
                 y = y,
-                z = z
+                z = z,
+                isOwner = isOwner
             };
             _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);
         }

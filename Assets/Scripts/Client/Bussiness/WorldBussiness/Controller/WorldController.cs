@@ -111,11 +111,29 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 float z = stateMsg.z / 10000f;
                 Vector3 pos = new Vector3(x, y, z);
                 var entity = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
-                if (entity != null)
+                if (entity == null)
                 {
-                    entity.transform.position = pos;
-                    Debug.Log($"人物状态同步帧 : {worldClientFrameIndex}    wRid:{stateMsg.wRid}  {roleState.ToString()} {pos}");
+                    Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
+
+                    var wRoleId = stateMsg.wRid;
+                    var repo = worldFacades.Repo;
+                    var fieldEntity = repo.FiledEntityRepo.Get(1);
+                    var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+                    entity = domain.SpawnWorldRole(fieldEntity.transform);
+                    entity.SetWRid(wRoleId);
+
+                    var roleRepo = repo.WorldRoleRepo;
+                    roleRepo.Add(entity);
+                    if (stateMsg.isOwner && roleRepo.Owner == null)
+                    {
+                        Debug.Log($"生成Owner  wRid:{entity.WRid})");
+                        roleRepo.SetOwner(entity);
+                        worldFacades.CinemachineExtra.FollowSolo(entity.transform, 3f);
+                        worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
+                    }
                 }
+                entity.transform.position = pos;
+                Debug.Log($"人物状态同步帧 : {worldClientFrameIndex}    wRid:{stateMsg.wRid}  {roleState.ToString()} {pos}");
             }
 
         }
@@ -153,6 +171,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 byte rid = worldFacades.Repo.WorldRoleRepo.Owner.WRid;
                 worldFacades.Network.WorldRoleReqAndRes.SendReq_WorldRoleMove(worldClientFrameIndex, rid, moveDir);
+
+                //预测操作
+                owner.MoveComponent.Move(moveDir);
             }
         }
 
@@ -162,6 +183,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             stateQueue.Enqueue(msg);
         }
+
+
+
+
+
+
 
         // OPT & SPAWN
         void OnWorldRoleOpt(FrameOptResMsg msg)

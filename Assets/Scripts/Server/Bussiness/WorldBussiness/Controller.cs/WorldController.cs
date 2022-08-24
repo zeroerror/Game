@@ -13,7 +13,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         WorldFacades worldFacades;
         int worldServeFrameIndex;
-        byte wRoleId;
+        byte wRid;
 
         // 记录当前所有ConnId
         List<int> connIdList;
@@ -74,6 +74,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         // 目前流程是会先生成唯一的控制角色，所以这里相当于入口，在这里判断是否是中途加入，是否需要补发数据包
         private void Tick_WRoleSpawn()
         {
+
             int nextFrameIndex = worldServeFrameIndex + 1;
             if (spawnDic.TryGetValue(nextFrameIndex, out var spawn))
             {
@@ -88,53 +89,53 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var fieldEntity = repo.FiledEntityRepo.Get(1);
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
                 var roleRepo = repo.WorldRoleRepo;
+                wRid++;
+
+                // 服务器逻辑
+                var roleEntity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
+                roleEntity.SetWRid(wRid);
+                Debug.Log($"服务器逻辑[Spawn] frame:{worldServeFrameIndex} wRid:{wRid}");
 
                 if (clientFrameIndex + 1 < worldServeFrameIndex)
                 {
 
                     // ====== 补发数据包
-                    Debug.Log($"中途加入，补发数据包：connId:{connId} clientFrameIndex:{clientFrameIndex} 到 worldServeFrameIndex:{worldServeFrameIndex}");
+                    // Debug.Log("所有人物操作包数据========================================");
+                    // for (int frameIndex = clientFrameIndex + 1; frameIndex < worldServeFrameIndex; frameIndex++)
+                    // {
+                    //     if (!optDic.TryGetValue(frameIndex, out var optMsgStruct)) continue;
 
-                    Debug.Log("所有人物生成包数据========================================");
+                    //     rqs.ResendRes_WorldRoleMove(connId, frameIndex, optMsgStruct.msg);
+                    // }
+
+                    // ====== 发送其他角色的状态同步帧给请求者
                     var allEntity = roleRepo.GetAll();
-                    int index = 0;
-                    for (int frameIndex = clientFrameIndex + 1; frameIndex < worldServeFrameIndex; frameIndex++)
+                    for (int i = 0; i < allEntity.Length; i++)
                     {
-                        if (!spawnDic.TryGetValue(frameIndex, out var spawnMsgStruct)) continue;
-
-                        rqs.ResendRes_WorldRoleSpawn(connId, frameIndex, allEntity[index++].WRid, false);
-                    }
-                    // 加上当前帧
-                    rqs.ResendRes_WorldRoleSpawn(connId, worldServeFrameIndex, ++wRoleId, true);
-
-                    Debug.Log("所有人物操作包数据========================================");
-                    for (int frameIndex = clientFrameIndex + 1; frameIndex < worldServeFrameIndex; frameIndex++)
-                    {
-                        if (!optDic.TryGetValue(frameIndex, out var optMsgStruct)) continue;
-
-                        rqs.ResendRes_WorldRoleMove(connId, frameIndex, optMsgStruct.msg);
+                        var otherRole = allEntity[i];
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, otherRole.WRid, otherRole.RoleStatus, otherRole.transform.position);
                     }
 
-                    // ====== 广播给其他人
+                    // ====== 广播请求者创建的角色给其他人
                     connIdList.ForEach((otherConnId) =>
                     {
                         if (otherConnId != connId)
                         {
-                            rqs.SendRes_WorldRoleSpawn(otherConnId, worldServeFrameIndex, wRoleId, false);
+                            rqs.SendUpdate_WRoleState(otherConnId, nextFrameIndex, wRid, roleEntity.RoleStatus, roleEntity.transform.position);
                         }
                     });
+
+                    // ====== 回复请求者创建的角色
+                    rqs.SendUpdate_WRoleState(connId, nextFrameIndex, wRid, roleEntity.RoleStatus, roleEntity.transform.position, true);
+
                 }
                 else
                 {
-                    Debug.Log($"服务端回复消息[生成帧] {worldServeFrameIndex}--------------------------------------------------------------------------");
-                    rqs.SendRes_WorldRoleSpawn(connId, worldServeFrameIndex, ++wRoleId, true);
+                    Debug.Log($"服务端回复消息[生成帧] {nextFrameIndex}--------------------------------------------------------------------------");
+                    rqs.SendRes_WorldRoleSpawn(connId, nextFrameIndex, wRid, true);
                 }
 
-                // 服务器逻辑
-                var entity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
-                entity.SetWRid(wRoleId);
-                roleRepo.Add(entity);
-                Debug.Log($"服务器逻辑[Spawn] frame:{worldServeFrameIndex}");
+                roleRepo.Add(roleEntity);
             }
         }
 
@@ -157,39 +158,25 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var optTypeId = opt.msg.optTypeId;
                 if (optTypeId == 1)
                 {
-                    roleEntity.MoveComponent.Move(dir); //服务器逻辑移动
+                    //服务器逻辑移动
+                    roleEntity.MoveComponent.Move(dir);
 
-                    // 根据状态是否改变判断是否回复给客户端
+                    // 刷新人物状态
                     bool isMove = roleEntity.MoveComponent.Velocity != Vector3.zero;
-                    bool isMoveStatus = roleEntity.RoleStatus != RoleState.Stand;
-                    if ((isMove && !isMoveStatus) || (!isMove && isMoveStatus))
+                    bool isMoveStatus = roleEntity.RoleStatus != RoleState.Idle;
+                    if (roleEntity.IsStateChange(out RoleState newRoleState))
                     {
-                        // 刷新人物状态
-                        var roleNewStatus = isMove ? RoleState.Move : RoleState.Stand;
-                        roleEntity.SetRoleStatus(roleNewStatus);
-
-                        //发送状态同步帧
-                        var rqs = worldFacades.Network.WorldRoleReqAndRes;
-                        //状态帧同步就不需要发送确认操作帧了
-                        // Debug.Log($"服务端广播回复消息[操作帧]--------------------------------------------------------------------------");
-                        // connIdList.ForEach((connId) =>
-                        // {
-                        //     rqs.SendRes_WorldRoleMove(connId, worldServeFrameIndex, msg);
-                        //     Debug.Log($"SendFrame: {worldServeFrameIndex} [connId:{connId}] 确认人物移动  rid:{rid}  dir:{dir}");
-                        // });
-
-                        connIdList.ForEach((connId) =>
-                      {
-                          rqs.SendUpdate_WRoleState(connId, nextFrameIndex, rid, RoleState.Move, roleEntity.transform.position);
-                      });
+                        roleEntity.SetRoleStatus(newRoleState);
                     }
 
+                    //发送状态同步帧
+                    var rqs = worldFacades.Network.WorldRoleReqAndRes;
+                    connIdList.ForEach((connId) =>
+                    {
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, rid, RoleState.Move, roleEntity.transform.position);
+                    });
+
                 }
-
-
-
-                // 服务器逻辑
-
 
             }
         }
@@ -202,12 +189,9 @@ namespace Game.Server.Bussiness.WorldBussiness
             var WorldRoleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
             WorldRoleRepo.Foreach((roleEntity) =>
             {
-                bool isMove = roleEntity.MoveComponent.Velocity != Vector3.zero;
-                bool isMoveStatus = roleEntity.RoleStatus != RoleState.Stand;
-                if ((isMove && !isMoveStatus) || (!isMove && isMoveStatus))
+                if (roleEntity.IsStateChange(out RoleState roleNewStatus))
                 {
                     isNextFrame = true;
-                    var roleNewStatus = isMove ? RoleState.Move : RoleState.Stand;
                     roleEntity.SetRoleStatus(roleNewStatus);
 
                     var rqs = worldFacades.Network.WorldRoleReqAndRes;
@@ -220,9 +204,11 @@ namespace Game.Server.Bussiness.WorldBussiness
             if (isNextFrame) worldServeFrameIndex = nextFrameIndex;
         }
 
+        // Network
         void OnWoldRoleMove(int connId, FrameOptReqMsg msg)
         {
             optDic.TryAdd(worldServeFrameIndex + 1, new FrameReqOptMsgStruct { connId = connId, msg = msg });
+
         }
 
         void OnWoldRoleSpawn(int connId, FrameWRoleSpawnReqMsg msg)

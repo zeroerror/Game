@@ -5,7 +5,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
     public enum RoleState
     {
-        Stand,
+        Idle,
         Move
     }
 
@@ -25,10 +25,32 @@ namespace Game.Client.Bussiness.WorldBussiness
         public RoleState RoleStatus { get; private set; }
         public void SetRoleStatus(RoleState roleStatus) => this.RoleStatus = roleStatus;
 
+        public bool IsStateChange(out RoleState roleNewStatus)
+        {
+            roleNewStatus = RoleState.Idle;
+            // Movement
+            bool isMove = MoveComponent.Velocity != Vector3.zero;
+            bool isMoveStatus = RoleStatus != RoleState.Idle;
+            if ((isMove && !isMoveStatus) || (!isMove && isMoveStatus))
+            {
+                roleNewStatus = isMove ? RoleState.Move : RoleState.Idle;
+                return true;
+            }
+            // TODO:Hit
+            // TODO:JUMP
+
+            return false;
+        }
+
+        public void UpdateState()
+        {
+
+        }
+
         public void Awake()
         {
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>());
-            RoleStatus = RoleState.Stand;
+            RoleStatus = RoleState.Idle;
         }
 
         public void Move(Vector3 v)

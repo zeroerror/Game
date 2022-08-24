@@ -68,7 +68,7 @@ namespace Game.Client
             action.Invoke();
         }
 
-        void Update()
+        void FixedUpdate()
         {
             // == Entry ==
             LoginEntry.Tick();
