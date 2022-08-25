@@ -27,8 +27,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public WorldRoleEntity SpawnWorldRole(Transform parent)
         {
-            Debug.Log("生成Player");
-            if (worldFacades.Assets.WorldRoleAssets.TryGetByName("player", out GameObject prefabAsset))
+            string rolePrefabName = "Player";
+            Debug.Log("生成" + rolePrefabName);
+            if (worldFacades.Assets.WorldRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var entity = prefabAsset.GetComponent<WorldRoleEntity>();

@@ -95,7 +95,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 {
                     roleRepo.SetOwner(entity);
                     worldFacades.CinemachineExtra.FollowSolo(entity.transform, 3f);
-                    worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
+                    // worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
                 }
 
                 Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{entity.WRid}" : $"生成其他角色 : WRid:{entity.WRid}");
