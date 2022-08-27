@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
-using UnityEngine.SceneManagement;
 using Game.Client.Bussiness.WorldBussiness;
 
 namespace Game.Server.Bussiness.WorldBussiness
@@ -64,15 +63,15 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
             if (!isSceneSpawn) return;
 
+            Tick_WRoleSpawn();
             // 每一帧判断人物状态是否改变，是否需要发送客户端更新人物状态信息
             Tick_RoleStateSync();
             // 对客户端发送来的生成帧和操作帧进行处理
-            Tick_WRoleSpawn();
             Tick_Opt();
         }
 
         // 目前流程是会先生成唯一的控制角色，所以这里相当于入口，在这里判断是否是中途加入，是否需要补发数据包
-        private void Tick_WRoleSpawn()
+        void Tick_WRoleSpawn()
         {
 
             int nextFrameIndex = worldServeFrameIndex + 1;
@@ -94,7 +93,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 // 服务器逻辑
                 var roleEntity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
                 roleEntity.SetWRid(wRid);
-                Debug.Log($"服务器逻辑[Spawn] frame:{worldServeFrameIndex} wRid:{wRid}");
+                Debug.Log($"服务器逻辑[Spawn] frame:{worldServeFrameIndex} wRid:{wRid}  roleEntity.MoveComponent.CurPos:{roleEntity.MoveComponent.CurPos}");
 
                 if (clientFrameIndex + 1 < worldServeFrameIndex)
                 {
@@ -113,7 +112,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     for (int i = 0; i < allEntity.Length; i++)
                     {
                         var otherRole = allEntity[i];
-                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, otherRole.WRid, otherRole.RoleStatus, otherRole.transform.position);
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, otherRole.WRid, otherRole.RoleStatus, otherRole.transform.position, otherRole.transform.rotation, otherRole.MoveComponent.Velocity);
                     }
 
                     // ====== 广播请求者创建的角色给其他人
@@ -121,12 +120,12 @@ namespace Game.Server.Bussiness.WorldBussiness
                     {
                         if (otherConnId != connId)
                         {
-                            rqs.SendUpdate_WRoleState(otherConnId, nextFrameIndex, wRid, roleEntity.RoleStatus, roleEntity.transform.position);
+                            rqs.SendUpdate_WRoleState(otherConnId, nextFrameIndex, wRid, roleEntity.RoleStatus, roleEntity.transform.position, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity);
                         }
                     });
 
                     // ====== 回复请求者创建的角色
-                    rqs.SendUpdate_WRoleState(connId, nextFrameIndex, wRid, roleEntity.RoleStatus, roleEntity.transform.position, true);
+                    rqs.SendUpdate_WRoleState(connId, nextFrameIndex, wRid, roleEntity.RoleStatus, roleEntity.transform.position, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity, true);
 
                 }
                 else
@@ -151,31 +150,40 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var connId = opt.connId;
 
                 var rid = (byte)(realMsg >> 24);
-                Vector3 dir = new Vector3((sbyte)(realMsg >> 16), (sbyte)(realMsg >> 8), (sbyte)realMsg);
-
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
                 var roleEntity = roleRepo.Get(rid);
                 var optTypeId = opt.msg.optTypeId;
+                var rqs = worldFacades.Network.WorldRoleReqAndRes;
+
                 if (optTypeId == 1)
                 {
-                    //服务器逻辑移动
+                    Vector3 dir = new Vector3((sbyte)(realMsg >> 16), (sbyte)(realMsg >> 8), (sbyte)realMsg);
+                    //服务器逻辑Move
                     roleEntity.MoveComponent.Move(dir);
+                    roleEntity.MoveComponent.FaceTo(dir);
 
                     // 刷新人物状态
-                    bool isMove = roleEntity.MoveComponent.Velocity != Vector3.zero;
-                    bool isMoveStatus = roleEntity.RoleStatus != RoleState.Idle;
-                    if (roleEntity.IsStateChange(out RoleState newRoleState))
-                    {
-                        roleEntity.SetRoleStatus(newRoleState);
-                    }
+                    UpdateWRoleStatus(roleEntity);
 
                     //发送状态同步帧
-                    var rqs = worldFacades.Network.WorldRoleReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, rid, RoleState.Move, roleEntity.transform.position);
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, rid, RoleState.Move, roleEntity.transform.position, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity);
                     });
+                }
+                else if (optTypeId == 2)
+                {
+                    //服务器逻辑Jump
+                    roleEntity.MoveComponent.Jump();
 
+                    // 刷新人物状态
+                    UpdateWRoleStatus(roleEntity);
+
+                    //发送状态同步帧
+                    connIdList.ForEach((connId) =>
+                    {
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, rid, RoleState.Jump, roleEntity.transform.position, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity);
+                    });
                 }
 
             }
@@ -194,15 +202,35 @@ namespace Game.Server.Bussiness.WorldBussiness
                     isNextFrame = true;
                     roleEntity.SetRoleStatus(roleNewStatus);
 
+
+                    if (roleNewStatus == RoleState.Idle)
+                    {
+                        // 从运动到静止：因为运动的这个过程没有实时记录角色的状态位置信息LastSyncFramePos,所有这种情况下需要手动刷新下
+                        roleEntity.MoveComponent.UpdateLastSyncFramePos();
+                    }
                     var rqs = worldFacades.Network.WorldRoleReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity.WRid, roleNewStatus, roleEntity.transform.position);
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity.WRid, roleNewStatus, roleEntity.MoveComponent.LastSyncFramePos, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity);
+                        roleEntity.MoveComponent.UpdateLastSyncFramePos();
                     });
                 }
             });
-            if (isNextFrame) worldServeFrameIndex = nextFrameIndex;
+
+            if (isNextFrame)
+            {
+                worldServeFrameIndex = nextFrameIndex;
+            }
         }
+
+        void UpdateWRoleStatus(WorldRoleEntity roleEntity)
+        {
+            if (roleEntity.IsStateChange(out RoleState newRoleState))
+            {
+                roleEntity.SetRoleStatus(newRoleState);
+            }
+        }
+
 
         // Network
         void OnWoldRoleMove(int connId, FrameOptReqMsg msg)

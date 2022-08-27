@@ -6,7 +6,8 @@ namespace Game.Client.Bussiness.WorldBussiness
     public enum RoleState
     {
         Idle,
-        Move
+        Move,
+        Jump
     }
 
     public class WorldRoleEntity : MonoBehaviour
@@ -22,8 +23,17 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public MoveComponent MoveComponent { get; private set; }
 
+        public AnimatorComponent AnimatorComponent { get; private set; }
+
         public RoleState RoleStatus { get; private set; }
         public void SetRoleStatus(RoleState roleStatus) => this.RoleStatus = roleStatus;
+
+        public void Awake()
+        {
+            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>());
+            AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
+            RoleStatus = RoleState.Idle;
+        }
 
         public bool IsStateChange(out RoleState roleNewStatus)
         {
@@ -42,21 +52,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             return false;
         }
 
-        public void UpdateState()
+        public void FaceTo(Vector3 v)
         {
-
-        }
-
-        public void Awake()
-        {
-            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>());
-            RoleStatus = RoleState.Idle;
-        }
-
-        public void Move(Vector3 v)
-        {
-            var offset = v * MoveComponent.speed;
-            transform.position += offset;
+            transform.forward = v;
         }
 
     }

@@ -27,7 +27,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.RegistMsg<WRoleStateUpdateMsg>(action);
         }
 
-        public void SendReq_WorldRoleMove(int frameIndex, byte rid, Vector3 dir)
+        public void SendReq_WRoleMove(int frameIndex, byte rid, Vector3 dir)
         {
             int msg = rid << 24;
             msg |= (byte)dir.x << 16;
@@ -43,6 +43,19 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.SendMsg<FrameOptReqMsg>(frameOptReqMsg);
         }
 
+        public void SendReq_WRoleJump(int frameIndex, byte rid)
+        {
+            int msg = rid << 24;
+            FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
+            {
+                clientFrameIndex = frameIndex,
+                optTypeId = 2,
+                msg = msg
+            };
+            _client.SendMsg<FrameOptReqMsg>(frameOptReqMsg);
+        }
+
+        [Obsolete]
         public void RegistRes_WorldRoleOpt(Action<FrameOptResMsg> action)
         {
             _client.RegistMsg<FrameOptResMsg>(action);

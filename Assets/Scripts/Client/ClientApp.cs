@@ -24,7 +24,7 @@ namespace Game.Client
 
         void Awake()
         {
-            DontDestroyOnLoad(this.gameObject);          
+            DontDestroyOnLoad(this.gameObject);
 
             // == Network ==
             AllClientNetwork.Ctor();
@@ -68,7 +68,7 @@ namespace Game.Client
             action.Invoke();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             // == Entry ==
             LoginEntry.Tick();
