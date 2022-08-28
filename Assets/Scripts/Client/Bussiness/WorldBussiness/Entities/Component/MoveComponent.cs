@@ -11,6 +11,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         float jumpVelocity;
 
         Rigidbody rb;
+
         public Vector3 Velocity => rb.velocity;
         public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
 
@@ -41,16 +42,21 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Jump()
         {
+            Debug.Log("Jump");
             var newVelocity = rb.velocity;
             newVelocity.y += jumpVelocity;    // Add Axis Y's Velocity
             rb.velocity = newVelocity;
             lastSyncFramePos = FixPosDecimal(rb.position);
-            Debug.Log($"JumpJumpJump======> {rb.velocity}");
         }
 
         public void FaceTo(Vector3 forward)
         {
             rb.rotation = Quaternion.LookRotation(forward);
+        }
+
+        public void AddForce(Vector3 force)
+        {
+            rb.AddForce(force, ForceMode.Impulse);
         }
 
         public void SetRotaionEulerAngle(Vector3 eulerAngle)

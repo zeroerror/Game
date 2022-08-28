@@ -40,25 +40,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
                 optTypeId = 1,
                 msg = msg
             };
-            _client.SendMsg<FrameOptReqMsg>(frameOptReqMsg);
+            _client.SendMsg(frameOptReqMsg);
         }
 
-        public void SendReq_WRoleJump(int frameIndex, byte rid)
+        public void SendReq_WRoleJump(int frameIndex, byte wRid)
         {
-            int msg = rid << 24;
-            FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
+            FrameJumpReqMsg frameJumpReqMsg = new FrameJumpReqMsg
             {
                 clientFrameIndex = frameIndex,
-                optTypeId = 2,
-                msg = msg
+                wRid = wRid
             };
-            _client.SendMsg<FrameOptReqMsg>(frameOptReqMsg);
-        }
 
-        [Obsolete]
-        public void RegistRes_WorldRoleOpt(Action<FrameOptResMsg> action)
-        {
-            _client.RegistMsg<FrameOptResMsg>(action);
+            _client.SendMsg(frameJumpReqMsg);
         }
 
         public void SendReq_WolrdRoleSpawn(int frameIndex)
@@ -75,14 +68,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.RegistMsg<FrameWRoleSpawnResMsg>(action);
         }
 
-        public void RegistResResend_WorldRoleSpawn(Action<FrameWRoleSpawnResResendMsg> action)
+        public void RegistRes_BulletSpawn(Action<FrameBulletSpawnResMsg> action)
         {
-            _client.RegistMsg<FrameWRoleSpawnResResendMsg>(action);
-        }
-
-        public void RegistResResend_Opt(Action<FrameOptResResendMsg> action)
-        {
-            _client.RegistMsg<FrameOptResResendMsg>(action);
+            _client.RegistMsg<FrameBulletSpawnResMsg>(action);
         }
 
     }

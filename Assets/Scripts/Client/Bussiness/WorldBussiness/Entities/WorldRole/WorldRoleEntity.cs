@@ -17,9 +17,8 @@ namespace Game.Client.Bussiness.WorldBussiness
         public byte WRid => wRid;
         public void SetWRid(byte wRid) => this.wRid = wRid;
 
-        [SerializeField]
-        Transform camTrackingObj;
-        public Transform CamTrackingObj => camTrackingObj;
+        Vector3 offset;
+        public Vector3 ShootPointPos => MoveComponent.CurPos + transform.forward + offset;
 
         public MoveComponent MoveComponent { get; private set; }
 
@@ -28,11 +27,16 @@ namespace Game.Client.Bussiness.WorldBussiness
         public RoleState RoleStatus { get; private set; }
         public void SetRoleStatus(RoleState roleStatus) => this.RoleStatus = roleStatus;
 
+        [SerializeField]
+        Transform camTrackingObj;
+        public Transform CamTrackingObj => camTrackingObj;
+
         public void Awake()
         {
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>());
             AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
             RoleStatus = RoleState.Idle;
+            offset = new Vector3(0, 1.5f, 0);
         }
 
         public bool IsStateChange(out RoleState roleNewStatus)

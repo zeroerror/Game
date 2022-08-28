@@ -8,19 +8,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
     {
 
         // Network
-        public WorldReqAndRes WorldReqAndRes { get; private set; }
         public WorldRoleReqAndRes WorldRoleReqAndRes { get; private set; }
-
+        public BulletReqAndRes BulletReqAndRes { get; private set; }
         public AllWorldNetwork()
         {
-            WorldReqAndRes = new WorldReqAndRes();
             WorldRoleReqAndRes = new WorldRoleReqAndRes();
+            BulletReqAndRes = new BulletReqAndRes();
         }
 
         public void Inject(NetworkClient client)
         {
-            WorldReqAndRes.Inject(client);
             WorldRoleReqAndRes.Inject(client);
+            BulletReqAndRes.Inject(client);
         }
 
     }

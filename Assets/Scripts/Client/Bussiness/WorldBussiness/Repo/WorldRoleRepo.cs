@@ -9,10 +9,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
     {
 
         List<WorldRoleEntity> list;
+        public byte Size => (byte)list.Count;
 
         WorldRoleEntity owner;
         public WorldRoleEntity Owner => owner;
         public void SetOwner(WorldRoleEntity worldRoleEntity) => this.owner = worldRoleEntity;
+
 
         public WorldRoleRepo()
         {

@@ -17,12 +17,12 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(LoginResMessage), 3);
             messageInfoDic.Add(typeof(RegisterAccountReqMessage), 4);
             messageInfoDic.Add(typeof(RegisterAccountResMessage), 5);
-            messageInfoDic.Add(typeof(FrameOptReqMsg), 6);
-            messageInfoDic.Add(typeof(FrameOptResMsg), 7);
-            messageInfoDic.Add(typeof(FrameOptResResendMsg), 8);
-            messageInfoDic.Add(typeof(FrameWRoleSpawnReqMsg), 9);
-            messageInfoDic.Add(typeof(FrameWRoleSpawnResMsg), 10);
-            messageInfoDic.Add(typeof(FrameWRoleSpawnResResendMsg), 11);
+            messageInfoDic.Add(typeof(FrameBulletSpawnReqMsg), 6);
+            messageInfoDic.Add(typeof(FrameBulletSpawnResMsg), 7);
+            messageInfoDic.Add(typeof(FrameJumpReqMsg), 8);
+            messageInfoDic.Add(typeof(FrameOptReqMsg), 9);
+            messageInfoDic.Add(typeof(FrameWRoleSpawnReqMsg), 10);
+            messageInfoDic.Add(typeof(FrameWRoleSpawnResMsg), 11);
             messageInfoDic.Add(typeof(WRoleStateUpdateMsg), 12);
 
         }

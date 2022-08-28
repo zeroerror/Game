@@ -7,15 +7,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
     {
 
         public WorldRoleAssets WorldRoleAssets { get; private set; }
+        public BulletAsset BulletAsset { get; private set; }
 
         public AllWorldAssets()
         {
             WorldRoleAssets = new WorldRoleAssets();
+            BulletAsset = new BulletAsset();
         }
 
         public void LoadAll()
         {
             WorldRoleAssets.LoadAssets();
+            BulletAsset.LoadAssets();
         }
 
     }
