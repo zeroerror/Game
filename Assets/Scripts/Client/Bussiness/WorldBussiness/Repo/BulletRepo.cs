@@ -8,40 +8,43 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
     public class BulletEntityRepo
     {
 
-        List<BulletEntity> list;
-        public ushort Size=>(ushort)list.Count;
+        List<BulletEntity> bulletList;
+        public ushort BulletCount => (ushort)bulletList.Count;
 
         public BulletEntityRepo()
         {
-            list = new List<BulletEntity>();
+            bulletList = new List<BulletEntity>();
         }
 
-        public BulletEntity Get(byte wRid)
+        public BulletEntity GetByBulletId(ushort bulletId)
         {
-            return list.Find((entity) => entity.WRid == wRid);
+            return bulletList.Find((entity) => entity.BulletId == bulletId);
+        }
+
+        public BulletEntity GetByWRid(ushort wRid)
+        {
+            return bulletList.Find((entity) => entity.WRid == wRid);
         }
 
         public BulletEntity[] GetAll()
         {
-            return list.ToArray();
+            return bulletList.ToArray();
         }
 
         public void Add(BulletEntity entity)
         {
-            list.Add(entity);
+            bulletList.Add(entity);
         }
 
-
-        public void Remove(BulletEntity entity)
+        public bool TryRemove(BulletEntity entity)
         {
-            list.Remove(entity);
+            return bulletList.Remove(entity);
         }
 
         public void Foreach(Action<BulletEntity> action)
         {
             if (action == null) return;
-
-            list.ForEach((bullet) =>
+            bulletList.ForEach((bullet) =>
             {
                 action.Invoke(bullet);
             });

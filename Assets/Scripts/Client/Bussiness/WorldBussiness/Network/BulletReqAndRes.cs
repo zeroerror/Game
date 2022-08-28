@@ -21,13 +21,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
-        public void SendReq_BulletSpawn(int frameIndex, byte wRid, Vector3 targetPos)
+        public void SendReq_BulletSpawn(int frameIndex, BulletType bulletType, byte wRid, Vector3 targetPos)
         {
             targetPos *= 10000f;
 
             FrameBulletSpawnReqMsg msg = new FrameBulletSpawnReqMsg
             {
                 clientFrameIndex = frameIndex,
+                bulletType = (byte)bulletType,
                 wRid = wRid,
                 targetPosX = (int)(targetPos.x),
                 targetPosY = (int)(targetPos.y),

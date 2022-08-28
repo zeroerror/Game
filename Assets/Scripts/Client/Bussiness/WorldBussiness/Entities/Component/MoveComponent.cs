@@ -1,4 +1,5 @@
 using UnityEngine;
+using Game.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness
 {
@@ -8,7 +9,9 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         // TODO: INJECT
         float speed;
+        public void SetSpeed(float speed) => this.speed = speed;
         float jumpVelocity;
+        public void SetJumpVelocity(float jumpVelocity) => this.jumpVelocity = jumpVelocity;
 
         Rigidbody rb;
 
@@ -20,33 +23,43 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         Vector3 lastSyncFramePos;
         public Vector3 LastSyncFramePos => lastSyncFramePos;
-        public void UpdateLastSyncFramePos() => lastSyncFramePos = FixPosDecimal(rb.position);
+        public void UpdateLastSyncFramePos() => lastSyncFramePos = rb.position.FixDecimal(4);
 
         public Vector3 EulerAngel => rb.rotation.eulerAngles;
 
-        public MoveComponent(Rigidbody rb)
+        public MoveComponent(Rigidbody rb, float speed, float jumpVelocity)
         {
             this.rb = rb;
-            speed = 5f;
-            jumpVelocity = 5f;
-            lastSyncFramePos = FixPosDecimal(rb.position);
+            this.speed = speed;
+            this.jumpVelocity = jumpVelocity;
+            lastSyncFramePos = rb.position.FixDecimal(4);
         }
 
         public void Move(Vector3 velocity)
         {
+            velocity = velocity.FixDecimal(2);
+            Debug.Log($" Move: {velocity}");
             var addVelocity = velocity * speed;
             addVelocity.y = Velocity.y;
             rb.velocity = addVelocity;
-            lastSyncFramePos = FixPosDecimal(rb.position);
+            lastSyncFramePos = rb.position.FixDecimal(4);
+        }
+
+        public void AddVelocity(Vector3 addVelocity)
+        {
+            addVelocity = addVelocity.FixDecimal(2);
+            Debug.Log($" AddVelocity: {addVelocity}");
+            rb.velocity += addVelocity;
+            lastSyncFramePos = rb.position.FixDecimal(4);
         }
 
         public void Jump()
         {
             Debug.Log("Jump");
             var newVelocity = rb.velocity;
-            newVelocity.y += jumpVelocity;    // Add Axis Y's Velocity
+            newVelocity.y = jumpVelocity;    // Add Axis Y's Velocity
             rb.velocity = newVelocity;
-            lastSyncFramePos = FixPosDecimal(rb.position);
+            lastSyncFramePos = rb.position.FixDecimal(4);
         }
 
         public void FaceTo(Vector3 forward)
@@ -54,9 +67,11 @@ namespace Game.Client.Bussiness.WorldBussiness
             rb.rotation = Quaternion.LookRotation(forward);
         }
 
-        public void AddForce(Vector3 force)
+        public void HitByBullet(BulletEntity bulletEntity)
         {
-            rb.AddForce(force, ForceMode.Impulse);
+            var velocity = bulletEntity.MoveComponent.Velocity / 10f;
+            Debug.Log($"HitByBullet velocity add:  {velocity}");
+            rb.velocity += (velocity);
         }
 
         public void SetRotaionEulerAngle(Vector3 eulerAngle)
@@ -64,16 +79,11 @@ namespace Game.Client.Bussiness.WorldBussiness
             rb.rotation = Quaternion.Euler(eulerAngle);
         }
 
-        Vector3 FixPosDecimal(Vector3 pos)
+        public void Reset()
         {
-            pos *= 10000;
-            int posX = (int)pos.x;
-            int posY = (int)pos.y;
-            int posZ = (int)pos.z;
-            pos.x = posX / 10000f;
-            pos.y = posY / 10000f;
-            pos.z = posZ / 10000f;
-            return pos;
+            rb.position = new Vector3(0, 10f, 0);
+            rb.velocity = Vector3.zero;
+            rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
         }
 
     }

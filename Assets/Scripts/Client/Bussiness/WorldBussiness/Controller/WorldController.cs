@@ -12,11 +12,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
     public class WorldController
     {
         WorldFacades worldFacades;
-        int worldClientFrameIndex;
+        int worldClientFrame;
 
         // 生成队列
         Queue<FrameWRoleSpawnResMsg> roleSpawnQueue;
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
+        // 物理事件队列
+        Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
 
         // 人物状态同步队列
         Queue<WRoleStateUpdateMsg> stateQueue;
@@ -29,6 +31,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             roleSpawnQueue = new Queue<FrameWRoleSpawnResMsg>();
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
             stateQueue = new Queue<WRoleStateUpdateMsg>();
+            bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
         }
 
         public void Inject(WorldFacades worldFacades)
@@ -37,6 +40,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var req = worldFacades.Network.WorldRoleReqAndRes;
             req.RegistRes_WorldRoleSpawn(OnWorldRoleSpawn);
             req.RegistRes_BulletSpawn(OnBulletSpawn);
+            req.RegistRes_BulletHitRole(OnBulletHitRole);
             req.RegistUpdate_WRole(OnWRoleSync);
         }
 
@@ -48,14 +52,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         void Tick_ServerResQueues()
         {
-            int nextFrameIndex = worldClientFrameIndex + 1;
-            
-            if (roleSpawnQueue.TryPeek(out var spawn) && nextFrameIndex == spawn.serverFrameIndex)
+            int nextFrame = worldClientFrame + 1;
+
+            if (roleSpawnQueue.TryPeek(out var spawn) && nextFrame == spawn.serverFrame)
             {
                 roleSpawnQueue.Dequeue();
-                worldClientFrameIndex = nextFrameIndex;
+                worldClientFrame = nextFrame;
 
-                Debug.Log($"生成人物帧 : {worldClientFrameIndex}");
+                Debug.Log($"生成人物帧 : {worldClientFrame}");
                 var wRoleId = spawn.wRoleId;
                 var repo = worldFacades.Repo;
                 var fieldEntity = repo.FiledEntityRepo.Get(1);
@@ -75,20 +79,20 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{entity.WRid}" : $"生成其他角色 : WRid:{entity.WRid}");
             }
 
-            if (bulletSpawnQueue.TryPeek(out var bulletSpawn) && nextFrameIndex == bulletSpawn.serverFrameIndex)
+            if (bulletSpawnQueue.TryPeek(out var bulletSpawn) && nextFrame == bulletSpawn.serverFrame)
             {
                 bulletSpawnQueue.Dequeue();
-                worldClientFrameIndex = nextFrameIndex;
+                worldClientFrame = nextFrame;
 
                 var bulletId = bulletSpawn.bulletId;
+                var bulletType = bulletSpawn.bulletType;
                 var masterWRid = bulletSpawn.wRid;
                 var masterWRole = worldFacades.Repo.WorldRoleRepo.Get(masterWRid);
                 var shootStartPoint = masterWRole.ShootPointPos;
                 Vector3 shootDir = new Vector3(bulletSpawn.shootDirX / 100f, bulletSpawn.shootDirY / 100f, bulletSpawn.shootDirZ / 100f);
-
-                Debug.Log($"生成子弹帧 {worldClientFrameIndex}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
+                Debug.Log($"生成子弹帧 {worldClientFrame}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
                 var fieldEntity = worldFacades.Repo.FiledEntityRepo.Get(1);
-                var bulletEntity = worldFacades.Domain.BulletSpawnDomain.SpawnBullet(fieldEntity.transform);
+                var bulletEntity = worldFacades.Domain.BulletSpawnDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.Move(shootDir);
                 bulletEntity.SetWRid(masterWRid);
@@ -101,7 +105,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 stateQueue.Dequeue();
 
-                worldClientFrameIndex = stateMsg.serverFrameIndex;
+                worldClientFrame = stateMsg.serverFrameIndex;
 
                 RoleState roleState = (RoleState)stateMsg.roleState;
                 float x = stateMsg.x / 10000f;
@@ -140,8 +144,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
                     }
                 }
-
-                Debug.Log($"人物状态同步帧 : {worldClientFrameIndex}    wRid:{stateMsg.wRid}  人物状态：{roleState.ToString()}  位置: {pos} 旋转角:{eulerAngle}");
+                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid}  人物状态：{roleState.ToString()}  位置: {pos} 旋转角:{eulerAngle} ";
+                Debug.Log($"<color=#ff0000>{log}</color>");
 
                 if (entity.RoleStatus != roleState)
                 {
@@ -182,17 +186,39 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             }
 
+            if (bulletHitRoleQueue.TryPeek(out var bulletHitRole) && nextFrame == bulletHitRole.serverFrame)
+            {
+                bulletHitRoleQueue.Dequeue();
+                worldClientFrame = nextFrame;
+
+                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var roleRepo = worldFacades.Repo.WorldRoleRepo;
+                var bullet = bulletRepo.GetByBulletId(bulletHitRole.bulletId);
+                var role = roleRepo.Get(bulletHitRole.wRid);
+
+                role.HealthComponent.HurtByBullet(bullet);
+                role.MoveComponent.HitByBullet(bullet);
+                if (role.HealthComponent.IsDead)
+                {
+                    role.TearDown();
+                    role.Reborn();
+                }
+
+                GameObject.Destroy(bullet.gameObject);
+            }
         }
 
         void Tick_Input()
         {
             //没有角色就没有移动
             var owner = worldFacades.Repo.WorldRoleRepo.Owner;
-            if (owner == null) return;
+            if (owner == null || owner.IsDead) return;
 
             bool needMove = false;
             bool needJump = false;
+
             bool needShoot = false;
+            BulletType bulletType = default;
 
             Vector3 moveDir = Vector3.zero;
             Vector3 targetPos = Vector3.zero;
@@ -220,21 +246,22 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 needJump = true;
             }
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                needShoot = true;
+                bulletType = BulletType.Grenade;
+            }
             if (Input.GetMouseButtonDown(0))
             {
-                // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                // if (Physics.Raycast(ray, out RaycastHit hit))
-                // {
-
-                // }
                 needShoot = true;
                 targetPos = owner.ShootPointPos + owner.transform.forward;
+                bulletType = BulletType.Default;
             }
 
             if (needMove && !WillHitOtherRole(owner, moveDir))
             {
                 byte rid = owner.WRid;
-                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrameIndex, rid, moveDir);
+                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
 
                 //预测操作
                 owner.MoveComponent.Move(moveDir);
@@ -244,7 +271,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             if (needJump)
             {
                 byte rid = owner.WRid;
-                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrameIndex, rid);
+                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrame, rid);
                 //预测操作
                 owner.MoveComponent.Jump();
                 owner.AnimatorComponent.PlayRun();
@@ -254,7 +281,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             if (needShoot)
             {
                 byte rid = owner.WRid;
-                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrameIndex, rid, targetPos);
+                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, bulletType, rid, targetPos);
             }
 
         }
@@ -303,6 +330,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             bulletSpawnQueue.Enqueue(msg);
         }
 
+        // PHYSICS
+        void OnBulletHitRole(FrameBulletHitRoleResMsg msg)
+        {
+            // Debug.Log("加入子弹生成队列");
+            bulletHitRoleQueue.Enqueue(msg);
+        }
+
         // Network Event Center
         async void EnterWorldChooseScene()
         {
@@ -315,7 +349,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             // Send Spawn Role Message
             var rqs = worldFacades.Network.WorldRoleReqAndRes;
-            rqs.SendReq_WolrdRoleSpawn(worldClientFrameIndex);
+            rqs.SendReq_WolrdRoleSpawn(worldClientFrame);
         }
 
     }

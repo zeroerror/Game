@@ -33,7 +33,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - Scene
   - m_GUID: ddecd5858106b934ab3b08447af5f135
-    m_Address: ClientApp
+    m_Address: ClientEntry
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene

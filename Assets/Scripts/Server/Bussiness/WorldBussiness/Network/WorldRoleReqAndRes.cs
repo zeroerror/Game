@@ -77,7 +77,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
         {
             FrameWRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameWRoleSpawnResMsg
             {
-                serverFrameIndex = frameIndex,
+                serverFrame = frameIndex,
                 wRoleId = wRoleId,
                 isOwner = isOwner
             };

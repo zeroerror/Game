@@ -4,14 +4,15 @@ using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
 using Game.Client.Bussiness.WorldBussiness;
 
+
 namespace Game.Server.Bussiness.WorldBussiness
 {
 
     public class WorldController
     {
-
         WorldFacades worldFacades;
-        int worldServeFrameIndex;
+        int worldServeFrame;
+        float FixedTime => UnityEngine.Time.fixedDeltaTime;
 
         // 记录当前所有ConnId
         List<int> connIdList;
@@ -83,20 +84,28 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
             if (!isSceneSpawn) return;
 
+            // CLIENT REQUEST
             Tick_WRoleSpawn();
             Tick_BulletSpawn();
+
             Tick_JumpOpt();
             Tick_Opt();
+
             Tick_RoleStateSync();
+            Tick_BulletLife();
+
+            // PHYSIC
+            Tick_BulletHitRole();
         }
 
-        // 目前流程是会先生成唯一的控制角色，所以这里相当于入口，在这里判断是否是中途加入，是否需要补发数据包
+        #region [Client Requst]
+        // ====== ROLE
         void Tick_WRoleSpawn()
         {
-            int nextFrameIndex = worldServeFrameIndex + 1;
+            int nextFrameIndex = worldServeFrame + 1;
             if (wRoleSpawnDic.TryGetValue(nextFrameIndex, out var spawn))
             {
-                worldServeFrameIndex = nextFrameIndex;
+                worldServeFrame = nextFrameIndex;
 
                 var msg = spawn.msg;
                 var connId = spawn.connId;
@@ -112,9 +121,9 @@ namespace Game.Server.Bussiness.WorldBussiness
                 // 服务器逻辑
                 var roleEntity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
                 roleEntity.SetWRid(wrid);
-                Debug.Log($"服务器逻辑[Spawn Role] frame:{worldServeFrameIndex} wRid:{wrid}  roleEntity.MoveComponent.CurPos:{roleEntity.MoveComponent.CurPos}");
+                Debug.Log($"服务器逻辑[Spawn Role] frame:{worldServeFrame} wRid:{wrid}  roleEntity.MoveComponent.CurPos:{roleEntity.MoveComponent.CurPos}");
 
-                if (clientFrameIndex + 1 < worldServeFrameIndex)
+                if (clientFrameIndex + 1 < worldServeFrame)
                 {
 
                     // ====== 补发数据包
@@ -157,12 +166,46 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
         }
 
+        void Tick_RoleStateSync()
+        {
+            int nextFrameIndex = worldServeFrame + 1;
+            //人物静止和运动 2个状态
+            bool isNextFrame = false;
+            var WorldRoleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
+            WorldRoleRepo.Foreach((roleEntity) =>
+            {
+                if (roleEntity.IsStateChange(out RoleState roleNewStatus))
+                {
+                    isNextFrame = true;
+                    roleEntity.SetRoleStatus(roleNewStatus);
+
+
+                    if (roleNewStatus == RoleState.Idle)
+                    {
+                        // 从运动到静止：因为运动的这个过程没有实时记录角色的状态位置信息LastSyncFramePos,所有这种情况下需要手动刷新下
+                        roleEntity.MoveComponent.UpdateLastSyncFramePos();
+                    }
+                    var rqs = worldFacades.Network.WorldRoleReqAndRes;
+                    connIdList.ForEach((connId) =>
+                    {
+                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity.WRid, roleNewStatus, roleEntity.MoveComponent.LastSyncFramePos, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity);
+                        roleEntity.MoveComponent.UpdateLastSyncFramePos();
+                    });
+                }
+            });
+
+            if (isNextFrame)
+            {
+                worldServeFrame = nextFrameIndex;
+            }
+        }
+
         void Tick_Opt()
         {
-            int nextFrameIndex = worldServeFrameIndex + 1;
+            int nextFrameIndex = worldServeFrame + 1;
             if (wRoleOptDic.TryGetValue(nextFrameIndex, out var opt))
             {
-                worldServeFrameIndex = nextFrameIndex;
+                worldServeFrame = nextFrameIndex;
 
                 var msg = opt.msg;
                 var realMsg = msg.msg;
@@ -194,10 +237,10 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         void Tick_JumpOpt()
         {
-            int nextFrameIndex = worldServeFrameIndex + 1;
+            int nextFrameIndex = worldServeFrame + 1;
             if (jumpOptDic.TryGetValue(nextFrameIndex, out var jumpOpt))
             {
-                worldServeFrameIndex = nextFrameIndex;
+                worldServeFrame = nextFrameIndex;
 
                 var wRid = jumpOpt.msg.wRid;
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
@@ -216,16 +259,18 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
         }
 
+        // ====== Bullet
         void Tick_BulletSpawn()
         {
-            int nextFrameIndex = worldServeFrameIndex + 1;
+            int nextFrameIndex = worldServeFrame + 1;
             if (bulletSpawnDic.TryGetValue(nextFrameIndex, out var bulletSpawn))
             {
-                worldServeFrameIndex = nextFrameIndex;
+                worldServeFrame = nextFrameIndex;
 
                 int connId = bulletSpawn.connId;
                 var msg = bulletSpawn.msg;
 
+                var bulletType = msg.bulletType;
                 byte wRid = msg.wRid;
                 float targetPosX = msg.targetPosX / 10000f;
                 float targetPosY = msg.targetPosY / 10000f;
@@ -241,56 +286,95 @@ namespace Game.Server.Bussiness.WorldBussiness
                 // 服务器逻辑
                 var clientFacades = worldFacades.ClientWorldFacades;
                 var fieldEntity = clientFacades.Repo.FiledEntityRepo.Get(1);
-                var bulletEntity = clientFacades.Domain.BulletSpawnDomain.SpawnBullet(fieldEntity.transform);
+                var bulletEntity = clientFacades.Domain.BulletSpawnDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
                 var bulletRepo = clientFacades.Repo.BulletEntityRepo;
-                var bulletId = bulletRepo.Size;
+                var bulletId = bulletRepo.BulletCount;
+                GrenadeEntity grenadeEntity = bulletEntity as GrenadeEntity;
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.Move(dir);
                 bulletEntity.SetWRid(wRid);
                 bulletEntity.SetBulletId(bulletId);
                 bulletRepo.Add(bulletEntity);
-                Debug.Log($"服务器逻辑[Spawn Bullet] frame {worldServeFrameIndex} connId {connId}    :MasterWRid:{wRid}  bulletId:{bulletId} 起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{dir}");
+                Debug.Log($"服务器逻辑[Spawn Bullet] frame {worldServeFrame} connId {connId}:  bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{dir}");
 
                 var rqs = worldFacades.Network.BulletReqAndRes;
                 connIdList.ForEach((otherConnId) =>
                 {
-                    rqs.SendRes_BulletSpawn(otherConnId, worldServeFrameIndex, bulletId, wRid, dir);
+                    rqs.SendRes_BulletSpawn(otherConnId, worldServeFrame, bulletType, bulletId, wRid, dir);
                 });
             }
         }
 
-        void Tick_RoleStateSync()
+        void Tick_BulletLife()
         {
-            int nextFrameIndex = worldServeFrameIndex + 1;
-            //人物静止和运动 2个状态
-            bool isNextFrame = false;
-            var WorldRoleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-            WorldRoleRepo.Foreach((roleEntity) =>
+            var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
+            List<BulletEntity> removeList = new List<BulletEntity>();
+            bulletRepo.Foreach((bulletEntity) =>
             {
-                if (roleEntity.IsStateChange(out RoleState roleNewStatus))
+                if (bulletEntity.LifeTime < 0)
                 {
-                    isNextFrame = true;
-                    roleEntity.SetRoleStatus(roleNewStatus);
-
-
-                    if (roleNewStatus == RoleState.Idle)
+                    if (bulletEntity.BulletType == BulletType.Default)
                     {
-                        // 从运动到静止：因为运动的这个过程没有实时记录角色的状态位置信息LastSyncFramePos,所有这种情况下需要手动刷新下
-                        roleEntity.MoveComponent.UpdateLastSyncFramePos();
+                        // TODO:通过工厂模式进行子弹的创建和销毁
+                        bulletEntity.TearDown();
+                        return;
                     }
-                    var rqs = worldFacades.Network.WorldRoleReqAndRes;
-                    connIdList.ForEach((connId) =>
+                    else if (bulletEntity.BulletType == BulletType.Grenade)
                     {
-                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity.WRid, roleNewStatus, roleEntity.MoveComponent.LastSyncFramePos, roleEntity.transform.rotation, roleEntity.MoveComponent.Velocity);
-                        roleEntity.MoveComponent.UpdateLastSyncFramePos();
-                    });
+                        ((GrenadeEntity)bulletEntity).TearDown();
+                        //子弹爆炸半径3米内造成伤害
+                        var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
+                        roleRepo.Foreach((role) =>
+                        {
+                            var dis = Vector3.Distance(role.MoveComponent.CurPos, bulletEntity.MoveComponent.CurPos);
+                            Debug.Log($"爆炸 ， ids{dis}");
+                            if (dis < 5f)
+                            {
+                                var dir = role.MoveComponent.CurPos - bulletEntity.MoveComponent.CurPos;
+                                dir.Normalize();
+                                role.MoveComponent.AddVelocity(dir * 10f);
+                            }
+                        });
+                        removeList.Add(bulletEntity);
+                        return;
+                    }
                 }
+                bulletEntity.ReduceLifeTime(FixedTime);
             });
 
-            if (isNextFrame)
+            removeList.ForEach((bulletEntity) =>
             {
-                worldServeFrameIndex = nextFrameIndex;
-            }
+                bulletRepo.TryRemove(bulletEntity);
+            });
+        }
+
+        #endregion
+
+        void Tick_BulletHitRole()
+        {
+            var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
+            bulletRepo.Foreach((bullet) =>
+            {
+                int nextFrameIndex = worldServeFrame + 1;
+                if (bullet.TryDequeue(out var wrole))
+                {
+                    worldServeFrame = nextFrameIndex;
+                    var rqs = worldFacades.Network.BulletReqAndRes;
+                    connIdList.ForEach((connId) =>
+                    {
+                        rqs.SendRes_BulletHitRole(connId, worldServeFrame, bullet.BulletId, wrole.WRid);
+                    });
+
+                    // Server Logic
+                    wrole.HealthComponent.HurtByBullet(bullet);
+                    wrole.MoveComponent.HitByBullet(bullet);
+                    if (wrole.HealthComponent.IsDead)
+                    {
+                        wrole.TearDown();
+                        wrole.Reborn();
+                    }
+                }
+            });
         }
 
         void UpdateWRoleStatus(WorldRoleEntity roleEntity)
@@ -301,22 +385,20 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
         }
 
-
         // == Network
         // Role
         void OnWoldRoleMove(int connId, FrameOptReqMsg msg)
         {
-            wRoleOptDic.TryAdd(worldServeFrameIndex + 1, new FrameReqOptMsgStruct { connId = connId, msg = msg });
+            wRoleOptDic.TryAdd(worldServeFrame + 1, new FrameReqOptMsgStruct { connId = connId, msg = msg });
         }
-
         void OnWoldRoleJump(int connId, FrameJumpReqMsg msg)
         {
-            jumpOptDic.TryAdd(worldServeFrameIndex + 1, new FrameReqJumpMsgStruct { connId = connId, msg = msg });
+            jumpOptDic.TryAdd(worldServeFrame + 1, new FrameReqJumpMsgStruct { connId = connId, msg = msg });
         }
 
         void OnWoldRoleSpawn(int connId, FrameWRoleSpawnReqMsg msg)
         {
-            wRoleSpawnDic.TryAdd(worldServeFrameIndex + 1, new FrameReqWRoleSpawnMsgStruct { connId = connId, msg = msg });
+            wRoleSpawnDic.TryAdd(worldServeFrame + 1, new FrameReqWRoleSpawnMsgStruct { connId = connId, msg = msg });
             // TODO:连接服和世界服分离
             connIdList.Add(connId);
             // 创建场景
@@ -326,7 +408,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         // Bullet
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
-            bulletSpawnDic.TryAdd(worldServeFrameIndex + 1, new FrameReqBulletSpawnMsgStruct { connId = connId, msg = msg });
+            bulletSpawnDic.TryAdd(worldServeFrame + 1, new FrameReqBulletSpawnMsgStruct { connId = connId, msg = msg });
         }
 
         async void SpawWorldChooseScene()

@@ -20,18 +20,38 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             this.worldFacades = facades;
         }
 
-        public BulletEntity SpawnBullet(Transform parent)
+        public BulletEntity SpawnBullet(Transform parent, BulletType bulletType)
         {
             string bulletPrefabName = "Bullet";
-            Debug.Log("生成" + bulletPrefabName);
+            switch (bulletType)
+            {
+                case BulletType.Default:
+                    bulletPrefabName = "Bullet";
+                    break;
+                case BulletType.Grenade:
+                    bulletPrefabName = "Grenade";
+                    break;
+            }
             if (worldFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
-                var entity = prefabAsset.GetComponent<BulletEntity>();
-                return entity;
+                var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
+                if (bulletType == BulletType.Grenade)
+                {
+                    var grenadeEntity = (GrenadeEntity)bulletEntity;
+                    grenadeEntity.SetLifeTime(3f); //手榴弹生命周期
+                    grenadeEntity.SetMoveComponent(10f);//手榴弹投掷速度
+                }
+
+                bulletEntity.SetBulletType(bulletType);
+                return bulletEntity;
             }
 
             return null;
+        }
+
+        void Spawn()
+        {
 
         }
 

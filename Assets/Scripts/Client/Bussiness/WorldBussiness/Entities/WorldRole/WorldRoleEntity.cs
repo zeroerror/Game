@@ -1,4 +1,5 @@
 using UnityEngine;
+using Game.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness
 {
@@ -7,7 +8,8 @@ namespace Game.Client.Bussiness.WorldBussiness
     {
         Idle,
         Move,
-        Jump
+        Jump,
+        Be_Imprisoned       //-被禁锢
     }
 
     public class WorldRoleEntity : MonoBehaviour
@@ -18,14 +20,17 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void SetWRid(byte wRid) => this.wRid = wRid;
 
         Vector3 offset;
-        public Vector3 ShootPointPos => MoveComponent.CurPos + transform.forward + offset;
+        Vector3 shootPointPos => MoveComponent.CurPos + transform.forward + offset;
+        public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
 
         public MoveComponent MoveComponent { get; private set; }
-
+        public HealthComponent HealthComponent { get; private set; }
         public AnimatorComponent AnimatorComponent { get; private set; }
 
         public RoleState RoleStatus { get; private set; }
         public void SetRoleStatus(RoleState roleStatus) => this.RoleStatus = roleStatus;
+
+        public bool IsDead { get; private set; }
 
         [SerializeField]
         Transform camTrackingObj;
@@ -33,10 +38,11 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Awake()
         {
-            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>());
+            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 5f, 5f);
             AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
+            HealthComponent = new HealthComponent(100f);
             RoleStatus = RoleState.Idle;
-            offset = new Vector3(0, 1.5f, 0);
+            offset = new Vector3(0, 1f, 0);
         }
 
         public bool IsStateChange(out RoleState roleNewStatus)
@@ -56,9 +62,17 @@ namespace Game.Client.Bussiness.WorldBussiness
             return false;
         }
 
-        public void FaceTo(Vector3 v)
+        public void TearDown()
         {
-            transform.forward = v;
+            IsDead = true;
+        }
+
+        public void Reborn()
+        {
+            Debug.Log($"重生 wRid:{wRid}");
+            MoveComponent.Reset();
+            HealthComponent.Reset();
+            IsDead = false;
         }
 
     }

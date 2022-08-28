@@ -5,7 +5,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 
     [ZeroMessage]
     public class FrameBulletSpawnResMsg :IZeroMessage<FrameBulletSpawnResMsg>{
-        public int serverFrameIndex;
+        public int serverFrame;
+        public byte bulletType;
         public byte wRid;
         public ushort bulletId;
         public short shootDirX;   // (8 8) 整数部8位 sbyte -128 --- +127） 小数部分16位 byte(0 --- +255) 0.00到0.99
@@ -14,7 +15,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 
         public void FromBytes(byte[] src, ref int offset)
         {
-            serverFrameIndex = BufferReader.ReadInt32(src, ref offset);
+            serverFrame = BufferReader.ReadInt32(src, ref offset);
+            bulletType = BufferReader.ReadByte(src, ref offset);
             wRid = BufferReader.ReadByte(src, ref offset);
             bulletId = BufferReader.ReadUInt16(src, ref offset);
             shootDirX = BufferReader.ReadInt16(src, ref offset);
@@ -27,7 +29,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
         {
             int offset = 0;
             byte[] result = new byte[1000];
-            BufferWriter.WriteInt32(result, serverFrameIndex, ref offset);
+            BufferWriter.WriteInt32(result, serverFrame, ref offset);
+            BufferWriter.WriteByte(result, bulletType, ref offset);
             BufferWriter.WriteByte(result, wRid, ref offset);
             BufferWriter.WriteUInt16(result, bulletId, ref offset);
             BufferWriter.WriteInt16(result, shootDirX, ref offset);
