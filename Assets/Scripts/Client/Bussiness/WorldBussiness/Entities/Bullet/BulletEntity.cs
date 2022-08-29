@@ -46,6 +46,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void Awake()
         {
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 50f, 0f);
+            MoveComponent.isPersistentMove = true;
 
             hitRoleQueue = new Queue<WorldRoleEntity>();
         }

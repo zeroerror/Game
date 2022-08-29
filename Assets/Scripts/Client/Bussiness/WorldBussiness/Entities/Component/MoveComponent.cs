@@ -10,13 +10,25 @@ namespace Game.Client.Bussiness.WorldBussiness
         // TODO: INJECT
         float speed;
         public void SetSpeed(float speed) => this.speed = speed;
-        float jumpVelocity;
-        public void SetJumpVelocity(float jumpVelocity) => this.jumpVelocity = jumpVelocity;
+        float jumpSpeed;
+        public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
+
+        float frictionReduce = 100f;
+        public void SetFriction(float friction) => this.frictionReduce = friction;
 
         Rigidbody rb;
 
         public Vector3 Velocity => rb.velocity;
         public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
+
+        public bool isPersistentMove;
+        Vector3 moveVelocity;
+
+        Vector3 addVelocity;
+
+        float jumpVelocity;
+
+        public bool IsGrouded { get; private set; }
 
         public Vector3 CurPos => rb.position;
         public void SetCurPos(Vector3 curPos) => rb.position = curPos;
@@ -31,35 +43,68 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             this.rb = rb;
             this.speed = speed;
-            this.jumpVelocity = jumpVelocity;
+            this.jumpSpeed = jumpVelocity;
             lastSyncFramePos = rb.position.FixDecimal(4);
         }
 
-        public void Move(Vector3 velocity)
+        public void Move(Vector3 dir)
         {
-            velocity = velocity.FixDecimal(2);
-            Debug.Log($" Move: {velocity}");
-            var addVelocity = velocity * speed;
-            addVelocity.y = Velocity.y;
-            rb.velocity = addVelocity;
-            lastSyncFramePos = rb.position.FixDecimal(4);
+            dir.Normalize();
+            dir = dir.FixDecimal(2);
+            this.moveVelocity = dir * speed;
+            Debug.Log($" Move Velocity {moveVelocity}");
         }
 
         public void AddVelocity(Vector3 addVelocity)
         {
-            addVelocity = addVelocity.FixDecimal(2);
-            Debug.Log($" AddVelocity: {addVelocity}");
-            rb.velocity += addVelocity;
+            this.addVelocity += addVelocity.FixDecimal(2);
             lastSyncFramePos = rb.position.FixDecimal(4);
+            Debug.Log($" AddVelocity: {addVelocity}");
         }
 
         public void Jump()
         {
             Debug.Log("Jump");
-            var newVelocity = rb.velocity;
-            newVelocity.y = jumpVelocity;    // Add Axis Y's Velocity
-            rb.velocity = newVelocity;
+            LeaveGround();
+            jumpVelocity = jumpSpeed;
             lastSyncFramePos = rb.position.FixDecimal(4);
+        }
+
+        public void Tick(float time)
+        {
+            var vel = moveVelocity + addVelocity;
+            vel.y = rb.velocity.y + jumpVelocity;
+            rb.velocity = vel;
+
+            if (isPersistentMove)
+            {
+                Debug.Log("PersistentMove ");
+                return;
+            }
+
+            moveVelocity = Vector3.zero;
+            jumpVelocity = 0;
+            if (IsGrouded && (Mathf.Abs(addVelocity.x) > 0.1f || Mathf.Abs(addVelocity.z) > 0.1f))
+            {
+                var reduceVelocity = addVelocity.normalized;
+                reduceVelocity.y = 0;
+                addVelocity -= (frictionReduce * reduceVelocity * time);
+                if (Mathf.Abs(addVelocity.x) <= 0.1f) addVelocity.x = 0f;
+                if (Mathf.Abs(addVelocity.z) <= 0.1f) addVelocity.z = 0f;
+                Debug.Log("摩擦力过后 " + addVelocity);
+            }
+        }
+
+        public void LeaveGround()
+        {
+            Debug.Log("离开地面");
+            IsGrouded = false;
+        }
+
+        public void StandGround()
+        {
+            Debug.Log("接触地面");
+            IsGrouded = true;
         }
 
         public void FaceTo(Vector3 forward)

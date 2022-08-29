@@ -9,19 +9,19 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
 
         public WorldSpawnDomain WorldSpawnDomain { get; private set; }
         public WorldRoleSpawnDomain WorldRoleSpawnDomain { get; private set; }
-        public BulletSpawnDomain BulletSpawnDomain { get; private set; }
+        public BulletDomain BulletDomain { get; private set; }
 
         public AllDomains()
         {
             WorldSpawnDomain = new WorldSpawnDomain();
             WorldRoleSpawnDomain = new WorldRoleSpawnDomain();
-            BulletSpawnDomain = new BulletSpawnDomain();
+            BulletDomain = new BulletDomain();
         }
 
         public void Inject(WorldFacades facades){
             WorldSpawnDomain.Inject(facades);
             WorldRoleSpawnDomain.Inject(facades);
-            BulletSpawnDomain.Inject(facades);
+            BulletDomain.Inject(facades);
         }
     }
 

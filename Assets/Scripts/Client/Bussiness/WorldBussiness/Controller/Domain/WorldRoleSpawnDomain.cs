@@ -42,6 +42,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         }
 
+        public void Tick_RoleMovement()
+        {
+            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            roleRepo.Foreach((role) =>
+            {
+                role.MoveComponent.Tick(UnityEngine.Time.deltaTime);
+            });
+        }
+
     }
 
 }

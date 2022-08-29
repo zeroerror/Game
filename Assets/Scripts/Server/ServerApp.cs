@@ -55,7 +55,7 @@ namespace Game.Server
         {
             Debug.Log("服务端启动！");
             var networkServer = allServerNetwork.networkServer;
-            networkServer.StartListen(NetworkConfig.port);
+            networkServer.StartListen(NetworkConfig.PORT);
             new Thread(() =>
                       {
                           while (true)

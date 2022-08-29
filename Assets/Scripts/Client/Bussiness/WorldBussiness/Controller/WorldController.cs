@@ -3,8 +3,10 @@ using UnityEngine;
 using Game.Generic;
 using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
+using Game.Infrastructure.Network;
 using Game.Client.Bussiness.EventCenter;
 using System;
+using Game.Infrastructure.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
@@ -48,6 +50,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             Tick_Input();
             Tick_ServerResQueues();
+            Tick_BulletLife();
+            Tick_RoleMovement();
+            Tick_BulletMovement();
         }
 
         void Tick_ServerResQueues()
@@ -92,7 +97,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 Vector3 shootDir = new Vector3(bulletSpawn.shootDirX / 100f, bulletSpawn.shootDirY / 100f, bulletSpawn.shootDirZ / 100f);
                 Debug.Log($"生成子弹帧 {worldClientFrame}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
                 var fieldEntity = worldFacades.Repo.FiledEntityRepo.Get(1);
-                var bulletEntity = worldFacades.Domain.BulletSpawnDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
+                var bulletEntity = worldFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.Move(shootDir);
                 bulletEntity.SetWRid(masterWRid);
@@ -284,6 +289,22 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, bulletType, rid, targetPos);
             }
 
+        }
+        void Tick_BulletLife()
+        {
+            worldFacades.Domain.BulletDomain.Tick_BulletLife(UnityEngine.Time.deltaTime);
+        }
+
+        void Tick_RoleMovement()
+        {
+            var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+            domain.Tick_RoleMovement();
+        }
+
+        void Tick_BulletMovement()
+        {
+            var domain = worldFacades.Domain.BulletDomain;
+            domain.Tick_BulletMovement();
         }
 
         bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)

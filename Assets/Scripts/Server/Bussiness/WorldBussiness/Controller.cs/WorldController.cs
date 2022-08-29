@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
+using Game.Infrastructure.Network;
 using Game.Client.Bussiness.WorldBussiness;
-
+using Game.Infrastructure.Generic;
 
 namespace Game.Server.Bussiness.WorldBussiness
 {
@@ -12,7 +13,6 @@ namespace Game.Server.Bussiness.WorldBussiness
     {
         WorldFacades worldFacades;
         int worldServeFrame;
-        float FixedTime => UnityEngine.Time.fixedDeltaTime;
 
         // 记录当前所有ConnId
         List<int> connIdList;
@@ -96,6 +96,8 @@ namespace Game.Server.Bussiness.WorldBussiness
 
             // PHYSIC
             Tick_BulletHitRole();
+            Tick_RoleMovement();
+            Tick_BulletMovement();
         }
 
         #region [Client Requst]
@@ -286,7 +288,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 // 服务器逻辑
                 var clientFacades = worldFacades.ClientWorldFacades;
                 var fieldEntity = clientFacades.Repo.FiledEntityRepo.Get(1);
-                var bulletEntity = clientFacades.Domain.BulletSpawnDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
+                var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
                 var bulletRepo = clientFacades.Repo.BulletEntityRepo;
                 var bulletId = bulletRepo.BulletCount;
                 GrenadeEntity grenadeEntity = bulletEntity as GrenadeEntity;
@@ -307,45 +309,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         void Tick_BulletLife()
         {
-            var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
-            List<BulletEntity> removeList = new List<BulletEntity>();
-            bulletRepo.Foreach((bulletEntity) =>
-            {
-                if (bulletEntity.LifeTime < 0)
-                {
-                    if (bulletEntity.BulletType == BulletType.Default)
-                    {
-                        // TODO:通过工厂模式进行子弹的创建和销毁
-                        bulletEntity.TearDown();
-                        return;
-                    }
-                    else if (bulletEntity.BulletType == BulletType.Grenade)
-                    {
-                        ((GrenadeEntity)bulletEntity).TearDown();
-                        //子弹爆炸半径3米内造成伤害
-                        var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-                        roleRepo.Foreach((role) =>
-                        {
-                            var dis = Vector3.Distance(role.MoveComponent.CurPos, bulletEntity.MoveComponent.CurPos);
-                            Debug.Log($"爆炸 ， ids{dis}");
-                            if (dis < 5f)
-                            {
-                                var dir = role.MoveComponent.CurPos - bulletEntity.MoveComponent.CurPos;
-                                dir.Normalize();
-                                role.MoveComponent.AddVelocity(dir * 10f);
-                            }
-                        });
-                        removeList.Add(bulletEntity);
-                        return;
-                    }
-                }
-                bulletEntity.ReduceLifeTime(FixedTime);
-            });
-
-            removeList.ForEach((bulletEntity) =>
-            {
-                bulletRepo.TryRemove(bulletEntity);
-            });
+            worldFacades.ClientWorldFacades.Domain.BulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
         }
 
         #endregion
@@ -383,6 +347,18 @@ namespace Game.Server.Bussiness.WorldBussiness
             {
                 roleEntity.SetRoleStatus(newRoleState);
             }
+        }
+
+        void Tick_RoleMovement()
+        {
+            var domain = worldFacades.ClientWorldFacades.Domain.WorldRoleSpawnDomain;
+            domain.Tick_RoleMovement();
+        }
+
+        void Tick_BulletMovement()
+        {
+            var domain = worldFacades.ClientWorldFacades.Domain.BulletDomain;
+            domain.Tick_BulletMovement();
         }
 
         // == Network

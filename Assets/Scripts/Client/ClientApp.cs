@@ -100,7 +100,7 @@ namespace Game.Client
                 Debug.Log("Connect Success");
             };
 
-            networkClient.Connect(NetworkConfig.host, NetworkConfig.port);
+            networkClient.Connect(NetworkConfig.HOST, NetworkConfig.PORT);
 
             new Thread(() =>
             {

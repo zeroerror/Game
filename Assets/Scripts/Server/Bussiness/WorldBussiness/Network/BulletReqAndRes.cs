@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Game.Infrastructure.Network.Server;
 using Game.Protocol.World;
-
+using Game.Client.Bussiness.WorldBussiness;
 
 namespace Game.Server.Bussiness.WorldBussiness.Network
 {
@@ -53,6 +53,11 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             };
 
             _server.SendMsg(connId, msg);
+        }
+
+        public void SendRes_BulletExplode()
+        {
+
         }
 
     }

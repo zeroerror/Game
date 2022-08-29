@@ -75,6 +75,23 @@ namespace Game.Client.Bussiness.WorldBussiness
             IsDead = false;
         }
 
+        // Unity Physics 
+        void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+            {
+                MoveComponent.StandGround();
+            }
+        }
+
+        void OnCollisionExit(Collision collision)
+        {
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+            {
+                MoveComponent.LeaveGround();
+            }
+        }
+
     }
 
 }
