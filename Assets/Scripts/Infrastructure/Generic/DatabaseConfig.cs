@@ -4,7 +4,7 @@ namespace Game.Infrastructure.Generic
 
     public static class DatabaseConfig
     {
-        public static string ConnStr = "server=127.0.0.1;port=3306;user=root;password=123456; database=game;";
+        public static string ConnStr = "server=175.178.150.50;port=3306;user=root;password=root; database=game;";
     }
 
 }

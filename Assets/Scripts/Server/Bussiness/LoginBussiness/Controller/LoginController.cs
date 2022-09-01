@@ -65,7 +65,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 // MYSQL OPARATION
                 try
                 {
-                    var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from game_account");
+                    var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from account");
                     while (reader.GetEnumerator().MoveNext())
                     {
                         string name = reader.GetString("name");
@@ -105,7 +105,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 // MYSQL OPARATION
                 try
                 {
-                    var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from game_account");
+                    var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from account");
                     while (reader.GetEnumerator().MoveNext())
                     {
                         string name = reader.GetString("name");
@@ -119,7 +119,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                     if (status == 1)
                     {
                         Debug.Log($"MySQL插入game_account表 value('{ev.name}','{ev.pwd}')============================================");
-                        reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, $"insert into game_account value('{ev.name}','{ev.pwd}')");
+                        reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, $"insert into account value('{ev.name}','{ev.pwd}')");
                     }
                 }
                 catch (MySqlException exc)
