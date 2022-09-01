@@ -66,9 +66,12 @@ namespace Game.Client
             };
 
             action.Invoke();
+
+            // == Physics ==
+            Physics.autoSimulation = false;
         }
 
-        void Update()
+        void FixedUpdate()
         {
             // == Entry ==
             LoginEntry.Tick();

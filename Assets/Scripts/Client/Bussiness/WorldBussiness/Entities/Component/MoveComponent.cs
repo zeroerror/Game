@@ -33,10 +33,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public Vector3 CurPos => rb.position;
         public void SetCurPos(Vector3 curPos) => rb.position = curPos;
 
-        Vector3 lastSyncFramePos;
-        public Vector3 LastSyncFramePos => lastSyncFramePos;
-        public void UpdateLastSyncFramePos() => lastSyncFramePos = rb.position.FixDecimal(4);
-
         public Vector3 EulerAngel => rb.rotation.eulerAngles;
 
         public MoveComponent(Rigidbody rb, float speed, float jumpVelocity)
@@ -44,10 +40,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             this.rb = rb;
             this.speed = speed;
             this.jumpSpeed = jumpVelocity;
-            lastSyncFramePos = rb.position.FixDecimal(4);
         }
 
-        public void Move(Vector3 dir)
+        public void SetFrameMoveDir(Vector3 dir)
         {
             dir.Normalize();
             dir = dir.FixDecimal(2);
@@ -58,7 +53,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void AddVelocity(Vector3 addVelocity)
         {
             this.addVelocity += addVelocity.FixDecimal(2);
-            lastSyncFramePos = rb.position.FixDecimal(4);
             Debug.Log($" AddVelocity: {addVelocity}");
         }
 
@@ -67,10 +61,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             Debug.Log("Jump");
             LeaveGround();
             jumpVelocity = jumpSpeed;
-            lastSyncFramePos = rb.position.FixDecimal(4);
         }
 
-        public void Tick(float time)
+        public void Tick(float fixedTime)
         {
             var vel = moveVelocity + addVelocity;
             vel.y = rb.velocity.y + jumpVelocity;
@@ -88,7 +81,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             {
                 var reduceVelocity = addVelocity.normalized;
                 reduceVelocity.y = 0;
-                addVelocity -= (frictionReduce * reduceVelocity * time);
+                addVelocity -= (frictionReduce * reduceVelocity * fixedTime);
                 if (Mathf.Abs(addVelocity.x) <= 0.1f) addVelocity.x = 0f;
                 if (Mathf.Abs(addVelocity.z) <= 0.1f) addVelocity.z = 0f;
                 Debug.Log("摩擦力过后 " + addVelocity);

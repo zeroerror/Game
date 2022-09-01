@@ -38,9 +38,8 @@ namespace Game.Server
 
             DontDestroyOnLoad(this.gameObject);
 
-
-
-
+            // == Physics ==
+            Physics.autoSimulation = false;
         }
 
         void FixedUpdate()

@@ -37,8 +37,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public RoleState OldRoleState { get; private set; }
         public void UpdateRoleStatus() => this.OldRoleState = RoleState;
 
-        public int stateAhead;
-
         public bool IsDead { get; private set; }
         public bool IsOldState;
 
@@ -79,7 +77,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
                 MoveComponent.StandGround();
-                MoveComponent.UpdateLastSyncFramePos();
             }
         }
 
