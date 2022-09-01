@@ -19,6 +19,10 @@ namespace Game.Client.Bussiness.WorldBussiness
         public byte WRid => wRid;
         public void SetWRid(byte wRid) => this.wRid = wRid;
 
+        int connId;
+        public int ConnId => connId;
+        public void SetConnId(int connId) => this.connId = connId;
+
         Vector3 offset;
         Vector3 shootPointPos => MoveComponent.CurPos + transform.forward + offset;
         public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
@@ -27,10 +31,16 @@ namespace Game.Client.Bussiness.WorldBussiness
         public HealthComponent HealthComponent { get; private set; }
         public AnimatorComponent AnimatorComponent { get; private set; }
 
-        public RoleState RoleStatus { get; private set; }
-        public void SetRoleStatus(RoleState roleStatus) => this.RoleStatus = roleStatus;
+        public RoleState RoleState { get; private set; }
+        public void SetRoleStatus(RoleState roleStatus) => this.RoleState = roleStatus;
+
+        public RoleState OldRoleState { get; private set; }
+        public void UpdateRoleStatus() => this.OldRoleState = RoleState;
+
+        public int stateAhead;
 
         public bool IsDead { get; private set; }
+        public bool IsOldState;
 
         [SerializeField]
         Transform camTrackingObj;
@@ -41,25 +51,13 @@ namespace Game.Client.Bussiness.WorldBussiness
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 5f, 5f);
             AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
             HealthComponent = new HealthComponent(100f);
-            RoleStatus = RoleState.Idle;
+            RoleState = RoleState.Idle;
             offset = new Vector3(0, 1f, 0);
         }
 
-        public bool IsStateChange(out RoleState roleNewStatus)
+        public bool IsStateChange()
         {
-            roleNewStatus = RoleState.Idle;
-            // Movement
-            bool isMove = MoveComponent.Velocity != Vector3.zero;
-            bool isMoveStatus = RoleStatus != RoleState.Idle;
-            if ((isMove && !isMoveStatus) || (!isMove && isMoveStatus))
-            {
-                roleNewStatus = isMove ? RoleState.Move : RoleState.Idle;
-                return true;
-            }
-            // TODO:Hit
-            // TODO:JUMP
-
-            return false;
+            return OldRoleState != RoleState;
         }
 
         public void TearDown()
@@ -81,6 +79,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
                 MoveComponent.StandGround();
+                MoveComponent.UpdateLastSyncFramePos();
             }
         }
 

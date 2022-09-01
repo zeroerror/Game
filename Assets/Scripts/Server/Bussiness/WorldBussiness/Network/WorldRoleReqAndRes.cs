@@ -17,7 +17,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
-        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, byte wRid, RoleState roleStatus, Vector3 pos, Quaternion rot, Vector3 velocity, bool isOwner = false)
+        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleEntity role, RoleState roleStatus, Vector3 pos, Quaternion rot, Vector3 velocity)
         {
             // Position
             int x = (int)(pos.x * 10000);
@@ -35,12 +35,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             int velocityY = (int)(velocity.y * 10000);
             int velocityZ = (int)(velocity.z * 10000);
 
-            Debug.Log($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{wRid} 角色状态:{roleStatus.ToString()} 位置 :{pos} 旋转角度：{eulerAngle}");
+            Debug.Log($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{roleStatus.ToString()} 位置 :{pos} 旋转角度：{eulerAngle}");
 
             WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
             {
                 serverFrameIndex = serverFrameIndex,
-                wRid = wRid,
+                wRid = role.WRid,
                 roleState = (int)roleStatus,
                 x = x,
                 y = y,
@@ -51,7 +51,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
                 velocityX = velocityX,
                 velocityY = velocityY,
                 velocityZ = velocityZ,
-                isOwner = isOwner
+                isOwner = connId == role.ConnId
             };
             _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);
         }

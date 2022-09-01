@@ -7,7 +7,7 @@ using ZeroFrame.Protocol.Editor;
 public class ProtocolGenTool
 {
 
-    [MenuItem("Generate/生成协议")]
+    // [MenuItem("Generate/生成协议")]
     public static void Generate()
     {
         string msgDir = @"Assets\Scripts\Protocol\Message";

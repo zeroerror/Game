@@ -110,6 +110,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 stateQueue.Dequeue();
 
+                if (stateMsg.isOwner)
+                {
+                    var owner = worldFacades.Repo.WorldRoleRepo.Owner;
+                    owner.stateAhead--;
+                    owner.stateAhead = owner.stateAhead >= 0 ? owner.stateAhead : 0;
+                    Debug.Log($"owner.stateAhead--  :{owner.stateAhead}");
+                }
+
                 worldClientFrame = stateMsg.serverFrameIndex;
 
                 RoleState roleState = (RoleState)stateMsg.roleState;
@@ -152,7 +160,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid}  人物状态：{roleState.ToString()}  位置: {pos} 旋转角:{eulerAngle} ";
                 Debug.Log($"<color=#ff0000>{log}</color>");
 
-                if (entity.RoleStatus != roleState)
+                if (entity.RoleState != roleState)
                 {
                     switch (roleState)
                     {
@@ -163,7 +171,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                             entity.AnimatorComponent.PlayRun();
                             break;
                         case RoleState.Jump:
-                            entity.MoveComponent.Jump();
                             entity.AnimatorComponent.PlayRun();
                             break;
                     }
@@ -174,20 +181,23 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 //判断是否回滚预测操作
                 var moveComponent = entity.MoveComponent;
                 var lastSyncFramePos = moveComponent.LastSyncFramePos;
-                if (!lastSyncFramePos.Equals(pos, 2))
+                if (Vector3.Distance(lastSyncFramePos, pos) > 0.5f)
                 {
+                    //校准
+                    Debug.LogWarning($"校准位置: {lastSyncFramePos}   ------>   {pos}");
                     moveComponent.SetCurPos(pos);
-                    moveComponent.UpdateLastSyncFramePos();
-                    Debug.Log($"校准位置:FramePos:    {lastSyncFramePos}   ------>   {moveComponent.LastSyncFramePos}");
+
+                    Debug.LogWarning($"校准速度:  {moveComponent.Velocity}   ------>   {velocity}");
                     moveComponent.SetVelocity(velocity);
-                    Debug.Log($"校准速度   ------>   {velocity}");
                 }
+                //刷新Last
+                moveComponent.UpdateLastSyncFramePos();
+
                 if (!moveComponent.EulerAngel.Equals(eulerAngle, 2))
                 {
-                    Debug.Log($"校准旋转角度:EulerAngel:    {moveComponent.EulerAngel}   ------>   {eulerAngle}");
+                    Debug.Log($"校准旋转角度: {moveComponent.EulerAngel}   ------>   {eulerAngle}");
                     moveComponent.SetRotaionEulerAngle(eulerAngle);
                 }
-
 
             }
 
@@ -263,30 +273,43 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 bulletType = BulletType.Default;
             }
 
-            if (needMove && !WillHitOtherRole(owner, moveDir))
-            {
-                byte rid = owner.WRid;
-                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
-
-                //预测操作
-                owner.MoveComponent.Move(moveDir);
-                owner.MoveComponent.FaceTo(moveDir);
-            }
-
             if (needJump)
             {
+                Debug.Log($"needJump : owner.stateAhead:{owner.stateAhead}");
+                if (owner.stateAhead > 1) return;
+
                 byte rid = owner.WRid;
                 worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrame, rid);
                 //预测操作
                 owner.MoveComponent.Jump();
-                owner.AnimatorComponent.PlayRun();
+                owner.MoveComponent.UpdateLastSyncFramePos();
                 owner.SetRoleStatus(RoleState.Jump);
+                owner.AnimatorComponent.PlayRun();
+                owner.stateAhead++;
             }
 
             if (needShoot)
             {
+                Debug.Log($"needShoot : owner.stateAhead:{owner.stateAhead}");
+                if (owner.stateAhead > 1) return;
+
                 byte rid = owner.WRid;
                 worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, bulletType, rid, targetPos);
+            }
+
+            if (needMove && !WillHitOtherRole(owner, moveDir))
+            {
+                Debug.Log($"needMove : owner.stateAhead:{owner.stateAhead}");
+                if (owner.stateAhead > 1) return;
+
+                byte rid = owner.WRid;
+                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
+                //预测操作
+                owner.MoveComponent.Move(moveDir);
+                owner.MoveComponent.UpdateLastSyncFramePos();
+                owner.SetRoleStatus(RoleState.Move);
+                owner.MoveComponent.FaceTo(moveDir);
+                owner.stateAhead++;
             }
 
         }
