@@ -14,6 +14,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         public AllWorldAssets Assets { get; private set; }
         // Controller Set
         public CinemachineExtra CinemachineExtra { get; private set; }
+        public InputComponent InputComponent { get; private set; }
+
         public void SetCinemachineExtra(CinemachineExtra cinemachineExtra) => CinemachineExtra = cinemachineExtra;
 
         public WorldFacades()
@@ -25,9 +27,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             Domain.Inject(this);
         }
 
-        public void Inject(NetworkClient client)
+        public void Inject(NetworkClient client, InputComponent inputComponent)
         {
             Network.Inject(client);
+            InputComponent = inputComponent;
         }
 
         public void Init()

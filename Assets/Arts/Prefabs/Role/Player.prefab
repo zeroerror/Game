@@ -3832,7 +3832,7 @@ Rigidbody:
   m_Mass: 50
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
@@ -3849,6 +3849,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032c69efce5f81642aef0ffa36b9408e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsOldState: 0
   camTrackingObj: {fileID: 4152236487439866043}
 --- !u!65 &2132031221355962208
 BoxCollider:

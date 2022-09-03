@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Generic;
+using Game.Client.Bussiness.WorldBussiness.Shot;
 using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
 using Game.Infrastructure.Network;
@@ -26,7 +27,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         Queue<WRoleStateUpdateMsg> stateQueue;
 
         // 预测缓存池
-        Queue<MoveComponent> ShotQueue_MoveComponent;
+        Queue<MoveComponentShot> ShotQueue_MoveComponent;
+
+        bool isSync;
 
         public WorldController()
         {
@@ -37,7 +40,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
             stateQueue = new Queue<WRoleStateUpdateMsg>();
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
-            ShotQueue_MoveComponent = new Queue<MoveComponent>();
+            ShotQueue_MoveComponent = new Queue<MoveComponentShot>();
         }
 
         public void Inject(WorldFacades worldFacades)
@@ -52,24 +55,24 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         public void Tick()
         {
+            int nextFrame = worldClientFrame + 1;
+
             //1
-            Tick_ServerResQueues();
+            Tick_ServerResQueues(nextFrame);
             //2
             Tick_Input();
 
             // Physics Simulation
             if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity == null) return;
             Tick_BulletLife();
-            Tick_RoleMovement();
+            Tick_RoleMovement(fixedDeltaTime);
             Tick_BulletMovement();
             var physicsScene = worldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
         }
 
-        void Tick_ServerResQueues()
+        void Tick_ServerResQueues(int nextFrame)
         {
-            int nextFrame = worldClientFrame + 1;
-
             if (stateQueue.TryPeek(out var stateMsg))
             {
                 stateQueue.Dequeue();
@@ -112,48 +115,47 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
                     }
                 }
-                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid}  人物状态：{roleState.ToString()}  位置: {pos} 旋转角:{eulerAngle} ";
+                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} entity.RoleState :{entity.RoleState} --> 人物状态：{roleState.ToString()}  位置: {pos} 旋转角:{eulerAngle} ";
                 Debug.Log($"<color=#ff0000>{log}</color>");
 
-                if (entity.RoleState != roleState)
+                switch (roleState)
                 {
-                    switch (roleState)
-                    {
-                        case RoleState.Idle:
-                            entity.AnimatorComponent.PlayIdle();
-                            break;
-                        case RoleState.Move:
-                            entity.AnimatorComponent.PlayRun();
-                            break;
-                        case RoleState.Jump:
-                            entity.AnimatorComponent.PlayRun();
-                            break;
-                    }
-
-                    entity.SetRoleStatus(roleState);
+                    case RoleState.Idle:
+                        entity.AnimatorComponent.PlayIdle();
+                        break;
+                    case RoleState.Move:
+                        entity.MoveComponent.SetVelocity(velocity);
+                        entity.MoveComponent.SetCurPos(pos);
+                        entity.AnimatorComponent.PlayRun();
+                        break;
+                    case RoleState.Jump:
+                        entity.MoveComponent.SetJumpVelocity();
+                        entity.AnimatorComponent.PlayRun();
+                        break;
                 }
+
+                entity.SetRoleStatus(roleState);
 
                 //自身角色需要判断是否回滚之前的预测操作
-                if (stateMsg.isOwner)
-                {
-                    if (ShotQueue_MoveComponent.TryDequeue(out var moveComponent))
-                    {
-                        var dis = Vector3.Distance(moveComponent.CurPos, pos);
-                        if (dis > 1f)
-                        {
-                            Debug.LogWarning($"[Shot Error]校准位置: {moveComponent.CurPos}------>{pos} 校准速度: {moveComponent.Velocity}------>{velocity} 清除后续所有快照");
-                            moveComponent.SetCurPos(pos);
-                            moveComponent.SetVelocity(velocity);
-                            ShotQueue_MoveComponent.Clear();
-                        }
-                    }
-                }
-                else
-                {
-                    entity.MoveComponent.SetCurPos(pos);
-                    entity.MoveComponent.SetVelocity(velocity);
-                }
-
+                // if (stateMsg.isOwner)
+                // {
+                //     if (ShotQueue_MoveComponent.TryDequeue(out var moveComponent))
+                //     {
+                //         var dis = Vector3.Distance(moveComponent.CurPos, pos);
+                //         if (dis > .5f)
+                //         {
+                //             Debug.LogWarning($"[Shot Error]校准位置: {moveComponent.CurPos}------>{pos} 校准速度: {moveComponent.Velocity}------>{velocity} 清除后续所有快照");
+                //             entity.MoveComponent.SetCurPos(pos);
+                //             entity.MoveComponent.SetVelocity(velocity);
+                //             ShotQueue_MoveComponent.Clear();
+                //         }
+                //     }
+                // }
+                // else
+                // {
+                //     entity.MoveComponent.SetCurPos(pos);
+                //     entity.MoveComponent.SetVelocity(velocity);
+                // }
 
             }
 
@@ -232,90 +234,51 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var owner = worldFacades.Repo.WorldRoleRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
-            bool needMove = false;
-            bool needJump = false;
-
-            bool needShoot = false;
-            BulletType bulletType = default;
-
-            Vector3 moveDir = Vector3.zero;
-            Vector3 targetPos = Vector3.zero;
-            if (Input.GetKey(KeyCode.W))
-            {
-                needMove = true;
-                moveDir += new Vector3(0, 0, 1);
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                needMove = true;
-                moveDir += new Vector3(0, 0, -1);
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                needMove = true;
-                moveDir += new Vector3(-1, 0, 0);
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                needMove = true;
-                moveDir += new Vector3(1, 0, 0);
-            }
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                needJump = true;
-            }
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                needShoot = true;
-                bulletType = BulletType.Grenade;
-            }
-            if (Input.GetMouseButtonDown(0))
-            {
-                needShoot = true;
-                targetPos = owner.ShootPointPos + owner.transform.forward;
-                bulletType = BulletType.Default;
-            }
-
-            if (needJump)
+            var input = worldFacades.InputComponent;
+            if (input.pressJump)
             {
                 byte rid = owner.WRid;
                 worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrame, rid);
-                //预测操作
-                owner.MoveComponent.Jump();
-                owner.SetRoleStatus(RoleState.Jump);
-                owner.AnimatorComponent.PlayRun();
-                //保存快照 MoveComponent
-                ShotQueue_MoveComponent.Enqueue(owner.MoveComponent);
+                // //预测操作
+                // owner.MoveComponent.SetJumpVelocity();
+                // owner.SetRoleStatus(RoleState.Jump);
+                // owner.AnimatorComponent.PlayRun();
+                // //保存快照 MoveComponent
+                // ShotQueue_MoveComponent.Enqueue(owner.MoveComponent.ToShot());
             }
 
-            if (needShoot)
+            if (input.pressMouse0_Point != Vector3.zero)
             {
                 byte rid = owner.WRid;
-                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, bulletType, rid, targetPos);
+                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Default, rid, input.pressMouse0_Point);
             }
 
-            if (needMove && !WillHitOtherRole(owner, moveDir))
+            if (input.moveAxis != Vector3.zero)
             {
-                byte rid = owner.WRid;
-                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
-                //预测操作
-                owner.MoveComponent.SetFrameMoveDir(moveDir);
-                owner.SetRoleStatus(RoleState.Move);
-                owner.MoveComponent.FaceTo(moveDir);
-                //保存快照 MoveComponent
-                ShotQueue_MoveComponent.Enqueue(owner.MoveComponent);
+                var moveDir = input.moveAxis;
+                if (!WillHitOtherRole(owner, moveDir))
+                {
+                    byte rid = owner.WRid;
+                    worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
+                    // //预测操作
+                    // owner.MoveComponent.SetFrameMoveDir(moveDir);
+                    // owner.SetRoleStatus(RoleState.Move);
+                    // owner.MoveComponent.FaceTo(moveDir);
+                    // //保存快照 MoveComponent
+                    // ShotQueue_MoveComponent.Enqueue(owner.MoveComponent.ToShot());
+                }
             }
-
+            input.Reset();
         }
         void Tick_BulletLife()
         {
             worldFacades.Domain.BulletDomain.Tick_BulletLife(UnityEngine.Time.deltaTime);
         }
 
-        void Tick_RoleMovement()
+        void Tick_RoleMovement(float deltaTime)
         {
             var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-            domain.Tick_RoleMovement(UnityEngine.Time.fixedDeltaTime);
+            domain.Tick_RoleMovement(deltaTime);
         }
 
         void Tick_BulletMovement()

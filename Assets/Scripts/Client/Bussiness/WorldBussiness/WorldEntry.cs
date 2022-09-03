@@ -31,10 +31,10 @@ namespace Game.Client.Bussiness.WorldBussiness
             worldFacades.Init();
         }
 
-        public static void Inject(NetworkClient client)
+        public static void Inject(NetworkClient client,InputComponent inputComponent)
         {
               // == Facades ==
-            worldFacades.Inject(client);
+            worldFacades.Inject(client,inputComponent);
             // == Controller ==
             worldController.Inject(worldFacades);
         }

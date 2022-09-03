@@ -21,6 +21,7 @@ namespace Game.Client
     public class ClientApp : MonoBehaviour
     {
         public string CurrentSceneName { get; private set; }
+        InputComponent InputComponent;
 
         void Awake()
         {
@@ -41,7 +42,8 @@ namespace Game.Client
             LoginEntry.Init();
             // World
             WorldEntry.Ctor();
-            WorldEntry.Inject(AllClientNetwork.networkClient);
+            InputComponent = new InputComponent();
+            WorldEntry.Inject(AllClientNetwork.networkClient, InputComponent);
             WorldEntry.Init();
             // UI
             UIEntry.Ctor();
@@ -81,6 +83,59 @@ namespace Game.Client
             // == EventCenter ==
             NetworkEventCenter.Tick();
             LocalEventCenter.Tick();
+        }
+
+        void Update()
+        {
+            Tick_Input();
+        }
+
+        void Tick_Input()
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                InputComponent.moveAxis.z = 1;
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                InputComponent.moveAxis.z = -1;
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                InputComponent.moveAxis.x = -1;
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                InputComponent.moveAxis.x = 1;
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                InputComponent.pressJump = true;
+            }
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                var mainCam = Camera.main;
+                if (mainCam != null)
+                {
+                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out RaycastHit hit))
+                    {
+                        InputComponent.pressMouse0_Point = hit.point;
+                    }
+                }
+            }
+            if (Input.GetMouseButtonDown(0))
+            {
+                var mainCam = Camera.main;
+                if (mainCam != null)
+                {
+                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out RaycastHit hit))
+                    {
+                        InputComponent.pressMouse0_Point = hit.point;
+                    }
+                }
+            }
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)

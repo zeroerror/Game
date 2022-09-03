@@ -35,7 +35,8 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             int velocityY = (int)(velocity.y * 10000);
             int velocityZ = (int)(velocity.z * 10000);
 
-            Debug.Log($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{roleStatus.ToString()} 位置 :{pos} 旋转角度：{eulerAngle}");
+            var log = $"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{roleStatus.ToString()} 位置 :{pos} 旋转角度：{eulerAngle}";
+            Debug.Log($"<color=#ff0000>{log}</color>");
 
             WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
             {
