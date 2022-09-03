@@ -10,6 +10,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void SetMoveComponent(float moveSpeed)
         {
             MoveComponent.SetSpeed(moveSpeed);
+            MoveComponent.SetGravity(10);
         }
 
         public override void TearDown()

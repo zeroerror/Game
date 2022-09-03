@@ -17,41 +17,52 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
-        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleEntity role, RoleState roleStatus, Vector3 pos, Quaternion rot, Vector3 velocity)
+        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleEntity role)
         {
             // Position
+            var pos = role.MoveComponent.CurPos;
             int x = (int)(pos.x * 10000);
             int y = (int)(pos.y * 10000);
             int z = (int)(pos.z * 10000);
 
             // Rotation
+            var rot = role.transform.rotation;
             var eulerAngle = rot.eulerAngles;
             int rotX = (int)(eulerAngle.x * 10000);
             int rotY = (int)(eulerAngle.y * 10000);
             int rotZ = (int)(eulerAngle.z * 10000);
 
             // Velocity
-            int velocityX = (int)(velocity.x * 10000);
-            int velocityY = (int)(velocity.y * 10000);
-            int velocityZ = (int)(velocity.z * 10000);
+            var moveVelocity = role.MoveComponent.MoveVelocity;
+            int moveVelocityX = (int)(moveVelocity.x * 10000);
+            int moveVelocityY = (int)(moveVelocity.y * 10000);
+            int moveVelocityZ = (int)(moveVelocity.z * 10000);
 
-            var log = $"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{roleStatus.ToString()} 位置 :{pos} 旋转角度：{eulerAngle}";
+            var extraVelocity = role.MoveComponent.ExtraVelcoty;
+            int extraVelocityX = (int)(extraVelocity.x * 10000);
+            int extraVelocityY = (int)(extraVelocity.y * 10000);
+            int extraVelocityZ = (int)(extraVelocity.z * 10000);
+
+            var log = $"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity} 旋转角度：{eulerAngle}";
             Debug.Log($"<color=#ff0000>{log}</color>");
 
             WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
             {
                 serverFrameIndex = serverFrameIndex,
                 wRid = role.WRid,
-                roleState = (int)roleStatus,
+                roleState = (int)role.RoleState,
                 x = x,
                 y = y,
                 z = z,
                 eulerX = rotX,
                 eulerY = rotY,
                 eulerZ = rotZ,
-                velocityX = velocityX,
-                velocityY = velocityY,
-                velocityZ = velocityZ,
+                moveVelocityX = moveVelocityX,
+                moveVelocityY = moveVelocityY,
+                moveVelocityZ = moveVelocityZ,
+                extraVelocityX = extraVelocityX,
+                extraVelocityY = extraVelocityY,
+                extraVelocityZ = extraVelocityZ,
                 isOwner = connId == role.ConnId
             };
             _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);

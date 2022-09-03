@@ -43,6 +43,16 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.RegistMsg(action);
         }
 
+        public void RegistRes_BulletTearDown(Action<FrameBulletTearDownResMsg> action)
+        {
+            _client.RegistMsg(action);
+        }
+
+        public void RegistRes_BulletHitRole(Action<FrameBulletHitRoleResMsg> action)
+        {
+            _client.RegistMsg(action);
+        }
+
     }
 
 }

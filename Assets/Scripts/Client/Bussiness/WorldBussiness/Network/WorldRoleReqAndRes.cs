@@ -68,16 +68,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.RegistMsg<FrameWRoleSpawnResMsg>(action);
         }
 
-        public void RegistRes_BulletSpawn(Action<FrameBulletSpawnResMsg> action)
-        {
-            _client.RegistMsg<FrameBulletSpawnResMsg>(action);
-        }
-
-        public void RegistRes_BulletHitRole(Action<FrameBulletHitRoleResMsg> action)
-        {
-            _client.RegistMsg(action);
-        }
-
     }
 
 }

@@ -78,6 +78,10 @@ namespace Game.Client.Bussiness.WorldBussiness
             {
                 MoveComponent.StandGround();
             }
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            {
+                MoveComponent.HitWall();
+            }
         }
 
         void OnCollisionExit(Collision collision)
@@ -85,6 +89,10 @@ namespace Game.Client.Bussiness.WorldBussiness
             if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
                 MoveComponent.LeaveGround();
+            }
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            {
+                MoveComponent.LeaveWall();
             }
         }
 

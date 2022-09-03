@@ -40,7 +40,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 {
                     var grenadeEntity = (GrenadeEntity)bulletEntity;
                     grenadeEntity.SetLifeTime(3f); //手榴弹生命周期
-                    grenadeEntity.SetMoveComponent(10f);//手榴弹投掷速度
+                    grenadeEntity.SetMoveComponent(3f);//手榴弹投掷速度
                 }
 
                 bulletEntity.SetBulletType(bulletType);
@@ -50,7 +50,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return null;
         }
 
-        public void Tick_BulletLife(float deltaTime)
+        public List<BulletEntity> Tick_BulletLife(float deltaTime)
         {
             var bulletRepo = worldFacades.Repo.BulletEntityRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
@@ -64,34 +64,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 bulletEntity.ReduceLifeTime(deltaTime);
             });
 
-            removeList.ForEach((bulletEntity) =>
-            {
-                if (bulletEntity.BulletType == BulletType.Default)
-                {
-                    bulletEntity.TearDown();
-                }
-
-                if (bulletEntity.BulletType == BulletType.Grenade)
-                {
-                    ((GrenadeEntity)bulletEntity).TearDown();
-                    var roleRepo = worldFacades.Repo.WorldRoleRepo;
-                    roleRepo.Foreach((role) =>
-                    {
-                        var dis = Vector3.Distance(role.MoveComponent.CurPos, bulletEntity.MoveComponent.CurPos);
-                        if (dis < 5f)
-                        {
-                            var dir = role.MoveComponent.CurPos - bulletEntity.MoveComponent.CurPos;
-                            dir.Normalize();
-                            role.MoveComponent.AddVelocity(dir * 10f);
-                        }
-                    });
-                }
-
-                bulletRepo.TryRemove(bulletEntity);
-            });
+            return removeList;
         }
 
-       public void Tick_BulletMovement()
+        public void Tick_BulletMovement()
         {
             var bulletRepo = worldFacades.Repo.BulletEntityRepo;
             bulletRepo.Foreach((bullet) =>

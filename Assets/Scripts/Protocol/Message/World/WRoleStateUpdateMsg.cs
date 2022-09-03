@@ -14,9 +14,13 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
         public int eulerX;
         public int eulerY;
         public int eulerZ;
-        public int velocityX;
-        public int velocityY;
-        public int velocityZ;
+        public int moveVelocityX;
+        public int moveVelocityY;
+        public int moveVelocityZ;
+        public int extraVelocityX;
+        public int extraVelocityY;
+        public int extraVelocityZ;
+
         public bool isOwner;
 
         public void FromBytes(byte[] src, ref int offset)
@@ -30,9 +34,12 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
             eulerX = BufferReader.ReadInt32(src, ref offset);
             eulerY = BufferReader.ReadInt32(src, ref offset);
             eulerZ = BufferReader.ReadInt32(src, ref offset);
-            velocityX = BufferReader.ReadInt32(src, ref offset);
-            velocityY = BufferReader.ReadInt32(src, ref offset);
-            velocityZ = BufferReader.ReadInt32(src, ref offset);
+            moveVelocityX = BufferReader.ReadInt32(src, ref offset);
+            moveVelocityY = BufferReader.ReadInt32(src, ref offset);
+            moveVelocityZ = BufferReader.ReadInt32(src, ref offset);
+            extraVelocityX = BufferReader.ReadInt32(src, ref offset);
+            extraVelocityY = BufferReader.ReadInt32(src, ref offset);
+            extraVelocityZ = BufferReader.ReadInt32(src, ref offset);
             isOwner = BufferReader.ReadBool(src, ref offset);
             offset += src.Length;
         }
@@ -50,9 +57,12 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
             BufferWriter.WriteInt32(result, eulerX, ref offset);
             BufferWriter.WriteInt32(result, eulerY, ref offset);
             BufferWriter.WriteInt32(result, eulerZ, ref offset);
-            BufferWriter.WriteInt32(result, velocityX, ref offset);
-            BufferWriter.WriteInt32(result, velocityY, ref offset);
-            BufferWriter.WriteInt32(result, velocityZ, ref offset);
+            BufferWriter.WriteInt32(result, moveVelocityX, ref offset);
+            BufferWriter.WriteInt32(result, moveVelocityY, ref offset);
+            BufferWriter.WriteInt32(result, moveVelocityZ, ref offset);
+            BufferWriter.WriteInt32(result, extraVelocityX, ref offset);
+            BufferWriter.WriteInt32(result, extraVelocityY, ref offset);
+            BufferWriter.WriteInt32(result, extraVelocityZ, ref offset);
             BufferWriter.WriteBool(result, isOwner, ref offset);
             return result;
         }

@@ -24,23 +24,30 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public bool isPersistentMove;
         Vector3 moveVelocity;
-        public void SetFrameMoveDir(Vector3 dir)
+        public Vector3 MoveVelocity => moveVelocity;
+        public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
+        public void AddMoveVelocity(Vector3 dir)
         {
             dir.Normalize();
             dir = dir.FixDecimal(2);
             this.moveVelocity = dir * speed;
         }
-        Vector3 addVelocity;
-        public void AddVelocity(Vector3 addVelocity) => this.addVelocity += addVelocity.FixDecimal(2);
+
+        Vector3 extraVelocity;
+        public Vector3 ExtraVelcoty => extraVelocity;
+        public void SetExtraVelocity(Vector3 extraVelocity) => this.extraVelocity = extraVelocity;
+        public void AddExtraVelocity(Vector3 addVelocity) => this.extraVelocity += addVelocity.FixDecimal(2);
 
         // 重力
         float _gravityVelocity;
         float _gravity;
+        public void SetGravity(float _gravity) => this._gravity = _gravity;
 
         float jumpVelocity;
         public float JumpVelocity => jumpVelocity;
-        
+
         public bool IsGrouded { get; private set; }
+        public bool IsHitWall { get; private set; }
 
         public Vector3 CurPos => rb.position;
         public void SetCurPos(Vector3 curPos) => rb.position = curPos;
@@ -85,24 +92,25 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Tick(float fixedDeltaTime)
         {
-            var vel = moveVelocity + addVelocity;
+            if (fixedDeltaTime == 0) return;
+
+            var vel = moveVelocity + extraVelocity;
             vel.y = rb.velocity.y + jumpVelocity + _gravityVelocity * fixedDeltaTime;
             rb.velocity = vel;
-
             if (isPersistentMove)
             {
                 return;
             }
 
             //模拟摩擦力
-            if (IsGrouded && (Mathf.Abs(addVelocity.x) > 0.1f || Mathf.Abs(addVelocity.z) > 0.1f))
+            if (IsGrouded && (Mathf.Abs(extraVelocity.x) > 0.1f || Mathf.Abs(extraVelocity.z) > 0.1f))
             {
-                var reduceVelocity = addVelocity.normalized;
+                var reduceVelocity = extraVelocity.normalized;
                 reduceVelocity.y = 0;
-                addVelocity -= (frictionReduce * reduceVelocity * fixedDeltaTime);
-                if (Mathf.Abs(addVelocity.x) <= 0.1f) addVelocity.x = 0f;
-                if (Mathf.Abs(addVelocity.z) <= 0.1f) addVelocity.z = 0f;
-                Debug.Log("摩擦力过后 " + addVelocity);
+                extraVelocity -= (frictionReduce * reduceVelocity * fixedDeltaTime);
+                if (Mathf.Abs(extraVelocity.x) <= 0.1f) extraVelocity.x = 0f;
+                if (Mathf.Abs(extraVelocity.z) <= 0.1f) extraVelocity.z = 0f;
+                // Debug.Log($"摩擦力过后frictionReduce:{frictionReduce} reduceVelocity:{reduceVelocity}  {addVelocity}" + addVelocity);
             }
 
             //模拟重力
@@ -132,6 +140,25 @@ namespace Game.Client.Bussiness.WorldBussiness
             var v = rb.velocity;
             v.y = 0;
             rb.velocity = v;
+        }
+
+        public void LeaveWall()
+        {
+            Debug.Log("离开墙体");
+            IsHitWall = false;
+        }
+
+        public void HitWall()
+        {
+            Debug.Log("接触墙体");
+            IsHitWall = true;
+
+            // TODO: 惯性指定方向清零
+            // if (Velocity != Vector3.zero)
+            // {
+            // }
+
+            extraVelocity = Vector3.zero;
         }
 
         public void FaceTo(Vector3 forward)

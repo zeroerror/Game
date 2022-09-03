@@ -120,7 +120,7 @@ namespace Game.Client
                     var ray = mainCam.ScreenPointToRay(Input.mousePosition);
                     if (Physics.Raycast(ray, out RaycastHit hit))
                     {
-                        InputComponent.pressMouse0_Point = hit.point;
+                        InputComponent.grenadeThrowPoint = hit.point;
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace Game.Client
                     var ray = mainCam.ScreenPointToRay(Input.mousePosition);
                     if (Physics.Raycast(ray, out RaycastHit hit))
                     {
-                        InputComponent.pressMouse0_Point = hit.point;
+                        InputComponent.shootPoint = hit.point;
                     }
                 }
             }

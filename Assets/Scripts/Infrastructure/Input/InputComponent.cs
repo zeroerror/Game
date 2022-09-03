@@ -5,7 +5,8 @@ public class InputComponent
 {
 
     public Vector3 moveAxis;
-    public Vector3 pressMouse0_Point;
+    public Vector3 shootPoint;
+    public Vector3 grenadeThrowPoint;
     public bool pressJump;
 
     public InputComponent()
@@ -19,10 +20,9 @@ public class InputComponent
         moveAxis.y = 0;
         moveAxis.z = 0;
 
-        pressMouse0_Point.x = 0;
-        pressMouse0_Point.y = 0;
-        pressMouse0_Point.z = 0;
-        
+        shootPoint = Vector3.zero;
+        grenadeThrowPoint = Vector3.zero;
+
         pressJump = false;
     }
 
