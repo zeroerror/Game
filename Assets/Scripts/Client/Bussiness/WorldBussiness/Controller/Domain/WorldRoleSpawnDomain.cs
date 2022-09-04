@@ -42,12 +42,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         }
 
-        public void Tick_RoleMovement(float fixedTime)
+        public void Tick_RoleRigidbody(float fixedTime)
         {
             var roleRepo = worldFacades.Repo.WorldRoleRepo;
             roleRepo.Foreach((role) =>
             {
-                role.MoveComponent.Tick(fixedTime);
+                role.MoveComponent.Tick_Friction(fixedTime);
+                role.MoveComponent.Tick_GravityVelocity(fixedTime);
+                role.MoveComponent.Tick_Rigidbody(fixedTime);
             });
         }
 

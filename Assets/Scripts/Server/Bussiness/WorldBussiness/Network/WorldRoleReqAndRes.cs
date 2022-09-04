@@ -38,13 +38,15 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             int moveVelocityY = (int)(moveVelocity.y * 10000);
             int moveVelocityZ = (int)(moveVelocity.z * 10000);
 
-            var extraVelocity = role.MoveComponent.ExtraVelcoty;
+            var extraVelocity = role.MoveComponent.ExtraVelocity;
             int extraVelocityX = (int)(extraVelocity.x * 10000);
             int extraVelocityY = (int)(extraVelocity.y * 10000);
             int extraVelocityZ = (int)(extraVelocity.z * 10000);
 
-            var log = $"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity} 旋转角度：{eulerAngle}";
-            Debug.Log($"<color=#ff0000>{log}</color>");
+            int gravityVelocity = (int)(role.MoveComponent.GravityVelocity * 10000);
+
+            var log = $"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}";
+            Debug.Log($"<color=#008000>{log}</color>");
 
             WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
             {
@@ -63,6 +65,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
                 extraVelocityX = extraVelocityX,
                 extraVelocityY = extraVelocityY,
                 extraVelocityZ = extraVelocityZ,
+                gravityVelocity = gravityVelocity,
                 isOwner = connId == role.ConnId
             };
             _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);

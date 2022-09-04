@@ -31,18 +31,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 case BulletType.Grenade:
                     bulletPrefabName = "Grenade";
                     break;
+                case BulletType.Hooker:
+                    bulletPrefabName = "Hooker";
+                    break;
             }
+
             if (worldFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
-                if (bulletType == BulletType.Grenade)
-                {
-                    var grenadeEntity = (GrenadeEntity)bulletEntity;
-                    grenadeEntity.SetLifeTime(3f); //手榴弹生命周期
-                    grenadeEntity.SetMoveComponent(3f);//手榴弹投掷速度
-                }
-
                 bulletEntity.SetBulletType(bulletType);
                 return bulletEntity;
             }
@@ -56,7 +53,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bulletEntity) =>
             {
-                if (bulletEntity.LifeTime < 0)
+                if (bulletEntity.LifeTime <= 0)
                 {
                     removeList.Add(bulletEntity);
 
@@ -67,12 +64,36 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return removeList;
         }
 
-        public void Tick_BulletMovement()
+        public void Tick_Bullet(float fixedDeltaTime)
         {
             var bulletRepo = worldFacades.Repo.BulletEntityRepo;
             bulletRepo.Foreach((bullet) =>
             {
-                bullet.MoveComponent.Tick(UnityEngine.Time.deltaTime);
+                switch (bullet.BulletType)
+                {
+                    case BulletType.Default:
+                        break;
+                    case BulletType.Grenade:
+                        break;
+                    case BulletType.Hooker:
+                        var hookerEntity = (HookerEntity)bullet;
+                        var master = hookerEntity.MasterEntity;
+                        var masterMC = master.MoveComponent;
+                        if (hookerEntity.TickHooker())
+                        {
+                            var hookerEntityMC = hookerEntity.MoveComponent;
+                            var dir = hookerEntityMC.CurPos - masterMC.CurPos;
+                            dir.Normalize();
+                            var v = dir * 10f;
+                            Debug.Log($"Hooker : v:{v} ");
+                            masterMC.SetBeHookedVelocity(v);
+                        }
+                        break;
+                }
+
+                bullet.MoveComponent.Tick_Friction(fixedDeltaTime);
+                bullet.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
+                bullet.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
             });
         }
 

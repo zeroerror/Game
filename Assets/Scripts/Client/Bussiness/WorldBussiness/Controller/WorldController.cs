@@ -61,6 +61,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             int nextFrame = worldClientFrame + 1;
 
+            // Physics Simulation
+            if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity != null)
+            {
+                Tick_Physics_RoleMovement(fixedDeltaTime);
+            }
+            Tick_Physics_BulletMovement(fixedDeltaTime);
+
             //1
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
@@ -70,11 +77,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             //2
             Tick_Input();
 
-            // Physics Simulation
-            if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity == null) return;
-            // Tick_BulletLife();//服务器回传结束
-            Tick_Physics_RoleMovement(fixedDeltaTime);
-            Tick_Physics_BulletMovement();
             var physicsScene = worldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
         }
@@ -115,15 +117,29 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 worldClientFrame = nextFrame;
 
                 var bulletId = bulletSpawn.bulletId;
-                var bulletType = bulletSpawn.bulletType;
+                var bulletTypeByte = bulletSpawn.bulletType;
+                var bulletType = (BulletType)bulletTypeByte;
                 var masterWRid = bulletSpawn.wRid;
                 var masterWRole = worldFacades.Repo.WorldRoleRepo.Get(masterWRid);
                 var shootStartPoint = masterWRole.ShootPointPos;
                 Vector3 shootDir = new Vector3(bulletSpawn.shootDirX / 100f, bulletSpawn.shootDirY / 100f, bulletSpawn.shootDirZ / 100f);
                 Debug.Log($"生成子弹帧 {worldClientFrame}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
                 var fieldEntity = worldFacades.Repo.FiledEntityRepo.Get(1);
-                var bulletEntity = worldFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, (BulletType)bulletType);
+                var bulletEntity = worldFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
+                switch (bulletType)
+                {
+                    case BulletType.Default:
+                        break;
+                    case BulletType.Grenade:
+                        break;
+                    case BulletType.Hooker:
+                        var hookerEntity = (HookerEntity)bulletEntity;
+                        hookerEntity.SetMaster(masterWRole);
+                        hookerEntity.SetMasterGrabPoint(masterWRole.transform);
+                        break;
+                }
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
+                bulletEntity.MoveComponent.SetForward(shootDir);
                 bulletEntity.MoveComponent.AddMoveVelocity(shootDir);
                 bulletEntity.SetWRid(masterWRid);
                 bulletEntity.SetBulletId(bulletId);
@@ -152,14 +168,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 float extraVelocityX = stateMsg.extraVelocityX / 10000f;
                 float extraVelocityY = stateMsg.extraVelocityY / 10000f;
                 float extraVelocityZ = stateMsg.extraVelocityZ / 10000f;
+                float gravityVelocity = stateMsg.gravityVelocity / 10000f;
 
                 Vector3 pos = new Vector3(x, y, z);
                 Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
                 Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
                 Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
 
-                var entity = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
-                if (entity == null)
+                var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
+                if (role == null)
                 {
                     Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
 
@@ -167,42 +184,47 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     var repo = worldFacades.Repo;
                     var fieldEntity = repo.FiledEntityRepo.Get(1);
                     var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-                    entity = domain.SpawnWorldRole(fieldEntity.transform);
-                    entity.SetWRid(wRoleId);
+                    role = domain.SpawnWorldRole(fieldEntity.transform);
+                    role.SetWRid(wRoleId);
 
                     var roleRepo = repo.WorldRoleRepo;
-                    roleRepo.Add(entity);
+                    roleRepo.Add(role);
                     if (stateMsg.isOwner && roleRepo.Owner == null)
                     {
-                        Debug.Log($"生成Owner  wRid:{entity.WRid})");
-                        roleRepo.SetOwner(entity);
-                        worldFacades.CinemachineExtra.FollowSolo(entity.transform, 3f);
-                        worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
+                        Debug.Log($"生成Owner  wRid:{role.WRid})");
+                        roleRepo.SetOwner(role);
+                        worldFacades.CinemachineExtra.FollowSolo(role.transform, 3f);
+                        worldFacades.CinemachineExtra.LookAtSolo(role.CamTrackingObj, 3f);
                     }
                 }
-                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 人物状态：{roleState.ToString()}  位置: {pos}  移动速度: {moveVelocity}  额外速度: {extraVelocity}  旋转角:{eulerAngle}  ";
-                Debug.Log($"<color=#ff0000>{log}</color>");
+                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}";
+                Debug.Log($"<color=#008000>{log}</color>");
 
                 switch (roleState)
                 {
                     case RoleState.Idle:
-                        entity.AnimatorComponent.PlayIdle();
+                        role.AnimatorComponent.PlayIdle();
                         break;
                     case RoleState.Move:
-                        entity.MoveComponent.SetCurPos(pos);
-                        entity.MoveComponent.SetRotaionEulerAngle(eulerAngle);
-                        entity.MoveComponent.SetMoveVelocity(moveVelocity);
-                        entity.MoveComponent.SetExtraVelocity(extraVelocity);
-
-                        entity.AnimatorComponent.PlayRun();
+                        role.MoveComponent.SetCurPos(pos);
+                        role.MoveComponent.SetRotaionEulerAngle(eulerAngle);
+                        role.MoveComponent.SetMoveVelocity(moveVelocity);
+                        role.MoveComponent.SetExtraVelocity(extraVelocity);
+                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
+                        role.AnimatorComponent.PlayRun();
                         break;
                     case RoleState.Jump:
-                        entity.MoveComponent.SetJumpVelocity();
-                        entity.AnimatorComponent.PlayRun();
+                        role.MoveComponent.SetCurPos(pos);
+                        role.MoveComponent.SetRotaionEulerAngle(eulerAngle);
+                        role.MoveComponent.SetMoveVelocity(moveVelocity);
+                        role.MoveComponent.SetExtraVelocity(extraVelocity);
+                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
+                        role.MoveComponent.SetJumpVelocity();
+                        role.AnimatorComponent.PlayRun();
                         break;
                 }
 
-                entity.SetRoleStatus(roleState);
+                role.SetRoleStatus(roleState);
             }
         }
 
@@ -257,6 +279,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Grenade, rid, input.grenadeThrowPoint);
             }
 
+            if (input.hookPoint != Vector3.zero)
+            {
+                // TODO: 是否满足条件
+                byte rid = owner.WRid;
+                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Hooker, rid, input.hookPoint);
+            }
+
             if (input.moveAxis != Vector3.zero)
             {
                 var moveDir = input.moveAxis;
@@ -291,6 +320,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     ((GrenadeEntity)bulletEntity).TearDown();
                 }
 
+                if (bulletEntity.BulletType == BulletType.Hooker)
+                {
+                    ((HookerEntity)bulletEntity).TearDown();
+                }
+
                 bulletRepo.TryRemove(bulletEntity);
             }
         }
@@ -298,13 +332,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         void Tick_Physics_RoleMovement(float deltaTime)
         {
             var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-            domain.Tick_RoleMovement(deltaTime);
+            domain.Tick_RoleRigidbody(deltaTime);
         }
 
-        void Tick_Physics_BulletMovement()
+        void Tick_Physics_BulletMovement(float fixedDeltaTime)
         {
             var domain = worldFacades.Domain.BulletDomain;
-            domain.Tick_BulletMovement();
+            domain.Tick_Bullet(fixedDeltaTime);
         }
 
         bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)

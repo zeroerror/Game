@@ -7,16 +7,21 @@ namespace Game.Client.Bussiness.WorldBussiness
     public class GrenadeEntity : BulletEntity
     {
 
-        public void SetMoveComponent(float moveSpeed)
+        protected override void Init()
         {
-            MoveComponent.SetSpeed(moveSpeed);
-            MoveComponent.SetGravity(10);
+            base.Init();
+            SetLifeTime(3f);
+            moveComponent.isPersistentMove = false;
+            moveComponent.SetSpeed(10f);
+            moveComponent.SetGravity(5f);
+            moveComponent.isPersistentMove = true;
         }
 
         public override void TearDown()
         {
             Destroy(this.gameObject);
         }
+   
 
     }
 

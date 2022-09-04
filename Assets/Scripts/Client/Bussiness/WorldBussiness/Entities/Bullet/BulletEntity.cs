@@ -7,7 +7,8 @@ namespace Game.Client.Bussiness.WorldBussiness
     public enum BulletType
     {
         Default,
-        Grenade
+        Grenade,
+        Hooker
     }
 
     public class BulletEntity : MonoBehaviour
@@ -26,7 +27,8 @@ namespace Game.Client.Bussiness.WorldBussiness
         public ushort BulletId => bulletId;
         public void SetBulletId(ushort bulletId) => this.bulletId = bulletId;
 
-        public MoveComponent MoveComponent { get; private set; }
+        protected MoveComponent moveComponent;
+        public MoveComponent MoveComponent => moveComponent;
 
         Queue<WorldRoleEntity> hitRoleQueue;
 
@@ -45,10 +47,19 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Awake()
         {
-            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 50f, 0f);
-            MoveComponent.isPersistentMove = true;
+            moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
+            moveComponent.SetSpeed(10f);
+            moveComponent.SetGravity(0);
+            moveComponent.isPersistentMove = true;
 
+            lifeTime = 10f;
             hitRoleQueue = new Queue<WorldRoleEntity>();
+            Init();
+        }
+
+        protected virtual void Init()
+        {
+
         }
 
         public virtual void TearDown()
@@ -56,14 +67,47 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         }
 
+        // Unity Physics 
+
+        public virtual void EnterTrigger(Collider collision) { }
+        public virtual void ExitTrigger(Collider collision) { }
+        public virtual void EnterCollision(Collision collision) { }
+        public virtual void ExitCollision(Collision collision) { }
+
         void OnTriggerEnter(Collider collision)
         {
-            var go = collision.gameObject;
-            var layerName = LayerMask.LayerToName(go.layer);
-            if (layerName == "Player")
+            EnterTrigger(collision);
+        }
+
+        void OnTriggerExit(Collider collision)
+        {
+            ExitTrigger(collision);
+        }
+
+        void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
-                hitRoleQueue.Enqueue(go.GetComponent<WorldRoleEntity>());
+                MoveComponent.EnterGround();
             }
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            {
+                MoveComponent.HitWall();
+            }
+            EnterCollision(collision);
+        }
+
+        void OnCollisionExit(Collision collision)
+        {
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+            {
+                MoveComponent.LeaveGround();
+            }
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            {
+                MoveComponent.LeaveWall();
+            }
+            ExitCollision(collision);
         }
 
     }

@@ -34,9 +34,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public RoleState RoleState { get; private set; }
         public void SetRoleStatus(RoleState roleStatus) => this.RoleState = roleStatus;
 
-        public RoleState OldRoleState { get; private set; }
-        public void UpdateRoleStatus() => this.OldRoleState = RoleState;
-
         public bool IsDead { get; private set; }
         public bool IsOldState;
 
@@ -53,9 +50,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             offset = new Vector3(0, 1f, 0);
         }
 
-        public bool IsStateChange()
+        public bool IsIdle()
         {
-            return OldRoleState != RoleState;
+            return MoveComponent.Velocity == Vector3.zero;
         }
 
         public void TearDown()
@@ -76,7 +73,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
-                MoveComponent.StandGround();
+                MoveComponent.EnterGround();
             }
             if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {

@@ -10,18 +10,21 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         public WorldSpawnDomain WorldSpawnDomain { get; private set; }
         public WorldRoleSpawnDomain WorldRoleSpawnDomain { get; private set; }
         public BulletDomain BulletDomain { get; private set; }
+        public HookerDomain HookerDomain { get; private set; }
 
         public AllDomains()
         {
             WorldSpawnDomain = new WorldSpawnDomain();
             WorldRoleSpawnDomain = new WorldRoleSpawnDomain();
             BulletDomain = new BulletDomain();
+            HookerDomain = new HookerDomain();
         }
 
         public void Inject(WorldFacades facades){
             WorldSpawnDomain.Inject(facades);
             WorldRoleSpawnDomain.Inject(facades);
             BulletDomain.Inject(facades);
+            HookerDomain.Inject(facades);
         }
     }
 

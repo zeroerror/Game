@@ -20,6 +20,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
         public int extraVelocityX;
         public int extraVelocityY;
         public int extraVelocityZ;
+        public int gravityVelocity;
 
         public bool isOwner;
 
@@ -40,6 +41,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
             extraVelocityX = BufferReader.ReadInt32(src, ref offset);
             extraVelocityY = BufferReader.ReadInt32(src, ref offset);
             extraVelocityZ = BufferReader.ReadInt32(src, ref offset);
+            gravityVelocity = BufferReader.ReadInt32(src, ref offset);
             isOwner = BufferReader.ReadBool(src, ref offset);
             offset += src.Length;
         }
@@ -63,6 +65,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
             BufferWriter.WriteInt32(result, extraVelocityX, ref offset);
             BufferWriter.WriteInt32(result, extraVelocityY, ref offset);
             BufferWriter.WriteInt32(result, extraVelocityZ, ref offset);
+            BufferWriter.WriteInt32(result, gravityVelocity, ref offset);
             BufferWriter.WriteBool(result, isOwner, ref offset);
             return result;
         }

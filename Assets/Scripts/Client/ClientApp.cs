@@ -124,6 +124,18 @@ namespace Game.Client
                     }
                 }
             }
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                var mainCam = Camera.main;
+                if (mainCam != null)
+                {
+                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out RaycastHit hit))
+                    {
+                        InputComponent.hookPoint = hit.point;
+                    }
+                }
+            }
             if (Input.GetMouseButtonDown(0))
             {
                 var mainCam = Camera.main;
