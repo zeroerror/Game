@@ -211,9 +211,20 @@ namespace Game.Client.Bussiness.WorldBussiness
             rb.velocity += (velocity);
         }
 
-        public void SetRotaionEulerAngle(Vector3 eulerAngle)
+        public void SetRotationByEulerAngle(Vector3 eulerAngle)
         {
             rb.rotation = Quaternion.Euler(eulerAngle);
+        }
+
+        public void AddRotation(Vector2 eulerAngle)
+        {
+            var euler = rb.rotation.eulerAngles;
+            euler.x -= eulerAngle.y;    //上下看
+            euler.x = euler.x > 30f ? 30f : euler.x;
+            euler.x = euler.x < -30f ? -30f : euler.x;
+            
+            euler.y += eulerAngle.x;    //左右看
+            rb.rotation = Quaternion.Euler(euler);
         }
 
         public void Reset()

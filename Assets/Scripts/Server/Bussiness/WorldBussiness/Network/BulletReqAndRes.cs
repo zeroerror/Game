@@ -67,11 +67,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.SendMsg(connId, msg);
         }
 
+
+        // == Regist ==
         public void RegistReq_BulletSpawn(Action<int, FrameBulletSpawnReqMsg> action)
         {
             _server.AddRegister<FrameBulletSpawnReqMsg>(action);
         }
-
 
     }
 

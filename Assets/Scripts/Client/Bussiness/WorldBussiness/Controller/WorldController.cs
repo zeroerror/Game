@@ -204,7 +204,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         break;
                     case RoleState.Move:
                         role.MoveComponent.SetCurPos(pos);
-                        role.MoveComponent.SetRotaionEulerAngle(eulerAngle);
+                        role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
                         role.MoveComponent.SetMoveVelocity(moveVelocity);
                         role.MoveComponent.SetExtraVelocity(extraVelocity);
                         role.MoveComponent.SetGravityVelocity(gravityVelocity);
@@ -212,7 +212,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         break;
                     case RoleState.Jump:
                         role.MoveComponent.SetCurPos(pos);
-                        role.MoveComponent.SetRotaionEulerAngle(eulerAngle);
+                        role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
                         role.MoveComponent.SetMoveVelocity(moveVelocity);
                         role.MoveComponent.SetExtraVelocity(extraVelocity);
                         role.MoveComponent.SetGravityVelocity(gravityVelocity);
@@ -261,7 +261,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 byte rid = owner.WRid;
                 worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrame, rid);
             }
-
+            if (input.pressV)
+            {
+                //打开第一人称视角
+                // TODO: 加切换视角的判定条件
+                var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner, owner.EyeFocusPoint);
+                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner);
+            }
             if (input.shootPoint != Vector3.zero)
             {
                 // TODO: 是否满足条件
@@ -293,14 +300,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 }
             }
 
-            if (input.pressV)
+            if (input.mouseAxis != Vector2.zero)
             {
-                //打开第一人称视角
-                // TODO: 加切换视角的判定条件
-                var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
-                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner, owner.EyeFocusPoint);
-                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner);
+                owner.MoveComponent.AddRotation(input.mouseAxis*10f);
+
+                var roleRqs = worldFacades.Network.WorldRoleReqAndRes;
+                roleRqs.SendReq_WRoleRotate(worldClientFrame, owner);
             }
+
             input.Reset();
         }
 

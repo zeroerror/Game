@@ -17,6 +17,8 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
+
+        // == Send ==
         public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleEntity role)
         {
             // Position
@@ -71,8 +73,21 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);
         }
 
+        public void SendRes_WorldRoleSpawn(int connId, int frameIndex, byte wRoleId, bool isOwner)
+        {
+            FrameWRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameWRoleSpawnResMsg
+            {
+                serverFrame = frameIndex,
+                wRoleId = wRoleId,
+                isOwner = isOwner
+            };
+            _server.SendMsg<FrameWRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
+            Debug.Log($"服务端回复帧消息 serverFrameIndex:{frameIndex} connId:{connId} ---->确认人物生成");
+        }
+
+        // == Regist ==
         // == OPT ==
-        public void RegistReq_WorldRoleMove(Action<int, FrameOptReqMsg> action)
+        public void RegistReq_WorldRoleOpt(Action<int, FrameOptReqMsg> action)
         {
             _server.AddRegister<FrameOptReqMsg>(action);
         }
@@ -86,18 +101,6 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
         public void RegistReq_WolrdRoleSpawn(Action<int, FrameWRoleSpawnReqMsg> action)
         {
             _server.AddRegister<FrameWRoleSpawnReqMsg>(action);
-        }
-
-        public void SendRes_WorldRoleSpawn(int connId, int frameIndex, byte wRoleId, bool isOwner)
-        {
-            FrameWRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameWRoleSpawnResMsg
-            {
-                serverFrame = frameIndex,
-                wRoleId = wRoleId,
-                isOwner = isOwner
-            };
-            _server.SendMsg<FrameWRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
-            Debug.Log($"服务端回复帧消息 serverFrameIndex:{frameIndex} connId:{connId} ---->确认人物生成");
         }
 
     }

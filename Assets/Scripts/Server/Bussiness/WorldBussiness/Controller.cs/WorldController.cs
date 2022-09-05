@@ -68,7 +68,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             this.worldFacades = worldFacades;
 
             var roleRqs = worldFacades.Network.WorldRoleReqAndRes;
-            roleRqs.RegistReq_WorldRoleMove(OnWoldRoleMove);
+            roleRqs.RegistReq_WorldRoleOpt(OnWoldRoleOpt);
             roleRqs.RegistReq_Jump(OnWoldRoleJump);
             roleRqs.RegistReq_WolrdRoleSpawn(OnWoldRoleSpawn);
 
@@ -100,7 +100,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             // Client Request
             Tick_WRoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
-            Tick_Opt(nextFrame);
+            Tick_AllOpt(nextFrame);
 
             // Tick
             Tick_BulletLife();
@@ -250,13 +250,13 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
         }
 
-        void Tick_Opt(int nextFrame)
+        void Tick_AllOpt(int nextFrame)
         {
             Tick_JumpOpt(nextFrame);
-            Tick_MoveOpt(nextFrame);
+            Tick_MoveAndRotateOpt(nextFrame);
         }
 
-        void Tick_MoveOpt(int nextFrame)
+        void Tick_MoveAndRotateOpt(int nextFrame)
         {
             if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList)) return;
 
@@ -278,6 +278,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
                 if (optTypeId == 1)
                 {
+                    // ----移动
                     Vector3 dir = new Vector3((sbyte)(realMsg >> 16), (sbyte)(realMsg >> 8), (sbyte)realMsg);
                     // 人物状态同步
                     roleEntity.SetRoleStatus(RoleState.Move);
@@ -290,12 +291,25 @@ namespace Game.Server.Bussiness.WorldBussiness
                     //服务器逻辑Move + 物理模拟
                     var curPhysicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
                     roleEntity.MoveComponent.AddMoveVelocity(dir);
-                    roleEntity.MoveComponent.FaceTo(dir);
                     roleEntity.MoveComponent.Tick_Friction(fixedDeltaTime);
                     roleEntity.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
                     roleEntity.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
                     curPhysicsScene.Simulate(fixedDeltaTime);
                     roleEntity.MoveComponent.AddMoveVelocity(Vector3.zero);
+                }
+
+                if (optTypeId == 2)
+                {
+                    // ----转向（基于客户端鉴权的同步）
+                    Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
+                    roleEntity.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                    Debug.Log($"转向（基于客户端鉴权的同步）eulerAngle:{eulerAngle}");
+                    //发送状态同步帧
+                    connIdList.ForEach((connId) =>
+                    {
+                        //TODO:只广播给非本人
+                        rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
+                    });
                 }
 
                 optList.RemoveAt(lastIndex);
@@ -441,7 +455,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         // == Network
         // Role
-        void OnWoldRoleMove(int connId, FrameOptReqMsg msg)
+        void OnWoldRoleOpt(int connId, FrameOptReqMsg msg)
         {
             if (!wRoleOptQueueDic.TryGetValue(serveFrame + 1, out var optQueue))
             {

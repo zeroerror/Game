@@ -6,6 +6,7 @@ namespace Game.Generic
     public static class VectorExtension
     {
 
+        #region [Vector3]
         public static bool Equals(this Vector3 v, Vector3 compareV, int decimalCount)
         {
             int num = 1;
@@ -43,6 +44,21 @@ namespace Game.Generic
             return v;
         }
 
+        public static void Reset(this ref Vector3 v)
+        {
+            v.x = 0;
+            v.y = 0;
+            v.z = 0;
+        }
+        #endregion
+
+        #region [Vector2]
+        public static void Reset(this Vector2 v)
+        {
+            v.x = 0;
+            v.y = 0;
+        }
+        #endregion
     }
 
 }

@@ -22,22 +22,35 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
-        public void RegistUpdate_WRole(Action<WRoleStateUpdateMsg> action)
-        {
-            _client.RegistMsg<WRoleStateUpdateMsg>(action);
-        }
-
+        // == Send ==
         public void SendReq_WRoleMove(int frameIndex, byte rid, Vector3 dir)
         {
-            int msg = rid << 24;
-            msg |= (byte)dir.x << 16;
-            msg |= (byte)dir.y << 8;
-            msg |= (byte)dir.z;
+            ulong msg = (ulong)rid << 56;     //8 wrid 8 x 8 y 8 z
+            msg |= (ulong)dir.x << 48;
+            msg |= (ulong)dir.y << 40;
+            msg |= (ulong)dir.z << 32;
 
             FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {
                 clientFrameIndex = frameIndex,
                 optTypeId = 1,
+                msg = msg
+            };
+            _client.SendMsg(frameOptReqMsg);
+        }
+
+        public void SendReq_WRoleRotate(int frameIndex, WorldRoleEntity roleEntity)
+        {
+            var eulerAngel = roleEntity.transform.rotation.eulerAngles;
+            ulong msg = (ulong)roleEntity.WRid << 48;   //16 wrid 16 x 16 y 16 z
+            msg |= (ulong)eulerAngel.x << 32;
+            msg |= (ulong)eulerAngel.y << 16;
+            msg |= (ulong)eulerAngel.z;
+
+            FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
+            {
+                clientFrameIndex = frameIndex,
+                optTypeId = 2,
                 msg = msg
             };
             _client.SendMsg(frameOptReqMsg);
@@ -63,10 +76,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.SendMsg<FrameWRoleSpawnReqMsg>(frameReqWRoleSpawnMsg);
         }
 
+        // == Regist ==
+
         public void RegistRes_WorldRoleSpawn(Action<FrameWRoleSpawnResMsg> action)
         {
             _client.RegistMsg<FrameWRoleSpawnResMsg>(action);
         }
+
+        public void RegistUpdate_WRole(Action<WRoleStateUpdateMsg> action)
+        {
+            _client.RegistMsg<WRoleStateUpdateMsg>(action);
+        }
+
 
     }
 

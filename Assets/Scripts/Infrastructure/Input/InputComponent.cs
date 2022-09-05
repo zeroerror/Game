@@ -1,10 +1,12 @@
 
 using UnityEngine;
+using Game.Generic;
 
 public class InputComponent
 {
 
     public Vector3 moveAxis;
+    public Vector2 mouseAxis;
     public Vector3 shootPoint;
     public Vector3 grenadeThrowPoint;
     public Vector3 hookPoint;
@@ -13,18 +15,20 @@ public class InputComponent
 
     public InputComponent()
     {
-        moveAxis = new Vector2();
+        moveAxis = new Vector3();
+        mouseAxis = new Vector2();
+        shootPoint = new Vector3();
+        grenadeThrowPoint = new Vector3();
+        grenadeThrowPoint = new Vector3();
     }
 
     public void Reset()
     {
-        moveAxis.x = 0;
-        moveAxis.y = 0;
-        moveAxis.z = 0;
-
-        shootPoint = Vector3.zero;
-        grenadeThrowPoint = Vector3.zero;
-        hookPoint = Vector3.zero;
+        moveAxis.Reset();
+        shootPoint.Reset();
+        grenadeThrowPoint.Reset();
+        hookPoint.Reset();
+        mouseAxis.Reset();
 
         pressV = false;
         pressJump = false;

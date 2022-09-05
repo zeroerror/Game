@@ -20,8 +20,10 @@ namespace Game.Client
 
     public class ClientApp : MonoBehaviour
     {
+
         public string CurrentSceneName { get; private set; }
         InputComponent InputComponent;
+        float time;
 
         void Awake()
         {
@@ -152,6 +154,14 @@ namespace Game.Client
                         InputComponent.shootPoint = hit.point;
                     }
                 }
+            }
+
+            var realTime = Time.realtimeSinceStartup;
+            if (realTime - time > 0.5f)
+            {
+                time = realTime;
+                InputComponent.mouseAxis.x = Input.GetAxis("Mouse X");
+                InputComponent.mouseAxis.y = Input.GetAxis("Mouse Y");
             }
         }
 
