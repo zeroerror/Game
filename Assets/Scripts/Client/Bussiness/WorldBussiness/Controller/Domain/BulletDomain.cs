@@ -84,9 +84,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                             var hookerEntityMC = hookerEntity.MoveComponent;
                             var dir = hookerEntityMC.CurPos - masterMC.CurPos;
                             dir.Normalize();
-                            var v = dir * 10f;
+                            var v = dir * 20f*fixedDeltaTime;
                             Debug.Log($"Hooker : v:{v} ");
-                            masterMC.SetBeHookedVelocity(v);
+                            masterMC.AddExtraVelocity(v);
                         }
                         break;
                 }

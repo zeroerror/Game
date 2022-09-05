@@ -14,7 +14,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         float jumpSpeed;
         public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
 
-        float frictionReduce = 200f;
+        float frictionReduce = 0f;
         public void SetFriction(float friction) => this.frictionReduce = friction;
 
         // Rigidbody
@@ -55,11 +55,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public Vector3 ExtraVelocity => extraVelocity;
         public void SetExtraVelocity(Vector3 extraVelocity) => this.extraVelocity = extraVelocity;
         public void AddExtraVelocity(Vector3 addVelocity) => this.extraVelocity += addVelocity.FixDecimal(4);
-
-        // == 钩爪速度 5
-        Vector3 beHookedVelocity;
-        public Vector3 BeHookedVelocity;
-        public void SetBeHookedVelocity(Vector3 beHookedVelocity) => this.beHookedVelocity = beHookedVelocity;
 
         float _gravity;
         public void SetGravity(float _gravity) => this._gravity = _gravity;
@@ -112,15 +107,20 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             if (fixedDeltaTime == 0) return;
 
-            var vel = moveVelocity + extraVelocity + beHookedVelocity;
-            vel.y = rb.velocity.y + jumpVelocity + (_gravityVelocity + extraVelocity.y) * fixedDeltaTime;
+            var vel = moveVelocity; //XZ轴
+            vel.y = rb.velocity.y + jumpVelocity + _gravityVelocity * fixedDeltaTime;   //Y轴
+            vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
+            Debug.Log($"XZ轴->moveVelocity:{moveVelocity}");
+            Debug.Log($"Y轴->rbVelocity_Y:{rb.velocity.y} jumpVelocity:{jumpVelocity}  _gravityVelocityDelta:{_gravityVelocity * fixedDeltaTime}");
+            Debug.Log($"XYZ轴->extraVelocity:{extraVelocity}");
+            Debug.Log($"轴->rbVelocity:{rb.velocity}");
             if (isPersistentMove)
             {
                 return;
             }
 
-            // 重置
+            // 重置 ‘一次性速度’
             moveVelocity = Vector3.zero;
             jumpVelocity = 0;
         }
@@ -147,25 +147,6 @@ namespace Game.Client.Bussiness.WorldBussiness
                 // Debug.Log($"cosValue:{cosValue}摩擦力过后frictionReduce:{frictionReduce} reduceVelocity:{reduceVelocity} extraVelocity: {extraVelocity}");
             }
 
-             //模拟摩擦力
-            if (IsGrouded && (Mathf.Abs(beHookedVelocity.x) > 0.1f || Mathf.Abs(beHookedVelocity.z) > 0.1f))
-            {
-                var reduceVelocity = beHookedVelocity.normalized;
-                reduceVelocity.y = 0;
-                beHookedVelocity -= (frictionReduce * reduceVelocity * fixedDeltaTime);
-                var cosValue = Vector3.Dot(reduceVelocity.normalized, beHookedVelocity.normalized);
-                if (cosValue <= 0)
-                {
-                    beHookedVelocity.z = 0f;
-                    beHookedVelocity.x = 0f;
-                }
-                else
-                {
-                    if (Mathf.Abs(beHookedVelocity.x) <= 0.1f) beHookedVelocity.x = 0f;
-                    if (Mathf.Abs(beHookedVelocity.z) <= 0.1f) beHookedVelocity.z = 0f;
-                }
-                // Debug.Log($"cosValue:{cosValue}摩擦力过后frictionReduce:{frictionReduce} reduceVelocity:{reduceVelocity} extraVelocity: {extraVelocity}");
-            }
         }
 
         public void Tick_GravityVelocity(float fixedDeltaTime)
@@ -174,8 +155,11 @@ namespace Game.Client.Bussiness.WorldBussiness
             if (!IsGrouded)
             {
                 _gravityVelocity -= (fixedDeltaTime * _gravity);
-                // beHookedVelocity.y -= (fixedDeltaTime * _gravity);
-                // extraVelocity.y -= (fixedDeltaTime * _gravity);
+                if (extraVelocity.y > 0)
+                {
+                    extraVelocity.y -= (fixedDeltaTime * _gravity);
+                    if (extraVelocity.y < 0) extraVelocity.y = 0;
+                }
             }
         }
 
@@ -187,12 +171,14 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void EnterGround()
         {
-            Debug.Log($"角色击飞发送 接触地面");
             Debug.Log("接触地面");
             IsGrouded = true;
 
-            //重力速度和Y速度归零
+            //重力速度 归零
             _gravityVelocity = 0;
+            //额外速度Y轴 归零
+            extraVelocity.y = 0;
+            //RigidBody速度 归零
             var v = rb.velocity;
             v.y = 0;
             rb.velocity = v;
@@ -215,7 +201,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             // }
 
             extraVelocity = Vector3.zero;
-            beHookedVelocity = Vector3.zero;
         }
 
         public void FaceTo(Vector3 forward)

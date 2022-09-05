@@ -1,13 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Generic;
-using Game.Client.Bussiness.WorldBussiness.Shot;
 using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
-using Game.Infrastructure.Network;
 using Game.Client.Bussiness.EventCenter;
-using System;
-using Game.Infrastructure.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
