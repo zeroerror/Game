@@ -92,6 +92,7 @@ namespace Game.Client
 
         void Tick_Input()
         {
+
             if (Input.GetKey(KeyCode.W))
             {
                 InputComponent.moveAxis.z = 1;
@@ -107,6 +108,10 @@ namespace Game.Client
             if (Input.GetKey(KeyCode.D))
             {
                 InputComponent.moveAxis.x = 1;
+            }
+            if (Input.GetKey(KeyCode.V))
+            {
+                InputComponent.pressV = true;
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {

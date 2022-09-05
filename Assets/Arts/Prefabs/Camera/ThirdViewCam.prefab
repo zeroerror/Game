@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4918298110699510761}
   - component: {fileID: 4918298110699510760}
   m_Layer: 0
-  m_Name: CinemachineRenderer
+  m_Name: ThirdViewCam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

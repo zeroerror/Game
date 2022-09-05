@@ -111,10 +111,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             vel.y = rb.velocity.y + jumpVelocity + _gravityVelocity * fixedDeltaTime;   //Y轴
             vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
-            Debug.Log($"XZ轴->moveVelocity:{moveVelocity}");
-            Debug.Log($"Y轴->rbVelocity_Y:{rb.velocity.y} jumpVelocity:{jumpVelocity}  _gravityVelocityDelta:{_gravityVelocity * fixedDeltaTime}");
-            Debug.Log($"XYZ轴->extraVelocity:{extraVelocity}");
-            Debug.Log($"轴->rbVelocity:{rb.velocity}");
             if (isPersistentMove)
             {
                 return;

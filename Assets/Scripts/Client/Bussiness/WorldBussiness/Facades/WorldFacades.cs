@@ -13,10 +13,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         // Asset
         public AllWorldAssets Assets { get; private set; }
         // Controller Set
-        public CinemachineExtra CinemachineExtra { get; private set; }
         public InputComponent InputComponent { get; private set; }
-
-        public void SetCinemachineExtra(CinemachineExtra cinemachineExtra) => CinemachineExtra = cinemachineExtra;
 
         public WorldFacades()
         {

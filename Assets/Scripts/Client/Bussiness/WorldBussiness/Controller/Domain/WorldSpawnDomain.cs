@@ -31,10 +31,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             var fieldEntity = fieldTrans.GetComponent<FieldEntity>();
             var cinemachineExtra = fieldTrans.GetComponentInChildren<CinemachineExtra>();
 
-            Debug.Assert(cinemachineExtra != null, "cinemachineExtra 找不到");
-            worldFacades.SetCinemachineExtra(cinemachineExtra);
+            var cameraAsset = worldFacades.Assets.CameraAsset;
+            cameraAsset.TryGetByName("FirstViewCam", out GameObject firstViewCamPrefab);
+            cameraAsset.TryGetByName("ThirdViewCam", out GameObject thirdViewCamPrefab);
+            var firstCam = GameObject.Instantiate(firstViewCamPrefab).GetComponent<CinemachineExtra>();
+            var thirdCam = GameObject.Instantiate(thirdViewCamPrefab).GetComponent<CinemachineExtra>();
+            fieldEntity.CameraComponent.SetFirstViewCam(firstCam);
+            fieldEntity.CameraComponent.SetThirdViewCam(thirdCam);
 
-            Debug.Log("Enter WorldChooseScene");
+            Debug.Log("生成大世界---------------------------");
             LocalEventCenter.Invoke_SceneLoadedHandler(scene.name);
 
             return fieldEntity;

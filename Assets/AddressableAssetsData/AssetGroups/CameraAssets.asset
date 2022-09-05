@@ -18,7 +18,12 @@ MonoBehaviour:
   m_GUID: 75d3f1b501b5f1b4ab8707a0c43feb8b
   m_SerializeEntries:
   - m_GUID: d5b1d715f0aa06b4f8aab62f91f8922d
-    m_Address: CinemachineRenderer
+    m_Address: ThirdViewCam
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Camera
+  - m_GUID: 01cda3c227d4f444d962bce42cfa2ecb
+    m_Address: FirstViewCam
     m_ReadOnly: 0
     m_SerializedLabels:
     - Camera

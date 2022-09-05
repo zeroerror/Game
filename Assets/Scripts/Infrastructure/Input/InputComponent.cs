@@ -9,6 +9,7 @@ public class InputComponent
     public Vector3 grenadeThrowPoint;
     public Vector3 hookPoint;
     public bool pressJump;
+    public bool pressV;
 
     public InputComponent()
     {
@@ -25,6 +26,7 @@ public class InputComponent
         grenadeThrowPoint = Vector3.zero;
         hookPoint = Vector3.zero;
 
+        pressV = false;
         pressJump = false;
     }
 

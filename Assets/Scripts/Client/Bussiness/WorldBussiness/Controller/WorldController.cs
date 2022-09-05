@@ -91,14 +91,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var domain = worldFacades.Domain.WorldRoleSpawnDomain;
                 var entity = domain.SpawnWorldRole(fieldEntity.transform);
                 entity.SetWRid(wRoleId);
+
                 var roleRepo = repo.WorldRoleRepo;
                 roleRepo.Add(entity);
 
+                var fieldCameraComponent = fieldEntity.CameraComponent;
                 if (spawn.isOwner)
                 {
                     roleRepo.SetOwner(entity);
-                    worldFacades.CinemachineExtra.FollowSolo(entity.transform, 3f);
-                    // worldFacades.CinemachineExtra.LookAtSolo(entity.CamTrackingObj, 3f);
+                    fieldCameraComponent.OpenThirdViewCam(entity);
                 }
 
                 Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{entity.WRid}" : $"生成其他角色 : WRid:{entity.WRid}");
@@ -189,8 +190,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     {
                         Debug.Log($"生成Owner  wRid:{role.WRid})");
                         roleRepo.SetOwner(role);
-                        worldFacades.CinemachineExtra.FollowSolo(role.transform, 3f);
-                        worldFacades.CinemachineExtra.LookAtSolo(role.CamTrackingObj, 3f);
+                        var fieldCameraComponent = fieldEntity.CameraComponent;
+                        fieldCameraComponent.OpenThirdViewCam(role);
                     }
                 }
                 var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}";
@@ -290,6 +291,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     byte rid = owner.WRid;
                     worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
                 }
+            }
+
+            if (input.pressV)
+            {
+                //打开第一人称视角
+                // TODO: 加切换视角的判定条件
+                var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner, owner.EyeFocusPoint);
+                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner);
             }
             input.Reset();
         }

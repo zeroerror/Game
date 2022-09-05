@@ -29,6 +29,8 @@ namespace Game.Infrastructure.Input
 
         void Awake()
         {
+            _FollowGroup = GameObject.Find("FollowGroup").GetComponent<CinemachineTargetGroup>();
+            _LookAtGroup = GameObject.Find("TargetGroup").GetComponent<CinemachineTargetGroup>();
             Debug.Assert(_FollowGroup != null, "_FollowGroup Is Null!");
             Debug.Assert(_LookAtGroup != null, "_TargetGroup Is Null!");
             _FollowGroup.m_Targets = new CinemachineTargetGroup.Target[MAX_TARGET_FOLLOW];
@@ -43,17 +45,18 @@ namespace Game.Infrastructure.Input
         }
 
         // == Follow ==
-        public void FollowSolo(Transform trans, float radius)
+        public void FollowSolo(Transform trans, float weight = 1f, float radius = 0f)
         {
             ResetFollowGroup();
             var target = _FollowGroup.m_Targets[0];
             target.target = trans;
-            target.weight = 1;
+            target.weight = weight;
             target.radius = radius;
             _FollowGroup.m_Targets[0] = target;
             CurrentFollowCount = 1;
 
             cinemachineVirtual.m_Follow = trans;
+            Debug.Log($"FollowSolo: target{target.target.name}");
         }
 
         public void AddFollowMember(Transform trans, float weight, float radius)
@@ -82,7 +85,7 @@ namespace Game.Infrastructure.Input
         }
 
         // == Look At ==
-        public void LookAtSolo(Transform trans, float radius)
+        public void LookAtSolo(Transform trans, float weight = 1f, float radius = 0f)
         {
             ResetFollowGroup();
             var target = _LookAtGroup.m_Targets[0];
@@ -93,6 +96,7 @@ namespace Game.Infrastructure.Input
             CurrentLookAtCount = 1;
 
             cinemachineVirtual.m_LookAt = trans;
+            Debug.Log($"LookAtSolo: target{target.target.name}");
         }
 
         public void AddLookAtMember(Transform trans, float weight, float radius)

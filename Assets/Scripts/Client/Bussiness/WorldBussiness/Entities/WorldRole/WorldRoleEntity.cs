@@ -1,5 +1,6 @@
 using UnityEngine;
 using Game.Generic;
+using Game.Client.Bussiness.Interfaces;
 
 namespace Game.Client.Bussiness.WorldBussiness
 {
@@ -12,7 +13,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         Be_Imprisoned       //-被禁锢
     }
 
-    public class WorldRoleEntity : MonoBehaviour
+    public class WorldRoleEntity : MonoBehaviour, ICameraTrackObj
     {
 
         byte wRid;
@@ -40,6 +41,14 @@ namespace Game.Client.Bussiness.WorldBussiness
         [SerializeField]
         Transform camTrackingObj;
         public Transform CamTrackingObj => camTrackingObj;
+        
+        [SerializeField]
+        Transform eyeFocusPoint;
+        public Transform EyeFocusPoint => eyeFocusPoint;
+
+        // == ICameraTrackObj
+        public Vector3 selfPos => transform.position;
+        public Transform camTrackObjTrans => camTrackingObj.transform;
 
         public void Awake()
         {
