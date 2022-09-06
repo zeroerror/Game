@@ -182,7 +182,6 @@ namespace Game.Server.Bussiness.WorldBussiness
                 float targetPosY = msg.targetPosY / 10000f;
                 float targetPosZ = msg.targetPosZ / 10000f;
                 Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                // targetPos.y = 0;
                 var roleEntity = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(msg.wRid);
                 var moveComponent = roleEntity.MoveComponent;
                 var shootStartPoint = roleEntity.ShootPointPos;

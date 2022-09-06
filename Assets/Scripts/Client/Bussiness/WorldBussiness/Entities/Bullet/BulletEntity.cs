@@ -48,11 +48,11 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void Awake()
         {
             moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
-            moveComponent.SetSpeed(10f);
+            moveComponent.SetSpeed(30f);
             moveComponent.SetGravity(0);
             moveComponent.isPersistentMove = true;
 
-            lifeTime = 10f;
+            lifeTime = 5f;
             hitRoleQueue = new Queue<WorldRoleEntity>();
             Init();
         }

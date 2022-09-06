@@ -107,14 +107,18 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             if (fixedDeltaTime == 0) return;
 
-            var vel = moveVelocity; //XZ轴
+            Vector3 vel = Vector3.zero;
+            if (isPersistentMove)
+            {
+                //比如子弹
+                rb.velocity = moveVelocity;
+                return;
+            }
+
+            vel = moveVelocity;//XZ轴
             vel.y = rb.velocity.y + jumpVelocity + _gravityVelocity * fixedDeltaTime;   //Y轴
             vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
-            if (isPersistentMove)
-            {
-                return;
-            }
 
             // 重置 ‘一次性速度’
             moveVelocity = Vector3.zero;
@@ -155,6 +159,11 @@ namespace Game.Client.Bussiness.WorldBussiness
                 {
                     extraVelocity.y -= (fixedDeltaTime * _gravity);
                     if (extraVelocity.y < 0) extraVelocity.y = 0;
+                }
+                if (moveVelocity.y > 0)
+                {
+                    moveVelocity.y -= (fixedDeltaTime * _gravity);
+                    if (moveVelocity.y < 0) moveVelocity.y = 0;
                 }
             }
         }

@@ -468,6 +468,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var domain = worldFacades.Domain;
             var fieldEntity = await domain.WorldSpawnDomain.SpawnWorldChooseScene();
             Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = true;
             fieldEntity.SetFieldId(1);
             var fieldEntityRepo = worldFacades.Repo.FiledEntityRepo;
             var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
