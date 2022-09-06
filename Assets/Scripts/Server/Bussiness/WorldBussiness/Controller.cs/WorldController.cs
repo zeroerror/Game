@@ -271,22 +271,17 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var realMsg = msg.msg;
                 var connId = opt.connId;
 
-                var rid = (byte)(realMsg >> 24);
+                var rid = (byte)(realMsg >> 48);
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
                 var roleEntity = roleRepo.Get(rid);
                 var optTypeId = opt.msg.optTypeId;
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
+
+                // ------------移动
                 if (optTypeId == 1)
                 {
-                    // ----移动
-                    Vector3 dir = new Vector3((sbyte)(realMsg >> 16), (sbyte)(realMsg >> 8), (sbyte)realMsg);
-                    // 人物状态同步
-                    roleEntity.SetRoleStatus(RoleState.Move);
-                    //发送状态同步帧
-                    connIdList.ForEach((connId) =>
-                    {
-                        rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
-                    });
+                    Vector3 dir = new Vector3((sbyte)(realMsg >> 32), (sbyte)(realMsg >> 16), (sbyte)realMsg);
+                    Debug.Log($"rid:{rid} 移动:{dir}");
 
                     //服务器逻辑Move + 物理模拟
                     var curPhysicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
@@ -296,19 +291,30 @@ namespace Game.Server.Bussiness.WorldBussiness
                     roleEntity.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
                     curPhysicsScene.Simulate(fixedDeltaTime);
                     roleEntity.MoveComponent.AddMoveVelocity(Vector3.zero);
+
+                    // 人物状态同步
+                    roleEntity.SetRoleStatus(RoleState.Move);
+                    //发送状态同步帧
+                    connIdList.ForEach((otherConnId) =>
+                    {
+                        rqs.SendUpdate_WRoleState(otherConnId, nextFrame, roleEntity);
+                    });
                 }
 
+                // ------------转向（基于客户端鉴权的同步）
                 if (optTypeId == 2)
                 {
-                    // ----转向（基于客户端鉴权的同步）
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
                     roleEntity.MoveComponent.SetRotationByEulerAngle(eulerAngle);
                     Debug.Log($"转向（基于客户端鉴权的同步）eulerAngle:{eulerAngle}");
                     //发送状态同步帧
-                    connIdList.ForEach((connId) =>
+                    connIdList.ForEach((otherConnId) =>
                     {
-                        //TODO:只广播给非本人
-                        rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
+                        if (otherConnId != connId)
+                        {
+                            //只广播给非本人
+                            rqs.SendUpdate_WRoleState(otherConnId, nextFrame, roleEntity);
+                        }
                     });
                 }
 

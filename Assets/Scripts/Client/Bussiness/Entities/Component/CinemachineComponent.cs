@@ -40,11 +40,11 @@ namespace Game.Client.Bussiness
             FirstViewCam = cam;
             camList.Add(FirstViewCam);
         }
-        public void OpenFirstViewCam(ICameraTrackObj cameraTrackObj, Transform lookAtObj)
+        public void OpenFirstViewCam(ICameraTrackObj cameraTrackObj)
         {
             Debug.Log("打开第一人称相机");
             FirstViewCam.FollowSolo(cameraTrackObj.camTrackObjTrans);
-            FirstViewCam.LookAtSolo(lookAtObj);
+            FirstViewCam.LookAtSolo(null);
 
             SwitchCamView(FirstViewCam.gameObject.name);
             CurrentCameraView = CameraView.FirstView;

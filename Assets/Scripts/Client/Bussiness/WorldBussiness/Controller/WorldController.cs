@@ -77,6 +77,155 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             physicsScene.Simulate(fixedDeltaTime);
         }
 
+        public void RendererUpdate()
+        {
+            // 相机朝向更新
+            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
+            if (owner != null)
+            {
+                var axisX = Input.GetAxis("Mouse X");
+                var axisY = -Input.GetAxis("Mouse Y");
+                owner.MoveComponent.AddEulerAngleY(axisX);
+
+                var curCamComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+                var curCam = curCamComponent.CurrentCamera;
+                var ownerEulerAngle = owner.transform.rotation.eulerAngles;
+                switch (curCamComponent.CurrentCameraView)
+                {
+                    case CameraView.FirstView:
+                        curCam.AddEulerAngleX(axisY);
+                        curCam.SetEulerAngleY(ownerEulerAngle.y);
+                        break;
+                    case CameraView.ThirdView:
+                        curCam.SetEulerAngleY(ownerEulerAngle.y);
+                        break;
+                }
+            }
+        }
+
+        void Tick_Input()
+        {
+            //没有角色就没有移动
+            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = worldFacades.InputComponent;
+            if (input.pressJump)
+            {
+                byte rid = owner.WRid;
+                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrame, rid);
+            }
+            if (input.pressV)
+            {
+                //打开第一人称视角
+                // TODO: 加切换视角的判定条件
+                var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner);
+                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner);
+            }
+            if (input.shootPoint != Vector3.zero)
+            {
+                // TODO: 是否满足条件
+                byte rid = owner.WRid;
+                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Default, rid, input.shootPoint);
+            }
+
+            if (input.grenadeThrowPoint != Vector3.zero)
+            {
+                // TODO: 是否满足条件
+                byte rid = owner.WRid;
+                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Grenade, rid, input.grenadeThrowPoint);
+            }
+
+            if (input.hookPoint != Vector3.zero)
+            {
+                // TODO: 是否满足条件
+                byte rid = owner.WRid;
+                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Hooker, rid, input.hookPoint);
+            }
+
+            if (input.moveAxis != Vector3.zero)
+            {
+                var moveDir = input.moveAxis;
+                if (!WillHitOtherRole(owner, moveDir))
+                {
+                    byte rid = owner.WRid;
+                    worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
+                }
+            }
+
+            input.Reset();
+        }
+
+        void Tick_BulletLife(int nextFrame)
+        {
+            while (bulletTearDownQueue.TryDequeue(out var msg))
+            {
+                var bulletId = msg.bulletId;
+                var bulletType = msg.bulletType;
+                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var bulletEntity = bulletRepo.GetByBulletId(bulletId);
+
+                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+                bulletEntity.MoveComponent.SetCurPos(pos);
+
+                if (bulletEntity.BulletType == BulletType.Default)
+                {
+                    bulletEntity.TearDown();
+                }
+
+                if (bulletEntity.BulletType == BulletType.Grenade)
+                {
+                    ((GrenadeEntity)bulletEntity).TearDown();
+                }
+
+                if (bulletEntity.BulletType == BulletType.Hooker)
+                {
+                    ((HookerEntity)bulletEntity).TearDown();
+                }
+
+                bulletRepo.TryRemove(bulletEntity);
+            }
+        }
+
+        void Tick_Physics_RoleMovement(float deltaTime)
+        {
+            var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+            domain.Tick_RoleRigidbody(deltaTime);
+        }
+
+        void Tick_Physics_BulletMovement(float fixedDeltaTime)
+        {
+            var domain = worldFacades.Domain.BulletDomain;
+            domain.Tick_Bullet(fixedDeltaTime);
+        }
+
+        bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)
+        {
+            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            var array = roleRepo.GetAll();
+            for (int i = 0; i < array.Length; i++)
+            {
+                var r = array[i];
+                if (r.WRid == roleEntity.WRid) continue;
+
+                var pos1 = r.MoveComponent.CurPos;
+                var pos2 = roleEntity.MoveComponent.CurPos;
+                if (Vector3.Distance(pos1, pos2) < 1f)
+                {
+                    var betweenV = pos1 - pos2;
+                    betweenV.Normalize();
+                    moveDir.Normalize();
+                    var cosVal = Vector3.Dot(moveDir, betweenV);
+                    Debug.Log(cosVal);
+                    if (cosVal > 0) return true;
+                }
+            }
+
+            return false;
+        }
+
+
         void Tick_RoleSpawn(int nextFrame)
         {
             if (roleSpawnQueue.TryPeek(out var spawn))
@@ -247,136 +396,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
                 GameObject.Destroy(bullet.gameObject);
             }
-        }
-
-        void Tick_Input()
-        {
-            //没有角色就没有移动
-            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
-            if (owner == null || owner.IsDead) return;
-
-            var input = worldFacades.InputComponent;
-            if (input.pressJump)
-            {
-                byte rid = owner.WRid;
-                worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(worldClientFrame, rid);
-            }
-            if (input.pressV)
-            {
-                //打开第一人称视角
-                // TODO: 加切换视角的判定条件
-                var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
-                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner, owner.EyeFocusPoint);
-                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner);
-            }
-            if (input.shootPoint != Vector3.zero)
-            {
-                // TODO: 是否满足条件
-                byte rid = owner.WRid;
-                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Default, rid, input.shootPoint);
-            }
-
-            if (input.grenadeThrowPoint != Vector3.zero)
-            {
-                // TODO: 是否满足条件
-                byte rid = owner.WRid;
-                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Grenade, rid, input.grenadeThrowPoint);
-            }
-
-            if (input.hookPoint != Vector3.zero)
-            {
-                // TODO: 是否满足条件
-                byte rid = owner.WRid;
-                worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(worldClientFrame, BulletType.Hooker, rid, input.hookPoint);
-            }
-
-            if (input.moveAxis != Vector3.zero)
-            {
-                var moveDir = input.moveAxis;
-                if (!WillHitOtherRole(owner, moveDir))
-                {
-                    byte rid = owner.WRid;
-                    worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
-                }
-            }
-
-            if (input.mouseAxis != Vector2.zero)
-            {
-                owner.MoveComponent.AddRotation(input.mouseAxis*10f);
-
-                var roleRqs = worldFacades.Network.WorldRoleReqAndRes;
-                roleRqs.SendReq_WRoleRotate(worldClientFrame, owner);
-            }
-
-            input.Reset();
-        }
-
-        void Tick_BulletLife(int nextFrame)
-        {
-            while (bulletTearDownQueue.TryDequeue(out var msg))
-            {
-                var bulletId = msg.bulletId;
-                var bulletType = msg.bulletType;
-                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
-                var bulletEntity = bulletRepo.GetByBulletId(bulletId);
-
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                bulletEntity.MoveComponent.SetCurPos(pos);
-
-                if (bulletEntity.BulletType == BulletType.Default)
-                {
-                    bulletEntity.TearDown();
-                }
-
-                if (bulletEntity.BulletType == BulletType.Grenade)
-                {
-                    ((GrenadeEntity)bulletEntity).TearDown();
-                }
-
-                if (bulletEntity.BulletType == BulletType.Hooker)
-                {
-                    ((HookerEntity)bulletEntity).TearDown();
-                }
-
-                bulletRepo.TryRemove(bulletEntity);
-            }
-        }
-
-        void Tick_Physics_RoleMovement(float deltaTime)
-        {
-            var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-            domain.Tick_RoleRigidbody(deltaTime);
-        }
-
-        void Tick_Physics_BulletMovement(float fixedDeltaTime)
-        {
-            var domain = worldFacades.Domain.BulletDomain;
-            domain.Tick_Bullet(fixedDeltaTime);
-        }
-
-        bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)
-        {
-            var roleRepo = worldFacades.Repo.WorldRoleRepo;
-            var array = roleRepo.GetAll();
-            for (int i = 0; i < array.Length; i++)
-            {
-                var r = array[i];
-                if (r.WRid == roleEntity.WRid) continue;
-
-                var pos1 = r.MoveComponent.CurPos;
-                var pos2 = roleEntity.MoveComponent.CurPos;
-                if (Vector3.Distance(pos1, pos2) < 1f)
-                {
-                    var betweenV = pos1 - pos2;
-                    betweenV.Normalize();
-                    moveDir.Normalize();
-                    var cosVal = Vector3.Dot(moveDir, betweenV);
-                    Debug.Log(cosVal);
-                    if (cosVal > 0) return true;
-                }
-            }
-
-            return false;
         }
 
         // == Server Response ==

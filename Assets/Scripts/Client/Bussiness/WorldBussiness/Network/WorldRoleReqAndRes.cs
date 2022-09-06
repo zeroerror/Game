@@ -25,10 +25,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         // == Send ==
         public void SendReq_WRoleMove(int frameIndex, byte rid, Vector3 dir)
         {
-            ulong msg = (ulong)rid << 56;     //8 wrid 8 x 8 y 8 z
-            msg |= (ulong)dir.x << 48;
-            msg |= (ulong)dir.y << 40;
-            msg |= (ulong)dir.z << 32;
+            ulong msg = (ulong)(short)rid << 48;     //16 wrid 16 x 16 y 16 z
+            msg |= (ulong)(ushort)dir.x << 32;
+            msg |= (ulong)(ushort)dir.y << 16;
+            msg |= (ulong)(ushort)dir.z;
 
             FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {
@@ -42,10 +42,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         public void SendReq_WRoleRotate(int frameIndex, WorldRoleEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
-            ulong msg = (ulong)roleEntity.WRid << 48;   //16 wrid 16 x 16 y 16 z
-            msg |= (ulong)eulerAngel.x << 32;
-            msg |= (ulong)eulerAngel.y << 16;
-            msg |= (ulong)eulerAngel.z;
+            var rid = roleEntity.WRid;
+            ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
+            msg |= (ulong)(ushort)eulerAngel.x << 32;
+            msg |= (ulong)(ushort)eulerAngel.y << 16;
+            msg |= (ulong)(ushort)eulerAngel.z;
 
             FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {

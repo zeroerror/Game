@@ -35,7 +35,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             worldController.Tick();
         }
 
-    }
 
+    }
 
 }

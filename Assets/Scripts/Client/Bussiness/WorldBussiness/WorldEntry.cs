@@ -31,10 +31,10 @@ namespace Game.Client.Bussiness.WorldBussiness
             worldFacades.Init();
         }
 
-        public static void Inject(NetworkClient client,InputComponent inputComponent)
+        public static void Inject(NetworkClient client, InputComponent inputComponent)
         {
-              // == Facades ==
-            worldFacades.Inject(client,inputComponent);
+            // == Facades ==
+            worldFacades.Inject(client, inputComponent);
             // == Controller ==
             worldController.Inject(worldFacades);
         }
@@ -43,6 +43,11 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             // == Controller ==
             worldController.Tick();
+        }
+
+        public static void Update()
+        {
+            worldController.RendererUpdate();
         }
 
         public static void TearDown()

@@ -89,10 +89,11 @@ namespace Game.Client
 
         void Update()
         {
-            Tick_Input();
+            Receive_Input();
+            WorldEntry.Update();
         }
 
-        void Tick_Input()
+        void Receive_Input()
         {
 
             if (Input.GetKey(KeyCode.W))
@@ -154,14 +155,6 @@ namespace Game.Client
                         InputComponent.shootPoint = hit.point;
                     }
                 }
-            }
-
-            var realTime = Time.realtimeSinceStartup;
-            if (realTime - time > 0.5f)
-            {
-                time = realTime;
-                InputComponent.mouseAxis.x = Input.GetAxis("Mouse X");
-                InputComponent.mouseAxis.y = Input.GetAxis("Mouse Y");
             }
         }
 

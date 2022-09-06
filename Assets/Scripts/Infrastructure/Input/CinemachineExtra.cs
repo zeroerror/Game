@@ -96,7 +96,6 @@ namespace Game.Infrastructure.Input
             CurrentLookAtCount = 1;
 
             cinemachineVirtual.m_LookAt = trans;
-            Debug.Log($"LookAtSolo: target{target.target.name}");
         }
 
         public void AddLookAtMember(Transform trans, float weight, float radius)
@@ -123,6 +122,36 @@ namespace Game.Infrastructure.Input
 
             CurrentLookAtCount = 0;
         }
+
+        // == Rotation ==
+        public void AddEulerAngleX(float eulerAngleX)
+        {
+            var euler = transform.rotation.eulerAngles;
+            euler.x += eulerAngleX;
+            transform.rotation = Quaternion.Euler(euler);
+        }
+
+        public void SetEulerAngleX(float eulerAngleX)
+        {
+            var euler = transform.rotation.eulerAngles;
+            euler.x = eulerAngleX;
+            transform.rotation = Quaternion.Euler(euler);
+        }
+
+        public void AddEulerAngleY(float eulerAngleY)
+        {
+            var euler = transform.rotation.eulerAngles;
+            euler.y += eulerAngleY;
+            transform.rotation = Quaternion.Euler(euler);
+        }
+
+        public void SetEulerAngleY(float eulerAngleY)
+        {
+            var euler = transform.rotation.eulerAngles;
+            euler.y = eulerAngleY;
+            transform.rotation = Quaternion.Euler(euler);
+        }
+
 
     }
 

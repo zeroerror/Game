@@ -42,10 +42,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         Transform camTrackingObj;
         public Transform CamTrackingObj => camTrackingObj;
         
-        [SerializeField]
-        Transform eyeFocusPoint;
-        public Transform EyeFocusPoint => eyeFocusPoint;
-
         // == ICameraTrackObj
         public Vector3 selfPos => transform.position;
         public Transform camTrackObjTrans => camTrackingObj.transform;

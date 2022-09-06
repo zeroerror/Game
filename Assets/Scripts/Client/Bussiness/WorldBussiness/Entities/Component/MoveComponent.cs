@@ -216,14 +216,10 @@ namespace Game.Client.Bussiness.WorldBussiness
             rb.rotation = Quaternion.Euler(eulerAngle);
         }
 
-        public void AddRotation(Vector2 eulerAngle)
+        public void AddEulerAngleY(float eulerAngleY)
         {
             var euler = rb.rotation.eulerAngles;
-            euler.x -= eulerAngle.y;    //上下看
-            euler.x = euler.x > 30f ? 30f : euler.x;
-            euler.x = euler.x < -30f ? -30f : euler.x;
-            
-            euler.y += eulerAngle.x;    //左右看
+            euler.y += eulerAngleY;    //左右看
             rb.rotation = Quaternion.Euler(euler);
         }
 
