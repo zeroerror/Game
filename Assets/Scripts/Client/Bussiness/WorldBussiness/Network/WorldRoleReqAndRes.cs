@@ -25,10 +25,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         // == Send ==
         public void SendReq_WRoleMove(int frameIndex, byte rid, Vector3 dir)
         {
-            ulong msg = (ulong)(short)rid << 48;     //16 wrid 16 x 16 y 16 z
-            msg |= (ulong)(ushort)dir.x << 32;
-            msg |= (ulong)(ushort)dir.y << 16;
-            msg |= (ulong)(ushort)dir.z;
+            dir.Normalize();
+            ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
+            msg |= (ulong)(ushort)(dir.x * 100) << 32;
+            msg |= (ulong)(ushort)(dir.y * 100) << 16;
+            msg |= (ulong)(ushort)(dir.z * 100);
 
             FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {

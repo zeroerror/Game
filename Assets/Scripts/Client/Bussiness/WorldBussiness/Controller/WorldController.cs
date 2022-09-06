@@ -4,6 +4,7 @@ using UnityEngine;
 using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
 using Game.Client.Bussiness.EventCenter;
+using ZeroFrame.ZeroMath;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
@@ -146,15 +147,45 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             if (input.moveAxis != Vector3.zero)
             {
-                var moveDir = input.moveAxis;
+                var moveAxis = input.moveAxis;
+                Vector3 moveDir = moveAxis;
+                var currentCamView = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
+                if (currentCamView == CameraView.FirstView)
+                {
+                    Vector3 roleForward = owner.transform.forward;
+                    roleForward.y = 0;
+                    VectorHelper2D.GetRotVector(roleForward.x, roleForward.z, -90, out float rightX, out float rightZ);
+                    Vector3 roleRight = new Vector3(rightX, 0, rightZ);
+Debug.Log($"roleForward:{roleForward}   roleRight:{roleRight}");
+                    moveDir.x *= roleForward.x;
+                    moveDir = moveAxis.z * roleForward; //前后
+                    moveDir += moveAxis.x * roleRight;  //左右
+                }
                 if (!WillHitOtherRole(owner, moveDir))
                 {
+                    var rqs = worldFacades.Network.WorldRoleReqAndRes;
+                    if (owner.IsEulerAngleNeedFlush())
+                    {
+                        owner.FlushEulerAngle();
+                        //客户端鉴权旋转角度同步
+                        rqs.SendReq_WRoleRotate(worldClientFrame, owner);
+                    }
+
                     byte rid = owner.WRid;
-                    worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
+                    rqs.SendReq_WRoleMove(worldClientFrame, rid, moveDir);
                 }
             }
 
             input.Reset();
+
+            if (owner.IsEulerAngleNeedFlush())
+            {
+                owner.FlushEulerAngle();
+                //客户端鉴权旋转角度同步
+                var rqs = worldFacades.Network.WorldRoleReqAndRes;
+                rqs.SendReq_WRoleRotate(worldClientFrame, owner);
+            }
+
         }
 
         void Tick_BulletLife(int nextFrame)
@@ -321,19 +352,20 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
                 Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
 
+                var repo = worldFacades.Repo;
+                var roleRepo = repo.WorldRoleRepo;
+                var fieldRepo = repo.FiledEntityRepo;
                 var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
                 if (role == null)
                 {
                     Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
 
                     var wRoleId = stateMsg.wRid;
-                    var repo = worldFacades.Repo;
-                    var fieldEntity = repo.FiledEntityRepo.Get(1);
+                    var fieldEntity = fieldRepo.Get(1);
                     var domain = worldFacades.Domain.WorldRoleSpawnDomain;
                     role = domain.SpawnWorldRole(fieldEntity.transform);
                     role.SetWRid(wRoleId);
 
-                    var roleRepo = repo.WorldRoleRepo;
                     roleRepo.Add(role);
                     if (stateMsg.isOwner && roleRepo.Owner == null)
                     {
@@ -353,7 +385,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         break;
                     case RoleState.Move:
                         role.MoveComponent.SetCurPos(pos);
-                        role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
                         role.MoveComponent.SetMoveVelocity(moveVelocity);
                         role.MoveComponent.SetExtraVelocity(extraVelocity);
                         role.MoveComponent.SetGravityVelocity(gravityVelocity);
@@ -361,7 +393,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         break;
                     case RoleState.Jump:
                         role.MoveComponent.SetCurPos(pos);
-                        role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
                         role.MoveComponent.SetMoveVelocity(moveVelocity);
                         role.MoveComponent.SetExtraVelocity(extraVelocity);
                         role.MoveComponent.SetGravityVelocity(gravityVelocity);

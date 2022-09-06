@@ -16,6 +16,14 @@ namespace Game.Client.Bussiness.WorldBussiness
     public class WorldRoleEntity : MonoBehaviour, ICameraTrackObj
     {
 
+        [SerializeField]
+        Transform camTrackingObj;
+        public Transform CamTrackingObj => camTrackingObj;
+
+        // == ICameraTrackObj
+        public Vector3 selfPos => transform.position;
+        public Transform camTrackObjTrans => camTrackingObj.transform;
+
         byte wRid;
         public byte WRid => wRid;
         public void SetWRid(byte wRid) => this.wRid = wRid;
@@ -28,23 +36,29 @@ namespace Game.Client.Bussiness.WorldBussiness
         Vector3 shootPointPos => MoveComponent.CurPos + transform.forward + offset;
         public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
 
+        // == Component ==
         public MoveComponent MoveComponent { get; private set; }
         public HealthComponent HealthComponent { get; private set; }
         public AnimatorComponent AnimatorComponent { get; private set; }
+
+        // == Rotation ==
+        public Vector3 EulerAngle => transform.rotation.eulerAngles;
+        public Vector3 OldEulerAngle { get; private set; }
+        public void FlushEulerAngle() => OldEulerAngle = EulerAngle;
+        public bool IsEulerAngleNeedFlush()
+        {
+            if (Mathf.Abs(OldEulerAngle.x - EulerAngle.x) > 10) return true;
+            if (Mathf.Abs(OldEulerAngle.y - EulerAngle.y) > 10) return true;
+            if (Mathf.Abs(OldEulerAngle.z - EulerAngle.z) > 10) return true;
+            return false;
+        }
+
 
         public RoleState RoleState { get; private set; }
         public void SetRoleStatus(RoleState roleStatus) => this.RoleState = roleStatus;
 
         public bool IsDead { get; private set; }
         public bool IsOldState;
-
-        [SerializeField]
-        Transform camTrackingObj;
-        public Transform CamTrackingObj => camTrackingObj;
-        
-        // == ICameraTrackObj
-        public Vector3 selfPos => transform.position;
-        public Transform camTrackObjTrans => camTrackingObj.transform;
 
         public void Awake()
         {

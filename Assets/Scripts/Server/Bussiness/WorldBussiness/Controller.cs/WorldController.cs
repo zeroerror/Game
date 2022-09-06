@@ -280,8 +280,8 @@ namespace Game.Server.Bussiness.WorldBussiness
                 // ------------移动
                 if (optTypeId == 1)
                 {
-                    Vector3 dir = new Vector3((sbyte)(realMsg >> 32), (sbyte)(realMsg >> 16), (sbyte)realMsg);
-                    Debug.Log($"rid:{rid} 移动:{dir}");
+                    Vector3 dir = new Vector3((short)(realMsg >> 32) / 100f, (short)(realMsg >> 16) / 100f, (short)realMsg / 100f);
+                    Debug.Log($"realMsg :{realMsg} rid:{rid} 移动:{dir}");
 
                     //服务器逻辑Move + 物理模拟
                     var curPhysicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
@@ -306,7 +306,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 {
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
                     roleEntity.MoveComponent.SetRotationByEulerAngle(eulerAngle);
-                    Debug.Log($"转向（基于客户端鉴权的同步）eulerAngle:{eulerAngle}");
+                    // Debug.Log($"转向（基于客户端鉴权的同步）eulerAngle:{eulerAngle}");
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
                     {
