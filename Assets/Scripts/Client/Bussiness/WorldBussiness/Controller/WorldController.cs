@@ -98,7 +98,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         curCam.SetEulerAngleY(ownerEulerAngle.y);
                         break;
                     case CameraView.ThirdView:
-                        curCam.SetEulerAngleY(ownerEulerAngle.y);
+                        // curCam.SetEulerAngleY(ownerEulerAngle.y);
                         break;
                 }
             }
@@ -156,7 +156,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     roleForward.y = 0;
                     VectorHelper2D.GetRotVector(roleForward.x, roleForward.z, -90, out float rightX, out float rightZ);
                     Vector3 roleRight = new Vector3(rightX, 0, rightZ);
-Debug.Log($"roleForward:{roleForward}   roleRight:{roleRight}");
                     moveDir.x *= roleForward.x;
                     moveDir = moveAxis.z * roleForward; //前后
                     moveDir += moveAxis.x * roleRight;  //左右
@@ -468,6 +467,7 @@ Debug.Log($"roleForward:{roleForward}   roleRight:{roleRight}");
             // Load Scene And Spawn Field
             var domain = worldFacades.Domain;
             var fieldEntity = await domain.WorldSpawnDomain.SpawnWorldChooseScene();
+            Cursor.lockState = CursorLockMode.Locked;
             fieldEntity.SetFieldId(1);
             var fieldEntityRepo = worldFacades.Repo.FiledEntityRepo;
             var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
