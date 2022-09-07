@@ -11,11 +11,15 @@ namespace Game.Client.Bussiness.WorldBussiness
         // TODO: INJECT
         float speed;
         public void SetSpeed(float speed) => this.speed = speed;
+
+        float maximumSpeed = float.MaxValue;
+        public void SetMaximumSpeed(float speed) => this.maximumSpeed = speed;
+
         float jumpSpeed;
         public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
 
         // TODO: 滑铲摩擦力
-        float frictionReduce = 50f;
+        float frictionReduce = 10f;
         public void SetFriction(float friction) => this.frictionReduce = friction;
 
         // Rigidbody
@@ -120,6 +124,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             vel.y = rb.velocity.y + jumpVelocity + _gravityVelocity * fixedDeltaTime;   //Y轴
             vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
+
+            //限制'最大速度'
+            if (rb.velocity.magnitude > maximumSpeed) rb.velocity = rb.velocity.normalized * 30f;
 
             // 重置 ‘一次性速度’
             moveVelocity = Vector3.zero;

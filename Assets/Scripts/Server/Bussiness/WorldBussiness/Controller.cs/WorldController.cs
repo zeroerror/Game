@@ -454,6 +454,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         void Tick_BulletHit(int nextFrame)
         {
             var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
+            List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bullet) =>
             {
                 bool isHitSomething = false;
@@ -499,11 +500,14 @@ namespace Game.Server.Bussiness.WorldBussiness
                     }
                     else
                     {
-                        bullet.TearDown();
-                        bulletRepo.TryRemove(bullet);
+                        removeList.Add(bullet);
                     }
                 }
-
+            });
+            removeList.ForEach((bullet) =>
+            {
+                bullet.TearDown();
+                bulletRepo.TryRemove(bullet);
             });
         }
 

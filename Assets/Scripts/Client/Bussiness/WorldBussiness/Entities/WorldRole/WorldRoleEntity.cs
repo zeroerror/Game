@@ -63,6 +63,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void Awake()
         {
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 5f, 5f);
+            MoveComponent.SetMaximumSpeed(30f);
             AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
             HealthComponent = new HealthComponent(100f);
             RoleState = RoleState.Normal;
