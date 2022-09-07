@@ -18,14 +18,15 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(RegisterAccountReqMessage), 4);
             messageInfoDic.Add(typeof(RegisterAccountResMessage), 5);
             messageInfoDic.Add(typeof(FrameBulletHitRoleResMsg), 6);
-            messageInfoDic.Add(typeof(FrameBulletSpawnReqMsg), 7);
-            messageInfoDic.Add(typeof(FrameBulletSpawnResMsg), 8);
-            messageInfoDic.Add(typeof(FrameBulletTearDownResMsg), 9);
-            messageInfoDic.Add(typeof(FrameJumpReqMsg), 10);
-            messageInfoDic.Add(typeof(FrameOptReqMsg), 11);
-            messageInfoDic.Add(typeof(FrameWRoleSpawnReqMsg), 12);
-            messageInfoDic.Add(typeof(FrameWRoleSpawnResMsg), 13);
-            messageInfoDic.Add(typeof(WRoleStateUpdateMsg), 14);
+            messageInfoDic.Add(typeof(FrameBulletHitWallResMsg), 7);
+            messageInfoDic.Add(typeof(FrameBulletSpawnReqMsg), 8);
+            messageInfoDic.Add(typeof(FrameBulletSpawnResMsg), 9);
+            messageInfoDic.Add(typeof(FrameBulletTearDownResMsg), 10);
+            messageInfoDic.Add(typeof(FrameJumpReqMsg), 11);
+            messageInfoDic.Add(typeof(FrameOptReqMsg), 12);
+            messageInfoDic.Add(typeof(FrameWRoleSpawnReqMsg), 13);
+            messageInfoDic.Add(typeof(FrameWRoleSpawnResMsg), 14);
+            messageInfoDic.Add(typeof(WRoleStateUpdateMsg), 15);
 
         }
 

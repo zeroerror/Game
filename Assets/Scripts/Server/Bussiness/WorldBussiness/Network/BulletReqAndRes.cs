@@ -50,6 +50,23 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.SendMsg(connId, msg);
         }
 
+        public void SendRes_BulletHitWall(int connId, int frame, BulletEntity bulletEntity, GameObject wall)
+        {
+            var wallPos = wall.transform.position;
+            Debug.Log($"SendRes_BulletHitWall: wallPos  {wallPos}");
+            wallPos *= 10000f;
+            FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
+            {
+                serverFrame = frame,
+                bulletId = bulletEntity.BulletId,
+                posX = (int)wallPos.x,
+                posY = (int)wallPos.y,
+                posZ = (int)wallPos.z,
+            };
+
+            _server.SendMsg(connId, msg);
+        }
+
         public void SendRes_BulletTearDown(int connId, int serverFrame, BulletType bulletType, byte wRid, ushort bulletId, Vector3 pos)
         {
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{wRid}");

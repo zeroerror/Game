@@ -7,14 +7,8 @@ namespace Game.Client.Bussiness.WorldBussiness
     public class HookerEntity : BulletEntity
     {
 
-        Transform masterTrans;
-        WorldRoleEntity masterEntity;
-        public WorldRoleEntity MasterEntity => masterEntity;
-        public void SetMaster(WorldRoleEntity roleEntity)
-        {
-            masterEntity = roleEntity;
-            this.masterTrans = roleEntity.transform;
-        }
+        byte masterWRid;
+        public void SetMasterWRid(byte masterWRid) => this.masterWRid = masterWRid;
 
         GameObject masterGrabEnd;//钩爪持有者一端
         public void SetMasterGrabPoint(Transform grabPoint) => this.masterGrabEnd.transform.SetParent(grabPoint, false);
@@ -60,38 +54,46 @@ namespace Game.Client.Bussiness.WorldBussiness
             return false;
         }
 
-        public override void TearDown()
+        public void TryGrabSomthing(Transform hitTrans)
         {
-            Destroy(shootEnd);
-            Destroy(masterGrabEnd);
-            Destroy(GrabPoint);
-        }
-
-        public override void EnterTrigger(Collider collision)
-        {
-            var go = collision.gameObject;
-            var layer = go.layer;
-            if (layer == LayerMask.NameToLayer("Player"))
-            {
-                Debug.Log($"plaer: {go.name}");
-                var roleEntity = go.GetComponent<WorldRoleEntity>();
-                if (roleEntity.WRid == masterEntity.WRid) return;
-            }
+            if (hitTrans == null) return;
+            if (GrabPoint != null) return;
 
             Debug.Log("钩爪击中！");
             moveComponent.isPersistentMove = false;
             moveComponent.SetVelocity(Vector3.zero);
 
-            var shootEndTrans = this.shootEnd.transform;
-
-            var targetTrans = collision.gameObject.transform;
-
-            this.shootEnd.transform.localScale = new Vector3(2, 2, 2);
+            var shootEndTrans = ShootEnd.transform;
+            shootEndTrans.localScale = new Vector3(2, 2, 2);
             GrabPoint = new GameObject("爪钩击中点");
-            GrabPoint.transform.position = this.shootEnd.transform.position;
-            GrabPoint.transform.SetParent(targetTrans, true);
+            GrabPoint.transform.position = shootEndTrans.position;
+            GrabPoint.transform.SetParent(hitTrans, true);
 
             SetLifeTime(5f);
+        }
+
+        public void TryGrabSomthing(Vector3 pos)
+        {
+            Debug.Log("钩爪击中！");
+            if (GrabPoint != null) return;
+
+            moveComponent.isPersistentMove = false;
+            moveComponent.SetVelocity(Vector3.zero);
+
+            var shootEndTrans = ShootEnd.transform;
+            shootEndTrans.position = pos;
+            shootEndTrans.localScale = new Vector3(2, 2, 2);
+            GrabPoint = new GameObject("爪钩击中点");
+            GrabPoint.transform.position = shootEndTrans.position;
+
+            SetLifeTime(5f);
+        }
+
+        public override void TearDown()
+        {
+            Destroy(shootEnd);
+            Destroy(masterGrabEnd);
+            Destroy(GrabPoint);
         }
 
     }

@@ -53,6 +53,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.RegistMsg(action);
         }
 
+        public void RegistRes_BulletHitWall(Action<FrameBulletHitWallResMsg> action)
+        {
+            _client.RegistMsg(action);
+        }
+
     }
 
 }

@@ -76,19 +76,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     case BulletType.Grenade:
                         break;
                     case BulletType.Hooker:
-                        var hookerEntity = (HookerEntity)bullet;
-                        var master = hookerEntity.MasterEntity;
-                        var masterMC = master.MoveComponent;
-                        if (hookerEntity.TickHooker(out float force))
-                        {
-                            var hookerEntityMC = hookerEntity.MoveComponent;
-                            var dir = hookerEntityMC.CurPos - masterMC.CurPos;
-                            var dis = Vector3.Distance(hookerEntityMC.CurPos, masterMC.CurPos);
-                            dir.Normalize();
-                            var v = dir * force * fixedDeltaTime;
-                            Debug.Log($"Hooker : v:{v} ");
-                            masterMC.AddExtraVelocity(v);
-                        }
                         break;
                 }
 
@@ -96,6 +83,23 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 bullet.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
                 bullet.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
             });
+        }
+
+        // == Hooker
+        // 获得当前所有已激活的爪钩
+        public List<HookerEntity> GetActiveHookerList()
+        {
+            List<HookerEntity> hookerEntities = new List<HookerEntity>();
+            var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+            bulletRepo.Foreach((bullet) =>
+            {
+                if (bullet is HookerEntity hookerEntity && hookerEntity.GrabPoint != null)
+                {
+                    hookerEntities.Add(hookerEntity);
+                }
+            });
+
+            return hookerEntities;
         }
 
     }

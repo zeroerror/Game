@@ -199,9 +199,10 @@ namespace Game.Client.Bussiness.WorldBussiness
             IsHitWall = false;
         }
 
-        public void HitWall()
+        public void EnterWall()
         {
-            Debug.Log("接触墙体");
+            
+            Debug.Log($"{rb.gameObject.name} 接触墙体");
             IsHitWall = true;
 
             // TODO: 惯性指定方向清零

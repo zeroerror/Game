@@ -96,7 +96,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             }
             if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {
-                MoveComponent.HitWall();
+                MoveComponent.EnterWall();
             }
         }
 

@@ -14,14 +14,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         WorldFacades worldFacades;
         int worldClientFrame;
         float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
-        // 生成队列
+        // 服务器下发的生成队列
         Queue<FrameWRoleSpawnResMsg> roleSpawnQueue;
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
-        // 物理事件队列
+        // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
+        Queue<FrameBulletHitWallResMsg> bulletHitWallQueue;
         Queue<FrameBulletTearDownResMsg> bulletTearDownQueue;
 
-        // 人物状态同步队列
+        // 服务器下发的人物状态同步队列
         Queue<WRoleStateUpdateMsg> stateQueue;
 
         bool isSync;
@@ -33,9 +34,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             roleSpawnQueue = new Queue<FrameWRoleSpawnResMsg>();
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
-            stateQueue = new Queue<WRoleStateUpdateMsg>();
+
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
+            bulletHitWallQueue = new Queue<FrameBulletHitWallResMsg>();
             bulletTearDownQueue = new Queue<FrameBulletTearDownResMsg>();
+
+            stateQueue = new Queue<WRoleStateUpdateMsg>();
+
         }
 
         public void Inject(WorldFacades worldFacades)
@@ -49,8 +54,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var bulletRqs = worldFacades.Network.BulletReqAndRes;
             bulletRqs.RegistRes_BulletSpawn(OnBulletSpawn);
             bulletRqs.RegistRes_BulletHitRole(OnBulletHitRole);
+            bulletRqs.RegistRes_BulletHitWall(OnBulletHitWall);
             bulletRqs.RegistRes_BulletTearDown(OnBulletTearDown);
-
 
         }
 
@@ -101,6 +106,86 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         // curCam.SetEulerAngleY(ownerEulerAngle.y);
                         break;
                 }
+            }
+        }
+        void Tick_RoleStateSync(int nextFrame)
+        {
+            if (stateQueue.TryPeek(out var stateMsg))
+            {
+                stateQueue.Dequeue();
+                worldClientFrame = stateMsg.serverFrameIndex;
+
+                RoleState roleState = (RoleState)stateMsg.roleState;
+                float x = stateMsg.x / 10000f;
+                float y = stateMsg.y / 10000f;
+                float z = stateMsg.z / 10000f;
+                float eulerX = stateMsg.eulerX / 10000f;
+                float eulerY = stateMsg.eulerY / 10000f;
+                float eulerZ = stateMsg.eulerZ / 10000f;
+                float moveVelocityX = stateMsg.moveVelocityX / 10000f;
+                float moveVelocityY = stateMsg.moveVelocityY / 10000f;
+                float moveVelocityZ = stateMsg.moveVelocityZ / 10000f;
+                float extraVelocityX = stateMsg.extraVelocityX / 10000f;
+                float extraVelocityY = stateMsg.extraVelocityY / 10000f;
+                float extraVelocityZ = stateMsg.extraVelocityZ / 10000f;
+                float gravityVelocity = stateMsg.gravityVelocity / 10000f;
+
+                Vector3 pos = new Vector3(x, y, z);
+                Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
+                Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
+                Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
+
+                var repo = worldFacades.Repo;
+                var roleRepo = repo.WorldRoleRepo;
+                var fieldRepo = repo.FiledEntityRepo;
+                var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
+                if (role == null)
+                {
+                    Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
+
+                    var wRoleId = stateMsg.wRid;
+                    var fieldEntity = fieldRepo.Get(1);
+                    var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+                    role = domain.SpawnWorldRole(fieldEntity.transform);
+                    role.SetWRid(wRoleId);
+
+                    roleRepo.Add(role);
+                    if (stateMsg.isOwner && roleRepo.Owner == null)
+                    {
+                        Debug.Log($"生成Owner  wRid:{role.WRid})");
+                        roleRepo.SetOwner(role);
+                        var fieldCameraComponent = fieldEntity.CameraComponent;
+                        fieldCameraComponent.OpenThirdViewCam(role);
+                    }
+                }
+                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}";
+                Debug.Log($"<color=#008000>{log}</color>");
+
+                switch (roleState)
+                {
+                    case RoleState.Idle:
+                        role.AnimatorComponent.PlayIdle();
+                        break;
+                    case RoleState.Move:
+                        role.MoveComponent.SetCurPos(pos);
+                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                        role.MoveComponent.SetMoveVelocity(moveVelocity);
+                        role.MoveComponent.SetExtraVelocity(extraVelocity);
+                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
+                        role.AnimatorComponent.PlayRun();
+                        break;
+                    case RoleState.Jump:
+                        role.MoveComponent.SetCurPos(pos);
+                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                        role.MoveComponent.SetMoveVelocity(moveVelocity);
+                        role.MoveComponent.SetExtraVelocity(extraVelocity);
+                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
+                        role.MoveComponent.SetJumpVelocity();
+                        role.AnimatorComponent.PlayRun();
+                        break;
+                }
+
+                role.SetRoleStatus(roleState);
             }
         }
 
@@ -255,7 +340,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             return false;
         }
 
-
         void Tick_RoleSpawn(int nextFrame)
         {
             if (roleSpawnQueue.TryPeek(out var spawn))
@@ -310,7 +394,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         break;
                     case BulletType.Hooker:
                         var hookerEntity = (HookerEntity)bulletEntity;
-                        hookerEntity.SetMaster(masterWRole);
+                        hookerEntity.SetMasterWRid(masterWRid);
                         hookerEntity.SetMasterGrabPoint(masterWRole.transform);
                         break;
                 }
@@ -324,99 +408,19 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             }
         }
 
-        void Tick_RoleStateSync(int nextFrame)
-        {
-            if (stateQueue.TryPeek(out var stateMsg))
-            {
-                stateQueue.Dequeue();
-                worldClientFrame = stateMsg.serverFrameIndex;
-
-                RoleState roleState = (RoleState)stateMsg.roleState;
-                float x = stateMsg.x / 10000f;
-                float y = stateMsg.y / 10000f;
-                float z = stateMsg.z / 10000f;
-                float eulerX = stateMsg.eulerX / 10000f;
-                float eulerY = stateMsg.eulerY / 10000f;
-                float eulerZ = stateMsg.eulerZ / 10000f;
-                float moveVelocityX = stateMsg.moveVelocityX / 10000f;
-                float moveVelocityY = stateMsg.moveVelocityY / 10000f;
-                float moveVelocityZ = stateMsg.moveVelocityZ / 10000f;
-                float extraVelocityX = stateMsg.extraVelocityX / 10000f;
-                float extraVelocityY = stateMsg.extraVelocityY / 10000f;
-                float extraVelocityZ = stateMsg.extraVelocityZ / 10000f;
-                float gravityVelocity = stateMsg.gravityVelocity / 10000f;
-
-                Vector3 pos = new Vector3(x, y, z);
-                Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
-                Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
-                Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
-
-                var repo = worldFacades.Repo;
-                var roleRepo = repo.WorldRoleRepo;
-                var fieldRepo = repo.FiledEntityRepo;
-                var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
-                if (role == null)
-                {
-                    Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
-
-                    var wRoleId = stateMsg.wRid;
-                    var fieldEntity = fieldRepo.Get(1);
-                    var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-                    role = domain.SpawnWorldRole(fieldEntity.transform);
-                    role.SetWRid(wRoleId);
-
-                    roleRepo.Add(role);
-                    if (stateMsg.isOwner && roleRepo.Owner == null)
-                    {
-                        Debug.Log($"生成Owner  wRid:{role.WRid})");
-                        roleRepo.SetOwner(role);
-                        var fieldCameraComponent = fieldEntity.CameraComponent;
-                        fieldCameraComponent.OpenThirdViewCam(role);
-                    }
-                }
-                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}";
-                Debug.Log($"<color=#008000>{log}</color>");
-
-                switch (roleState)
-                {
-                    case RoleState.Idle:
-                        role.AnimatorComponent.PlayIdle();
-                        break;
-                    case RoleState.Move:
-                        role.MoveComponent.SetCurPos(pos);
-                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
-                        role.MoveComponent.SetMoveVelocity(moveVelocity);
-                        role.MoveComponent.SetExtraVelocity(extraVelocity);
-                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
-                        role.AnimatorComponent.PlayRun();
-                        break;
-                    case RoleState.Jump:
-                        role.MoveComponent.SetCurPos(pos);
-                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
-                        role.MoveComponent.SetMoveVelocity(moveVelocity);
-                        role.MoveComponent.SetExtraVelocity(extraVelocity);
-                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
-                        role.MoveComponent.SetJumpVelocity();
-                        role.AnimatorComponent.PlayRun();
-                        break;
-                }
-
-                role.SetRoleStatus(roleState);
-            }
-        }
-
         void Tick_BulletHitRole(int nextFrame)
         {
-            if (bulletHitRoleQueue.TryPeek(out var bulletHitRole))
+            while (bulletHitRoleQueue.TryPeek(out var bulletHitRoleMsg))
             {
                 bulletHitRoleQueue.Dequeue();
                 worldClientFrame = nextFrame;
 
                 var bulletRepo = worldFacades.Repo.BulletEntityRepo;
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
-                var bullet = bulletRepo.GetByBulletId(bulletHitRole.bulletId);
-                var role = roleRepo.Get(bulletHitRole.wRid);
+                var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
+                var role = roleRepo.Get(bulletHitRoleMsg.wRid);
 
+                // Client Logic
                 role.HealthComponent.HurtByBullet(bullet);
                 role.MoveComponent.HitByBullet(bullet);
                 if (role.HealthComponent.IsDead)
@@ -425,7 +429,37 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     role.Reborn();
                 }
 
-                GameObject.Destroy(bullet.gameObject);
+                if (bullet is HookerEntity hookerEntity)
+                {
+                    // 如果是爪钩则是抓住某物而不是销毁
+                    hookerEntity.TryGrabSomthing(role.transform);
+                    continue;
+                }
+
+                bullet.TearDown();
+            }
+        }
+
+        void Tick_BulletHitWall(int nextFrame)
+        {
+            while (bulletHitWallQueue.TryPeek(out var bulletHitWallResMsg))
+            {
+                bulletHitRoleQueue.Dequeue();
+                worldClientFrame = nextFrame;
+
+                var wallPos = new Vector3(bulletHitWallResMsg.posX / 10000f, bulletHitWallResMsg.posY / 10000f, bulletHitWallResMsg.posZ / 10000f);
+                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var roleRepo = worldFacades.Repo.WorldRoleRepo;
+                var bullet = bulletRepo.GetByBulletId(bulletHitWallResMsg.bulletId);
+
+                if (bullet is HookerEntity hookerEntity)
+                {
+                    // 如果是爪钩则是抓住某物而不是销毁
+                    hookerEntity.TryGrabSomthing(wallPos);
+                    continue;
+                }
+
+                bullet.TearDown();
             }
         }
 
@@ -451,8 +485,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         void OnBulletHitRole(FrameBulletHitRoleResMsg msg)
         {
-            Debug.Log("加入子弹击中队列");
+            Debug.Log("加入子弹击中角色队列");
             bulletHitRoleQueue.Enqueue(msg);
+        }
+
+        void OnBulletHitWall(FrameBulletHitWallResMsg msg)
+        {
+            Debug.Log("加入子弹击中墙壁队列");
+            bulletHitWallQueue.Enqueue(msg);
         }
 
         void OnBulletTearDown(FrameBulletTearDownResMsg msg)
@@ -464,6 +504,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         // Network Event Center
         async void EnterWorldChooseScene()
         {
+            // 当前有加载好的场景，则不加载
+            var curFieldEntity = worldFacades.Repo.FiledEntityRepo.CurFieldEntity;
+            if (curFieldEntity != null) return;
+
             // Load Scene And Spawn Field
             var domain = worldFacades.Domain;
             var fieldEntity = await domain.WorldSpawnDomain.SpawnWorldChooseScene();
