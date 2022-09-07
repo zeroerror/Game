@@ -418,7 +418,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         void Tick_ActiveHookersBehaviour(int nextFrame)
         {
             var activeHookers = worldFacades.ClientWorldFacades.Domain.BulletDomain.GetActiveHookerList();
-            bool needUpdateFrame = false;
+            List<WorldRoleEntity> roleList = new List<WorldRoleEntity>();
             activeHookers.ForEach((hooker) =>
             {
                 var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(hooker.WRid);
@@ -437,15 +437,17 @@ namespace Game.Server.Bussiness.WorldBussiness
                 masterMC.AddExtraVelocity(v);
                 master.SetRoleState(RoleState.Hooking);
 
+                if (!roleList.Contains(master)) roleList.Add(master);
+            });
+
+            roleList.ForEach((master) =>
+            {
                 //发送爪钩作用力后的角色状态帧
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
                 rqs.SendUpdate_WRoleState(master.ConnId, serveFrame, master);
-                Debug.Log($"发送爪钩作用力后的角色状态帧 : 爪钩加速度: {v} ");
-
-                needUpdateFrame = true;
             });
 
-            if (needUpdateFrame) serveFrame = nextFrame;
+            if (roleList.Count != 0) serveFrame = nextFrame;
         }
 
         #endregion
