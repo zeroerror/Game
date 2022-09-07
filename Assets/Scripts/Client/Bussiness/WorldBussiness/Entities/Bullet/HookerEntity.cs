@@ -35,8 +35,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             lineRenderer = new LineRenderer();
         }
 
-        public bool TickHooker()
+        public bool TickHooker(out float curForce)
         {
+            curForce = 0;
             // lineRenderer.positionCount = 2;
             // lineRenderer.SetPositions(new Vector3[] { masterGrabEnd.transform.position, shootEnd.transform.position });
             if (GrabPoint != null)
@@ -45,12 +46,14 @@ namespace Game.Client.Bussiness.WorldBussiness
                 var grabPos = GrabPoint.transform.position;
                 var masterGrabEndPos = masterGrabEnd.transform.position;
                 var dis = Vector3.Distance(grabPos, masterGrabEndPos);
-                if (dis < 3f)
+                if (dis < 5f)
                 {
                     Debug.Log("钩爪断开");
                     SetLifeTime(0f);
+
                     return false;
                 }
+                curForce = dis > 10f ? 10f : dis;
                 return true;
             }
 

@@ -155,11 +155,13 @@ namespace Game.Client.Bussiness.WorldBussiness
             if (!IsGrouded)
             {
                 _gravityVelocity -= (fixedDeltaTime * _gravity);
+
                 if (extraVelocity.y > 0)
                 {
                     extraVelocity.y -= (fixedDeltaTime * _gravity);
                     if (extraVelocity.y < 0) extraVelocity.y = 0;
                 }
+
                 if (moveVelocity.y > 0)
                 {
                     moveVelocity.y -= (fixedDeltaTime * _gravity);
@@ -183,6 +185,8 @@ namespace Game.Client.Bussiness.WorldBussiness
             _gravityVelocity = 0;
             //额外速度Y轴 归零
             extraVelocity.y = 0;
+            //移动速度Y轴 归零
+            moveVelocity.y = 0;
             //RigidBody速度 归零
             var v = rb.velocity;
             v.y = 0;
@@ -205,6 +209,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             // {
             // }
 
+            // 水平速度归零
+            extraVelocity.x = 0;
+            extraVelocity.z = 0;
             extraVelocity = Vector3.zero;
         }
 

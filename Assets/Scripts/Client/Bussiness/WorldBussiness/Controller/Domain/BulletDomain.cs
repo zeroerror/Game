@@ -79,12 +79,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         var hookerEntity = (HookerEntity)bullet;
                         var master = hookerEntity.MasterEntity;
                         var masterMC = master.MoveComponent;
-                        if (hookerEntity.TickHooker())
+                        if (hookerEntity.TickHooker(out float force))
                         {
                             var hookerEntityMC = hookerEntity.MoveComponent;
                             var dir = hookerEntityMC.CurPos - masterMC.CurPos;
+                            var dis = Vector3.Distance(hookerEntityMC.CurPos, masterMC.CurPos);
                             dir.Normalize();
-                            var v = dir * 20f*fixedDeltaTime;
+                            var v = dir * force * fixedDeltaTime;
                             Debug.Log($"Hooker : v:{v} ");
                             masterMC.AddExtraVelocity(v);
                         }
