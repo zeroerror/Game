@@ -236,7 +236,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             rb.velocity += (velocity);
         }
 
-        public void SetRotationByEulerAngle(Vector3 eulerAngle)
+        public void SetEulerAngle(Vector3 eulerAngle)
         {
             rb.rotation = Quaternion.Euler(eulerAngle);
         }

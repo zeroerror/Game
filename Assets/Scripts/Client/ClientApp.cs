@@ -112,7 +112,7 @@ namespace Game.Client
             {
                 InputComponent.moveAxis.x = 1;
             }
-            if (Input.GetKey(KeyCode.V))
+            if (Input.GetKeyDown(KeyCode.V))
             {
                 InputComponent.pressV = true;
             }

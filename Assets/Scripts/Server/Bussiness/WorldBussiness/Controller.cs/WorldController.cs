@@ -304,7 +304,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 if (optTypeId == 2)
                 {
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
-                    roleEntity.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                    roleEntity.MoveComponent.SetEulerAngle(eulerAngle);
                     // Debug.Log($"转向（基于客户端鉴权的同步）eulerAngle:{eulerAngle}");
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
@@ -444,7 +444,10 @@ namespace Game.Server.Bussiness.WorldBussiness
             {
                 //发送爪钩作用力后的角色状态帧
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
-                rqs.SendUpdate_WRoleState(master.ConnId, serveFrame, master);
+                connIdList.ForEach((connId) =>
+                {
+                    rqs.SendUpdate_WRoleState(connId, serveFrame, master);
+                });
             });
 
             if (roleList.Count != 0) serveFrame = nextFrame;

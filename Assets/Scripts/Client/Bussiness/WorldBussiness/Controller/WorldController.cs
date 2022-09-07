@@ -173,15 +173,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         role.AnimatorComponent.PlayRun();
                         break;
                     case RoleState.Jump:
+                        if (role.RoleState != RoleState.Jump)
+                        {
+                            role.AnimatorComponent.PlayJump();
+                        }
                         role.MoveComponent.SetJumpVelocity();
-                        role.AnimatorComponent.PlayJump();
                         break;
                     case RoleState.Hooking:
                         role.AnimatorComponent.PlayHooking();
                         break;
                 }
                 role.MoveComponent.SetCurPos(pos);
-                if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetEulerAngle(eulerAngle);
                 role.MoveComponent.SetMoveVelocity(moveVelocity);
                 role.MoveComponent.SetExtraVelocity(extraVelocity);
                 role.MoveComponent.SetGravityVelocity(gravityVelocity);
