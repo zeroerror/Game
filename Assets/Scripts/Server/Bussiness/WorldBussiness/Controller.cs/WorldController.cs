@@ -103,9 +103,9 @@ namespace Game.Server.Bussiness.WorldBussiness
             Tick_AllOpt(nextFrame);
 
             // Tick
-            Tick_BulletLife();
-            Tick_ActiveHookersBehaviour();
-            Tick_BulletHit();
+            Tick_BulletLife(nextFrame);
+            Tick_ActiveHookersBehaviour(nextFrame);
+            Tick_BulletHit(nextFrame);
         }
 
         #region [Client Requst]
@@ -230,10 +230,10 @@ namespace Game.Server.Bussiness.WorldBussiness
             var WorldRoleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
             WorldRoleRepo.Foreach((roleEntity) =>
             {
-                if (roleEntity.IsIdle() && roleEntity.RoleState != RoleState.Idle)
+                if (roleEntity.IsIdle() && roleEntity.RoleState != RoleState.Normal)
                 {
                     isNextFrame = true;
-                    roleEntity.SetRoleStatus(RoleState.Idle);
+                    roleEntity.SetRoleState(RoleState.Normal);
 
                     var rqs = worldFacades.Network.WorldRoleReqAndRes;
                     connIdList.ForEach((connId) =>
@@ -292,7 +292,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     roleEntity.MoveComponent.AddMoveVelocity(Vector3.zero);
 
                     // 人物状态同步
-                    roleEntity.SetRoleStatus(RoleState.Move);
+                    roleEntity.SetRoleState(RoleState.Move);
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
                     {
@@ -338,7 +338,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 //服务器逻辑Jump
                 roleEntity.MoveComponent.SetJumpVelocity();
-                roleEntity.SetRoleStatus(RoleState.Jump);
+                roleEntity.SetRoleState(RoleState.Jump);
 
                 //发送状态同步帧
                 connIdList.ForEach((connId) =>
@@ -351,7 +351,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         }
 
         // ====== Life Control
-        void Tick_BulletLife()
+        void Tick_BulletLife(int nextFrame)
         {
             var tearDownList = worldFacades.ClientWorldFacades.Domain.BulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
             if (tearDownList.Count == 0) return;
@@ -379,7 +379,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                             var extraV = dir.normalized * 10f;
                             role.MoveComponent.AddExtraVelocity(extraV);
                             // role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
-                            role.SetRoleStatus(RoleState.Move);
+                            role.SetRoleState(RoleState.Move);
                             effectRoleQueue.Enqueue(role);
                         }
                     });
@@ -412,17 +412,22 @@ namespace Game.Server.Bussiness.WorldBussiness
 
             });
 
-            serveFrame += 1;
+            serveFrame = nextFrame;
         }
 
-        void Tick_ActiveHookersBehaviour()
+        void Tick_ActiveHookersBehaviour(int nextFrame)
         {
             var activeHookers = worldFacades.ClientWorldFacades.Domain.BulletDomain.GetActiveHookerList();
+            bool needUpdateFrame = false;
             activeHookers.ForEach((hooker) =>
             {
-                if (!hooker.TickHooker(out float force)) return;
-
                 var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(hooker.WRid);
+                if (!hooker.TickHooker(out float force))
+                {
+                    master.SetRoleState(RoleState.Normal);
+                    return;
+                }
+
                 var masterMC = master.MoveComponent;
                 var hookerEntityMC = hooker.MoveComponent;
                 var dir = hookerEntityMC.CurPos - masterMC.CurPos;
@@ -430,26 +435,31 @@ namespace Game.Server.Bussiness.WorldBussiness
                 dir.Normalize();
                 var v = dir * force * fixedDeltaTime;
                 masterMC.AddExtraVelocity(v);
+                master.SetRoleState(RoleState.Hooking);
 
                 //发送爪钩作用力后的角色状态帧
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
                 rqs.SendUpdate_WRoleState(master.ConnId, serveFrame, master);
                 Debug.Log($"发送爪钩作用力后的角色状态帧 : 爪钩加速度: {v} ");
+
+                needUpdateFrame = true;
             });
+
+            if (needUpdateFrame) serveFrame = nextFrame;
         }
 
         #endregion
 
         // ====== Physics
-        void Tick_BulletHit()
+        void Tick_BulletHit(int nextFrame)
         {
             var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
             bulletRepo.Foreach((bullet) =>
             {
-                int nextFrameIndex = serveFrame + 1;
                 bool isHitSomething = false;
                 if (bullet.TryDequeueHitRole(out var wrole))
                 {
+                    isHitSomething = true;
                     // Server Logic
                     wrole.HealthComponent.HurtByBullet(bullet);
                     wrole.MoveComponent.HitByBullet(bullet);
@@ -459,7 +469,6 @@ namespace Game.Server.Bussiness.WorldBussiness
                         wrole.Reborn();
                     }
                     // Notice Client
-                    serveFrame = nextFrameIndex;
                     var rqs = worldFacades.Network.BulletReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
@@ -469,29 +478,29 @@ namespace Game.Server.Bussiness.WorldBussiness
                 }
                 if (bullet.TryDequeueHitWall(out var wall))
                 {
-                    // Server Logic
-                    if (bullet is HookerEntity hookerEntity)
-                    {
-                    }
+                    isHitSomething = true;
+                    // TODO:Server Logic
                     // Notice Client
-                    serveFrame = nextFrameIndex;
                     var rqs = worldFacades.Network.BulletReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendRes_BulletHitWall(connId, serveFrame, bullet, wall);
+                        rqs.SendRes_BulletHitWall(connId, serveFrame, bullet);
                     });
                 }
 
                 if (isHitSomething)
                 {
+                    serveFrame = nextFrame;
+                    // Server Logic
                     if (bullet is HookerEntity hookerEntity)
                     {
-                        hookerEntity.TryGrabSomthing(wrole.transform);
-                        hookerEntity.TryGrabSomthing(wall.transform);
+                        if (wall != null) hookerEntity.TryGrabSomthing(wall.transform);
+                        if (wrole != null) hookerEntity.TryGrabSomthing(wrole.transform);
                     }
                     else
                     {
                         bullet.TearDown();
+                        bulletRepo.TryRemove(bullet);
                     }
                 }
 

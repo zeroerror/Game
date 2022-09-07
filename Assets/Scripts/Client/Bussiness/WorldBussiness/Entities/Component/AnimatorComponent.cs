@@ -28,6 +28,16 @@ namespace Game.Client.Bussiness.WorldBussiness
             animator.Play("Run");
         }
 
+        public void PlayJump()
+        {
+            animator.CrossFade("Jump", 0.1f);
+        }
+
+        public void PlayHooking()
+        {
+            animator.Play("Hooking");
+        }
+
     }
 
 }

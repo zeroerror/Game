@@ -14,7 +14,8 @@ namespace Game.Client.Bussiness.WorldBussiness
         float jumpSpeed;
         public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
 
-        float frictionReduce = 0f;
+        // TODO: 滑铲摩擦力
+        float frictionReduce = 50f;
         public void SetFriction(float friction) => this.frictionReduce = friction;
 
         // Rigidbody
@@ -201,7 +202,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void EnterWall()
         {
-            
+
             Debug.Log($"{rb.gameObject.name} 接触墙体");
             IsHitWall = true;
 

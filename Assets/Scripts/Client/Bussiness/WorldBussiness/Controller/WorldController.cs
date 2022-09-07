@@ -73,7 +73,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             //1
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
+
             Tick_BulletHitRole(nextFrame);
+            Tick_BulletHitWall(nextFrame);
+
             Tick_BulletLife(nextFrame);
             Tick_RoleStateSync(nextFrame);
             //2
@@ -110,7 +113,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         }
         void Tick_RoleStateSync(int nextFrame)
         {
-            if (stateQueue.TryPeek(out var stateMsg))
+            while (stateQueue.TryPeek(out var stateMsg))
             {
                 stateQueue.Dequeue();
                 worldClientFrame = stateMsg.serverFrameIndex;
@@ -163,29 +166,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
                 switch (roleState)
                 {
-                    case RoleState.Idle:
+                    case RoleState.Normal:
                         role.AnimatorComponent.PlayIdle();
                         break;
                     case RoleState.Move:
-                        role.MoveComponent.SetCurPos(pos);
-                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
-                        role.MoveComponent.SetMoveVelocity(moveVelocity);
-                        role.MoveComponent.SetExtraVelocity(extraVelocity);
-                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
                         role.AnimatorComponent.PlayRun();
                         break;
                     case RoleState.Jump:
-                        role.MoveComponent.SetCurPos(pos);
-                        if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
-                        role.MoveComponent.SetMoveVelocity(moveVelocity);
-                        role.MoveComponent.SetExtraVelocity(extraVelocity);
-                        role.MoveComponent.SetGravityVelocity(gravityVelocity);
                         role.MoveComponent.SetJumpVelocity();
-                        role.AnimatorComponent.PlayRun();
+                        role.AnimatorComponent.PlayJump();
+                        break;
+                    case RoleState.Hooking:
+                        role.AnimatorComponent.PlayHooking();
                         break;
                 }
+                role.MoveComponent.SetCurPos(pos);
+                if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetRotationByEulerAngle(eulerAngle);
+                role.MoveComponent.SetMoveVelocity(moveVelocity);
+                role.MoveComponent.SetExtraVelocity(extraVelocity);
+                role.MoveComponent.SetGravityVelocity(gravityVelocity);
 
-                role.SetRoleStatus(roleState);
+                role.SetRoleState(roleState);
             }
         }
 
@@ -437,6 +438,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 }
 
                 bullet.TearDown();
+                bulletRepo.TryRemove(bullet);
             }
         }
 
@@ -444,10 +446,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             while (bulletHitWallQueue.TryPeek(out var bulletHitWallResMsg))
             {
-                bulletHitRoleQueue.Dequeue();
+                bulletHitWallQueue.Dequeue();
                 worldClientFrame = nextFrame;
 
-                var wallPos = new Vector3(bulletHitWallResMsg.posX / 10000f, bulletHitWallResMsg.posY / 10000f, bulletHitWallResMsg.posZ / 10000f);
+                var bulletHitPos = new Vector3(bulletHitWallResMsg.posX / 10000f, bulletHitWallResMsg.posY / 10000f, bulletHitWallResMsg.posZ / 10000f);
                 var bulletRepo = worldFacades.Repo.BulletEntityRepo;
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
                 var bullet = bulletRepo.GetByBulletId(bulletHitWallResMsg.bulletId);
@@ -455,11 +457,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 if (bullet is HookerEntity hookerEntity)
                 {
                     // 如果是爪钩则是抓住某物而不是销毁
-                    hookerEntity.TryGrabSomthing(wallPos);
+                    hookerEntity.TryGrabSomthing(bulletHitPos);
                     continue;
                 }
 
                 bullet.TearDown();
+                bulletRepo.TryRemove(bullet);
             }
         }
 
@@ -497,7 +500,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         void OnBulletTearDown(FrameBulletTearDownResMsg msg)
         {
-            Debug.Log("加入子弹销毁队列");
+            Debug.Log($"{msg.bulletType.ToString()} 加入子弹销毁队列");
             bulletTearDownQueue.Enqueue(msg);
         }
 

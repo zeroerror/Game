@@ -7,10 +7,10 @@ namespace Game.Client.Bussiness.WorldBussiness
 
     public enum RoleState
     {
-        Idle,
+        Normal,
         Move,
         Jump,
-        Be_Imprisoned       //-被禁锢
+        Hooking       //-使用爪钩中
     }
 
     public class WorldRoleEntity : MonoBehaviour, ICameraTrackObj
@@ -55,7 +55,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
 
         public RoleState RoleState { get; private set; }
-        public void SetRoleStatus(RoleState roleStatus) => this.RoleState = roleStatus;
+        public void SetRoleState(RoleState roleStatus) => this.RoleState = roleStatus;
 
         public bool IsDead { get; private set; }
         public bool IsOldState;
@@ -65,7 +65,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 5f, 5f);
             AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
             HealthComponent = new HealthComponent(100f);
-            RoleState = RoleState.Idle;
+            RoleState = RoleState.Normal;
             offset = new Vector3(0, 1f, 0);
         }
 
@@ -87,12 +87,13 @@ namespace Game.Client.Bussiness.WorldBussiness
             IsDead = false;
         }
 
-        // Unity Physics 
+        // Unity Physics TODO:转移到Tick事件处理
         void OnCollisionEnter(Collision collision)
         {
             if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
                 MoveComponent.EnterGround();
+                AnimatorComponent.PlayIdle();
             }
             if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {

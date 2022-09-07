@@ -50,18 +50,18 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.SendMsg(connId, msg);
         }
 
-        public void SendRes_BulletHitWall(int connId, int frame, BulletEntity bulletEntity, GameObject wall)
+        public void SendRes_BulletHitWall(int connId, int frame, BulletEntity bulletEntity)
         {
-            var wallPos = wall.transform.position;
-            Debug.Log($"SendRes_BulletHitWall: wallPos  {wallPos}");
-            wallPos *= 10000f;
+            var bulletPos = bulletEntity.MoveComponent.CurPos;
+            Debug.Log($"SendRes_BulletHitWall: bulletPos  {bulletPos}");
+            bulletPos *= 10000f;
             FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
             {
                 serverFrame = frame,
                 bulletId = bulletEntity.BulletId,
-                posX = (int)wallPos.x,
-                posY = (int)wallPos.y,
-                posZ = (int)wallPos.z,
+                posX = (int)bulletPos.x,
+                posY = (int)bulletPos.y,
+                posZ = (int)bulletPos.z,
             };
 
             _server.SendMsg(connId, msg);

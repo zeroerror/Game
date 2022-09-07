@@ -79,16 +79,41 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         void OnTriggerEnter(Collider collider)
         {
-            // GameObject colliderGo = collider.gameObject;
-            // if (colliderGo.layer == LayerMask.NameToLayer("Player"))
-            // {
-            //     hitRoleQueue.Enqueue(colliderGo.transform.GetComponent<WorldRoleEntity>());
-            // }
+            GameObject colliderGo = collider.gameObject;
+            var layer = colliderGo.layer;
+
+            if (layer == LayerMask.NameToLayer("Player"))
+            {
+                hitRoleQueue.Enqueue(colliderGo.transform.GetComponent<WorldRoleEntity>());
+            }
+            if (layer == LayerMask.NameToLayer("Field"))
+            {
+                MoveComponent.EnterGround();
+            }
+            if (layer == LayerMask.NameToLayer("Wall"))
+            {
+                MoveComponent.EnterWall();
+                hitWallQueue.Enqueue(colliderGo);
+            }
             EnterTrigger(collider);
         }
 
         void OnTriggerExit(Collider collider)
         {
+            GameObject colliderGo = collider.gameObject;
+            var layer = colliderGo.layer;
+
+            if (layer == LayerMask.NameToLayer("Player"))
+            {
+            }
+            if (layer == LayerMask.NameToLayer("Field"))
+            {
+                MoveComponent.LeaveGround();
+            }
+            if (layer == LayerMask.NameToLayer("Wall"))
+            {
+                MoveComponent.LeaveWall();
+            }
             ExitTrigger(collider);
         }
 
@@ -119,6 +144,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             }
             if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {
+                MoveComponent.LeaveWall();
             }
             ExitCollision(collision);
         }
