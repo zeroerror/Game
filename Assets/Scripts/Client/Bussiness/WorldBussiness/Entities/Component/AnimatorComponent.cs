@@ -38,6 +38,35 @@ namespace Game.Client.Bussiness.WorldBussiness
             animator.Play("Hooking");
         }
 
+        public bool IsInState(string stateName)
+        {
+            var curStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            return curStateInfo.IsName(stateName);
+        }
+
+        public int GetCurrentClipCurrentFrameIndex()
+        {
+            var clip = GetCurrentClip();
+            var frameRate = clip.frameRate;
+            int totalFrame = (int)(clip.length * frameRate);
+
+            var playedTime = GetCurrentClipAlreadyPlayedTime();
+            int playedFrame = (int)(playedTime / clip.length) * totalFrame;
+
+            Debug.Log($"frameRate {frameRate} totalFrame {totalFrame} playedFrame:{playedFrame}");
+            return playedFrame;
+        }
+
+        public AnimationClip GetCurrentClip()
+        {
+            return animator.GetCurrentAnimatorClipInfo(0)[0].clip;
+        }
+
+        public float GetCurrentClipAlreadyPlayedTime()
+        {
+            return animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        }
+
     }
 
 }

@@ -92,20 +92,21 @@ namespace Game.Server.Bussiness.WorldBussiness
             if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList) || optList.Count == 0)
             {
                 Tick_Physics_RoleMovement();
+                Tick_Physics_BulletMovement(fixedDeltaTime);
+                Tick_Physics_BulletHit(nextFrame);
                 var physicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
                 physicsScene.Simulate(fixedDeltaTime);
             }
-            Tick_Physics_BulletMovement(fixedDeltaTime);
+
 
             // Client Request
             Tick_WRoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
-            Tick_AllOpt(nextFrame);
+            Tick_AllOpt(nextFrame); // Include Physics Simulation
 
-            // Tick
+            // ====== Life
             Tick_BulletLife(nextFrame);
             Tick_ActiveHookersBehaviour(nextFrame);
-            Tick_BulletHit(nextFrame);
         }
 
         #region [Client Requst]
@@ -130,6 +131,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 // 服务器逻辑
                 var roleEntity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
+                roleEntity.Ctor();
                 roleEntity.SetWRid(wrid);
                 roleEntity.SetConnId(connId);
                 Debug.Log($"服务器逻辑[Spawn Role] frame:{serveFrame} wRid:{wrid}  roleEntity.MoveComponent.CurPos:{roleEntity.MoveComponent.CurPos}");
@@ -197,7 +199,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var bulletId = bulletRepo.BulletCount;
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.SetForward(shootDir);
-                bulletEntity.MoveComponent.AddMoveVelocity(shootDir);
+                bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                 switch (bulletType)
                 {
                     case BulletType.Default:
@@ -284,15 +286,15 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                     //服务器逻辑Move + 物理模拟
                     var curPhysicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
-                    roleEntity.MoveComponent.AddMoveVelocity(dir);
+                    roleEntity.MoveComponent.ActivateMoveVelocity(dir);
                     roleEntity.MoveComponent.Tick_Friction(fixedDeltaTime);
                     roleEntity.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
                     roleEntity.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
                     curPhysicsScene.Simulate(fixedDeltaTime);
-                    roleEntity.MoveComponent.AddMoveVelocity(Vector3.zero);
+                    roleEntity.MoveComponent.ActivateMoveVelocity(Vector3.zero);
 
                     // 人物状态同步
-                    roleEntity.SetRoleState(RoleState.Move);
+                    if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Move);
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
                     {
@@ -338,7 +340,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 //服务器逻辑Jump
                 roleEntity.MoveComponent.SetJumpVelocity();
-                roleEntity.SetRoleState(RoleState.Jump);
+                if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
 
                 //发送状态同步帧
                 connIdList.ForEach((connId) =>
@@ -419,12 +421,20 @@ namespace Game.Server.Bussiness.WorldBussiness
         {
             var activeHookers = worldFacades.ClientWorldFacades.Domain.BulletDomain.GetActiveHookerList();
             List<WorldRoleEntity> roleList = new List<WorldRoleEntity>();
+            var rqs = worldFacades.Network.WorldRoleReqAndRes;
+            bool hasHookerLoose = false;
             activeHookers.ForEach((hooker) =>
             {
                 var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(hooker.WRid);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.SetRoleState(RoleState.Normal);
+                    hasHookerLoose = true;
+                    //发送爪钩断开后的角色状态帧
+                    connIdList.ForEach((connId) =>
+                    {
+                        rqs.SendUpdate_WRoleState(connId, serveFrame, master);
+                    });
                     return;
                 }
 
@@ -443,20 +453,19 @@ namespace Game.Server.Bussiness.WorldBussiness
             roleList.ForEach((master) =>
             {
                 //发送爪钩作用力后的角色状态帧
-                var rqs = worldFacades.Network.WorldRoleReqAndRes;
                 connIdList.ForEach((connId) =>
                 {
                     rqs.SendUpdate_WRoleState(connId, serveFrame, master);
                 });
             });
 
-            if (roleList.Count != 0) serveFrame = nextFrame;
+            if (roleList.Count != 0 || hasHookerLoose) serveFrame = nextFrame;
         }
 
         #endregion
 
         // ====== Physics
-        void Tick_BulletHit(int nextFrame)
+        void Tick_Physics_BulletHit(int nextFrame)
         {
             var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();

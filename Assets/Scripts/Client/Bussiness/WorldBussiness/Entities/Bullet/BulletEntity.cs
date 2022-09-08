@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         Hooker
     }
 
-    public class BulletEntity : MonoBehaviour
+    public class BulletEntity : PhysicsEntity
     {
         // Master Info
         byte wRid;
@@ -82,13 +82,13 @@ namespace Game.Client.Bussiness.WorldBussiness
             GameObject colliderGo = collider.gameObject;
             var layer = colliderGo.layer;
 
-            if (layer == LayerMask.NameToLayer("Player"))
+            if (layer == LayerMask.NameToLayer("Role"))
             {
                 hitRoleQueue.Enqueue(colliderGo.transform.GetComponent<WorldRoleEntity>());
             }
             if (layer == LayerMask.NameToLayer("Field"))
             {
-                MoveComponent.EnterGround();
+                MoveComponent.EnterField();
             }
             if (layer == LayerMask.NameToLayer("Wall"))
             {
@@ -103,7 +103,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             GameObject colliderGo = collider.gameObject;
             var layer = colliderGo.layer;
 
-            if (layer == LayerMask.NameToLayer("Player"))
+            if (layer == LayerMask.NameToLayer("Role"))
             {
             }
             if (layer == LayerMask.NameToLayer("Field"))
@@ -120,13 +120,13 @@ namespace Game.Client.Bussiness.WorldBussiness
         void OnCollisionEnter(Collision collision)
         {
             GameObject collisionGo = collision.gameObject;
-            if (collisionGo.layer == LayerMask.NameToLayer("Player"))
+            if (collisionGo.layer == LayerMask.NameToLayer("Role"))
             {
                 hitRoleQueue.Enqueue(collisionGo.transform.GetComponent<WorldRoleEntity>());
             }
             if (collisionGo.layer == LayerMask.NameToLayer("Field"))
             {
-                MoveComponent.EnterGround();
+                MoveComponent.EnterField();
             }
             if (collisionGo.layer == LayerMask.NameToLayer("Wall"))
             {

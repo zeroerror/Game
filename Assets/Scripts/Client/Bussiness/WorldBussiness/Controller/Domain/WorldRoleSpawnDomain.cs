@@ -33,6 +33,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var entity = prefabAsset.GetComponent<WorldRoleEntity>();
+                entity.Ctor();
                 entity.SetWRid(++tempRidIndex);
 
                 return entity;

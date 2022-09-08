@@ -150,6 +150,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     var fieldEntity = fieldRepo.Get(1);
                     var domain = worldFacades.Domain.WorldRoleSpawnDomain;
                     role = domain.SpawnWorldRole(fieldEntity.transform);
+                    role.Ctor();
                     role.SetWRid(wRoleId);
 
                     roleRepo.Add(role);
@@ -357,6 +358,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var fieldEntity = repo.FiledEntityRepo.Get(1);
                 var domain = worldFacades.Domain.WorldRoleSpawnDomain;
                 var entity = domain.SpawnWorldRole(fieldEntity.transform);
+                entity.Ctor();
                 entity.SetWRid(wRoleId);
 
                 var roleRepo = repo.WorldRoleRepo;
@@ -404,7 +406,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 }
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.SetForward(shootDir);
-                bulletEntity.MoveComponent.AddMoveVelocity(shootDir);
+                bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                 bulletEntity.SetWRid(masterWRid);
                 bulletEntity.SetBulletId(bulletId);
                 var bulletRepo = worldFacades.Repo.BulletEntityRepo;

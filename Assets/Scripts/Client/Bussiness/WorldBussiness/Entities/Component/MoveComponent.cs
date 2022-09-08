@@ -39,7 +39,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         Vector3 moveVelocity;
         public Vector3 MoveVelocity => moveVelocity;
         public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
-        public void AddMoveVelocity(Vector3 dir)
+        public void ActivateMoveVelocity(Vector3 dir)
         {
             dir.Normalize();
             dir = dir.FixDecimal(2);
@@ -184,9 +184,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             IsGrouded = false;
         }
 
-        public void EnterGround()
+        public void EnterField()
         {
-            Debug.Log("接触地面");
+            Debug.Log("接触Field");
             IsGrouded = true;
 
             //重力速度 归零

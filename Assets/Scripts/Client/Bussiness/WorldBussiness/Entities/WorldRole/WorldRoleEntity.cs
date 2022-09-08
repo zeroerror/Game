@@ -13,7 +13,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         Hooking       //-使用爪钩中
     }
 
-    public class WorldRoleEntity : MonoBehaviour, ICameraTrackObj
+    public class WorldRoleEntity : PhysicsEntity, ICameraTrackObj
     {
 
         [SerializeField]
@@ -60,7 +60,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public bool IsDead { get; private set; }
         public bool IsOldState;
 
-        public void Awake()
+        public void Ctor()
         {
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 5f, 5f);
             MoveComponent.SetMaximumSpeed(30f);
@@ -93,8 +93,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
             {
-                MoveComponent.EnterGround();
-                AnimatorComponent.PlayIdle();
+        
             }
             if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {
@@ -114,6 +113,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             }
         }
 
+       
     }
 
 }
