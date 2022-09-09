@@ -79,74 +79,74 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         void OnTriggerEnter(Collider collider)
         {
-            GameObject colliderGo = collider.gameObject;
-            var layer = colliderGo.layer;
+            // GameObject colliderGo = collider.gameObject;
+            // var layer = colliderGo.layer;
 
-            if (layer == LayerMask.NameToLayer("Role"))
-            {
-                hitRoleQueue.Enqueue(colliderGo.transform.GetComponent<WorldRoleEntity>());
-            }
-            if (layer == LayerMask.NameToLayer("Field"))
-            {
-                MoveComponent.EnterField();
-            }
-            if (layer == LayerMask.NameToLayer("Wall"))
-            {
-                MoveComponent.EnterWall();
-                hitWallQueue.Enqueue(colliderGo);
-            }
-            EnterTrigger(collider);
+            // if (layer == LayerMask.NameToLayer("Role"))
+            // {
+            //     hitRoleQueue.Enqueue(colliderGo.transform.GetComponent<WorldRoleEntity>());
+            // }
+            // if (layer == LayerMask.NameToLayer("Field"))
+            // {
+            //     MoveComponent.EnterGound();
+            // }
+            // if (layer == LayerMask.NameToLayer("Wall"))
+            // {
+            //     MoveComponent.EnterWall();
+            //     hitWallQueue.Enqueue(colliderGo);
+            // }
+            // EnterTrigger(collider);
         }
 
         void OnTriggerExit(Collider collider)
         {
-            GameObject colliderGo = collider.gameObject;
-            var layer = colliderGo.layer;
+            // GameObject colliderGo = collider.gameObject;
+            // var layer = colliderGo.layer;
 
-            if (layer == LayerMask.NameToLayer("Role"))
-            {
-            }
-            if (layer == LayerMask.NameToLayer("Field"))
-            {
-                MoveComponent.LeaveGround();
-            }
-            if (layer == LayerMask.NameToLayer("Wall"))
-            {
-                MoveComponent.LeaveWall();
-            }
-            ExitTrigger(collider);
+            // if (layer == LayerMask.NameToLayer("Role"))
+            // {
+            // }
+            // if (layer == LayerMask.NameToLayer("Field"))
+            // {
+            //     MoveComponent.LeaveGround();
+            // }
+            // if (layer == LayerMask.NameToLayer("Wall"))
+            // {
+            //     MoveComponent.LeaveWall();
+            // }
+            // ExitTrigger(collider);
         }
 
         void OnCollisionEnter(Collision collision)
         {
-            GameObject collisionGo = collision.gameObject;
-            if (collisionGo.layer == LayerMask.NameToLayer("Role"))
-            {
-                hitRoleQueue.Enqueue(collisionGo.transform.GetComponent<WorldRoleEntity>());
-            }
-            if (collisionGo.layer == LayerMask.NameToLayer("Field"))
-            {
-                MoveComponent.EnterField();
-            }
-            if (collisionGo.layer == LayerMask.NameToLayer("Wall"))
-            {
-                MoveComponent.EnterWall();
-                hitWallQueue.Enqueue(collisionGo);
-            }
-            EnterCollision(collision);
+            // GameObject collisionGo = collision.gameObject;
+            // if (collisionGo.layer == LayerMask.NameToLayer("Role"))
+            // {
+            //     hitRoleQueue.Enqueue(collisionGo.transform.GetComponent<WorldRoleEntity>());
+            // }
+            // if (collisionGo.layer == LayerMask.NameToLayer("Field"))
+            // {
+            //     MoveComponent.EnterGound();
+            // }
+            // if (collisionGo.layer == LayerMask.NameToLayer("Wall"))
+            // {
+            //     MoveComponent.EnterWall();
+            //     hitWallQueue.Enqueue(collisionGo);
+            // }
+            // EnterCollision(collision);
         }
 
         void OnCollisionExit(Collision collision)
         {
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-            {
-                MoveComponent.LeaveGround();
-            }
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            {
-                MoveComponent.LeaveWall();
-            }
-            ExitCollision(collision);
+            // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+            // {
+            //     MoveComponent.LeaveGround();
+            // }
+            // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            // {
+            //     MoveComponent.LeaveWall();
+            // }
+            // ExitCollision(collision);
         }
 
     }

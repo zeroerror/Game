@@ -1959,7 +1959,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3522770426579625917}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.686, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3849,8 +3849,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032c69efce5f81642aef0ffa36b9408e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsOldState: 0
   camTrackingObj: {fileID: 4152236487439866043}
+  IsOldState: 0
 --- !u!65 &2132031221355962208
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3863,7 +3863,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.47, y: 1.31, z: 0.34}
-  m_Center: {x: 0, y: 0.75, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5734713072989455083
 GameObject:
   m_ObjectHideFlags: 0

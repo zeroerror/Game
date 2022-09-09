@@ -1156,7 +1156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 514143598}
   - component: {fileID: 514143599}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Field
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2176,7 +2176,7 @@ GameObject:
   - component: {fileID: 1237622184}
   - component: {fileID: 1237622183}
   - component: {fileID: 1237622186}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: MainCam
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -3342,7 +3342,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1817596334}
   - component: {fileID: 1817596335}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TargetGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3487,7 +3487,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1852870729}
   - component: {fileID: 1852870730}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FollowGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}

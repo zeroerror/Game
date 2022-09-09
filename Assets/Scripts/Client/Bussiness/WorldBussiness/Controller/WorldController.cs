@@ -66,16 +66,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             // Physics Simulation
             if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity != null)
             {
-                Tick_Physics_RoleMovement(fixedDeltaTime);
+                Tick_Physics_Movement_Role(fixedDeltaTime);
             }
-            Tick_Physics_BulletMovement(fixedDeltaTime);
+            Tick_Physics_Movement_Bullet(fixedDeltaTime);
 
+            
             //1
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
 
-            Tick_BulletHitRole(nextFrame);
-            Tick_BulletHitWall(nextFrame);
+            // Tick_BulletHitRole(nextFrame);
+            // Tick_BulletHitWall(nextFrame);
+            Tick_Physics_Collision_Role();
 
             Tick_BulletLife(nextFrame);
             Tick_RoleStateSync(nextFrame);
@@ -308,16 +310,22 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             }
         }
 
-        void Tick_Physics_RoleMovement(float deltaTime)
+        void Tick_Physics_Movement_Role(float deltaTime)
         {
             var domain = worldFacades.Domain.WorldRoleSpawnDomain;
             domain.Tick_RoleRigidbody(deltaTime);
         }
 
-        void Tick_Physics_BulletMovement(float fixedDeltaTime)
+        void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
         {
             var domain = worldFacades.Domain.BulletDomain;
             domain.Tick_Bullet(fixedDeltaTime);
+        }
+
+        void Tick_Physics_Collision_Role()
+        {
+            var domain = worldFacades.Domain.PhysicsDomain;
+            domain.Tick_RoleHit();
         }
 
         bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)

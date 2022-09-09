@@ -89,29 +89,29 @@ namespace Game.Client.Bussiness.WorldBussiness
         }
 
         // Unity Physics TODO:转移到Tick事件处理
-        void OnCollisionEnter(Collision collision)
-        {
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-            {
+        // void OnCollisionEnter(Collision collision)
+        // {
+            // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+            // {
         
-            }
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            {
-                MoveComponent.EnterWall();
-            }
-        }
+            // }
+            // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            // {
+            //     MoveComponent.EnterWall();
+            // }
+        // }
 
-        void OnCollisionExit(Collision collision)
-        {
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-            {
-                MoveComponent.LeaveGround();
-            }
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            {
-                MoveComponent.LeaveWall();
-            }
-        }
+        // void OnCollisionExit(Collision collision)
+        // {
+            // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+            // {
+            //     MoveComponent.LeaveGround();
+            // }
+            // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            // {
+            //     MoveComponent.LeaveWall();
+            // }
+        // }
 
        
     }

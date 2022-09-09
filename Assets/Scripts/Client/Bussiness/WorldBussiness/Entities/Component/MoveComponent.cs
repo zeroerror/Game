@@ -178,13 +178,46 @@ namespace Game.Client.Bussiness.WorldBussiness
             }
         }
 
+        public void HitSomething(Vector3 hitDir)
+        {
+            var log = $"碰撞某物，碰撞方向:{hitDir}";
+            Debug.Log($"<color=#191970>{log}</color>");
+            //  消除反方向V
+            EraseVelocity(-hitDir);
+        }
+
+        public void EraseVelocity(Vector3 dir)
+        {
+            var a = extraVelocity.normalized;
+            var b = dir.normalized;
+            var cosValue = Vector3.Dot(a, b);
+            var reduceVelocity = extraVelocity * cosValue;
+            extraVelocity -= reduceVelocity;
+            DebugExtensions.LogWithColor($"碰撞消除速度[ExtraVelocity]:{reduceVelocity}", "#191970");
+
+            var gravityVelocity = new Vector3(0, _gravityVelocity, 0);
+            a = gravityVelocity.normalized;
+            b = dir.normalized;
+            cosValue = Vector3.Dot(a, b);
+            reduceVelocity = gravityVelocity * cosValue;
+            gravityVelocity -= reduceVelocity;
+            _gravityVelocity = gravityVelocity.y;
+
+            DebugExtensions.LogWithColor($"碰撞消除速度[GravityVelocity]:{reduceVelocity}", "#191970");
+        }
+
+        public void LeaveSomthing(Vector3 leaveDir)
+        {
+            Debug.Log($"离开某物，方向:{leaveDir}");
+        }
+
         public void LeaveGround()
         {
             Debug.Log("离开地面");
             IsGrouded = false;
         }
 
-        public void EnterField()
+        public void EnterGound()
         {
             Debug.Log("接触Field");
             IsGrouded = true;

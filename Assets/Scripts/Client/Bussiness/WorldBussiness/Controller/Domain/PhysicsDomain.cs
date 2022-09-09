@@ -18,42 +18,45 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             this.worldFacades = facades;
         }
 
-        public List<Collider> GetHitWall_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
-        public List<Collider> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
+        public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
+        public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
         public void Tick_RoleHit()
         {
             var roleRepo = worldFacades.Repo.WorldRoleRepo;
             roleRepo.Foreach((role) =>
             {
-                var rolePos= role.selfPos;
+                var rolePos = role.selfPos;
                 // 墙体撞击：速度管理
-                var wallColliderList = GetHitWall_ColliderList(role);
-                wallColliderList.ForEach((wall) =>
+                var wallColliderList = GetHitField_ColliderList(role);
+                wallColliderList.ForEach((colliderExtra) =>
                 {
-                    var wallPos = wall.transform.position;  
+                    if (colliderExtra.isEnter == CollisionStatus.Enter)
+                    {
+                        colliderExtra.isEnter = CollisionStatus.Stay;
+                        // 处理碰撞逻辑
+                        // 1. 在Cube上面就属于Ground
+                        // 2. 其他情况都属于墙面
+                        var collider = colliderExtra.collider;
+                        var closestPoint = collider.bounds.ClosestPoint(rolePos);
+                        var hitDir = (closestPoint - rolePos).normalized;
+                        role.MoveComponent.HitSomething(hitDir);
+                    }
                 });
-
-                if (role.RoleState != RoleState.Hooking)
-                {
-                    role.SetRoleState(RoleState.Normal);
-                    role.MoveComponent.EnterField();
-                    role.AnimatorComponent.PlayIdle();
-                }
             });
         }
 
 
-        List<Collider> GetColliderList(PhysicsEntity physicsEntity, string layerName)
+        List<ColliderExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
         {
-            List<Collider> colliderList = new List<Collider>();
-            physicsEntity.HitColliderListForeach((collider) =>
+            List<ColliderExtra> colliderList = new List<ColliderExtra>();
+            physicsEntity.HitColliderListForeach((colliderExtra) =>
             {
-                var name = LayerMask.LayerToName(collider.gameObject.layer);
+                var name = LayerMask.LayerToName(colliderExtra.collider.gameObject.layer);
                 //= 墙体
                 if (name == layerName)
                 {
-                    colliderList.Add(collider);
+                    colliderList.Add(colliderExtra);
                 }
             });
 
