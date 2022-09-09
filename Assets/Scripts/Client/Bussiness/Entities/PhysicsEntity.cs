@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Generic;
 using UnityEngine;
 using ZeroFrame.Log;
 
@@ -41,15 +42,13 @@ namespace Game.Client.Bussiness
         //====== Unity Physics 
         void OnTriggerEnter(Collider collider)
         {
-            var log = $"碰撞信息:{collider.gameObject.name}";
-            Debug.Log($"<color=#191970>{log}</color>");
+            DebugExtensions.LogWithColor($"碰撞Trriger接触:{collider.gameObject.name}", "#191970");
             if (!Exist(collider)) hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collider });
         }
 
         void OnTriggerExit(Collider collider)
         {
-            var log = $"碰撞信息:{collider.gameObject.name}";
-            Debug.Log($"<color=#191970>{log}</color>");
+            DebugExtensions.LogWithColor($"碰撞Trriger离开:{collider.gameObject.name}", "#191970");
             hitColliderList.Remove(Find(collider));
         }
 
@@ -57,16 +56,14 @@ namespace Game.Client.Bussiness
         {
             if (!Exist(collision.collider))
             {
-                var log = $"碰撞信息:{collision.gameObject.name}";
-                Debug.Log($"<color=#191970>{log}</color>");
+                DebugExtensions.LogWithColor($"碰撞Collision接触:{collision.gameObject.name}", "#191970");
                 hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collision.collider });
             }
         }
 
         void OnCollisionExit(Collision collision)
         {
-            var log = $"碰撞信息:{collision.gameObject.name}";
-            Debug.Log($"<color=#191970>{log}</color>");
+            DebugExtensions.LogWithColor($"碰撞Collision离开:{collision.gameObject.name}", "#191970");
             hitColliderList.Remove(Find(collision.collider));
         }
 
