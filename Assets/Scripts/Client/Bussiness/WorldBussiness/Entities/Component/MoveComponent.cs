@@ -183,7 +183,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             var log = $"碰撞某物，碰撞方向:{hitDir}";
             Debug.Log($"<color=#191970>{log}</color>");
             //  消除反方向V
-            EraseVelocity(-hitDir);
+            EraseVelocity(hitDir);
         }
 
         public void EraseVelocity(Vector3 dir)
@@ -193,17 +193,17 @@ namespace Game.Client.Bussiness.WorldBussiness
             var cosValue = Vector3.Dot(a, b);
             var reduceVelocity = extraVelocity * cosValue;
             extraVelocity -= reduceVelocity;
-            DebugExtensions.LogWithColor($"碰撞消除速度[ExtraVelocity]:{reduceVelocity}", "#191970");
+            DebugExtensions.LogWithColor($"碰撞消除速度[ExtraVelocity]:{extraVelocity}", "#191970");
 
             var gravityVelocity = new Vector3(0, _gravityVelocity, 0);
             a = gravityVelocity.normalized;
             b = dir.normalized;
             cosValue = Vector3.Dot(a, b);
-            reduceVelocity = gravityVelocity * cosValue;
+            reduceVelocity = 2f * gravityVelocity * cosValue;
             gravityVelocity -= reduceVelocity;
             _gravityVelocity = gravityVelocity.y;
 
-            DebugExtensions.LogWithColor($"碰撞消除速度[GravityVelocity]:{reduceVelocity}", "#191970");
+            DebugExtensions.LogWithColor($"碰撞消除速度[GravityVelocity]:{_gravityVelocity}", "#191970");
         }
 
         public void LeaveSomthing(Vector3 leaveDir)
