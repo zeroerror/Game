@@ -75,8 +75,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var physicsScene = worldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
 
-            // == Physics Collision
+            // == Physics Collision(Only For Client Performances Like Hit Effect,etc.)
             Tick_Physics_Collision_Role();
+            Tick_Physics_Collision_Bullet();
+            // == Physics Server Responses
+            Tick_BulletHitWall(nextFrame);
+            Tick_BulletHitRole(nextFrame);
 
             // == Camera
             Tick_RoleCameraTracking();
@@ -222,6 +226,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             var physicsDomain = worldFacades.Domain.PhysicsDomain;
             var roleList = physicsDomain.Tick_AllRoleHitEnter();
+        }
+
+        void Tick_Physics_Collision_Bullet()
+        {
+            var physicsDomain = worldFacades.Domain.PhysicsDomain;
+            physicsDomain.Tick_BulletHit();
+            // TODO:客户端这边就负责击中特效啥的
         }
 
         void Tick_Physics_Movement_Role(float deltaTime)
@@ -387,7 +398,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                 bulletEntity.SetWRid(masterWRid);
                 bulletEntity.SetBulletId(bulletId);
-                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var bulletRepo = worldFacades.Repo.BulletRepo;
                 bulletRepo.Add(bulletEntity);
             }
         }
@@ -399,7 +410,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 bulletHitRoleQueue.Dequeue();
                 worldClientFrame = nextFrame;
 
-                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var bulletRepo = worldFacades.Repo.BulletRepo;
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
                 var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
                 var role = roleRepo.Get(bulletHitRoleMsg.wRid);
@@ -433,7 +444,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 worldClientFrame = nextFrame;
 
                 var bulletHitPos = new Vector3(bulletHitWallResMsg.posX / 10000f, bulletHitWallResMsg.posY / 10000f, bulletHitWallResMsg.posZ / 10000f);
-                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var bulletRepo = worldFacades.Repo.BulletRepo;
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
                 var bullet = bulletRepo.GetByBulletId(bulletHitWallResMsg.bulletId);
 
@@ -455,7 +466,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 var bulletId = msg.bulletId;
                 var bulletType = msg.bulletType;
-                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var bulletRepo = worldFacades.Repo.BulletRepo;
                 var bulletEntity = bulletRepo.GetByBulletId(bulletId);
 
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);

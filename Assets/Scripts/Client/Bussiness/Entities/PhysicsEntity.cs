@@ -56,7 +56,7 @@ namespace Game.Client.Bussiness
         {
             if (!Exist(collision.collider))
             {
-                DebugExtensions.LogWithColor($"Collision接触:{collision.gameObject.name}", "#48D1CC");
+                // DebugExtensions.LogWithColor($"Collision接触:{collision.gameObject.name}", "#48D1CC");
                 hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collision.collider });
             }
         }

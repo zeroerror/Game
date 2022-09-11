@@ -87,15 +87,6 @@ namespace Game.Server.Bussiness.WorldBussiness
             if (!isSceneSpawn) return;
             int nextFrame = serveFrame + 1;
 
-            // ====== Life
-            Tick_BulletLife(nextFrame);
-            Tick_ActiveHookersBehaviour(nextFrame);
-
-            // Client Request
-            Tick_WRoleSpawn(nextFrame);
-            Tick_BulletSpawn(nextFrame);
-            Tick_AllOpt(nextFrame); // Include Physics Simulation
-
             // Physics Simulation
             if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList) || optList.Count == 0)
             {
@@ -109,6 +100,15 @@ namespace Game.Server.Bussiness.WorldBussiness
             // Physcis Collision
             Tick_Physics_Collision_Role(nextFrame);
             Tick_Physics_Collision_Bullet(nextFrame);
+
+            // ====== Life
+            Tick_BulletLife(nextFrame);
+            Tick_ActiveHookersBehaviour(nextFrame);
+
+            // Client Request
+            Tick_WRoleSpawn(nextFrame);
+            Tick_BulletSpawn(nextFrame);
+            Tick_AllOpt(nextFrame); // Include Physics Simulation
         }
 
         #region [Client Requst]
@@ -197,7 +197,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var clientFacades = worldFacades.ClientWorldFacades;
                 var fieldEntity = clientFacades.Repo.FiledEntityRepo.Get(1);
                 var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                var bulletRepo = clientFacades.Repo.BulletEntityRepo;
+                var bulletRepo = clientFacades.Repo.BulletRepo;
                 var bulletId = bulletRepo.BulletCount;
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.SetForward(shootDir);
@@ -398,7 +398,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     ((HookerEntity)bulletEntity).TearDown();
                 }
 
-                var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
+                var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletRepo;
                 bulletRepo.TryRemove(bulletEntity);
 
                 var bulletRqs = worldFacades.Network.BulletReqAndRes;
@@ -472,6 +472,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         #region [Physics]
 
+        // 地形造成的减速 TODO:滑铲加速
         void Tick_Physics_Collision_Role(int nextFrame)
         {
             var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
@@ -490,12 +491,16 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         void Tick_Physics_Collision_Bullet(int nextFrame)
         {
-            var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
+            var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
+            physicsDomain.Tick_BulletHit();
+
+            var bulletDomain = worldFacades.ClientWorldFacades.Domain.BulletDomain;
+            var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bullet) =>
             {
                 bool isHitSomething = false;
-                if (bullet.TryDequeueHitRole(out var wrole))
+                if (bullet.HitRoleQueue.TryDequeue(out var wrole))
                 {
                     isHitSomething = true;
                     // Server Logic
@@ -514,7 +519,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     });
 
                 }
-                if (bullet.TryDequeueHitWall(out var wall))
+                if (bullet.HitFieldQueue.TryDequeue(out var field))
                 {
                     isHitSomething = true;
                     // TODO:Server Logic
@@ -532,11 +537,13 @@ namespace Game.Server.Bussiness.WorldBussiness
                     // Server Logic
                     if (bullet is HookerEntity hookerEntity)
                     {
-                        if (wall != null) hookerEntity.TryGrabSomthing(wall.transform);
+                        // 爪钩逻辑
+                        if (field != null) hookerEntity.TryGrabSomthing(field.transform);
                         if (wrole != null) hookerEntity.TryGrabSomthing(wrole.transform);
                     }
                     else
                     {
+                        // 其他普通子弹的逻辑，只是单纯的移除
                         removeList.Add(bullet);
                     }
                 }

@@ -64,6 +64,30 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             });
         }
 
+        public void Tick_BulletHit()
+        {
+            var bulletRepo = worldFacades.Repo.BulletRepo;
+            bulletRepo.Foreach((bullet) =>
+            {
+                var roleColliderList = GetHitRole_ColliderList(bullet);
+                var hitRoleQueue = bullet.HitRoleQueue;
+                roleColliderList.ForEach((colliderExtra) =>
+                {
+                    var role = colliderExtra.collider.GetComponent<WorldRoleEntity>();
+                    if (!hitRoleQueue.Contains(role)) hitRoleQueue.Enqueue(role);
+                });
+
+                var fieldColliderList = GetHitField_ColliderList(bullet);
+                var hitWallQueue = bullet.HitFieldQueue;
+                fieldColliderList.ForEach((colliderExtra) =>
+                {
+                    var field = colliderExtra.collider.gameObject;
+                    if (!hitWallQueue.Contains(field)) hitWallQueue.Enqueue(field);
+                });
+
+            });
+        }
+
         List<ColliderExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
         {
             List<ColliderExtra> colliderList = new List<ColliderExtra>();

@@ -42,12 +42,10 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void AddExistTime(float time) => existTime += time;
 
         // Physics Queue
-        Queue<WorldRoleEntity> hitRoleQueue;
-        public bool TryDequeueHitRole(out WorldRoleEntity roleEntity) => hitRoleQueue.TryDequeue(out roleEntity);
-        Queue<GameObject> hitWallQueue;
-        public bool TryDequeueHitWall(out GameObject wall) => hitWallQueue.TryDequeue(out wall);
+        public Queue<WorldRoleEntity> HitRoleQueue { get; private set; }
+        public Queue<GameObject> HitFieldQueue { get; private set; }
 
-        public void Awake()
+        public void Ctor()
         {
             moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
             moveComponent.SetSpeed(30f);
@@ -55,8 +53,8 @@ namespace Game.Client.Bussiness.WorldBussiness
             moveComponent.isPersistentMove = true;
 
             lifeTime = 5f;
-            hitRoleQueue = new Queue<WorldRoleEntity>();
-            hitWallQueue = new Queue<GameObject>();
+            HitRoleQueue = new Queue<WorldRoleEntity>();
+            HitFieldQueue = new Queue<GameObject>();
             Init();
         }
 
@@ -67,7 +65,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public virtual void TearDown()
         {
-
+            Destroy(gameObject);
         }
 
         // Unity Physics 
@@ -76,78 +74,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public virtual void ExitTrigger(Collider collision) { }
         public virtual void EnterCollision(Collision collision) { }
         public virtual void ExitCollision(Collision collision) { }
-
-        void OnTriggerEnter(Collider collider)
-        {
-            // GameObject colliderGo = collider.gameObject;
-            // var layer = colliderGo.layer;
-
-            // if (layer == LayerMask.NameToLayer("Role"))
-            // {
-            //     hitRoleQueue.Enqueue(colliderGo.transform.GetComponent<WorldRoleEntity>());
-            // }
-            // if (layer == LayerMask.NameToLayer("Field"))
-            // {
-            //     MoveComponent.EnterGound();
-            // }
-            // if (layer == LayerMask.NameToLayer("Wall"))
-            // {
-            //     MoveComponent.EnterWall();
-            //     hitWallQueue.Enqueue(colliderGo);
-            // }
-            // EnterTrigger(collider);
-        }
-
-        void OnTriggerExit(Collider collider)
-        {
-            // GameObject colliderGo = collider.gameObject;
-            // var layer = colliderGo.layer;
-
-            // if (layer == LayerMask.NameToLayer("Role"))
-            // {
-            // }
-            // if (layer == LayerMask.NameToLayer("Field"))
-            // {
-            //     MoveComponent.LeaveGround();
-            // }
-            // if (layer == LayerMask.NameToLayer("Wall"))
-            // {
-            //     MoveComponent.LeaveWall();
-            // }
-            // ExitTrigger(collider);
-        }
-
-        void OnCollisionEnter(Collision collision)
-        {
-            // GameObject collisionGo = collision.gameObject;
-            // if (collisionGo.layer == LayerMask.NameToLayer("Role"))
-            // {
-            //     hitRoleQueue.Enqueue(collisionGo.transform.GetComponent<WorldRoleEntity>());
-            // }
-            // if (collisionGo.layer == LayerMask.NameToLayer("Field"))
-            // {
-            //     MoveComponent.EnterGound();
-            // }
-            // if (collisionGo.layer == LayerMask.NameToLayer("Wall"))
-            // {
-            //     MoveComponent.EnterWall();
-            //     hitWallQueue.Enqueue(collisionGo);
-            // }
-            // EnterCollision(collision);
-        }
-
-        void OnCollisionExit(Collision collision)
-        {
-            // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-            // {
-            //     MoveComponent.LeaveGround();
-            // }
-            // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            // {
-            //     MoveComponent.LeaveWall();
-            // }
-            // ExitCollision(collision);
-        }
 
     }
 

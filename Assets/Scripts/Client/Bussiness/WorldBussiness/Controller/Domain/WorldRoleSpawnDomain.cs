@@ -59,7 +59,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             var owner = worldFacades.Repo.WorldRoleRepo.Owner;
             if (owner == null) return;
             var trackPos = owner.MoveComponent.CurPos + owner.transform.forward * 0.5f;
-            trackPos.y -= 1f;
+            trackPos.y -= 1.4f;
             owner.SetCamTrackingPos(trackPos);
         }
 

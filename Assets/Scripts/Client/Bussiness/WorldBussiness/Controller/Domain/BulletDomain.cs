@@ -41,6 +41,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
                 bulletEntity.SetBulletType(bulletType);
+                bulletEntity.Ctor();
                 return bulletEntity;
             }
 
@@ -49,7 +50,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public List<BulletEntity> Tick_BulletLife(float deltaTime)
         {
-            var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+            var bulletRepo = worldFacades.Repo.BulletRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bulletEntity) =>
             {
@@ -66,7 +67,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public void Tick_Bullet(float fixedDeltaTime)
         {
-            var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+            var bulletRepo = worldFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 switch (bullet.BulletType)
@@ -90,7 +91,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         public List<HookerEntity> GetActiveHookerList()
         {
             List<HookerEntity> hookerEntities = new List<HookerEntity>();
-            var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+            var bulletRepo = worldFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 if (bullet is HookerEntity hookerEntity && hookerEntity.GrabPoint != null)
