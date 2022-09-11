@@ -16,13 +16,12 @@ namespace Game.Client.Bussiness.WorldBussiness
     public class WorldRoleEntity : PhysicsEntity, ICameraTrackObj
     {
 
-        [SerializeField]
-        Transform camTrackingObj;
-        public Transform CamTrackingObj => camTrackingObj;
-
         // == ICameraTrackObj
+        GameObject camTrackingObj;
+        public Transform CamTrackObjTrans => camTrackingObj.transform;
+        public void SetCamTrackingPos(Vector3 pos) => this.camTrackingObj.transform.position = pos;
+        
         public Vector3 selfPos => transform.position;
-        public Transform camTrackObjTrans => camTrackingObj.transform;
 
         byte wRid;
         public byte WRid => wRid;
@@ -66,6 +65,8 @@ namespace Game.Client.Bussiness.WorldBussiness
             MoveComponent.SetMaximumSpeed(30f);
             AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
             HealthComponent = new HealthComponent(100f);
+
+            camTrackingObj = new GameObject($"CameraTrackingObject_RID_{wRid}");
             RoleState = RoleState.Normal;
             offset = new Vector3(0, 1f, 0);
         }
@@ -91,29 +92,29 @@ namespace Game.Client.Bussiness.WorldBussiness
         // Unity Physics TODO:转移到Tick事件处理
         // void OnCollisionEnter(Collision collision)
         // {
-            // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-            // {
-        
-            // }
-            // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            // {
-            //     MoveComponent.EnterWall();
-            // }
+        // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+        // {
+
+        // }
+        // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+        // {
+        //     MoveComponent.EnterWall();
+        // }
         // }
 
         // void OnCollisionExit(Collision collision)
         // {
-            // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-            // {
-            //     MoveComponent.LeaveGround();
-            // }
-            // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-            // {
-            //     MoveComponent.LeaveWall();
-            // }
+        // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
+        // {
+        //     MoveComponent.LeaveGround();
+        // }
+        // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+        // {
+        //     MoveComponent.LeaveWall();
+        // }
         // }
 
-       
+
     }
 
 }

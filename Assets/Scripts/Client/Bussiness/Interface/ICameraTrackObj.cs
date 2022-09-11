@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.Interfaces
     {
 
         Vector3 selfPos { get; }
-        Transform camTrackObjTrans { get; }
+        Transform CamTrackObjTrans { get; }
 
     }
 

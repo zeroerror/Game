@@ -4,6 +4,7 @@ using Game.Infrastructure.Network.Server;
 using Game.Protocol.Client2World;
 using Game.Protocol.World;
 using Game.Client.Bussiness.WorldBussiness;
+using Game.Generic;
 
 namespace Game.Server.Bussiness.WorldBussiness.Network
 {
@@ -47,8 +48,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
 
             int gravityVelocity = (int)(role.MoveComponent.GravityVelocity * 10000);
 
-            var log = $"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}";
-            Debug.Log($"<color=#008000>{log}</color>");
+            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.WRid} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}","#008000");
 
             WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
             {

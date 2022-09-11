@@ -42,13 +42,13 @@ namespace Game.Client.Bussiness
         //====== Unity Physics 
         void OnTriggerEnter(Collider collider)
         {
-            DebugExtensions.LogWithColor($"碰撞Trriger接触:{collider.gameObject.name}", "#191970");
+            // DebugExtensions.LogWithColor($"碰撞Trriger接触:{collider.gameObject.name}", "#48D1CC");
             if (!Exist(collider)) hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collider });
         }
 
         void OnTriggerExit(Collider collider)
         {
-            DebugExtensions.LogWithColor($"碰撞Trriger离开:{collider.gameObject.name}", "#191970");
+            // DebugExtensions.LogWithColor($"碰撞Trriger离开:{collider.gameObject.name}", "#48D1CC");
             hitColliderList.Remove(Find(collider));
         }
 
@@ -56,14 +56,14 @@ namespace Game.Client.Bussiness
         {
             if (!Exist(collision.collider))
             {
-                DebugExtensions.LogWithColor($"碰撞Collision接触:{collision.gameObject.name}", "#191970");
+                DebugExtensions.LogWithColor($"Collision接触:{collision.gameObject.name}", "#48D1CC");
                 hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collision.collider });
             }
         }
 
         void OnCollisionExit(Collision collision)
         {
-            DebugExtensions.LogWithColor($"碰撞Collision离开:{collision.gameObject.name}", "#191970");
+            // DebugExtensions.LogWithColor($"碰撞Collision离开:{collision.gameObject.name}", "#48D1CC");
             hitColliderList.Remove(Find(collision.collider));
         }
 

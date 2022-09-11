@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public static void Update()
         {
-            worldController.RendererUpdate();
+            worldController.Tick_CameraUpdate();
         }
 
         public static void TearDown()

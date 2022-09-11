@@ -85,28 +85,30 @@ namespace Game.Server.Bussiness.WorldBussiness
                 sceneSpawnTrigger = false;
             }
             if (!isSceneSpawn) return;
-
             int nextFrame = serveFrame + 1;
 
-            // Physics Simulation
-            if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList) || optList.Count == 0)
-            {
-                Tick_Physics_RoleMovement();
-                Tick_Physics_BulletMovement(fixedDeltaTime);
-                Tick_Physics_BulletHit(nextFrame);
-                var physicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
-                physicsScene.Simulate(fixedDeltaTime);
-            }
-
+            // ====== Life
+            Tick_BulletLife(nextFrame);
+            Tick_ActiveHookersBehaviour(nextFrame);
 
             // Client Request
             Tick_WRoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
             Tick_AllOpt(nextFrame); // Include Physics Simulation
 
-            // ====== Life
-            Tick_BulletLife(nextFrame);
-            Tick_ActiveHookersBehaviour(nextFrame);
+            // Physics Simulation
+            if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList) || optList.Count == 0)
+            {
+                Tick_Physics_Movement_Role(fixedDeltaTime);
+                Tick_Physics_Movement_Bullet(fixedDeltaTime);
+
+                var physicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
+                physicsScene.Simulate(fixedDeltaTime);
+            }
+
+            // Physcis Collision
+            Tick_Physics_Collision_Role(nextFrame);
+            Tick_Physics_Collision_Bullet(nextFrame);
         }
 
         #region [Client Requst]
@@ -274,7 +276,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 var rid = (byte)(realMsg >> 48);
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-                var roleEntity = roleRepo.Get(rid);
+                var role = roleRepo.Get(rid);
                 var optTypeId = opt.msg.optTypeId;
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
 
@@ -282,23 +284,27 @@ namespace Game.Server.Bussiness.WorldBussiness
                 if (optTypeId == 1)
                 {
                     Vector3 dir = new Vector3((short)(realMsg >> 32) / 100f, (short)(realMsg >> 16) / 100f, (short)realMsg / 100f);
-                    Debug.Log($"realMsg :{realMsg} rid:{rid} 移动:{dir}");
 
                     //服务器逻辑Move + 物理模拟
+                    var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
+
                     var curPhysicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
-                    roleEntity.MoveComponent.ActivateMoveVelocity(dir);
-                    roleEntity.MoveComponent.Tick_Friction(fixedDeltaTime);
-                    roleEntity.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
-                    roleEntity.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
+
+                    role.MoveComponent.ActivateMoveVelocity(dir);
+                    physicsDomain.Tick_RoleMoveHitErase(role);
+
+                    role.MoveComponent.Tick_Friction(fixedDeltaTime);
+                    role.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
+                    role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
                     curPhysicsScene.Simulate(fixedDeltaTime);
-                    roleEntity.MoveComponent.ActivateMoveVelocity(Vector3.zero);
+                    role.MoveComponent.ActivateMoveVelocity(Vector3.zero);
 
                     // 人物状态同步
-                    if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Move);
+                    if (role.RoleState != RoleState.Hooking) role.SetRoleState(RoleState.Move);
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
                     {
-                        rqs.SendUpdate_WRoleState(otherConnId, nextFrame, roleEntity);
+                        rqs.SendUpdate_WRoleState(otherConnId, nextFrame, role);
                     });
                 }
 
@@ -306,7 +312,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 if (optTypeId == 2)
                 {
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
-                    roleEntity.MoveComponent.SetEulerAngle(eulerAngle);
+                    role.MoveComponent.SetEulerAngle(eulerAngle);
                     // Debug.Log($"转向（基于客户端鉴权的同步）eulerAngle:{eulerAngle}");
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
@@ -314,7 +320,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                         if (otherConnId != connId)
                         {
                             //只广播给非本人
-                            rqs.SendUpdate_WRoleState(otherConnId, nextFrame, roleEntity);
+                            rqs.SendUpdate_WRoleState(otherConnId, nextFrame, role);
                         }
                     });
                 }
@@ -464,8 +470,25 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         #endregion
 
-        // ====== Physics
-        void Tick_Physics_BulletHit(int nextFrame)
+        #region [Physics]
+
+        void Tick_Physics_Collision_Role(int nextFrame)
+        {
+            var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
+            var roleList = physicsDomain.Tick_AllRoleHitEnter();
+            var rqs = worldFacades.Network.WorldRoleReqAndRes;
+            roleList.ForEach((role) =>
+            {
+                connIdList.ForEach((connId) =>
+                {
+                    rqs.SendUpdate_WRoleState(connId, serveFrame, role);
+                });
+            });
+
+            if (roleList.Count != 0) serveFrame = nextFrame;
+        }
+
+        void Tick_Physics_Collision_Bullet(int nextFrame)
         {
             var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletEntityRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
@@ -525,17 +548,19 @@ namespace Game.Server.Bussiness.WorldBussiness
             });
         }
 
-        void Tick_Physics_RoleMovement()
+        void Tick_Physics_Movement_Role(float fixedDeltaTime)
         {
             var domain = worldFacades.ClientWorldFacades.Domain.WorldRoleSpawnDomain;
             domain.Tick_RoleRigidbody(fixedDeltaTime);
         }
 
-        void Tick_Physics_BulletMovement(float fixedDeltaTime)
+        void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
         {
             var domain = worldFacades.ClientWorldFacades.Domain.BulletDomain;
             domain.Tick_Bullet(fixedDeltaTime);
         }
+
+        #endregion
 
         // ====== Network
         // Role

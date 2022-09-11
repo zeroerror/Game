@@ -5,6 +5,7 @@ using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
 using Game.Client.Bussiness.EventCenter;
 using ZeroFrame.ZeroMath;
+using Game.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
@@ -63,138 +64,36 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             int nextFrame = worldClientFrame + 1;
 
-            // Physics Simulation
+            // == Movement
             if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity != null)
             {
                 Tick_Physics_Movement_Role(fixedDeltaTime);
+                Tick_Physics_Movement_Bullet(fixedDeltaTime);
             }
-            Tick_Physics_Movement_Bullet(fixedDeltaTime);
 
-            
-            //1
+            // == Physics Simulation
+            var physicsScene = worldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
+            physicsScene.Simulate(fixedDeltaTime);
+
+            // == Physics Collision
+            Tick_Physics_Collision_Role();
+
+            // == Camera
+            Tick_RoleCameraTracking();
+            Tick_CameraUpdate();
+
+            // == Tick Server Resonse
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
 
-            // Tick_BulletHitRole(nextFrame);
-            // Tick_BulletHitWall(nextFrame);
-            Tick_Physics_Collision_Role();
-
             Tick_BulletLife(nextFrame);
             Tick_RoleStateSync(nextFrame);
-            //2
+
+            // == Input
             Tick_Input();
-
-            var physicsScene = worldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
-            physicsScene.Simulate(fixedDeltaTime);
         }
 
-        public void RendererUpdate()
-        {
-            // 相机朝向更新
-            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
-            if (owner != null)
-            {
-                var axisX = Input.GetAxis("Mouse X");
-                var axisY = -Input.GetAxis("Mouse Y");
-                owner.MoveComponent.AddEulerAngleY(axisX);
-
-                var curCamComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
-                var curCam = curCamComponent.CurrentCamera;
-                var ownerEulerAngle = owner.transform.rotation.eulerAngles;
-                switch (curCamComponent.CurrentCameraView)
-                {
-                    case CameraView.FirstView:
-                        curCam.AddEulerAngleX(axisY);
-                        curCam.SetEulerAngleY(ownerEulerAngle.y);
-                        break;
-                    case CameraView.ThirdView:
-                        // curCam.SetEulerAngleY(ownerEulerAngle.y);
-                        break;
-                }
-            }
-        }
-        void Tick_RoleStateSync(int nextFrame)
-        {
-            while (stateQueue.TryPeek(out var stateMsg))
-            {
-                stateQueue.Dequeue();
-                worldClientFrame = stateMsg.serverFrameIndex;
-
-                RoleState roleState = (RoleState)stateMsg.roleState;
-                float x = stateMsg.x / 10000f;
-                float y = stateMsg.y / 10000f;
-                float z = stateMsg.z / 10000f;
-                float eulerX = stateMsg.eulerX / 10000f;
-                float eulerY = stateMsg.eulerY / 10000f;
-                float eulerZ = stateMsg.eulerZ / 10000f;
-                float moveVelocityX = stateMsg.moveVelocityX / 10000f;
-                float moveVelocityY = stateMsg.moveVelocityY / 10000f;
-                float moveVelocityZ = stateMsg.moveVelocityZ / 10000f;
-                float extraVelocityX = stateMsg.extraVelocityX / 10000f;
-                float extraVelocityY = stateMsg.extraVelocityY / 10000f;
-                float extraVelocityZ = stateMsg.extraVelocityZ / 10000f;
-                float gravityVelocity = stateMsg.gravityVelocity / 10000f;
-
-                Vector3 pos = new Vector3(x, y, z);
-                Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
-                Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
-                Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
-
-                var repo = worldFacades.Repo;
-                var roleRepo = repo.WorldRoleRepo;
-                var fieldRepo = repo.FiledEntityRepo;
-                var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
-                if (role == null)
-                {
-                    Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
-
-                    var wRoleId = stateMsg.wRid;
-                    var fieldEntity = fieldRepo.Get(1);
-                    var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-                    role = domain.SpawnWorldRole(fieldEntity.transform);
-                    role.Ctor();
-                    role.SetWRid(wRoleId);
-
-                    roleRepo.Add(role);
-                    if (stateMsg.isOwner && roleRepo.Owner == null)
-                    {
-                        Debug.Log($"生成Owner  wRid:{role.WRid})");
-                        roleRepo.SetOwner(role);
-                        var fieldCameraComponent = fieldEntity.CameraComponent;
-                        fieldCameraComponent.OpenThirdViewCam(role);
-                    }
-                }
-                var log = $"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}";
-                Debug.Log($"<color=#008000>{log}</color>");
-
-                switch (roleState)
-                {
-                    case RoleState.Normal:
-                        role.AnimatorComponent.PlayIdle();
-                        break;
-                    case RoleState.Move:
-                        role.AnimatorComponent.PlayRun();
-                        break;
-                    case RoleState.Jump:
-                        if (role.RoleState != RoleState.Jump)
-                        {
-                            role.AnimatorComponent.PlayJump();
-                        }
-                        role.MoveComponent.SetJumpVelocity();
-                        break;
-                    case RoleState.Hooking:
-                        role.AnimatorComponent.PlayHooking();
-                        break;
-                }
-                role.MoveComponent.SetCurPos(pos);
-                if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetEulerAngle(eulerAngle);
-                role.MoveComponent.SetMoveVelocity(moveVelocity);
-                role.MoveComponent.SetExtraVelocity(extraVelocity);
-                role.MoveComponent.SetGravityVelocity(gravityVelocity);
-
-                role.SetRoleState(roleState);
-            }
-        }
+        #region [Input]
 
         void Tick_Input()
         {
@@ -279,41 +178,57 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         }
 
-        void Tick_BulletLife(int nextFrame)
+        #endregion
+
+        #region [Renderer]
+
+        void Tick_RoleCameraTracking()
         {
-            while (bulletTearDownQueue.TryDequeue(out var msg))
+            var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+            domain.Tick_RoleCameraTracking();
+        }
+
+        public void Tick_CameraUpdate()
+        {
+            // 相机朝向更新
+            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
+            if (owner != null)
             {
-                var bulletId = msg.bulletId;
-                var bulletType = msg.bulletType;
-                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
-                var bulletEntity = bulletRepo.GetByBulletId(bulletId);
+                var axisX = Input.GetAxis("Mouse X");
+                var axisY = -Input.GetAxis("Mouse Y");
+                owner.MoveComponent.AddEulerAngleY(axisX);
 
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                bulletEntity.MoveComponent.SetCurPos(pos);
-
-                if (bulletEntity.BulletType == BulletType.Default)
+                var curCamComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+                var curCam = curCamComponent.CurrentCamera;
+                var ownerEulerAngle = owner.transform.rotation.eulerAngles;
+                switch (curCamComponent.CurrentCameraView)
                 {
-                    bulletEntity.TearDown();
+                    case CameraView.FirstView:
+                        curCam.AddEulerAngleX(axisY);
+                        curCam.SetEulerAngleY(ownerEulerAngle.y);
+                        break;
+                    case CameraView.ThirdView:
+                        // curCam.SetEulerAngleY(ownerEulerAngle.y);
+                        break;
                 }
-
-                if (bulletEntity.BulletType == BulletType.Grenade)
-                {
-                    ((GrenadeEntity)bulletEntity).TearDown();
-                }
-
-                if (bulletEntity.BulletType == BulletType.Hooker)
-                {
-                    ((HookerEntity)bulletEntity).TearDown();
-                }
-
-                bulletRepo.TryRemove(bulletEntity);
             }
+        }
+
+        #endregion
+
+        #region [Physics]
+
+        void Tick_Physics_Collision_Role()
+        {
+            var physicsDomain = worldFacades.Domain.PhysicsDomain;
+            var roleList = physicsDomain.Tick_AllRoleHitEnter();
         }
 
         void Tick_Physics_Movement_Role(float deltaTime)
         {
             var domain = worldFacades.Domain.WorldRoleSpawnDomain;
             domain.Tick_RoleRigidbody(deltaTime);
+            domain.Tick_RoleCameraTracking();
         }
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
@@ -322,35 +237,90 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             domain.Tick_Bullet(fixedDeltaTime);
         }
 
-        void Tick_Physics_Collision_Role()
-        {
-            var domain = worldFacades.Domain.PhysicsDomain;
-            domain.Tick_RoleHit();
-        }
+        #endregion
 
-        bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)
+        #region [Tick Server Resonse]
+
+        void Tick_RoleStateSync(int nextFrame)
         {
-            var roleRepo = worldFacades.Repo.WorldRoleRepo;
-            var array = roleRepo.GetAll();
-            for (int i = 0; i < array.Length; i++)
+            while (stateQueue.TryPeek(out var stateMsg))
             {
-                var r = array[i];
-                if (r.WRid == roleEntity.WRid) continue;
+                stateQueue.Dequeue();
+                worldClientFrame = stateMsg.serverFrameIndex;
 
-                var pos1 = r.MoveComponent.CurPos;
-                var pos2 = roleEntity.MoveComponent.CurPos;
-                if (Vector3.Distance(pos1, pos2) < 1f)
+                RoleState roleState = (RoleState)stateMsg.roleState;
+                float x = stateMsg.x / 10000f;
+                float y = stateMsg.y / 10000f;
+                float z = stateMsg.z / 10000f;
+                float eulerX = stateMsg.eulerX / 10000f;
+                float eulerY = stateMsg.eulerY / 10000f;
+                float eulerZ = stateMsg.eulerZ / 10000f;
+                float moveVelocityX = stateMsg.moveVelocityX / 10000f;
+                float moveVelocityY = stateMsg.moveVelocityY / 10000f;
+                float moveVelocityZ = stateMsg.moveVelocityZ / 10000f;
+                float extraVelocityX = stateMsg.extraVelocityX / 10000f;
+                float extraVelocityY = stateMsg.extraVelocityY / 10000f;
+                float extraVelocityZ = stateMsg.extraVelocityZ / 10000f;
+                float gravityVelocity = stateMsg.gravityVelocity / 10000f;
+
+                Vector3 pos = new Vector3(x, y, z);
+                Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
+                Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
+                Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
+
+                var repo = worldFacades.Repo;
+                var roleRepo = repo.WorldRoleRepo;
+                var fieldRepo = repo.FiledEntityRepo;
+                var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
+                if (role == null)
                 {
-                    var betweenV = pos1 - pos2;
-                    betweenV.Normalize();
-                    moveDir.Normalize();
-                    var cosVal = Vector3.Dot(moveDir, betweenV);
-                    Debug.Log(cosVal);
-                    if (cosVal > 0) return true;
-                }
-            }
+                    Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
 
-            return false;
+                    var wRoleId = stateMsg.wRid;
+                    var fieldEntity = fieldRepo.Get(1);
+                    var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+                    role = domain.SpawnWorldRole(fieldEntity.transform);
+                    role.Ctor();
+                    role.SetWRid(wRoleId);
+
+                    roleRepo.Add(role);
+                    if (stateMsg.isOwner && roleRepo.Owner == null)
+                    {
+                        Debug.Log($"生成Owner  wRid:{role.WRid})");
+                        roleRepo.SetOwner(role);
+                        var fieldCameraComponent = fieldEntity.CameraComponent;
+                        fieldCameraComponent.OpenThirdViewCam(role);
+                    }
+                }
+                // DebugExtensions.LogWithColor($"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}","#008000");
+
+                switch (roleState)
+                {
+                    case RoleState.Normal:
+                        role.AnimatorComponent.PlayIdle();
+                        break;
+                    case RoleState.Move:
+                        role.AnimatorComponent.PlayRun();
+                        break;
+                    case RoleState.Jump:
+                        if (role.RoleState != RoleState.Jump)
+                        {
+                            role.AnimatorComponent.PlayJump();
+                        }
+                        role.MoveComponent.SetJumpVelocity();
+                        break;
+                    case RoleState.Hooking:
+                        role.AnimatorComponent.PlayHooking();
+                        break;
+                }
+                role.MoveComponent.SetCurPos(pos);
+                if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetEulerAngle(eulerAngle);
+                role.MoveComponent.SetMoveVelocity(moveVelocity);
+                role.MoveComponent.SetExtraVelocity(extraVelocity);
+                role.MoveComponent.SetGravityVelocity(gravityVelocity);
+
+                role.SetRoleState(roleState);
+            }
         }
 
         void Tick_RoleSpawn(int nextFrame)
@@ -479,7 +449,41 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             }
         }
 
-        // == Server Response ==
+        void Tick_BulletLife(int nextFrame)
+        {
+            while (bulletTearDownQueue.TryDequeue(out var msg))
+            {
+                var bulletId = msg.bulletId;
+                var bulletType = msg.bulletType;
+                var bulletRepo = worldFacades.Repo.BulletEntityRepo;
+                var bulletEntity = bulletRepo.GetByBulletId(bulletId);
+
+                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+                bulletEntity.MoveComponent.SetCurPos(pos);
+
+                if (bulletEntity.BulletType == BulletType.Default)
+                {
+                    bulletEntity.TearDown();
+                }
+
+                if (bulletEntity.BulletType == BulletType.Grenade)
+                {
+                    ((GrenadeEntity)bulletEntity).TearDown();
+                }
+
+                if (bulletEntity.BulletType == BulletType.Hooker)
+                {
+                    ((HookerEntity)bulletEntity).TearDown();
+                }
+
+                bulletRepo.TryRemove(bulletEntity);
+            }
+        }
+
+        #endregion
+
+        #region [Server Response]
+
         // ROLE 
         void OnWRoleSync(WRoleStateUpdateMsg msg)
         {
@@ -517,7 +521,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             bulletTearDownQueue.Enqueue(msg);
         }
 
-        // Network Event Center
+        #endregion
+
+        #region [Network Event Center]
+
         async void EnterWorldChooseScene()
         {
             // 当前有加载好的场景，则不加载
@@ -538,6 +545,37 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var rqs = worldFacades.Network.WorldRoleReqAndRes;
             rqs.SendReq_WolrdRoleSpawn(worldClientFrame);
         }
+
+        #endregion
+
+        #region [Private Func]
+
+        bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)
+        {
+            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            var array = roleRepo.GetAll();
+            for (int i = 0; i < array.Length; i++)
+            {
+                var r = array[i];
+                if (r.WRid == roleEntity.WRid) continue;
+
+                var pos1 = r.MoveComponent.CurPos;
+                var pos2 = roleEntity.MoveComponent.CurPos;
+                if (Vector3.Distance(pos1, pos2) < 1f)
+                {
+                    var betweenV = pos1 - pos2;
+                    betweenV.Normalize();
+                    moveDir.Normalize();
+                    var cosVal = Vector3.Dot(moveDir, betweenV);
+                    Debug.Log(cosVal);
+                    if (cosVal > 0) return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
 
     }
 

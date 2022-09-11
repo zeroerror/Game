@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness
         public void OpenThirdViewCam(ICameraTrackObj cameraTrackObj)
         {
             Debug.Log("打开第三人称");
-            ThirdViewCam.FollowSolo(cameraTrackObj.camTrackObjTrans, 3f);
+            ThirdViewCam.FollowSolo(cameraTrackObj.CamTrackObjTrans, 3f);
 
             SwitchCamView(ThirdViewCam.gameObject.name);
             CurrentCameraView = CameraView.ThirdView;
@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness
         public void OpenFirstViewCam(ICameraTrackObj cameraTrackObj)
         {
             Debug.Log("打开第一人称相机");
-            FirstViewCam.FollowSolo(cameraTrackObj.camTrackObjTrans);
+            FirstViewCam.FollowSolo(cameraTrackObj.CamTrackObjTrans);
             FirstViewCam.LookAtSolo(null);
 
             SwitchCamView(FirstViewCam.gameObject.name);

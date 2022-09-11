@@ -21,8 +21,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
         public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
-        public void Tick_RoleHit()
+        public List<WorldRoleEntity> Tick_AllRoleHitEnter()
         {
+            List<WorldRoleEntity> roleList = new List<WorldRoleEntity>();
             var roleRepo = worldFacades.Repo.WorldRoleRepo;
             roleRepo.Foreach((role) =>
             {
@@ -34,18 +35,34 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     if (colliderExtra.isEnter == CollisionStatus.Enter)
                     {
                         colliderExtra.isEnter = CollisionStatus.Stay;
-                        // 处理碰撞逻辑
-                        // 1. 在Cube上面就属于Ground
-                        // 2. 其他情况都属于墙面
                         var collider = colliderExtra.collider;
-                        var closestPoint = collider.bounds.ClosestPoint(rolePos);
+                        var closestPoint = collider.ClosestPoint(rolePos);
                         var hitDir = (closestPoint - rolePos).normalized;
                         role.MoveComponent.HitSomething(hitDir);
+                        if (hitDir.y < -0.1f) role.MoveComponent.EnterGound();
+                        else role.MoveComponent.EnterWall();
+                        role.SetRoleState(RoleState.Normal);
+                        roleList.Add(role);
                     }
                 });
             });
+
+            return roleList;
         }
 
+        public void Tick_RoleMoveHitErase(WorldRoleEntity role)
+        {
+            var rolePos = role.selfPos;
+            // 墙体撞击：速度管理
+            var wallColliderList = GetHitField_ColliderList(role);
+            wallColliderList.ForEach((colliderExtra) =>
+            {
+                var collider = colliderExtra.collider;
+                var closestPoint = collider.ClosestPoint(rolePos);
+                var hitDir = (closestPoint - rolePos).normalized;
+                role.MoveComponent.MoveHitErase(hitDir);
+            });
+        }
 
         List<ColliderExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
         {
