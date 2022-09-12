@@ -11,7 +11,8 @@ namespace Game.Client.Bussiness
     {
         None,
         Enter,
-        Stay
+        Stay,
+        Exit
     }
 
     public class ColliderExtra
@@ -38,6 +39,24 @@ namespace Game.Client.Bussiness
             });
         }
 
+        public bool RemoveHitCollider(Collider collider)
+        {
+            var e = hitColliderList.GetEnumerator();
+            while (e.MoveNext())
+            {
+                if (e.Current.collider.Equals(collider))
+                {
+                    break;
+                }
+            }
+            return hitColliderList.Remove(e.Current);
+        }
+
+        public bool RemoveHitCollider(ColliderExtra colliderExtra)
+        {
+            return hitColliderList.Remove(colliderExtra);
+        }
+
 
         //====== Unity Physics 
         void OnTriggerEnter(Collider collider)
@@ -49,7 +68,8 @@ namespace Game.Client.Bussiness
         void OnTriggerExit(Collider collider)
         {
             // DebugExtensions.LogWithColor($"碰撞Trriger离开:{collider.gameObject.name}", "#48D1CC");
-            hitColliderList.Remove(Find(collider));
+            var ce = Find(collider);
+            ce.isEnter = CollisionStatus.Exit;
         }
 
         void OnCollisionEnter(Collision collision)
@@ -64,7 +84,8 @@ namespace Game.Client.Bussiness
         void OnCollisionExit(Collision collision)
         {
             // DebugExtensions.LogWithColor($"碰撞Collision离开:{collision.gameObject.name}", "#48D1CC");
-            hitColliderList.Remove(Find(collision.collider));
+            var ce = Find(collision.collider);
+            ce.isEnter = CollisionStatus.Exit;
         }
 
         ColliderExtra Find(Collider collider)

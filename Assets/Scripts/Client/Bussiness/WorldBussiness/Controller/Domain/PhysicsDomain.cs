@@ -42,8 +42,21 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         if (hitDir.y < -0.1f) role.MoveComponent.EnterGound();
                         else role.MoveComponent.EnterWall();
                         role.SetRoleState(RoleState.Normal);
+
                         roleList.Add(role);
                     }
+                    else if (colliderExtra.isEnter == CollisionStatus.Exit)
+                    {
+                        var collider = colliderExtra.collider;
+                        var closestPoint = collider.ClosestPoint(rolePos);
+                        var leaveDir = (rolePos - closestPoint).normalized;
+                        role.MoveComponent.LeaveSomthing(leaveDir);
+                        if (leaveDir.y > 0.1f) role.MoveComponent.LeaveGround();
+                        else role.MoveComponent.LeaveWall();
+
+                        role.RemoveHitCollider(colliderExtra);
+                    }
+
                 });
             });
 
@@ -73,16 +86,24 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 var hitRoleQueue = bullet.HitRoleQueue;
                 roleColliderList.ForEach((colliderExtra) =>
                 {
-                    var role = colliderExtra.collider.GetComponent<WorldRoleEntity>();
-                    if (!hitRoleQueue.Contains(role)) hitRoleQueue.Enqueue(role);
+                    if (colliderExtra.isEnter == CollisionStatus.Enter)
+                    {
+                        colliderExtra.isEnter = CollisionStatus.Stay;
+                        var role = colliderExtra.collider.GetComponent<WorldRoleEntity>();
+                        hitRoleQueue.Enqueue(role);
+                    }
                 });
 
                 var fieldColliderList = GetHitField_ColliderList(bullet);
                 var hitWallQueue = bullet.HitFieldQueue;
                 fieldColliderList.ForEach((colliderExtra) =>
                 {
-                    var field = colliderExtra.collider.gameObject;
-                    if (!hitWallQueue.Contains(field)) hitWallQueue.Enqueue(field);
+                    if (colliderExtra.isEnter == CollisionStatus.Enter)
+                    {
+                        colliderExtra.isEnter = CollisionStatus.Stay;
+                        var field = colliderExtra.collider.gameObject;
+                        hitWallQueue.Enqueue(field);
+                    }
                 });
 
             });
@@ -91,8 +112,15 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         List<ColliderExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
         {
             List<ColliderExtra> colliderList = new List<ColliderExtra>();
+            List<ColliderExtra> removeList = new List<ColliderExtra>();
             physicsEntity.HitColliderListForeach((colliderExtra) =>
             {
+                if (colliderExtra.collider == null)
+                {
+                    removeList.Add(colliderExtra);
+                    return;
+                }
+
                 var name = LayerMask.LayerToName(colliderExtra.collider.gameObject.layer);
                 //= 墙体
                 if (name == layerName)
@@ -101,9 +129,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 }
             });
 
+            removeList.ForEach((ce) =>
+            {
+                physicsEntity.RemoveHitCollider(ce);
+            });
+
             return colliderList;
         }
-
 
     }
 

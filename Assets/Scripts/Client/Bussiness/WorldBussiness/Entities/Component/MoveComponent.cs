@@ -89,13 +89,11 @@ namespace Game.Client.Bussiness.WorldBussiness
             this.speed = speed;
             this.jumpSpeed = jumpVelocity;
             rb.useGravity = false;  //关闭地球引力
-            _gravity = 10;
+            _gravity = 20f;
         }
 
         public void SetJumpVelocity()
         {
-            if (IsGrouded) LeaveGround();
-
             var v = rb.velocity;
             v.y = 0;
             rb.velocity = v;
@@ -195,7 +193,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             var cosValue = Vector3.Dot(a, b);
             var reduceVelocity = MoveVelocity * cosValue;
             moveVelocity -= reduceVelocity;
-            // DebugExtensions.LogWithColor($"MoveVelocity：{MoveVelocity} cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
         }
 
         public void HitSomething(Vector3 hitDir)
@@ -203,6 +201,11 @@ namespace Game.Client.Bussiness.WorldBussiness
             DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
             //  消除反方向Velocity
             EraseVelocity(hitDir);
+        }
+
+        public void LeaveSomthing(Vector3 leaveDir)
+        {
+            DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
         }
 
         public void EraseVelocity(Vector3 dir)
@@ -229,11 +232,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             gravityVelocity -= reduceVelocity;
             _gravityVelocity = gravityVelocity.y;
             DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}---->新'重力速度':{_gravityVelocity}", "#48D1CC");
-        }
-
-        public void LeaveSomthing(Vector3 leaveDir)
-        {
-            DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
         }
 
         public void EnterGound()
