@@ -94,6 +94,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             Destroy(shootEnd);
             Destroy(masterGrabEnd);
             Destroy(GrabPoint);
+            Debug.Log($"爪钩断开！！！");
         }
 
     }

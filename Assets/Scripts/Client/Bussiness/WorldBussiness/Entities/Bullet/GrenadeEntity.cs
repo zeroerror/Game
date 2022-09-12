@@ -12,7 +12,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         protected override void Init()
         {
             base.Init();
-            SetLifeTime(20f);
+            SetLifeTime(3f);
             ExplosionRadius = 7f;
             moveComponent.isPersistentMove = false;
             moveComponent.SetSpeed(10f);
@@ -22,7 +22,8 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public override void TearDown()
         {
-            SetLifeTime(3f);
+            Destroy(gameObject);
+            Debug.Log($"手雷爆炸！！！");
         }
 
 

@@ -77,7 +77,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             });
         }
 
-        public void Tick_BulletHit()
+        public void Refresh_BulletHit()
         {
             var bulletRepo = worldFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>

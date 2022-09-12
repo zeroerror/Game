@@ -76,12 +76,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public void Tick_RoleRenderer(float deltaTime)
         {
-            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
-            if (owner == null) return;
-
-            var renderer = owner.roleRenderer;
-            renderer.transform.position = Vector3.Lerp(renderer.transform.position, owner.MoveComponent.CurPos, deltaTime * renderer.adjustSpeed);
-            renderer.transform.rotation = Quaternion.Lerp(renderer.transform.rotation, owner.MoveComponent.Rotation, deltaTime * renderer.adjustSpeed);
+            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            roleRepo.Foreach((role) =>
+            {
+                var renderer = role.roleRenderer;
+                renderer.transform.position = Vector3.Lerp(renderer.transform.position, role.MoveComponent.CurPos, deltaTime * renderer.adjustSpeed);
+                renderer.transform.rotation = role.MoveComponent.Rotation;
+            });
         }
 
 

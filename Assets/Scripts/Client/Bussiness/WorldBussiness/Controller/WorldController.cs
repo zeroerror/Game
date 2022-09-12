@@ -87,7 +87,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
 
-            Tick_BulletLife(nextFrame);
+            Tick_BulletTearDown(nextFrame);
             Tick_RoleStateSync(nextFrame);
 
             // == Input
@@ -229,7 +229,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         void Tick_Physics_Collision_Bullet()
         {
             var physicsDomain = worldFacades.Domain.PhysicsDomain;
-            physicsDomain.Tick_BulletHit();
+            physicsDomain.Refresh_BulletHit();
             // TODO:客户端这边就负责击中特效啥的
         }
 
@@ -283,8 +283,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var roleLogic = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
                 if (roleLogic == null)
                 {
-                    Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
-
                     var wRoleId = stateMsg.wRid;
                     var fieldEntity = fieldRepo.Get(1);
                     var domain = worldFacades.Domain.WorldRoleDomain;
@@ -304,6 +302,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         roleRepo.SetOwner(roleLogic);
                         var fieldCameraComponent = fieldEntity.CameraComponent;
                         fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
+                    }
+                    else
+                    {
+                        Debug.Log($"人物状态同步帧(roleLogic[{wRoleId}]丢失，重新生成)");
                     }
                 }
                 // DebugExtensions.LogWithColor($"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}","#008000");
@@ -330,7 +332,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         break;
                 }
                 moveComponent.SetCurPos(pos);
-                if (roleRepo.Owner.WRid != roleLogic.WRid) moveComponent.SetEulerAngle(eulerAngle);
+                if (roleRepo.Owner == null || roleRepo.Owner.WRid != roleLogic.WRid) moveComponent.SetEulerAngle(eulerAngle);
                 moveComponent.SetMoveVelocity(moveVelocity);
                 moveComponent.SetExtraVelocity(extraVelocity);
                 moveComponent.SetGravityVelocity(gravityVelocity);
@@ -409,6 +411,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 bulletEntity.SetWRid(masterWRid);
                 bulletEntity.SetBulletId(bulletId);
                 var bulletRepo = worldFacades.Repo.BulletRepo;
+                bulletEntity.gameObject.SetActive(true);
                 bulletRepo.Add(bulletEntity);
             }
         }
@@ -434,15 +437,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     role.Reborn();
                 }
 
-                if (bullet is HookerEntity hookerEntity)
+                if (bullet.BulletType == BulletType.Default)
+                {
+                    bullet.TearDown();
+                    bulletRepo.TryRemove(bullet);
+                }
+                else if (bullet is HookerEntity hookerEntity)
                 {
                     // 如果是爪钩则是抓住某物而不是销毁
                     hookerEntity.TryGrabSomthing(role.transform);
                     continue;
                 }
 
-                bullet.TearDown();
-                bulletRepo.TryRemove(bullet);
             }
         }
 
@@ -458,19 +464,32 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
                 var bullet = bulletRepo.GetByBulletId(bulletHitWallResMsg.bulletId);
 
-                if (bullet is HookerEntity hookerEntity)
+                if (bullet == null)
                 {
-                    // 如果是爪钩则是抓住某物而不是销毁
-                    hookerEntity.TryGrabSomthing(bulletHitPos);
+                    bulletRepo.TryRemove(bullet);
                     continue;
                 }
 
-                bullet.TearDown();
-                bulletRepo.TryRemove(bullet);
+                if (bullet.BulletType == BulletType.Default)
+                {
+                    bullet.TearDown();
+                    bulletRepo.TryRemove(bullet);
+                }
+                else if (bullet is HookerEntity hookerEntity)
+                {
+                    // 爪钩:抓住某物而不是销毁
+                    hookerEntity.TryGrabSomthing(bulletHitPos);
+                }
+                else if (bullet is GrenadeEntity grenadeEntity)
+                {
+                    // 手雷:速度清零
+                    bullet.MoveComponent.SetMoveVelocity(Vector3.zero);
+                }
+
             }
         }
 
-        void Tick_BulletLife(int nextFrame)
+        void Tick_BulletTearDown(int nextFrame)
         {
             while (bulletTearDownQueue.TryDequeue(out var msg))
             {
@@ -487,14 +506,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     bulletEntity.TearDown();
                 }
 
-                if (bulletEntity.BulletType == BulletType.Grenade)
+                if (bulletEntity is GrenadeEntity grenadeEntity)
                 {
-                    ((GrenadeEntity)bulletEntity).TearDown();
+                    grenadeEntity.TearDown();
                 }
 
-                if (bulletEntity.BulletType == BulletType.Hooker)
+                if (bulletEntity is HookerEntity hookerEntity)
                 {
-                    ((HookerEntity)bulletEntity).TearDown();
+                    hookerEntity.TearDown();
                 }
 
                 bulletRepo.TryRemove(bulletEntity);

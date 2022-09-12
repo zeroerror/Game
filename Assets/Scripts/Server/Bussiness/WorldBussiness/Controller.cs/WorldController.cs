@@ -215,6 +215,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 }
                 bulletEntity.SetWRid(wRid);
                 bulletEntity.SetBulletId(bulletId);
+                bulletEntity.gameObject.SetActive(true);
                 bulletRepo.Add(bulletEntity);
                 Debug.Log($"服务器逻辑[Spawn Bullet] frame {serveFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
 
@@ -370,31 +371,31 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var bulletType = bulletEntity.BulletType;
                 if (bulletType == BulletType.Default)
                 {
+                    Debug.Log("爆炸Default");
                     bulletEntity.TearDown();
                 }
-
-                if (bulletType == BulletType.Grenade)
+                else if (bulletEntity is GrenadeEntity grenadeEntity)
                 {
-                    ((GrenadeEntity)bulletEntity).TearDown();
+                    Debug.Log("爆炸grenadeEntity");
+                    grenadeEntity.TearDown();
                     var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
                     roleRepo.Foreach((role) =>
                     {
                         var dis = Vector3.Distance(role.MoveComponent.CurPos, bulletEntity.MoveComponent.CurPos);
-                        if (dis < 5f)
+                        if (dis < 7f)
                         {
                             var dir = role.MoveComponent.CurPos - bulletEntity.MoveComponent.CurPos;
                             var extraV = dir.normalized * 10f;
                             role.MoveComponent.AddExtraVelocity(extraV);
-                            // role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
+                            role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
                             role.SetRoleState(RoleState.Move);
                             effectRoleQueue.Enqueue(role);
                         }
                     });
                 }
-
-                if (bulletType == BulletType.Hooker)
+                else if (bulletEntity is HookerEntity hookerEntity)
                 {
-                    ((HookerEntity)bulletEntity).TearDown();
+                    hookerEntity.TearDown();
                 }
 
                 var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletRepo;
@@ -491,7 +492,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         void Tick_Physics_Collision_Bullet(int nextFrame)
         {
             var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
-            physicsDomain.Tick_BulletHit();
+            physicsDomain.Refresh_BulletHit();
 
             var bulletDomain = worldFacades.ClientWorldFacades.Domain.BulletDomain;
             var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletRepo;
@@ -534,17 +535,23 @@ namespace Game.Server.Bussiness.WorldBussiness
                 {
                     serveFrame = nextFrame;
                     // Server Logic
+                    if (bullet.BulletType == BulletType.Default)
+                    {
+                        // 普通子弹的逻辑，只是单纯的移除
+                        removeList.Add(bullet);
+                    }
                     if (bullet is HookerEntity hookerEntity)
                     {
                         // 爪钩逻辑
                         if (field != null) hookerEntity.TryGrabSomthing(field.transform);
                         if (wrole != null) hookerEntity.TryGrabSomthing(wrole.transform);
                     }
-                    else
+                    else if (bullet is GrenadeEntity grenadeEntity)
                     {
-                        // 其他普通子弹的逻辑，只是单纯的移除
-                        removeList.Add(bullet);
+                        // 手雷逻辑: 速度清零
+                        grenadeEntity.MoveComponent.SetMoveVelocity(Vector3.zero);
                     }
+
                 }
             });
             removeList.ForEach((bullet) =>
