@@ -27,9 +27,9 @@ namespace Game.Client.Bussiness.EventCenter
             };
 
         static Action worldRoleSpawn_Action;
-        static Action<WorldRoleEntity> worldRoleSpawn_Handler;
-        public static void Regist_WorldRoleSpawnHandler(Action<WorldRoleEntity> action) => worldRoleSpawn_Handler += action;
-        public static void Invoke_WorldRoleSpawnHandler(WorldRoleEntity entity) => worldRoleSpawn_Action = () =>
+        static Action<WorldRoleLogicEntity> worldRoleSpawn_Handler;
+        public static void Regist_WorldRoleSpawnHandler(Action<WorldRoleLogicEntity> action) => worldRoleSpawn_Handler += action;
+        public static void Invoke_WorldRoleSpawnHandler(WorldRoleLogicEntity entity) => worldRoleSpawn_Action = () =>
             {
                 if (worldRoleSpawn_Handler == null) return;
                 var list = worldRoleSpawn_Handler.GetInvocationList();

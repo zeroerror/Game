@@ -63,6 +63,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         public void Tick()
         {
             int nextFrame = worldClientFrame + 1;
+            float deltaTime = UnityEngine.Time.deltaTime;
 
             // == Movement
             if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity != null)
@@ -81,10 +82,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             // == Physics Server Responses
             Tick_BulletHitWall(nextFrame);
             Tick_BulletHitRole(nextFrame);
-
-            // == Camera
-            Tick_RoleCameraTracking();
-            Tick_CameraUpdate();
 
             // == Tick Server Resonse
             Tick_RoleSpawn(nextFrame);
@@ -116,8 +113,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 //打开第一人称视角
                 // TODO: 加切换视角的判定条件
                 var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
-                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner);
-                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner);
+                if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner.roleRenderer);
+                else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner.roleRenderer);
             }
             if (input.shootPoint != Vector3.zero)
             {
@@ -186,13 +183,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         #region [Renderer]
 
-        void Tick_RoleCameraTracking()
+        public void Tick_RoleRendererAndCamera(float deltaTime)
         {
-            var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+            var domain = worldFacades.Domain.WorldRoleDomain;
+            domain.Tick_RoleRenderer(deltaTime);
             domain.Tick_RoleCameraTracking();
         }
 
-        public void Tick_CameraUpdate()
+        public void Tick_CameraUpdate(float deltaTime)
         {
             // 相机朝向更新
             var owner = worldFacades.Repo.WorldRoleRepo.Owner;
@@ -200,7 +198,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 var axisX = Input.GetAxis("Mouse X");
                 var axisY = -Input.GetAxis("Mouse Y");
-                owner.MoveComponent.AddEulerAngleY(axisX);
 
                 var curCamComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
                 var curCam = curCamComponent.CurrentCamera;
@@ -209,7 +206,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 {
                     case CameraView.FirstView:
                         curCam.AddEulerAngleX(axisY);
-                        curCam.SetEulerAngleY(ownerEulerAngle.y);
+                        curCam.AddEulerAngleY(axisX);
+                        owner.MoveComponent.SetEulerAngleY(curCam.EulerAngles);
                         break;
                     case CameraView.ThirdView:
                         // curCam.SetEulerAngleY(ownerEulerAngle.y);
@@ -237,7 +235,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         void Tick_Physics_Movement_Role(float deltaTime)
         {
-            var domain = worldFacades.Domain.WorldRoleSpawnDomain;
+            var domain = worldFacades.Domain.WorldRoleDomain;
             domain.Tick_RoleRigidbody(deltaTime);
             domain.Tick_RoleCameraTracking();
         }
@@ -282,55 +280,62 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var repo = worldFacades.Repo;
                 var roleRepo = repo.WorldRoleRepo;
                 var fieldRepo = repo.FiledEntityRepo;
-                var role = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
-                if (role == null)
+                var roleLogic = worldFacades.Repo.WorldRoleRepo.Get(stateMsg.wRid);
+                if (roleLogic == null)
                 {
                     Debug.Log($"人物状态同步帧(entity丢失，重新生成)");
 
                     var wRoleId = stateMsg.wRid;
                     var fieldEntity = fieldRepo.Get(1);
-                    var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-                    role = domain.SpawnWorldRole(fieldEntity.transform);
-                    role.Ctor();
-                    role.SetWRid(wRoleId);
+                    var domain = worldFacades.Domain.WorldRoleDomain;
+                    roleLogic = domain.SpawnWorldRoleLogic(fieldEntity.transform);
+                    roleLogic.SetWRid(wRoleId);
+                    roleLogic.Ctor();
 
-                    roleRepo.Add(role);
+                    var roleRenderer = domain.SpawnWorldRoleRenderer(fieldEntity.Role_Group_Renderer);
+                    roleRenderer.SetWRid(wRoleId);
+                    roleRenderer.Ctor();
+                    roleLogic.Inject(roleRenderer);
+
+                    roleRepo.Add(roleLogic);
                     if (stateMsg.isOwner && roleRepo.Owner == null)
                     {
-                        Debug.Log($"生成Owner  wRid:{role.WRid})");
-                        roleRepo.SetOwner(role);
+                        Debug.Log($"生成Owner  wRid:{roleLogic.WRid})");
+                        roleRepo.SetOwner(roleLogic);
                         var fieldCameraComponent = fieldEntity.CameraComponent;
-                        fieldCameraComponent.OpenThirdViewCam(role);
+                        fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
                     }
                 }
                 // DebugExtensions.LogWithColor($"人物状态同步帧 : {worldClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}","#008000");
 
+                var animatorComponent = roleLogic.roleRenderer.AnimatorComponent;
+                var moveComponent = roleLogic.MoveComponent;
                 switch (roleState)
                 {
                     case RoleState.Normal:
-                        role.AnimatorComponent.PlayIdle();
+                        animatorComponent.PlayIdle();
                         break;
                     case RoleState.Move:
-                        role.AnimatorComponent.PlayRun();
+                        if (moveComponent.IsGrouded) animatorComponent.PlayRun();
                         break;
                     case RoleState.Jump:
-                        if (role.RoleState != RoleState.Jump)
+                        if (roleLogic.RoleState != RoleState.Jump)
                         {
-                            role.AnimatorComponent.PlayJump();
+                            animatorComponent.PlayJump();
                         }
-                        role.MoveComponent.SetJumpVelocity();
+                        moveComponent.Jump();
                         break;
                     case RoleState.Hooking:
-                        role.AnimatorComponent.PlayHooking();
+                        animatorComponent.PlayHooking();
                         break;
                 }
-                role.MoveComponent.SetCurPos(pos);
-                if (roleRepo.Owner.WRid != role.WRid) role.MoveComponent.SetEulerAngle(eulerAngle);
-                role.MoveComponent.SetMoveVelocity(moveVelocity);
-                role.MoveComponent.SetExtraVelocity(extraVelocity);
-                role.MoveComponent.SetGravityVelocity(gravityVelocity);
+                moveComponent.SetCurPos(pos);
+                if (roleRepo.Owner.WRid != roleLogic.WRid) moveComponent.SetEulerAngle(eulerAngle);
+                moveComponent.SetMoveVelocity(moveVelocity);
+                moveComponent.SetExtraVelocity(extraVelocity);
+                moveComponent.SetGravityVelocity(gravityVelocity);
 
-                role.SetRoleState(roleState);
+                roleLogic.SetRoleState(roleState);
             }
         }
 
@@ -345,22 +350,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var wRoleId = spawn.wRoleId;
                 var repo = worldFacades.Repo;
                 var fieldEntity = repo.FiledEntityRepo.Get(1);
-                var domain = worldFacades.Domain.WorldRoleSpawnDomain;
-                var entity = domain.SpawnWorldRole(fieldEntity.transform);
-                entity.Ctor();
-                entity.SetWRid(wRoleId);
+                var domain = worldFacades.Domain.WorldRoleDomain;
+                var roleLogic = domain.SpawnWorldRoleLogic(fieldEntity.Role_Group_Logic);
+                roleLogic.SetWRid(wRoleId);
+                roleLogic.Ctor();
+
+                var roleRenderer = domain.SpawnWorldRoleRenderer(fieldEntity.Role_Group_Renderer);
+                roleRenderer.SetWRid(wRoleId);
+                roleRenderer.Ctor();
+                roleLogic.Inject(roleRenderer);
 
                 var roleRepo = repo.WorldRoleRepo;
-                roleRepo.Add(entity);
+                roleRepo.Add(roleLogic);
 
                 var fieldCameraComponent = fieldEntity.CameraComponent;
                 if (spawn.isOwner)
                 {
-                    roleRepo.SetOwner(entity);
-                    fieldCameraComponent.OpenThirdViewCam(entity);
+                    roleRepo.SetOwner(roleLogic);
+                    fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
                 }
 
-                Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{entity.WRid}" : $"生成其他角色 : WRid:{entity.WRid}");
+                Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{roleLogic.WRid}" : $"生成其他角色 : WRid:{roleLogic.WRid}");
             }
         }
 
@@ -561,7 +571,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         #region [Private Func]
 
-        bool WillHitOtherRole(WorldRoleEntity roleEntity, Vector3 moveDir)
+        bool WillHitOtherRole(WorldRoleLogicEntity roleEntity, Vector3 moveDir)
         {
             var roleRepo = worldFacades.Repo.WorldRoleRepo;
             var array = roleRepo.GetAll();

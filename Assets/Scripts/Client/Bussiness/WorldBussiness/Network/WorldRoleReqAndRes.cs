@@ -40,7 +40,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.SendMsg(frameOptReqMsg);
         }
 
-        public void SendReq_WRoleRotate(int frameIndex, WorldRoleEntity roleEntity)
+        public void SendReq_WRoleRotate(int frameIndex, WorldRoleLogicEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
             var rid = roleEntity.WRid;

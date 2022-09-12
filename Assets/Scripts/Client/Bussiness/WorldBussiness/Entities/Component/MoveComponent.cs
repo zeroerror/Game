@@ -73,6 +73,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void SetCurPos(Vector3 curPos) => rb.position = curPos;
 
         // == Rotation
+        public Quaternion Rotation => rb.rotation;
         public Vector3 EulerAngel => rb.rotation.eulerAngles;
         public void FaceTo(Vector3 forward) => rb.rotation = Quaternion.LookRotation(forward);
         public void SetEulerAngle(Vector3 eulerAngle) => rb.rotation = Quaternion.Euler(eulerAngle);
@@ -80,6 +81,12 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             var euler = rb.rotation.eulerAngles;
             euler.y += eulerAngleY;    //左右看
+            rb.rotation = Quaternion.Euler(euler);
+        }
+        public void SetEulerAngleY(Vector3 eulerAngle)
+        {
+            var euler = rb.rotation.eulerAngles;
+            euler.y = eulerAngle.y;
             rb.rotation = Quaternion.Euler(euler);
         }
 
@@ -92,15 +99,17 @@ namespace Game.Client.Bussiness.WorldBussiness
             _gravity = 20f;
         }
 
-        public void SetJumpVelocity()
+        public void Jump()
         {
+            if (!IsGrouded) return;
+            Debug.Log($"Jump");
+
             var v = rb.velocity;
             v.y = 0;
             rb.velocity = v;
+            _gravityVelocity = 0;
 
             jumpVelocity = jumpSpeed;
-
-            _gravityVelocity = 0;
         }
 
         public void Tick_Rigidbody(float fixedDeltaTime)
@@ -141,13 +150,13 @@ namespace Game.Client.Bussiness.WorldBussiness
                 {
                     extraVelocity.z = 0f;
                     extraVelocity.x = 0f;
+                    Debug.Log($"摩擦力作用结束");
                 }
                 else
                 {
                     if (Mathf.Abs(extraVelocity.x) <= 0.1f) extraVelocity.x = 0f;
                     if (Mathf.Abs(extraVelocity.z) <= 0.1f) extraVelocity.z = 0f;
                 }
-                Debug.Log($"摩擦力过后frictionReduce:{frictionReduce} reduceVelocity:{reduceVelocity} extraVelocity: {extraVelocity}");
             }
 
         }

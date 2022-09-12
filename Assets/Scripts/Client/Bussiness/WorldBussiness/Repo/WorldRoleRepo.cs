@@ -8,41 +8,41 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
     public class WorldRoleRepo
     {
 
-        List<WorldRoleEntity> list;
+        List<WorldRoleLogicEntity> list;
         public byte Size => (byte)list.Count;
 
-        WorldRoleEntity owner;
-        public WorldRoleEntity Owner => owner;
-        public void SetOwner(WorldRoleEntity worldRoleEntity) => this.owner = worldRoleEntity;
+        WorldRoleLogicEntity owner;
+        public WorldRoleLogicEntity Owner => owner;
+        public void SetOwner(WorldRoleLogicEntity worldRoleEntity) => this.owner = worldRoleEntity;
 
 
         public WorldRoleRepo()
         {
-            list = new List<WorldRoleEntity>();
+            list = new List<WorldRoleLogicEntity>();
         }
 
-        public WorldRoleEntity Get(byte wRid)
+        public WorldRoleLogicEntity Get(byte wRid)
         {
             return list.Find((entity) => entity.WRid == wRid);
         }
 
-        public WorldRoleEntity[] GetAll()
+        public WorldRoleLogicEntity[] GetAll()
         {
             return list.ToArray();
         }
 
-        public void Add(WorldRoleEntity entity)
+        public void Add(WorldRoleLogicEntity entity)
         {
             list.Add(entity);
         }
 
 
-        public void Remove(WorldRoleEntity entity)
+        public void Remove(WorldRoleLogicEntity entity)
         {
             list.Remove(entity);
         }
 
-        public void Foreach(Action<WorldRoleEntity> action)
+        public void Foreach(Action<WorldRoleLogicEntity> action)
         {
             if (action == null) return;
 

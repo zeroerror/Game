@@ -18,7 +18,12 @@ MonoBehaviour:
   m_GUID: b7ca4e6ae41f2ed41af4532fd9b1ce99
   m_SerializeEntries:
   - m_GUID: e5286f1985326b340a3a1117420f6d41
-    m_Address: Player
+    m_Address: PlayerRenderer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Role
+  - m_GUID: cedadc64c011e514ebd3a60aacc2c17d
+    m_Address: PlayerLogic
     m_ReadOnly: 0
     m_SerializedLabels:
     - Role

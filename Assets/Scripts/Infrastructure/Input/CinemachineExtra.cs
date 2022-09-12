@@ -21,6 +21,8 @@ namespace Game.Infrastructure.Input
 
         CinemachineVirtualCamera cinemachineVirtual;
 
+        public Vector3 EulerAngles => transform.rotation.eulerAngles;
+
         public int CurrentFollowCount { get; private set; }
         public int CurrentLookAtCount { get; private set; }
 

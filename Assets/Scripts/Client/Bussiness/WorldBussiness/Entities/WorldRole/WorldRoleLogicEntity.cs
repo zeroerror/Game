@@ -13,15 +13,10 @@ namespace Game.Client.Bussiness.WorldBussiness
         Hooking       //-使用爪钩中
     }
 
-    public class WorldRoleEntity : PhysicsEntity, ICameraTrackObj
+    public class WorldRoleLogicEntity : PhysicsEntity
     {
-
-        // == ICameraTrackObj
-        GameObject camTrackingObj;
-        public Transform CamTrackObjTrans => camTrackingObj.transform;
-        public void SetCamTrackingPos(Vector3 pos) => this.camTrackingObj.transform.position = pos;
-        
-        public Vector3 selfPos => transform.position;
+        public WorldRoleRendererEntity roleRenderer { get; private set; }
+        public Vector3 SelfPos => transform.position;
 
         byte wRid;
         public byte WRid => wRid;
@@ -38,7 +33,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         // == Component ==
         public MoveComponent MoveComponent { get; private set; }
         public HealthComponent HealthComponent { get; private set; }
-        public AnimatorComponent AnimatorComponent { get; private set; }
 
         // == Rotation ==
         public Vector3 EulerAngle => transform.rotation.eulerAngles;
@@ -59,16 +53,19 @@ namespace Game.Client.Bussiness.WorldBussiness
         public bool IsDead { get; private set; }
         public bool IsOldState;
 
+        public void Inject(WorldRoleRendererEntity roleRendererEntity)
+        {
+            roleRenderer = roleRendererEntity;
+        }
+
         public void Ctor()
         {
-            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 10f, 5f);
+            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 8f, 5f);
             MoveComponent.SetMaximumSpeed(30f);
-            AnimatorComponent = new AnimatorComponent(transform.GetComponentInParent<Animator>());
             HealthComponent = new HealthComponent(100f);
 
-            camTrackingObj = new GameObject($"CameraTrackingObject_RID_{wRid}");
             RoleState = RoleState.Normal;
-            offset = new Vector3(0, 1f, 0);
+            offset = new Vector3(0, 0.2f, 0);
         }
 
         public bool IsIdle()
@@ -88,32 +85,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             HealthComponent.Reset();
             IsDead = false;
         }
-
-        // Unity Physics TODO:转移到Tick事件处理
-        // void OnCollisionEnter(Collision collision)
-        // {
-        // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-        // {
-
-        // }
-        // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-        // {
-        //     MoveComponent.EnterWall();
-        // }
-        // }
-
-        // void OnCollisionExit(Collision collision)
-        // {
-        // if (collision.gameObject.layer == LayerMask.NameToLayer("Field"))
-        // {
-        //     MoveComponent.LeaveGround();
-        // }
-        // if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
-        // {
-        //     MoveComponent.LeaveWall();
-        // }
-        // }
-
 
     }
 

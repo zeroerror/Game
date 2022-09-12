@@ -21,13 +21,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
         public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
-        public List<WorldRoleEntity> Tick_AllRoleHitEnter()
+        public List<WorldRoleLogicEntity> Tick_AllRoleHitEnter()
         {
-            List<WorldRoleEntity> roleList = new List<WorldRoleEntity>();
+            List<WorldRoleLogicEntity> roleList = new List<WorldRoleLogicEntity>();
             var roleRepo = worldFacades.Repo.WorldRoleRepo;
             roleRepo.Foreach((role) =>
             {
-                var rolePos = role.selfPos;
+                var rolePos = role.SelfPos;
                 // 墙体撞击：速度管理
                 var wallColliderList = GetHitField_ColliderList(role);
                 wallColliderList.ForEach((colliderExtra) =>
@@ -63,9 +63,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return roleList;
         }
 
-        public void Tick_RoleMoveHitErase(WorldRoleEntity role)
+        public void Tick_RoleMoveHitErase(WorldRoleLogicEntity role)
         {
-            var rolePos = role.selfPos;
+            var rolePos = role.SelfPos;
             // 墙体撞击：速度管理
             var wallColliderList = GetHitField_ColliderList(role);
             wallColliderList.ForEach((colliderExtra) =>
@@ -89,7 +89,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     if (colliderExtra.isEnter == CollisionStatus.Enter)
                     {
                         colliderExtra.isEnter = CollisionStatus.Stay;
-                        var role = colliderExtra.collider.GetComponent<WorldRoleEntity>();
+                        var role = colliderExtra.collider.GetComponent<WorldRoleLogicEntity>();
                         hitRoleQueue.Enqueue(role);
                     }
                 });

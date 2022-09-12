@@ -88,11 +88,10 @@ namespace Game.Server.Bussiness.WorldBussiness
             int nextFrame = serveFrame + 1;
 
             // Physics Simulation
+            Tick_Physics_Movement_Bullet(fixedDeltaTime);
             if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList) || optList.Count == 0)
             {
                 Tick_Physics_Movement_Role(fixedDeltaTime);
-                Tick_Physics_Movement_Bullet(fixedDeltaTime);
-
                 var physicsScene = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
                 physicsScene.Simulate(fixedDeltaTime);
             }
@@ -132,7 +131,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var wrid = roleRepo.Size;
 
                 // 服务器逻辑
-                var roleEntity = clientFacades.Domain.WorldRoleSpawnDomain.SpawnWorldRole(fieldEntity.transform);
+                var roleEntity = clientFacades.Domain.WorldRoleDomain.SpawnWorldRoleLogic(fieldEntity.transform);
                 roleEntity.Ctor();
                 roleEntity.SetWRid(wrid);
                 roleEntity.SetConnId(connId);
@@ -345,7 +344,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
 
                 //服务器逻辑Jump
-                roleEntity.MoveComponent.SetJumpVelocity();
+                roleEntity.MoveComponent.Jump();
                 if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
 
                 //发送状态同步帧
@@ -367,7 +366,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             tearDownList.ForEach((bulletEntity) =>
             {
 
-                Queue<WorldRoleEntity> effectRoleQueue = new Queue<WorldRoleEntity>();
+                Queue<WorldRoleLogicEntity> effectRoleQueue = new Queue<WorldRoleLogicEntity>();
                 var bulletType = bulletEntity.BulletType;
                 if (bulletType == BulletType.Default)
                 {
@@ -426,7 +425,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         void Tick_ActiveHookersBehaviour(int nextFrame)
         {
             var activeHookers = worldFacades.ClientWorldFacades.Domain.BulletDomain.GetActiveHookerList();
-            List<WorldRoleEntity> roleList = new List<WorldRoleEntity>();
+            List<WorldRoleLogicEntity> roleList = new List<WorldRoleLogicEntity>();
             var rqs = worldFacades.Network.WorldRoleReqAndRes;
             bool hasHookerLoose = false;
             activeHookers.ForEach((hooker) =>
@@ -557,7 +556,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         void Tick_Physics_Movement_Role(float fixedDeltaTime)
         {
-            var domain = worldFacades.ClientWorldFacades.Domain.WorldRoleSpawnDomain;
+            var domain = worldFacades.ClientWorldFacades.Domain.WorldRoleDomain;
             domain.Tick_RoleRigidbody(fixedDeltaTime);
         }
 

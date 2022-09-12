@@ -9,7 +9,7 @@ namespace Game.Client.Bussiness.Interfaces
     public interface ICameraTrackObj
     {
 
-        Vector3 selfPos { get; }
+        Vector3 SelfPos { get; }
         Transform CamTrackObjTrans { get; }
 
     }

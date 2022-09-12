@@ -15,7 +15,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         // Controller
         static WorldController worldController;
 
-
         #region [Life Cycle]
 
         public static void Ctor()
@@ -47,7 +46,8 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public static void Update()
         {
-            worldController.Tick_CameraUpdate();
+            worldController.Tick_CameraUpdate(UnityEngine.Time.deltaTime);
+            worldController.Tick_RoleRendererAndCamera(UnityEngine.Time.deltaTime);
         }
 
         public static void TearDown()

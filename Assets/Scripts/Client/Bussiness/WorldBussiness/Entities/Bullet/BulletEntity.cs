@@ -30,7 +30,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         protected MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
 
-
         // Life 
         float lifeTime;
         public float LifeTime => lifeTime;
@@ -42,18 +41,18 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void AddExistTime(float time) => existTime += time;
 
         // Physics Queue
-        public Queue<WorldRoleEntity> HitRoleQueue { get; private set; }
+        public Queue<WorldRoleLogicEntity> HitRoleQueue { get; private set; }
         public Queue<GameObject> HitFieldQueue { get; private set; }
 
         public void Ctor()
         {
             moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
-            moveComponent.SetSpeed(30f);
-            moveComponent.SetGravity(0);
+            moveComponent.SetSpeed(50f);
+            moveComponent.SetGravity(5f);
             moveComponent.isPersistentMove = true;
 
             lifeTime = 5f;
-            HitRoleQueue = new Queue<WorldRoleEntity>();
+            HitRoleQueue = new Queue<WorldRoleLogicEntity>();
             HitFieldQueue = new Queue<GameObject>();
             Init();
         }

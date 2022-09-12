@@ -20,7 +20,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
 
 
         // == Send ==
-        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleEntity role)
+        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleLogicEntity role)
         {
             // Position
             var pos = role.MoveComponent.CurPos;
