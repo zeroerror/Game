@@ -77,7 +77,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             physicsScene.Simulate(fixedDeltaTime);
 
             // == Physics Collision(Only For Client Performances Like Hit Effect,etc.)
-            Tick_Physics_Collision_Role();
+            Tick_Physics_Collision_Role(fixedDeltaTime);
             Tick_Physics_Collision_Bullet();
             // == Physics Server Responses
             Tick_BulletHitWall(nextFrame);
@@ -220,10 +220,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         #region [Physics]
 
-        void Tick_Physics_Collision_Role()
+        void Tick_Physics_Collision_Role(float fixedDeltaTime)
         {
             var physicsDomain = worldFacades.Domain.PhysicsDomain;
-            var roleList = physicsDomain.Tick_AllRoleHitEnter();
+            var roleList = physicsDomain.Tick_AllRoleHitEnter(fixedDeltaTime);
         }
 
         void Tick_Physics_Collision_Bullet()

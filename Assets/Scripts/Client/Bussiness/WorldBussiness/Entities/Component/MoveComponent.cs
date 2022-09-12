@@ -1,6 +1,7 @@
 using UnityEngine;
 using Game.Generic;
 using Game.Client.Bussiness.WorldBussiness.Shot;
+using System;
 
 namespace Game.Client.Bussiness.WorldBussiness
 {
@@ -202,19 +203,19 @@ namespace Game.Client.Bussiness.WorldBussiness
             var cosValue = Vector3.Dot(a, b);
             var reduceVelocity = MoveVelocity * cosValue;
             moveVelocity -= reduceVelocity;
-            // DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
+            DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
         }
 
         public void HitSomething(Vector3 hitDir)
         {
-            DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
             //  消除反方向Velocity
             EraseVelocity(hitDir);
         }
 
         public void LeaveSomthing(Vector3 leaveDir)
         {
-            DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
         }
 
         public void EraseVelocity(Vector3 dir)
@@ -224,14 +225,14 @@ namespace Game.Client.Bussiness.WorldBussiness
             var cosValue = Vector3.Dot(a, b);
             var reduceVelocity = rb.velocity * cosValue;
             rb.velocity -= Vector3.zero;
-            DebugExtensions.LogWithColor($"碰撞消除'Rigidbody速度':{reduceVelocity}---->新'Rigidbody速度':{rb.velocity}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"碰撞消除'Rigidbody速度':{reduceVelocity}---->新'Rigidbody速度':{rb.velocity}", "#48D1CC");
 
             a = extraVelocity.normalized;
             b = dir.normalized;
             cosValue = Vector3.Dot(a, b);
             reduceVelocity = extraVelocity * cosValue;
             extraVelocity -= reduceVelocity;
-            DebugExtensions.LogWithColor($"碰撞消除'额外速度':{reduceVelocity}---->新'额外速度':{extraVelocity}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"碰撞消除'额外速度':{reduceVelocity}---->新'额外速度':{extraVelocity}", "#48D1CC");
 
             var gravityVelocity = new Vector3(0, _gravityVelocity, 0);
             a = gravityVelocity.normalized;
@@ -240,18 +241,28 @@ namespace Game.Client.Bussiness.WorldBussiness
             reduceVelocity = gravityVelocity * cosValue;
             gravityVelocity -= reduceVelocity;
             _gravityVelocity = gravityVelocity.y;
-            DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}---->新'重力速度':{_gravityVelocity}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}---->新'重力速度':{_gravityVelocity}", "#48D1CC");
+        }
+
+        public void JumpboardSpeedUp()
+        {
+            DebugExtensions.LogWithColor($"跳板起飞！！！！！", "#48D1CC");
+            extraVelocity.y += 10f;
+            var v = rb.velocity;
+            v.y = 0;
+            extraVelocity += v * 5f;
+            DebugExtensions.LogWithColor($"跳板起飞  rb.velocity:{rb.velocity} extraVelocity:{extraVelocity}", "#48D1CC");
         }
 
         public void EnterGound()
         {
-            DebugExtensions.LogWithColor($"接触地面------------------------", "#48D1CC");
+            DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
             IsGrouded = true;
         }
 
         public void LeaveGround()
         {
-            DebugExtensions.LogWithColor($"离开地面-----------------------", "#48D1CC");
+            DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
             IsGrouded = false;
         }
 
@@ -270,7 +281,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void HitByBullet(BulletEntity bulletEntity)
         {
             var velocity = bulletEntity.MoveComponent.Velocity / 10f;
-            Debug.Log($"HitByBullet velocity add:  {velocity}");
+            Debug.Log($"被子弹击中 velocity add:  {velocity}");
             rb.velocity += (velocity);
         }
 

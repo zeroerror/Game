@@ -96,10 +96,6 @@ namespace Game.Server.Bussiness.WorldBussiness
                 physicsScene.Simulate(fixedDeltaTime);
             }
 
-            // Physcis Collision
-            Tick_Physics_Collision_Role(nextFrame);
-            Tick_Physics_Collision_Bullet(nextFrame);
-
             // ====== Life
             Tick_BulletLife(nextFrame);
             Tick_ActiveHookersBehaviour(nextFrame);
@@ -108,6 +104,10 @@ namespace Game.Server.Bussiness.WorldBussiness
             Tick_WRoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
             Tick_AllOpt(nextFrame); // Include Physics Simulation
+
+            // Physcis Collision
+            Tick_Physics_Collision_Role(nextFrame);
+            Tick_Physics_Collision_Bullet(nextFrame);
         }
 
         #region [Client Requst]
@@ -297,7 +297,6 @@ namespace Game.Server.Bussiness.WorldBussiness
                     role.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
                     role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
                     curPhysicsScene.Simulate(fixedDeltaTime);
-                    role.MoveComponent.ActivateMoveVelocity(Vector3.zero);
 
                     // 人物状态同步
                     if (role.RoleState != RoleState.Hooking) role.SetRoleState(RoleState.Move);
@@ -306,6 +305,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     {
                         rqs.SendUpdate_WRoleState(otherConnId, nextFrame, role);
                     });
+
                 }
 
                 // ------------转向（基于客户端鉴权的同步）
@@ -476,7 +476,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         void Tick_Physics_Collision_Role(int nextFrame)
         {
             var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
-            var roleList = physicsDomain.Tick_AllRoleHitEnter();
+            var roleList = physicsDomain.Tick_AllRoleHitEnter(fixedDeltaTime);
             var rqs = worldFacades.Network.WorldRoleReqAndRes;
             roleList.ForEach((role) =>
             {

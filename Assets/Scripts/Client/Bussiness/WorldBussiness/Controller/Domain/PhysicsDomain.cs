@@ -21,9 +21,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
         public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
-        public List<WorldRoleLogicEntity> Tick_AllRoleHitEnter()
+        public List<WorldRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
         {
-            List<WorldRoleLogicEntity> roleList = new List<WorldRoleLogicEntity>();
+            List<WorldRoleLogicEntity> hitRoleList = new List<WorldRoleLogicEntity>();
             var roleRepo = worldFacades.Repo.WorldRoleRepo;
             roleRepo.Foreach((role) =>
             {
@@ -42,8 +42,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         if (hitDir.y < -0.1f) role.MoveComponent.EnterGound();
                         else role.MoveComponent.EnterWall();
                         role.SetRoleState(RoleState.Normal);
-
-                        roleList.Add(role);
+                        if (collider.gameObject.tag == "Jumpboard")
+                        {
+                            role.MoveComponent.JumpboardSpeedUp();
+                        }
+                        hitRoleList.Add(role);
                     }
                     else if (colliderExtra.isEnter == CollisionStatus.Exit)
                     {
@@ -60,7 +63,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 });
             });
 
-            return roleList;
+            return hitRoleList;
         }
 
         public void Tick_RoleMoveHitErase(WorldRoleLogicEntity role)
