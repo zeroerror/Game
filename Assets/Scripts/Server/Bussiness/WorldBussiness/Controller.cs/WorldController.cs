@@ -618,7 +618,7 @@ namespace Game.Server.Bussiness.WorldBussiness
         {
             // Load Scene And Spawn Field
             var domain = worldFacades.ClientWorldFacades.Domain;
-            var fieldEntity = await domain.WorldSpawnDomain.SpawnWorldChooseScene();
+            var fieldEntity = await domain.WorldSpawnDomain.SpawnFightScene();
             fieldEntity.SetFieldId(1);
             var fieldEntityRepo = worldFacades.ClientWorldFacades.Repo.FiledEntityRepo;
             fieldEntityRepo.Add(fieldEntity);

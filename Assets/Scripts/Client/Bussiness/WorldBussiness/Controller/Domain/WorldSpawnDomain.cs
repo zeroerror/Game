@@ -22,9 +22,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             this.worldFacades = worldFacades;
         }
 
-        public async Task<FieldEntity> SpawnWorldChooseScene()
+        public async Task<FieldEntity> SpawnWorldChooseScene()=> await SpawnScene("WorldChooseScene");
+
+        public async Task<FieldEntity> SpawnFightScene() => await SpawnScene("Map_v1");
+
+        public async Task<FieldEntity> SpawnScene(string sceneName)
         {
-            var result = await Addressables.LoadSceneAsync("WorldChooseScene", LoadSceneMode.Single).Task;
+            var result = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).Task;
             var scene = result.Scene;
             var sceneObjs = scene.GetRootGameObjects();
             var fieldTrans = sceneObjs[0].transform;
@@ -39,9 +43,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             fieldEntity.CameraComponent.SetFirstViewCam(firstCam);
             fieldEntity.CameraComponent.SetThirdViewCam(thirdCam);
 
-            Debug.Log("生成大世界---------------------------");
             LocalEventCenter.Invoke_SceneLoadedHandler(scene.name);
-
             return fieldEntity;
         }
 
