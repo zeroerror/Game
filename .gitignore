@@ -136,6 +136,9 @@ $RECYCLE.BIN/
 # 忽略编译包体
 /[Bb]in/
 
+# 忽略下载的资源包
+/Assets/Arts/Source
+
 # 忽略其他仓
 
 # For AddressableResourceCollector
