@@ -38,8 +38,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         var collider = colliderExtra.collider;
                         var closestPoint = collider.ClosestPoint(rolePos);
                         var hitDir = (closestPoint - rolePos).normalized;
+                        if (hitDir == Vector3.zero) hitDir.y = -1f;
                         role.MoveComponent.HitSomething(hitDir);
-                        if (hitDir.y < -0.1f) role.MoveComponent.EnterGound();
+                        if (hitDir.y < 0f) role.MoveComponent.EnterGound();
                         else role.MoveComponent.EnterWall();
                         role.SetRoleState(RoleState.Normal);
                         if (collider.gameObject.tag == "Jumpboard")
@@ -53,6 +54,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         var collider = colliderExtra.collider;
                         var closestPoint = collider.ClosestPoint(rolePos);
                         var leaveDir = (rolePos - closestPoint).normalized;
+                        if (leaveDir == Vector3.zero) leaveDir.y = -1f;
                         role.MoveComponent.LeaveSomthing(leaveDir);
                         if (leaveDir.y > 0.1f) role.MoveComponent.LeaveGround();
                         else role.MoveComponent.LeaveWall();
