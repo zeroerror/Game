@@ -106,6 +106,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 // MYSQL OPARATION
                 try
                 {
+                        Debug.Log($"注册账户请求 账户名：'{ev.name}'  密码'{ev.pwd}'-------------------------------");
                     var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from account");
                     while (reader.GetEnumerator().MoveNext())
                     {
@@ -119,6 +120,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                     }
                     if (status == 1)
                     {
+                        Debug.Log($"注册账户成功*******************************");
                         Debug.Log($"MySQL插入game_account表 value('{ev.name}','{ev.pwd}')============================================");
                         reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, $"insert into account value('{ev.name}','{ev.pwd}')");
                     }
