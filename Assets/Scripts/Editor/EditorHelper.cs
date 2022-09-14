@@ -3,7 +3,7 @@ using UnityEditor;
 
 public static class EditorHelper
 {
-    [MenuItem("GameObject/禁用所有碰撞体（包括子物体）")]
+    [MenuItem("GameObject/禁用所有碰撞体")]
     static void DisableAllCollider()
     {
         var chosenGo = Selection.activeGameObject;
@@ -16,7 +16,7 @@ public static class EditorHelper
         Debug.Log($"禁用碰撞盒个数：{allColliders.Length}");
     }
 
-    [MenuItem("GameObject/启用所有碰撞体（包括子物体）")]
+    [MenuItem("GameObject/启用所有碰撞体")]
     static void EnableAllCollider()
     {
         var chosenGo = Selection.activeGameObject;
@@ -28,4 +28,18 @@ public static class EditorHelper
         }
         Debug.Log($"启用碰撞盒个数：{allColliders.Length}");
     }
+
+    [MenuItem("GameObject/启用所有MeshCollider的Convex")]
+    static void EnableAllMeshConvex()
+    {
+        var chosenGo = Selection.activeGameObject;
+        var allColliders = chosenGo.transform.GetComponentsInChildren<MeshCollider>();
+        for (int i = 0; i < allColliders.Length; i++)
+        {
+            var meshCollider = allColliders[i];
+            meshCollider.convex = true;
+        }
+        Debug.Log($"启用Convex个数：{allColliders.Length}");
+    }
+
 }
