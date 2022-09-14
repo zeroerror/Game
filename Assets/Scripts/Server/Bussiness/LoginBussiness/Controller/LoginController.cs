@@ -65,23 +65,24 @@ namespace Game.Server.Bussiness.LoginBussiness
                 // MYSQL OPARATION
                 try
                 {
-                    var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from account");
-                    while (reader.GetEnumerator().MoveNext())
-                    {
-                        string name = reader.GetString("name");
-                        string pwd = reader.GetString("pwd");
-                        if (name == msg.name && pwd == msg.pwd)
-                        {
-                            status = 1;
-                            break;
-                        }
-                    }
+                    // var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from account");
+                    // while (reader.GetEnumerator().MoveNext())
+                    // {
+                    //     string name = reader.GetString("name");
+                    //     string pwd = reader.GetString("pwd");
+                    //     if (name == msg.name && pwd == msg.pwd)
+                    //     {
+                    //         status = 1;
+                    //         break;
+                    //     }
+                    // }
                 }
                 catch (MySqlException exc)
                 {
                     Debug.Log(exc.ToString());
                 }
 
+                status = 1;// Temp
                 var networkServer = loginFacades.NetworkServer;
                 networkServer.SendMsg<LoginResMessage>(ev.connID, new LoginResMessage
                 {

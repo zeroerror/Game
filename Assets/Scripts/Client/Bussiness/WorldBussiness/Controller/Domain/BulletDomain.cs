@@ -22,17 +22,19 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public BulletEntity SpawnBullet(Transform parent, BulletType bulletType)
         {
-            string bulletPrefabName = "Bullet";
+            string bulletPrefabName = "DefaultBullet";
             switch (bulletType)
             {
                 case BulletType.Default:
-                    bulletPrefabName = "Bullet";
+                    bulletPrefabName = "DefaultBullet";
                     break;
                 case BulletType.Grenade:
                     bulletPrefabName = "Grenade";
                     break;
                 case BulletType.Hooker:
                     bulletPrefabName = "Hooker";
+                    break;
+                default:
                     break;
             }
 

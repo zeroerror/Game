@@ -1,3 +1,4 @@
+using System;
 using Game.Client.Bussiness.Assets;
 using Game.Client.Bussiness.WorldBussiness.Assets;
 
@@ -20,6 +21,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
 
         public void LoadAll()
         {
+            Console.WriteLine("世界资源开始加载------------------------------------------");
             WorldRoleAssets.LoadAssets();
             BulletAsset.LoadAssets();
             CameraAsset.LoadAssets();

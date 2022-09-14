@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Game.Generic;
+using System;
 
 namespace Game.Client.Bussiness.Assets
 {
@@ -21,6 +22,7 @@ namespace Game.Client.Bussiness.Assets
             Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.CameraAssets, (obj) =>
             {
                 dic_name.Add(obj.name, obj);
+                Console.WriteLine($"相机资源添加：{obj.name}");
             });
         }
 

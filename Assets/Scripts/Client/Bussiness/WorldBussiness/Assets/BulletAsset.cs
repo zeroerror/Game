@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Game.Generic;
+using System;
 
 namespace Game.Client.Bussiness.WorldBussiness.Assets
 {
@@ -20,7 +21,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Assets
         {
             Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.BulletAssets, (obj) =>
             {
-                dic_name.Add(obj.name, obj);
+                dic_name.TryAdd(obj.name, obj);
+                Console.WriteLine($"子弹资源添加：{obj.name}");
             });
         }
 
