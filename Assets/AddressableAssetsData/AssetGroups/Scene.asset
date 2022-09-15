@@ -17,8 +17,8 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 37d93d84fdbbb694cbc6e8671374b44d
   m_SerializeEntries:
-  - m_GUID: 282898bbb90a5c143ab087d2287bc8a4
-    m_Address: WorldRendererScene
+  - m_GUID: b32f9224a7f8a6f4eb5a631e4ece1fa9
+    m_Address: scene_city
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene

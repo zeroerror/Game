@@ -33,13 +33,19 @@ public static class EditorHelper
     static void EnableAllMeshConvex()
     {
         var chosenGo = Selection.activeGameObject;
-        var allColliders = chosenGo.transform.GetComponentsInChildren<MeshCollider>();
-        for (int i = 0; i < allColliders.Length; i++)
+        var allMeshFilter = chosenGo.transform.GetComponentsInChildren<MeshFilter>();
+        for (int i = 0; i < allMeshFilter.Length; i++)
         {
-            var meshCollider = allColliders[i];
+            var meshFilter = allMeshFilter[i];
+            var meshCollider = meshFilter.transform.GetComponent<MeshCollider>();
+            if (meshCollider == null)
+            {
+                meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
+            }
+
             meshCollider.convex = true;
         }
-        Debug.Log($"启用Convex个数：{allColliders.Length}");
+        Debug.Log($"启用Convex个数：{allMeshFilter.Length}");
     }
 
 }
