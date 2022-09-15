@@ -86,6 +86,11 @@ namespace Game.Client.Bussiness.WorldBussiness
             IsDead = false;
         }
 
+        public bool IsAllowEnterNormal()
+        {
+            return true;
+        }
+
     }
 
 }

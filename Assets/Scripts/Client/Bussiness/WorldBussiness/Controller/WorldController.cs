@@ -573,7 +573,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             // Load Scene And Spawn Field
             var domain = worldFacades.Domain;
-            var fieldEntity = await domain.WorldSpawnDomain.SpawnFightScene();
+            var fieldEntity = await domain.WorldSpawnDomain.SpawnCityScene();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = true;
             fieldEntity.SetFieldId(1);

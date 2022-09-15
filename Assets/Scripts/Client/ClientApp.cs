@@ -178,7 +178,7 @@ namespace Game.Client
                 Debug.Log("Connect Success");
             };
 
-            networkClient.Connect(NetworkConfig.REMOTE_HOST, NetworkConfig.PORT);
+            networkClient.Connect(NetworkConfig.HOST, NetworkConfig.PORT);
 
             new Thread(() =>
             {

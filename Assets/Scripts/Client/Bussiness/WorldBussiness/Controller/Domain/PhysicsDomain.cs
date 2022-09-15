@@ -30,39 +30,53 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 var rolePos = role.SelfPos;
                 // 墙体撞击：速度管理
                 var wallColliderList = GetHitField_ColliderList(role);
+                int enterGroundCount = 0;
+                int hitWallCount = 0;
                 wallColliderList.ForEach((colliderExtra) =>
                 {
+                    var collider = colliderExtra.collider;
+                    var closestPoint = collider.ClosestPoint(rolePos);
+                    var hitDir = (closestPoint - rolePos).normalized;
+                    role.MoveComponent.HitSomething(hitDir);
+
+                    if (colliderExtra.isEnter != CollisionStatus.Exit)
+                    {
+                        if (hitDir.y < 0) enterGroundCount++;
+                        else hitWallCount++;
+                    }
+
                     if (colliderExtra.isEnter == CollisionStatus.Enter)
                     {
                         colliderExtra.isEnter = CollisionStatus.Stay;
-                        var collider = colliderExtra.collider;
-                        var closestPoint = collider.ClosestPoint(rolePos);
-                        var hitDir = (closestPoint - rolePos).normalized;
-                        if (hitDir == Vector3.zero) hitDir.y = -1f;
-                        role.MoveComponent.HitSomething(hitDir);
-                        if (hitDir.y < 0f) role.MoveComponent.EnterGound();
-                        else role.MoveComponent.EnterWall();
-                        role.SetRoleState(RoleState.Normal);
                         if (collider.gameObject.tag == "Jumpboard")
                         {
                             role.MoveComponent.JumpboardSpeedUp();
                         }
                         hitRoleList.Add(role);
                     }
+                    else if (colliderExtra.isEnter == CollisionStatus.Stay)
+                    {
+
+                    }
                     else if (colliderExtra.isEnter == CollisionStatus.Exit)
                     {
-                        var collider = colliderExtra.collider;
-                        var closestPoint = collider.ClosestPoint(rolePos);
-                        var leaveDir = (rolePos - closestPoint).normalized;
-                        if (leaveDir == Vector3.zero) leaveDir.y = -1f;
+                        var leaveDir = -hitDir;
                         role.MoveComponent.LeaveSomthing(leaveDir);
-                        if (leaveDir.y > 0.1f) role.MoveComponent.LeaveGround();
-                        else role.MoveComponent.LeaveWall();
-
+                        if (leaveDir.y < 0f) hitWallCount--;
+                        else enterGroundCount--;
                         role.RemoveHitCollider(colliderExtra);
                     }
-
                 });
+
+                if (enterGroundCount <= 0) role.MoveComponent.LeaveGround();
+                else
+                {
+                    role.MoveComponent.EnterGound();
+                    if(role.IsAllowEnterNormal()) role.SetRoleState(RoleState.Normal);
+                }
+
+                if (hitWallCount <= 0) role.MoveComponent.LeaveWall();
+                else role.MoveComponent.EnterWall();
             });
 
             return hitRoleList;

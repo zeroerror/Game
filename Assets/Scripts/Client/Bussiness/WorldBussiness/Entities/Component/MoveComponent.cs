@@ -97,7 +97,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             this.speed = speed;
             this.jumpSpeed = jumpVelocity;
             rb.useGravity = false;  //关闭地球引力
-            _gravity = 20f;
+            _gravity = 50f;
         }
 
         public void Jump()
@@ -256,24 +256,32 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void EnterGound()
         {
+            if (IsGrouded) return;
+
             DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
             IsGrouded = true;
         }
 
         public void LeaveGround()
         {
+            if (!IsGrouded) return;
+
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
             IsGrouded = false;
         }
 
         public void EnterWall()
         {
+            if (IsHitWall) return;
+
             DebugExtensions.LogWithColor($"{rb.gameObject.name}接触墙体---------------------------", "#48D1CC");
             IsHitWall = true;
         }
 
         public void LeaveWall()
         {
+            if (!IsHitWall) return;
+
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开墙体-----------------------------", "#48D1CC");
             IsHitWall = false;
         }
