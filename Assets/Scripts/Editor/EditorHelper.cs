@@ -43,6 +43,7 @@ public static class EditorHelper
                 meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
             }
 
+            meshCollider.enabled = true;
             meshCollider.convex = true;
         }
         Debug.Log($"启用Convex个数：{allMeshFilter.Length}");
