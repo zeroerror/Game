@@ -75,7 +75,8 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         // == Rotation
         public Quaternion Rotation => rb.rotation;
-        public Vector3 EulerAngel => rb.rotation.eulerAngles;
+        public Vector3 EulerAngle => rb.rotation.eulerAngles;
+        public Vector3 OldEulerAngle { get; private set; }
         public void FaceTo(Vector3 forward) => rb.rotation = Quaternion.LookRotation(forward);
         public void SetEulerAngle(Vector3 eulerAngle) => rb.rotation = Quaternion.Euler(eulerAngle);
         public void AddEulerAngleY(float eulerAngleY)
@@ -89,6 +90,14 @@ namespace Game.Client.Bussiness.WorldBussiness
             var euler = rb.rotation.eulerAngles;
             euler.y = eulerAngle.y;
             rb.rotation = Quaternion.Euler(euler);
+        }
+        public void FlushEulerAngle() => OldEulerAngle = EulerAngle;
+        public bool IsEulerAngleNeedFlush()
+        {
+            if (Mathf.Abs(OldEulerAngle.x - EulerAngle.x) > 10) return true;
+            if (Mathf.Abs(OldEulerAngle.y - EulerAngle.y) > 10) return true;
+            if (Mathf.Abs(OldEulerAngle.z - EulerAngle.z) > 10) return true;
+            return false;
         }
 
         public MoveComponent(Rigidbody rb, float speed = 0, float jumpVelocity = 0)

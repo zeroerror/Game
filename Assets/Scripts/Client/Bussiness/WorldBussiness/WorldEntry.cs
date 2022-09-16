@@ -46,8 +46,9 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public static void Update()
         {
-            worldController.Tick_CameraUpdate(UnityEngine.Time.deltaTime);
-            worldController.Tick_RoleRendererAndCamera(UnityEngine.Time.deltaTime);
+            float deltaTime = UnityEngine.Time.deltaTime;
+            worldController.Tick_RoleRenderer(deltaTime);
+            worldController.Tick_CameraUpdate();
         }
 
         public static void TearDown()

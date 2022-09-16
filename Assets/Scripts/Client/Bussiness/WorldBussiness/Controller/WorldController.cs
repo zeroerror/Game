@@ -140,24 +140,17 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             if (input.moveAxis != Vector3.zero)
             {
                 var moveAxis = input.moveAxis;
-                Vector3 moveDir = moveAxis;
-                var currentCamView = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
-                if (currentCamView == CameraView.FirstView)
-                {
-                    Vector3 roleForward = owner.transform.forward;
-                    roleForward.y = 0;
-                    VectorHelper2D.GetRotVector(roleForward.x, roleForward.z, -90, out float rightX, out float rightZ);
-                    Vector3 roleRight = new Vector3(rightX, 0, rightZ);
-                    moveDir.x *= roleForward.x;
-                    moveDir = moveAxis.z * roleForward; //前后
-                    moveDir += moveAxis.x * roleRight;  //左右
-                }
+
+                var cameraView = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
+                Vector3 moveDir = worldFacades.Domain.WorldInputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
+                owner.MoveComponent.FaceTo(moveDir);
+
                 if (!WillHitOtherRole(owner, moveDir))
                 {
                     var rqs = worldFacades.Network.WorldRoleReqAndRes;
-                    if (owner.IsEulerAngleNeedFlush())
+                    if (owner.MoveComponent.IsEulerAngleNeedFlush())
                     {
-                        owner.FlushEulerAngle();
+                        owner.MoveComponent.FlushEulerAngle();
                         //客户端鉴权旋转角度同步
                         rqs.SendReq_WRoleRotate(worldClientFrame, owner);
                     }
@@ -169,9 +162,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             input.Reset();
 
-            if (owner.IsEulerAngleNeedFlush())
+            if (owner.MoveComponent.IsEulerAngleNeedFlush())
             {
-                owner.FlushEulerAngle();
+                owner.MoveComponent.FlushEulerAngle();
                 //客户端鉴权旋转角度同步
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
                 rqs.SendReq_WRoleRotate(worldClientFrame, owner);
@@ -183,37 +176,24 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         #region [Renderer]
 
-        public void Tick_RoleRendererAndCamera(float deltaTime)
+        public void Tick_RoleRenderer(float deltaTime)
         {
             var domain = worldFacades.Domain.WorldRoleDomain;
             domain.Tick_RoleRenderer(deltaTime);
-            domain.Tick_RoleCameraTracking();
         }
 
-        public void Tick_CameraUpdate(float deltaTime)
+        public void Tick_CameraUpdate()
         {
-            // 相机朝向更新
-            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
-            if (owner != null)
-            {
-                var axisX = Input.GetAxis("Mouse X");
-                var axisY = -Input.GetAxis("Mouse Y");
+            var curFieldEntity = worldFacades.Repo.FiledEntityRepo.CurFieldEntity;
+            if (curFieldEntity == null) return;
+            
+            var cameraComponent = curFieldEntity.CameraComponent;
+            var currentCam = cameraComponent.CurrentCamera;
+            var cameraView = cameraComponent.CurrentCameraView;
+            var inputDomain = worldFacades.Domain.WorldInputDomain;
+            Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-                var curCamComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
-                var curCam = curCamComponent.CurrentCamera;
-                var ownerEulerAngle = owner.transform.rotation.eulerAngles;
-                switch (curCamComponent.CurrentCameraView)
-                {
-                    case CameraView.FirstView:
-                        curCam.AddEulerAngleX(axisY);
-                        curCam.AddEulerAngleY(axisX);
-                        owner.MoveComponent.SetEulerAngleY(curCam.EulerAngles);
-                        break;
-                    case CameraView.ThirdView:
-                        // curCam.SetEulerAngleY(ownerEulerAngle.y);
-                        break;
-                }
-            }
+            inputDomain.CameraUpdateByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCam, inputAxis);
         }
 
         #endregion
@@ -237,7 +217,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         {
             var domain = worldFacades.Domain.WorldRoleDomain;
             domain.Tick_RoleRigidbody(deltaTime);
-            domain.Tick_RoleCameraTracking();
+
+            var cameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+            var currentCamera = cameraComponent.CurrentCamera;
+            var cameraView = cameraComponent.CurrentCameraView;
+            var inputDomain = worldFacades.Domain.WorldInputDomain;
+
+            Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            inputDomain.CameraUpdateByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCamera, inputAxis);
         }
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)

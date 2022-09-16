@@ -63,17 +63,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             });
         }
 
-        public void Tick_RoleCameraTracking()
-        {
-            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
-            if (owner == null) return;
-
-            var ownerRendererTrans = owner.roleRenderer.transform;
-            var trackPos = ownerRendererTrans.position + ownerRendererTrans.forward * 0.5f;
-            trackPos.y -= 1.2f;
-            owner.roleRenderer.SetCamTrackingPos(trackPos);
-        }
-
         public void Tick_RoleRenderer(float deltaTime)
         {
             var roleRepo = worldFacades.Repo.WorldRoleRepo;

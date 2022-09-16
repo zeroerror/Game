@@ -34,19 +34,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public MoveComponent MoveComponent { get; private set; }
         public HealthComponent HealthComponent { get; private set; }
 
-        // == Rotation ==
-        public Vector3 EulerAngle => transform.rotation.eulerAngles;
-        public Vector3 OldEulerAngle { get; private set; }
-        public void FlushEulerAngle() => OldEulerAngle = EulerAngle;
-        public bool IsEulerAngleNeedFlush()
-        {
-            if (Mathf.Abs(OldEulerAngle.x - EulerAngle.x) > 10) return true;
-            if (Mathf.Abs(OldEulerAngle.y - EulerAngle.y) > 10) return true;
-            if (Mathf.Abs(OldEulerAngle.z - EulerAngle.z) > 10) return true;
-            return false;
-        }
-
-
         public RoleState RoleState { get; private set; }
         public void SetRoleState(RoleState roleStatus) => this.RoleState = roleStatus;
 

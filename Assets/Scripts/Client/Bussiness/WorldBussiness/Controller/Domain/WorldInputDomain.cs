@@ -1,0 +1,59 @@
+using Game.Infrastructure.Input;
+using UnityEngine;
+using ZeroFrame.ZeroMath;
+
+namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
+{
+
+    public class WorldInputDomain
+    {
+
+        public void CameraUpdateByCameraView(WorldRoleLogicEntity owner, CameraView cameraView, CinemachineExtra curCam, Vector2 inputAxis)
+        {
+            if (owner == null) return;
+
+            var roleRenderer = owner.roleRenderer;
+            Vector3 trackPos = roleRenderer.transform.position;
+            switch (cameraView)
+            {
+                case CameraView.FirstView:
+                    trackPos += roleRenderer.transform.forward * 0.5f;
+                    trackPos.y -= 1.2f;
+
+                    curCam.AddEulerAngleX(inputAxis.y);
+                    curCam.AddEulerAngleY(inputAxis.x);
+                    owner.MoveComponent.SetEulerAngleY(curCam.EulerAngles);
+                    break;
+                case CameraView.ThirdView:
+                    break;
+            }
+
+            roleRenderer.SetCamTrackingPos(trackPos);
+        }
+
+        public Vector3 GetMoveDirByCameraView(WorldRoleLogicEntity owner, Vector3 moveAxis, CameraView cameraView)
+        {
+            Vector3 moveDir = Vector3.zero;
+            switch (cameraView)
+            {
+                case CameraView.FirstView:
+                    Vector3 roleForward = owner.transform.forward;
+                    roleForward.y = 0;
+                    VectorHelper2D.GetRotVector(roleForward.x, roleForward.z, -90, out float rightX, out float rightZ);
+                    Vector3 roleRight = new Vector3(rightX, 0, rightZ);
+                    moveDir = moveAxis;
+                    moveDir.x *= roleForward.x;
+                    moveDir = moveAxis.z * roleForward; //前后
+                    moveDir += moveAxis.x * roleRight;  //左右
+                    break;
+                case CameraView.ThirdView:
+                    moveDir = moveAxis;
+                    break;
+            }
+
+            return moveDir.normalized;
+        }
+
+    }
+
+}
