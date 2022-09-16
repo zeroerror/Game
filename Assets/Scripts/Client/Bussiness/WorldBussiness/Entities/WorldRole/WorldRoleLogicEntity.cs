@@ -33,6 +33,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         // == Component ==
         public MoveComponent MoveComponent { get; private set; }
         public HealthComponent HealthComponent { get; private set; }
+        public WeaponComponent WeaponComponent { get; private set; }
 
         public RoleState RoleState { get; private set; }
         public void SetRoleState(RoleState roleStatus) => this.RoleState = roleStatus;
@@ -47,9 +48,14 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Ctor()
         {
+            // == Component
             MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 8f, 5f);
             MoveComponent.SetMaximumSpeed(30f);
+
             HealthComponent = new HealthComponent(100f);
+            
+            WeaponComponent = new WeaponComponent();
+            WeaponComponent.Ctor();
 
             RoleState = RoleState.Normal;
             offset = new Vector3(0, 0.2f, 0);

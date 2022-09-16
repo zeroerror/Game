@@ -145,6 +145,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 Vector3 moveDir = worldFacades.Domain.WorldInputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
                 owner.MoveComponent.FaceTo(moveDir);
 
+
                 if (!WillHitOtherRole(owner, moveDir))
                 {
                     var rqs = worldFacades.Network.WorldRoleReqAndRes;
@@ -176,24 +177,24 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         #region [Renderer]
 
-        public void Tick_RoleRenderer(float deltaTime)
+        public void Update_RoleRenderer(float deltaTime)
         {
             var domain = worldFacades.Domain.WorldRoleDomain;
-            domain.Tick_RoleRenderer(deltaTime);
+            domain.Update_RoleRenderer(deltaTime);
         }
 
-        public void Tick_CameraUpdate()
+        public void Update_Camera()
         {
             var curFieldEntity = worldFacades.Repo.FiledEntityRepo.CurFieldEntity;
             if (curFieldEntity == null) return;
-            
+
             var cameraComponent = curFieldEntity.CameraComponent;
             var currentCam = cameraComponent.CurrentCamera;
             var cameraView = cameraComponent.CurrentCameraView;
             var inputDomain = worldFacades.Domain.WorldInputDomain;
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-            inputDomain.CameraUpdateByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCam, inputAxis);
+            inputDomain.UpdateCameraByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCam, inputAxis);
         }
 
         #endregion
@@ -224,7 +225,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var inputDomain = worldFacades.Domain.WorldInputDomain;
 
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            inputDomain.CameraUpdateByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCamera, inputAxis);
+            inputDomain.UpdateCameraByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCamera, inputAxis);
         }
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)

@@ -22,7 +22,8 @@ namespace Game.Client.Bussiness.WorldBussiness
         public Vector3 SelfPos => transform.position;
 
         [SerializeField]
-        public float adjustSpeed;
+        public float posAdjust;
+        public float rotAdjust;
 
         public void Ctor()
         {
@@ -31,6 +32,9 @@ namespace Game.Client.Bussiness.WorldBussiness
 
             AnimatorComponent = new AnimatorComponent(animator);
             camTrackingObj = new GameObject($"CameraTrackingObject_RID_{wRid}");
+
+            posAdjust = 15f;
+            rotAdjust = 15f;
         }
     }
 

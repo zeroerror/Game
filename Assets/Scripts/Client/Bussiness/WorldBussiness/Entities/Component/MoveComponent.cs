@@ -77,7 +77,11 @@ namespace Game.Client.Bussiness.WorldBussiness
         public Quaternion Rotation => rb.rotation;
         public Vector3 EulerAngle => rb.rotation.eulerAngles;
         public Vector3 OldEulerAngle { get; private set; }
-        public void FaceTo(Vector3 forward) => rb.rotation = Quaternion.LookRotation(forward);
+        public void FaceTo(Vector3 forward)
+        {
+            var newRotation = Quaternion.LookRotation(forward);
+            rb.rotation = newRotation;
+        }
         public void SetEulerAngle(Vector3 eulerAngle) => rb.rotation = Quaternion.Euler(eulerAngle);
         public void AddEulerAngleY(float eulerAngleY)
         {

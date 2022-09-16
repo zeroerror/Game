@@ -8,7 +8,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
     public class WorldInputDomain
     {
 
-        public void CameraUpdateByCameraView(WorldRoleLogicEntity owner, CameraView cameraView, CinemachineExtra curCam, Vector2 inputAxis)
+        public void UpdateCameraByCameraView(WorldRoleLogicEntity owner, CameraView cameraView, CinemachineExtra curCam, Vector2 inputAxis)
         {
             if (owner == null) return;
 
