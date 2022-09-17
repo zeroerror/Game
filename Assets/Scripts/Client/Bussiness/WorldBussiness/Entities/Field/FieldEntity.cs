@@ -23,6 +23,11 @@ namespace Game.Client.Bussiness
             Debug.Assert(Role_Group_Renderer != null);
         }
 
+        public void Ctor()
+        {
+
+        }
+
     }
 
 

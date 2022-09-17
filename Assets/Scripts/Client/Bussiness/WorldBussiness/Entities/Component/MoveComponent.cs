@@ -113,9 +113,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             _gravity = 50f;
         }
 
-        public void Jump()
+        public bool TryJump()
         {
-            if (!IsGrouded) return;
+            if (!IsGrouded) return false;
             Debug.Log($"Jump");
 
             var v = rb.velocity;
@@ -124,6 +124,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             _gravityVelocity = 0;
 
             jumpVelocity = jumpSpeed;
+            return true;
         }
 
         public void Tick_Rigidbody(float fixedDeltaTime)

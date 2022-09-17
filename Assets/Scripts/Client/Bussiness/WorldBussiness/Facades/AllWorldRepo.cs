@@ -9,12 +9,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
 
         public FiledEntityRepo FiledEntityRepo { get; private set; }
         public WorldRoleRepo WorldRoleRepo { get; private set; }
+        public WeaponRepo WeaponRepo { get; private set; }
         public BulletEntityRepo BulletRepo { get; private set; }
 
         public AllWorldRepo()
         {
             FiledEntityRepo = new FiledEntityRepo();
             WorldRoleRepo = new WorldRoleRepo();
+            WeaponRepo = new WeaponRepo();
             BulletRepo = new BulletEntityRepo();
         }
 

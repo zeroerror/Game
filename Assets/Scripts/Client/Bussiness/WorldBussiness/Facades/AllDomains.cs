@@ -11,6 +11,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         public WorldRoleDomain WorldRoleDomain { get; private set; }
         public WorldInputDomain WorldInputDomain { get; private set; }
         public BulletDomain BulletDomain { get; private set; }
+        public WeaponDomain WeaponDomain { get; private set; }
         public PhysicsDomain PhysicsDomain { get; private set; }
 
         public AllDomains()
@@ -19,6 +20,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             WorldRoleDomain = new WorldRoleDomain();
             WorldInputDomain = new WorldInputDomain();
             BulletDomain = new BulletDomain();
+            WeaponDomain = new WeaponDomain();
             PhysicsDomain = new PhysicsDomain();
         }
 
@@ -28,6 +30,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             WorldSpawnDomain.Inject(facades);
             WorldRoleDomain.Inject(facades);
             BulletDomain.Inject(facades);
+            WeaponDomain.Inject(facades);
             PhysicsDomain.Inject(facades);
         }
     }

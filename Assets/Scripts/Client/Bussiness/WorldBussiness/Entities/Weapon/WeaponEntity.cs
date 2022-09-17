@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Game.Client.Bussiness.WorldBussiness
 {
 
+    [SerializeField]
     public enum WeaponType
     {
         // TODO: 根据武器类型去配置表查询对应弹夹容量

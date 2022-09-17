@@ -48,6 +48,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3b1d30a405f6ae344893e0ab12ec99a8, type: 2}
   - {fileID: 11400000, guid: 15c0f3baf1502e246b7f68b4f7184529, type: 2}
   - {fileID: 11400000, guid: fe87583b4162ff54bb6a7fade34feac1, type: 2}
+  - {fileID: 11400000, guid: 0047247b04008f84a8b129f2795cfd65, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -94,6 +95,7 @@ MonoBehaviour:
     - Camera
     - Role
     - Bullet
+    - Weapon
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 7bd76f96a6249af4ea39e86aeb76659e, type: 2}

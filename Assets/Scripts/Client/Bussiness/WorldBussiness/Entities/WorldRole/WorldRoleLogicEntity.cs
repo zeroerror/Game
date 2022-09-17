@@ -49,7 +49,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void Ctor()
         {
             // == Component
-            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 8f, 5f);
+            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 4f, 4f);
             MoveComponent.SetMaximumSpeed(30f);
 
             HealthComponent = new HealthComponent(100f);

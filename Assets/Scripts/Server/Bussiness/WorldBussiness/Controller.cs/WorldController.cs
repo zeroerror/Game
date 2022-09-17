@@ -2,10 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
-using Game.Infrastructure.Network;
 using Game.Client.Bussiness.WorldBussiness;
 using Game.Infrastructure.Generic;
-using Game.Generic;
 
 namespace Game.Server.Bussiness.WorldBussiness
 {
@@ -345,14 +343,15 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
 
                 //服务器逻辑Jump
-                roleEntity.MoveComponent.Jump();
-                if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
-
-                //发送状态同步帧
-                connIdList.ForEach((connId) =>
+                if (roleEntity.MoveComponent.TryJump())
                 {
-                    rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
-                });
+                    if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
+                    //发送状态同步帧
+                    connIdList.ForEach((connId) =>
+                    {
+                        rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
+                    });
+                }
 
                 jumpOptList.RemoveAt(lastIndex);
             }
@@ -624,6 +623,61 @@ namespace Game.Server.Bussiness.WorldBussiness
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
             isSceneSpawn = true;
+
+            // 生成场景资源，并回复客户端
+            List<WeaponType> weaponGenList = new List<WeaponType>();
+            AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
+            for (int i = 0; i < assetPointEntities.Length; i++)
+            {
+                var assetPoint = assetPointEntities[i];
+                WeaponGenProbability[] weaponGenProbabilities = assetPoint.weaponGenProbability;
+                float totalWeight = 0;
+                for (int j = 0; j < weaponGenProbabilities.Length; j++) totalWeight += weaponGenProbabilities[j].weight;
+
+                float lRange = 0;
+                float rRange = 0;
+                float randomNumber = Random.Range(0f, 1f);
+                for (int j = 0; j < weaponGenProbabilities.Length; j++)
+                {
+                    WeaponGenProbability wgp = weaponGenProbabilities[j];
+                    if (wgp.weight <= 0) continue;
+                    rRange = lRange + wgp.weight / totalWeight;
+                    if (randomNumber >= lRange && randomNumber < rRange)
+                    {
+                        weaponGenList.Add(wgp.weaponType);
+                        break;
+                    }
+
+                    lRange = rRange;
+                }
+            }
+
+            ushort[] weaponIdArray = new ushort[weaponGenList.Count];
+            ushort weaponId = 0;
+            Debug.Log($"服务器地图武器生成----------------------------");
+            weaponGenList.ForEach((weaponType) =>
+            {
+                // 生成武器资源
+                var weaponDomain = worldFacades.ClientWorldFacades.Domain.WeaponDomain;
+                var weapon = weaponDomain.SpawnWeapon(weaponType);
+
+                var parent = assetPointEntities[weaponId];
+                weapon.transform.SetParent(parent.transform);
+                weapon.transform.localPosition = Vector3.zero;
+
+                var weaponEntity = weapon.GetComponent<WeaponEntity>();
+                var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
+                weaponRepo.Add(weaponEntity);
+
+                weaponIdArray[weaponId] = weaponId;
+                weaponId++;
+            });
+
+            var rqs = worldFacades.Network.WeaponReqAndRes;
+            connIdList.ForEach((connId) =>
+            {
+                rqs.SendRes_WeaponAssetsSpawn(connId, serveFrame, weaponGenList.ToArray(), weaponIdArray);
+            });
         }
 
     }

@@ -20,7 +20,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     trackPos += roleRenderer.transform.forward * 0.5f;
                     trackPos.y -= 1.2f;
 
-                    curCam.AddEulerAngleX(inputAxis.y);
+                    curCam.AddEulerAngleX(-inputAxis.y);
                     curCam.AddEulerAngleY(inputAxis.x);
                     owner.MoveComponent.SetEulerAngleY(curCam.EulerAngles);
                     break;

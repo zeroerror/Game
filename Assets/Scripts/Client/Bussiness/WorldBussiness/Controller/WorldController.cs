@@ -18,6 +18,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         // 服务器下发的生成队列
         Queue<FrameWRoleSpawnResMsg> roleSpawnQueue;
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
+        Queue<FrameWeaponAssetsSpawnResMsg> weaponAssetsSpawnQueue;
         // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
         Queue<FrameBulletHitWallResMsg> bulletHitWallQueue;
@@ -35,6 +36,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             roleSpawnQueue = new Queue<FrameWRoleSpawnResMsg>();
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
+            weaponAssetsSpawnQueue = new Queue<FrameWeaponAssetsSpawnResMsg>();
 
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
             bulletHitWallQueue = new Queue<FrameBulletHitWallResMsg>();
@@ -58,7 +60,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             bulletRqs.RegistRes_BulletHitWall(OnBulletHitWall);
             bulletRqs.RegistRes_BulletTearDown(OnBulletTearDown);
 
+            var weaponRqs = worldFacades.Network.WeaponReqAndRes;
+            weaponRqs.RegistRes_WeaponAssetsSpawn(OnWeaponSpawn);
         }
+
 
         public void Tick()
         {
@@ -83,12 +88,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             Tick_BulletHitWall(nextFrame);
             Tick_BulletHitRole(nextFrame);
 
-            // == Tick Server Resonse
+            // == Tick Server Resonse (Order By Life Cycle)
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
+            Tick_WeaponAssetsSpawn(nextFrame);
 
-            Tick_BulletTearDown(nextFrame);
             Tick_RoleStateSync(nextFrame);
+            Tick_BulletTearDown(nextFrame);
 
             // == Input
             Tick_Input();
@@ -238,6 +244,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         #region [Tick Server Resonse]
 
+        // ====== ROLE
         void Tick_RoleStateSync(int nextFrame)
         {
             while (stateQueue.TryPeek(out var stateMsg))
@@ -313,7 +320,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         {
                             animatorComponent.PlayJump();
                         }
-                        moveComponent.Jump();
+                        moveComponent.TryJump();
                         break;
                     case RoleState.Hooking:
                         animatorComponent.PlayHooking();
@@ -364,6 +371,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             }
         }
 
+        // ====== ROLE
         void Tick_BulletSpawn(int nextFrame)
         {
             if (bulletSpawnQueue.TryPeek(out var bulletSpawn))
@@ -508,6 +516,40 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             }
         }
 
+        // ====== WEAPON
+        void Tick_WeaponAssetsSpawn(int nextFrame)
+        {
+            if (weaponAssetsSpawnQueue.TryPeek(out var weaponAssetSpawnMsg))
+            {
+                Debug.Log($"客户端地图武器生成----------------------------");
+                weaponAssetsSpawnQueue.Dequeue();
+                worldClientFrame = nextFrame;
+
+                var weaponTypeArray = weaponAssetSpawnMsg.weaponTypeArray;
+                var weaponIdArray = weaponAssetSpawnMsg.weaponIdArray;
+                var fieldEntity = worldFacades.Repo.FiledEntityRepo.CurFieldEntity;
+                AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
+                for (int i = 0; i < assetPointEntities.Length; i++)
+                {
+                    Transform assetPoint = assetPointEntities[i].transform;
+                    WeaponType weaponType = (WeaponType)weaponTypeArray[i];
+                    ushort weaponId = weaponIdArray[i];
+
+                    // 生成武器资源
+                    var waponDomain = worldFacades.Domain.WeaponDomain;
+                    var weapon = waponDomain.SpawnWeapon(weaponType);
+                    weapon.transform.SetParent(assetPoint.transform);
+                    weapon.transform.localPosition = Vector3.zero;
+
+                    var weaponEntity = weapon.transform.GetComponent<WeaponEntity>();
+                    var weaponRepo = worldFacades.Repo.WeaponRepo;
+                    weaponRepo.Add(weaponEntity);
+                }
+
+            }
+        }
+
+
         #endregion
 
         #region [Server Response]
@@ -548,6 +590,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             Debug.Log($"{msg.bulletType.ToString()} 加入子弹销毁队列");
             bulletTearDownQueue.Enqueue(msg);
         }
+
+        // WEAPON
+        void OnWeaponSpawn(FrameWeaponAssetsSpawnResMsg msg)
+        {
+            Debug.Log($"加入武器生成队列");
+            weaponAssetsSpawnQueue.Enqueue(msg);
+        }
+
 
         #endregion
 

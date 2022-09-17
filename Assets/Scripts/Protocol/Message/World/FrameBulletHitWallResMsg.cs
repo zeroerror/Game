@@ -4,7 +4,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 {
 
     [ZeroMessage]
-    public class FrameBulletHitWallResMsg : IZeroMessage<FrameBulletHitWallResMsg>{
+    public class FrameBulletHitWallResMsg :IZeroMessage<FrameBulletHitWallResMsg>{
         public int serverFrame;
         public ushort bulletId;
          public int posX; //(8  8)  (8  8)   整数部16位 int16（-32768 --- +32767） 小数部分16位 uint16(0 --- +65535) 0.0000到0.9999
