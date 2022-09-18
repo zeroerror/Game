@@ -11,16 +11,16 @@ namespace Game.Client.Bussiness.WorldBussiness.Interface
         Pill    // heal or speedup ,etc.
     }
 
-    public class Pickable : MonoBehaviour
+    public interface IPickable
     {
-        public ItemType ItemType { get; private set; }
-        protected void SetItemType(ItemType itemType) => ItemType = itemType;
+        ItemType ItemType { get; }
+        void SetItemType(ItemType itemType);
 
-        public ushort EntityId { get; private set; }
-        protected void SetEntityId(ushort entityId) => EntityId = entityId;
+        ushort EntityId { get; }
+        void SetEntityId(ushort entityId);
 
-        public byte MasterWRid { get; private set; }
-        protected void SetMasterWRid(byte masterWRid) => MasterWRid = masterWRid;
+        byte MasterId { get; }
+        void SetMasterId(byte masterWRid);
 
     }
 

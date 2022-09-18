@@ -25,8 +25,14 @@ namespace Game.Client.Bussiness.WorldBussiness
         // 拾取武器
         public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
         {
-            Debug.Log($"拾取武器:{weaponEntity.WeaponType.ToString()}");
+            if (CurrentNum >= WEAPON_CAPICY) return;
 
+            Debug.Log($"拾取武器:{weaponEntity.WeaponType.ToString()}");
+            var colliders = weaponEntity.GetComponentsInChildren<Collider>();
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                colliders[i].enabled = false;
+            }
             //武器挂点
             weaponEntity.transform.SetParent(hangPoint);
             weaponEntity.transform.localPosition = Vector3.zero;

@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             string bulletPrefabName = "DefaultBullet";
             switch (bulletType)
             {
-                case BulletType.Default:
+                case BulletType.DefaultBullet:
                     bulletPrefabName = "DefaultBullet";
                     break;
                 case BulletType.Grenade:
@@ -74,7 +74,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             {
                 switch (bullet.BulletType)
                 {
-                    case BulletType.Default:
+                    case BulletType.DefaultBullet:
                         break;
                     case BulletType.Grenade:
                         break;

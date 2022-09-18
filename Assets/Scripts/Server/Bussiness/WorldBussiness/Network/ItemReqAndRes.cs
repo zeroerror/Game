@@ -35,6 +35,19 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.SendMsg(connId, msg);
         }
 
+        public void SendRes_ItemSpawn(int connId, int frameIndex, byte[] itemTypeArray,byte[] subtypeArray ,ushort[] entityIdArray)
+        {
+            FrameItemSpawnResMsg msg = new FrameItemSpawnResMsg
+            {
+                serverFrame = frameIndex,
+                itemTypeArray = itemTypeArray,
+                subtypeArray = subtypeArray,
+                entityIdArray = entityIdArray
+            };
+
+            _server.SendMsg(connId, msg);
+        }
+
         // ====== Regist ======
         public void RegistReq_ItemPickUp(Action<int, FrameItemPickReqMsg> action)
         {

@@ -20,9 +20,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
-        public void RegistRes_WeaponAssetsSpawn(Action<FrameWeaponAssetsSpawnResMsg> action)
+        public void RegistRes_WeaponAssetsSpawn(Action<FrameItemSpawnResMsg> action)
         {
-            _client.RegistMsg<FrameWeaponAssetsSpawnResMsg>(action);
+            _client.RegistMsg<FrameItemSpawnResMsg>(action);
         }
 
     }

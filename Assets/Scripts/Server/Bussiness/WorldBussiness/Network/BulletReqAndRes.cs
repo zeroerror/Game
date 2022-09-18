@@ -58,7 +58,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
             {
                 serverFrame = frame,
-                bulletId = bulletEntity.BulletId,
+                bulletId = bulletEntity.EntityId,
                 posX = (int)bulletPos.x,
                 posY = (int)bulletPos.y,
                 posZ = (int)bulletPos.z,

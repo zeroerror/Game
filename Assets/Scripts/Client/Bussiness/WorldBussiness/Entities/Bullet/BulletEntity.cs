@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.Client.Bussiness.WorldBussiness.Interface;
 using UnityEngine;
 
 namespace Game.Client.Bussiness.WorldBussiness
@@ -6,26 +7,32 @@ namespace Game.Client.Bussiness.WorldBussiness
 
     public enum BulletType
     {
-        Default,
+        DefaultBullet,
         Grenade,
         Hooker
     }
 
-    public class BulletEntity : PhysicsEntity
+    public class BulletEntity : PhysicsEntity, IPickable
     {
         // Master Info
-        byte wRid;
-        public byte WRid => wRid;
-        public void SetWRid(byte wRid) => this.wRid = wRid;
+        byte masterId;
+        public byte MasterId => masterId;
+        public void SetMasterId(byte masterId) => this.masterId = masterId;
+
+        [SerializeField]
+        ItemType itemType;
+        public ItemType ItemType => this.itemType;
+        public void SetItemType(ItemType itemType) => this.itemType = itemType;
 
         // Bullet Info
-        BulletType bulletType = BulletType.Default;
+        [SerializeField]
+        BulletType bulletType = BulletType.DefaultBullet;
         public BulletType BulletType => bulletType;
         public void SetBulletType(BulletType bulletType) => this.bulletType = bulletType;
 
-        ushort bulletId;
-        public ushort BulletId => bulletId;
-        public void SetBulletId(ushort bulletId) => this.bulletId = bulletId;
+        ushort entityId;
+        public ushort EntityId => entityId;
+        public void SetEntityId(ushort entityId) => this.entityId = entityId;
 
         protected MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
@@ -49,6 +56,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
             moveComponent.SetSpeed(50f);
             moveComponent.SetGravity(5f);
+            moveComponent.enable = true;
             moveComponent.isPersistentMove = true;
 
             lifeTime = 5f;

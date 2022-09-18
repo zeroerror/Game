@@ -347,7 +347,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                 switch (bulletType)
                 {
-                    case BulletType.Default:
+                    case BulletType.DefaultBullet:
                         break;
                     case BulletType.Grenade:
                         break;
@@ -357,8 +357,8 @@ namespace Game.Server.Bussiness.WorldBussiness
                         hookerEntity.SetMasterGrabPoint(roleEntity.transform);
                         break;
                 }
-                bulletEntity.SetWRid(wRid);
-                bulletEntity.SetBulletId(bulletId);
+                bulletEntity.SetMasterId(wRid);
+                bulletEntity.SetEntityId(bulletId);
                 bulletEntity.gameObject.SetActive(true);
                 bulletRepo.Add(bulletEntity);
                 Debug.Log($"服务器逻辑[Spawn Bullet] frame {serveFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
@@ -381,7 +381,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 Queue<WorldRoleLogicEntity> effectRoleQueue = new Queue<WorldRoleLogicEntity>();
                 var bulletType = bulletEntity.BulletType;
-                if (bulletType == BulletType.Default)
+                if (bulletType == BulletType.DefaultBullet)
                 {
                     Debug.Log("爆炸Default");
                     bulletEntity.TearDown();
@@ -418,7 +418,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 connIdList.ForEach((connId) =>
                 {
                     // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletTearDown(connId, serveFrame, bulletType, bulletEntity.WRid, bulletEntity.BulletId, bulletEntity.MoveComponent.CurPos);
+                    bulletRqs.SendRes_BulletTearDown(connId, serveFrame, bulletType, bulletEntity.MasterId, bulletEntity.EntityId, bulletEntity.MoveComponent.CurPos);
                 });
                 while (effectRoleQueue.TryDequeue(out var role))
                 {
@@ -443,7 +443,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             bool hasHookerLoose = false;
             activeHookers.ForEach((hooker) =>
             {
-                var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(hooker.WRid);
+                var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(hooker.MasterId);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.SetRoleState(RoleState.Normal);
@@ -561,7 +561,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     var rqs = worldFacades.Network.BulletReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendRes_BulletHitRole(connId, serveFrame, bullet.BulletId, wrole.WRid);
+                        rqs.SendRes_BulletHitRole(connId, serveFrame, bullet.EntityId, wrole.WRid);
                     });
 
                 }
@@ -581,7 +581,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 {
                     serveFrame = nextFrame;
                     // Server Logic
-                    if (bullet.BulletType == BulletType.Default)
+                    if (bullet.BulletType == BulletType.DefaultBullet)
                     {
                         // 普通子弹的逻辑，只是单纯的移除
                         removeList.Add(bullet);
@@ -683,61 +683,86 @@ namespace Game.Server.Bussiness.WorldBussiness
             isSceneSpawn = true;
 
             // 生成场景资源，并回复客户端
-            List<WeaponType> weaponGenList = new List<WeaponType>();
+            List<ItemType> itemTypeList = new List<ItemType>();
+            List<byte> subTypeList = new List<byte>();
             AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
             for (int i = 0; i < assetPointEntities.Length; i++)
             {
                 var assetPoint = assetPointEntities[i];
-                WeaponGenProbability[] weaponGenProbabilities = assetPoint.weaponGenProbability;
+                ItemGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
                 float totalWeight = 0;
-                for (int j = 0; j < weaponGenProbabilities.Length; j++) totalWeight += weaponGenProbabilities[j].weight;
-
+                for (int j = 0; j < itemGenProbabilities.Length; j++) totalWeight += itemGenProbabilities[j].weight;
                 float lRange = 0;
                 float rRange = 0;
                 float randomNumber = Random.Range(0f, 1f);
-                for (int j = 0; j < weaponGenProbabilities.Length; j++)
+                for (int j = 0; j < itemGenProbabilities.Length; j++)
                 {
-                    WeaponGenProbability wgp = weaponGenProbabilities[j];
-                    if (wgp.weight <= 0) continue;
-                    rRange = lRange + wgp.weight / totalWeight;
+                    ItemGenProbability igp = itemGenProbabilities[j];
+                    if (igp.weight <= 0) continue;
+                    rRange = lRange + igp.weight / totalWeight;
                     if (randomNumber >= lRange && randomNumber < rRange)
                     {
-                        weaponGenList.Add(wgp.weaponType);
+                        itemTypeList.Add(igp.itemType);
+                        subTypeList.Add(igp.subType);
                         break;
                     }
-
                     lRange = rRange;
                 }
             }
 
-            ushort[] weaponIdArray = new ushort[weaponGenList.Count];
-            ushort weaponId = 0;
-            Debug.Log($"服务器地图武器生成----------------------------");
-            weaponGenList.ForEach((weaponType) =>
+            int count = itemTypeList.Count;
+            ushort[] entityIdArray = new ushort[count];
+            byte[] itemTypeByteArray = new byte[count];
+            Debug.Log($"服务器地图物件生成count:{count}----------------------------");
+            int index = 0;
+            itemTypeList.ForEach((itemType) =>
             {
+                var parent = assetPointEntities[index];
+                var subtype = subTypeList[index];
+                itemTypeByteArray[index] = (byte)itemType;
                 // 生成武器资源
-                var weaponDomain = worldFacades.ClientWorldFacades.Domain.ItemDomain;
-                var weapon = weaponDomain.SpawnWeapon(weaponType);
+                var itemDomain = worldFacades.ClientWorldFacades.Domain.ItemDomain;
+                var item = itemDomain.SpawnItem(itemType, subtype);
+                item.transform.SetParent(parent.transform);
+                item.transform.localPosition = Vector3.zero;
 
-                var parent = assetPointEntities[weaponId];
-                weapon.transform.SetParent(parent.transform);
-                weapon.transform.localPosition = Vector3.zero;
+                switch (itemType)
+                {
+                    case ItemType.Default:
+                        break;
+                    case ItemType.Weapon:
+                        var weaponEntity = item.GetComponent<WeaponEntity>();
+                        var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
+                        var weaponEntityId = weaponRepo.weaponIdAutoIncreaseId;
+                        weaponEntity.Ctor();
+                        weaponEntity.SetEntityId(weaponEntityId);
+                        weaponRepo.Add(weaponEntity);
+                        entityIdArray[index] = weaponEntityId;
+                        weaponRepo.weaponIdAutoIncreaseId++;
+                        break;
+                    case ItemType.Bullet:
+                        var bulletEntity = item.GetComponent<BulletEntity>();
+                        var bulletItemRepo = worldFacades.ClientWorldFacades.Repo.BulletItemRepo;
+                        var bulletEntityId = bulletItemRepo.bulletItemAutoIncreaseId;
+                        bulletEntity.Ctor();
+                        bulletEntity.MoveComponent.enable = false;
+                        bulletEntity.SetEntityId(bulletEntityId);
+                        bulletItemRepo.Add(bulletEntity);
+                        entityIdArray[index] = bulletEntityId;
+                        bulletItemRepo.bulletItemAutoIncreaseId++;
+                        break;
+                    case ItemType.Pill:
+                        break;
 
-                var weaponEntity = weapon.GetComponent<WeaponEntity>();
-                var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
-                weaponEntity.Ctor();
-                weaponEntity.SetWeaponId(weaponRepo.weaponIdAutoIncrease);
+                }
 
-                weaponRepo.Add(weaponEntity);
-                weaponIdArray[weaponId] = weaponRepo.weaponIdAutoIncrease;
-                weaponId++;
-                weaponRepo.weaponIdAutoIncrease++;
+                index++;
             });
 
-            var rqs = worldFacades.Network.WeaponReqAndRes;
+            var rqs = worldFacades.Network.ItemReqAndRes;
             connIdList.ForEach((connId) =>
             {
-                rqs.SendRes_WeaponAssetsSpawn(connId, serveFrame, weaponGenList.ToArray(), weaponIdArray);
+                rqs.SendRes_ItemSpawn(connId, serveFrame, itemTypeByteArray, subTypeList.ToArray(), entityIdArray);
             });
         }
 

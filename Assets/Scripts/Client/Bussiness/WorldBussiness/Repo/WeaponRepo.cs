@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         List<WeaponEntity> weaponList;
         public ushort WeaponCount => (ushort)weaponList.Count;
-        public ushort weaponIdAutoIncrease;
+        public ushort weaponIdAutoIncreaseId;
 
         public WeaponRepo()
         {
@@ -31,7 +31,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public bool TryGetByMasterWRid(ushort masterWRid, out WeaponEntity weaponEntity)
         {
-            weaponEntity = weaponList.Find((entity) => entity.MasterWRid == masterWRid);
+            weaponEntity = weaponList.Find((entity) => entity.MasterId == masterWRid);
             return weaponEntity != null;
         }
 

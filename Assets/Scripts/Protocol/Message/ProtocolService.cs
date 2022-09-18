@@ -26,7 +26,7 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(FrameItemPickResMsg), 12);
             messageInfoDic.Add(typeof(FrameJumpReqMsg), 13);
             messageInfoDic.Add(typeof(FrameOptReqMsg), 14);
-            messageInfoDic.Add(typeof(FrameWeaponAssetsSpawnResMsg), 15);
+            messageInfoDic.Add(typeof(FrameItemSpawnResMsg), 15);
             messageInfoDic.Add(typeof(FrameWRoleSpawnReqMsg), 16);
             messageInfoDic.Add(typeof(FrameWRoleSpawnResMsg), 17);
             messageInfoDic.Add(typeof(WRoleStateUpdateMsg), 18);

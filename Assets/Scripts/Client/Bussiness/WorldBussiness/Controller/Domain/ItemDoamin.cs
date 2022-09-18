@@ -1,8 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.WorldBussiness.Facades;
-using Game.Infrastructure.Generic;
-using Game.Protocol.World;
 using Game.Client.Bussiness.WorldBussiness.Interface;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
@@ -22,15 +19,25 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             this.worldFacades = facades;
         }
 
-        public GameObject SpawnWeapon(WeaponType weaponType)
+        public GameObject SpawnItem(ItemType itemType, byte sortType)
         {
-            var weapon = SpawnItem(weaponType.ToString());
-            return weapon;
-        }
+            string itemName = null;
+            switch (itemType)
+            {
+                case ItemType.Default:
+                    break;
+                case ItemType.Weapon:
+                    itemName = ((WeaponType)sortType).ToString() + "_Item";
+                    break;
+                case ItemType.Bullet:
+                    itemName = ((BulletType)sortType).ToString() + "_Item";
+                    break;
+                case ItemType.Pill:
+                    break;
 
-        public GameObject SpawnItem(string itemName)
-        {
+            }
             var itemAssets = worldFacades.Assets.ItemAsset;
+            Debug.Log($"生成物件：{itemName}");
             itemAssets.TryGetByName(itemName, out GameObject item);
             item = GameObject.Instantiate(item);
             item.SetActive(true);
@@ -49,11 +56,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     if (weaponRepo.TryGetByWeaponId(entityId, out var weaponEntity))
                     {
                         isPickUpSucceed = true;
-                        role.WeaponComponent.PickUpWeapon(weaponEntity,hangPoint);
+                        role.WeaponComponent.PickUpWeapon(weaponEntity, hangPoint);
                         weaponRepo.TryRemove(weaponEntity);
                     }
                     break;
                 case ItemType.Bullet:
+                    var bulletItemRepo = repo.BulletItemRepo;
+                    if (bulletItemRepo.TryGetByBulletId(entityId, out BulletEntity bulletEntity))
+                    {
+                        isPickUpSucceed = true;
+                        role.ItemComponent.TryCollectItem_Bullet(bulletEntity);
+                        bulletItemRepo.TryRemove(bulletEntity);
+                    }
                     break;
                 case ItemType.Pill:
                     break;

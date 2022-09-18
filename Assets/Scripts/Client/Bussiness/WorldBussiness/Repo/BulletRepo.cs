@@ -5,25 +5,25 @@ using UnityEngine;
 namespace Game.Client.Bussiness.WorldBussiness.Repo
 {
 
-    public class BulletEntityRepo
+    public class BulletRepo
     {
 
         List<BulletEntity> bulletList;
         public ushort BulletCount => (ushort)bulletList.Count;
 
-        public BulletEntityRepo()
+        public BulletRepo()
         {
             bulletList = new List<BulletEntity>();
         }
 
         public BulletEntity GetByBulletId(ushort bulletId)
         {
-            return bulletList.Find((entity) => entity.BulletId == bulletId);
+            return bulletList.Find((entity) => entity.EntityId == bulletId);
         }
 
         public BulletEntity GetByWRid(ushort wRid)
         {
-            return bulletList.Find((entity) => entity.WRid == wRid);
+            return bulletList.Find((entity) => entity.MasterId == wRid);
         }
 
         public BulletEntity[] GetAll()
