@@ -15,23 +15,24 @@ namespace Game.Client.Bussiness.WorldBussiness
         GrenadeLauncher //榴弹发射器
     }
 
-    public class WeaponEntity : MonoBehaviour, IPickable
+    public class WeaponEntity : Pickable
     {
-        public byte MasterWRid { get; private set; }
-        public void SetMasterWRid(byte wrid) => this.MasterWRid = wrid;
-
         ushort weaponId;
         public ushort WeaponId => weaponId;
-        public void SetWeaponId(ushort id) => this.weaponId = id;
+        public void SetWeaponId(ushort id)
+        {
+            weaponId = id;
+            SetEntityId(weaponId);
+        }
 
-        public WeaponType WeaponType { get; private set; }
-        public void SetWeaponType(WeaponType weaponType) => this.WeaponType = weaponType;
-
+        [SerializeField]
+        WeaponType weaponType;
+        public WeaponType WeaponType => weaponType;
 
         public void Ctor()
         {
+            SetItemType(ItemType.Weapon);
         }
-
 
     }
 

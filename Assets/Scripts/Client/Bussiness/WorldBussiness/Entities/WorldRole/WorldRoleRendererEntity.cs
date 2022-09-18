@@ -15,13 +15,15 @@ namespace Game.Client.Bussiness.WorldBussiness
         Animator animator;
         public AnimatorComponent AnimatorComponent { get; private set; }
 
-        // == ICameraTrackObj
+        // == ICameraTrackObj ==
         GameObject camTrackingObj;
         public Transform CamTrackObjTrans => camTrackingObj.transform;
         public void SetCamTrackingPos(Vector3 pos) => this.camTrackingObj.transform.position = pos;
         public Vector3 SelfPos => transform.position;
 
-        [SerializeField]
+        // == Hang Point ==
+        public Transform handPoint;
+
         public float posAdjust;
         public float rotAdjust;
 

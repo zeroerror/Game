@@ -10,20 +10,29 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         List<WeaponEntity> weaponList;
         public ushort WeaponCount => (ushort)weaponList.Count;
+        public ushort weaponIdAutoIncrease;
 
         public WeaponRepo()
         {
             weaponList = new List<WeaponEntity>();
         }
 
-        public WeaponEntity GetByBulletId(ushort weaponId)
+        public bool TryGetByWeaponId(ushort weaponId, out WeaponEntity weaponEntity)
         {
-            return weaponList.Find((entity) => entity.WeaponId == weaponId);
+            weaponEntity = weaponList.Find((entity) => entity.WeaponId == weaponId);
+            return weaponEntity != null;
         }
 
-        public WeaponEntity GetByMasterWRid(ushort masterWRid)
+        public bool TryRemove(WeaponEntity entity)
         {
-            return weaponList.Find((entity) => entity.MasterWRid == masterWRid);
+            Debug.Log($"TryRemove:{entity.WeaponId}");
+            return weaponList.Remove(entity);
+        }
+
+        public bool TryGetByMasterWRid(ushort masterWRid, out WeaponEntity weaponEntity)
+        {
+            weaponEntity = weaponList.Find((entity) => entity.MasterWRid == masterWRid);
+            return weaponEntity != null;
         }
 
         public WeaponEntity[] GetAll()
@@ -36,10 +45,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
             weaponList.Add(entity);
         }
 
-        public bool TryRemove(WeaponEntity entity)
-        {
-            return weaponList.Remove(entity);
-        }
+
 
         public void Foreach(Action<WeaponEntity> action)
         {

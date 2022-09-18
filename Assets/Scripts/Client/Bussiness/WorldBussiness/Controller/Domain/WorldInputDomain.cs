@@ -54,6 +54,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return moveDir.normalized;
         }
 
+        public Vector3 GetShotPointByCameraView(CameraView cameraView, WorldRoleLogicEntity roleLogicEntity)
+        {
+            var mainCam = Camera.main;
+            if (mainCam == null) return Vector3.zero;
+
+            switch (cameraView)
+            {
+                case CameraView.FirstView:
+                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out RaycastHit hit)) return hit.point;
+                    break;
+                case CameraView.ThirdView:
+                    var roleTrans = roleLogicEntity.MoveComponent.CurPos;
+                    var forward = roleLogicEntity.transform.forward;
+                    if (Physics.Raycast(roleTrans, forward, out hit, 100f)) return hit.point;
+                    break;
+            }
+
+            return Vector3.zero;
+        }
+
     }
 
 }

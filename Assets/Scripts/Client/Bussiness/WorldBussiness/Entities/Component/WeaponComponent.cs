@@ -22,15 +22,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
         }
 
-        // 加入武器
-        public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint)
+        // 拾取武器
+        public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
         {
-            if (CurrentNum >= WEAPON_CAPICY)
-            {
-                Debug.LogWarning("超出持有武器数量！！！");
-                return;
-            }
-
             Debug.Log($"拾取武器:{weaponEntity.WeaponType.ToString()}");
 
             //武器挂点
@@ -53,6 +47,10 @@ namespace Game.Client.Bussiness.WorldBussiness
         }
 
         //丢弃武器
+        public void DropWeapon()
+        {
+
+        }
 
     }
 

@@ -12,12 +12,14 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
         public WorldRoleReqAndRes WorldRoleReqAndRes { get; private set; }
         public BulletReqAndRes BulletReqAndRes { get; private set; }
         public WeaponReqAndRes WeaponReqAndRes { get; private set; }
+        public ItemReqAndRes ItemReqAndRes { get; private set; }
 
         public AllWorldNetwork()
         {
             WorldRoleReqAndRes = new WorldRoleReqAndRes();
             BulletReqAndRes = new BulletReqAndRes();
             WeaponReqAndRes = new WeaponReqAndRes();
+            ItemReqAndRes = new ItemReqAndRes();
         }
 
         public void Inject(NetworkServer server)
@@ -25,6 +27,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
             WorldRoleReqAndRes.Inject(server);
             BulletReqAndRes.Inject(server);
             WeaponReqAndRes.Inject(server);
+            ItemReqAndRes.Inject(server);
         }
 
     }

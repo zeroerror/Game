@@ -3805,7 +3805,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49761840691247a4bb6d0cc48c0aa10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  adjustSpeed: 10
+  handPoint: {fileID: 7983722290381163202}
+  posAdjust: 0
+  rotAdjust: 0
 --- !u!1 &5734713072989455083
 GameObject:
   m_ObjectHideFlags: 0

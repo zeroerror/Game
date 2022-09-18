@@ -9,7 +9,7 @@ namespace Game.Generic
         public const string BattleRenderer_Scene = "Scene";
         public const string RoleAssets = "Role";
         public const string BulletAssets = "Bullet";
-        public const string WeaponAssets = "Weapon";
+        public const string ItemAssets = "Item";
 
     }
 

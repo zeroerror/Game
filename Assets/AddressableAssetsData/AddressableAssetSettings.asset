@@ -96,6 +96,7 @@ MonoBehaviour:
     - Role
     - Bullet
     - Weapon
+    - Item
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 7bd76f96a6249af4ea39e86aeb76659e, type: 2}

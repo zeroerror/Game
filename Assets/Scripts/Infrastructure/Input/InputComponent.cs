@@ -6,16 +6,16 @@ public class InputComponent
 {
 
     public Vector3 moveAxis;
-    public Vector3 shootPoint;
-    public Vector3 grenadeThrowPoint;
-    public Vector3 hookPoint;
-    public bool pressJump;
-    public bool pressV;
+    public bool isPressShoot;
+    public bool isPressJump;
+    public bool isPressSwitchView;
+    public bool isPressPickUpItem;
+    public Vector3 grenadeThrowPoint;   //obsolete
+    public Vector3 hookPoint; //obsolete
 
     public InputComponent()
     {
         moveAxis = new Vector3();
-        shootPoint = new Vector3();
         grenadeThrowPoint = new Vector3();
         grenadeThrowPoint = new Vector3();
     }
@@ -23,12 +23,13 @@ public class InputComponent
     public void Reset()
     {
         moveAxis.Reset();
-        shootPoint.Reset();
         grenadeThrowPoint.Reset();
         hookPoint.Reset();
 
-        pressV = false;
-        pressJump = false;
+        isPressShoot = false;
+        isPressSwitchView = false;
+        isPressJump = false;
+        isPressPickUpItem = false;
     }
 
 }

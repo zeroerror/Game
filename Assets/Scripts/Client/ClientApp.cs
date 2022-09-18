@@ -21,42 +21,43 @@ namespace Game.Client
     public class ClientApp : MonoBehaviour
     {
 
+        Thread _clientThread;
         public string CurrentSceneName { get; private set; }
-        InputComponent InputComponent;
+        InputComponent _inputComponent;
         float time;
 
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
 
-            // == Network ==
+            // ====== Network ======
             AllClientNetwork.Ctor();
             StartClient();
 
-            // == EventCenter ==
+            // ====== EventCenter ======
             NetworkEventCenter.Ctor();
             LocalEventCenter.Ctor();
 
-            // == Entry ==
+            // ====== Entry ======
             // Login
             LoginEntry.Ctor();
             LoginEntry.Inject(AllClientNetwork.networkClient);
             LoginEntry.Init();
             // World
             WorldEntry.Ctor();
-            InputComponent = new InputComponent();
-            WorldEntry.Inject(AllClientNetwork.networkClient, InputComponent);
+            _inputComponent = new InputComponent();
+            WorldEntry.Inject(AllClientNetwork.networkClient, _inputComponent);
             WorldEntry.Init();
             // UI
             UIEntry.Ctor();
 
-            // == Manager ==
+            // ====== Manager ======
             UIManager.Ctor();
             CameraManager.Ctor();
 
+            // ======  Asset ======
             Action action = async () =>
             {
-                // == All Asset ==
                 await LoadAllAsset();
 
                 var uiCamTrans = CameraManager.UICamTrans;
@@ -71,7 +72,10 @@ namespace Game.Client
 
             action.Invoke();
 
-            // == Physics ==
+            // ======  Input ======
+            InputGameSet.Ctor();
+
+            // ====== Physics ======
             Physics.autoSimulation = false;
         }
 
@@ -89,73 +93,8 @@ namespace Game.Client
 
         void Update()
         {
-            Receive_Input();
+            InputGameSet.Receive_Input(ref _inputComponent);
             WorldEntry.Update();
-        }
-
-        void Receive_Input()
-        {
-
-            if (Input.GetKey(KeyCode.W))
-            {
-                InputComponent.moveAxis.z = 1;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                InputComponent.moveAxis.z = -1;
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                InputComponent.moveAxis.x = -1;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                InputComponent.moveAxis.x = 1;
-            }
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                InputComponent.pressV = true;
-            }
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                InputComponent.pressJump = true;
-            }
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                var mainCam = Camera.main;
-                if (mainCam != null)
-                {
-                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-                    if (Physics.Raycast(ray, out RaycastHit hit))
-                    {
-                        InputComponent.grenadeThrowPoint = hit.point;
-                    }
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                var mainCam = Camera.main;
-                if (mainCam != null)
-                {
-                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-                    if (Physics.Raycast(ray, out RaycastHit hit))
-                    {
-                        InputComponent.hookPoint = hit.point;
-                    }
-                }
-            }
-            if (Input.GetMouseButtonDown(0))
-            {
-                var mainCam = Camera.main;
-                if (mainCam != null)
-                {
-                    var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-                    if (Physics.Raycast(ray, out RaycastHit hit))
-                    {
-                        InputComponent.shootPoint = hit.point;
-                    }
-                }
-            }
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
@@ -169,25 +108,25 @@ namespace Game.Client
 
         void StartClient()
         {
-            Debug.Log("Start Client---------------------------------");
+            Debug.Log("启动客户端---------------------------------");
 
             var networkClient = AllClientNetwork.networkClient;
 
             networkClient.OnConnectedHandle += () =>
             {
-                Debug.Log("Connect Success");
+                Debug.Log("连接服务器成功*************************************************************");
             };
 
             networkClient.Connect(NetworkConfig.HOST, NetworkConfig.PORT);
 
-            new Thread(() =>
+            _clientThread = new Thread(() =>
             {
                 while (true)
                 {
                     networkClient.Tick();
                 }
-            }).Start();
-
+            });
+            _clientThread.Start();
         }
 
         async Task LoadAllAsset()
@@ -200,6 +139,9 @@ namespace Game.Client
             LoginEntry.TearDown();
             WorldEntry.TearDown();
             UIEntry.TearDown();
+            InputGameSet.TearDown();
+
+            _clientThread.Abort();
         }
 
     }

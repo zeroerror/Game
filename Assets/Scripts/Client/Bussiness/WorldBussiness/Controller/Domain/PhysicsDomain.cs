@@ -19,6 +19,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         }
 
         public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
+        public List<ColliderExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Item");
         public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
         public List<WorldRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
@@ -72,7 +73,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 else
                 {
                     role.MoveComponent.EnterGound();
-                    if(role.IsAllowEnterNormal()) role.SetRoleState(RoleState.Normal);
+                    if (role.IsAllowEnterNormal()) role.SetRoleState(RoleState.Normal);
                 }
 
                 if (hitWallCount <= 0) role.MoveComponent.LeaveWall();

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: WeaponAssets
+  m_Name: ItemAssets
   m_EditorClassIdentifier: 
-  m_GroupName: WeaponAssets
+  m_GroupName: ItemAssets
   m_Data:
     m_SerializedData: []
   m_GUID: 7b3f5e790c1fa654cafd5524861715b6
@@ -21,17 +21,22 @@ MonoBehaviour:
     m_Address: machine_gun
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Weapon
+    - Item
   - m_GUID: 5c57c2f3f5f953047bacdca589b10cba
     m_Address: GrenadeLauncher
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Weapon
+    - Item
   - m_GUID: 3fc25ad048bd7824aaa1d0d1a1a6a6c5
     m_Address: Pistol
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Weapon
+    - Item
+  - m_GUID: d3113228bddad8f4bb16bb23755e0773
+    m_Address: BulletItem
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

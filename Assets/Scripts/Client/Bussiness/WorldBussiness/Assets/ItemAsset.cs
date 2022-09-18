@@ -7,22 +7,22 @@ using System;
 namespace Game.Client.Bussiness.WorldBussiness.Assets
 {
 
-    public class WeaponAsset
+    public class ItemAsset
     {
 
         Dictionary<string, GameObject> dic_name;
 
-        public WeaponAsset()
+        public ItemAsset()
         {
             dic_name = new Dictionary<string, GameObject>();
         }
 
         public void LoadAssets()
         {
-            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.WeaponAssets, (obj) =>
+            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.ItemAssets, (obj) =>
             {
                 dic_name.TryAdd(obj.name, obj);
-                Console.WriteLine($"武器资源添加：{obj.name}");
+                Console.WriteLine($"物件资源添加：{obj.name}");
             });
         }
 
