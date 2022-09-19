@@ -17,22 +17,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
             weaponList = new List<WeaponEntity>();
         }
 
-        public bool TryGetByWeaponId(ushort weaponId, out WeaponEntity weaponEntity)
+        public bool TryGetByEntityId(ushort weaponId, out WeaponEntity weaponEntity)
         {
-            weaponEntity = weaponList.Find((entity) => entity.WeaponId == weaponId);
+            weaponEntity = weaponList.Find((entity) => entity.EntityId == weaponId);
             return weaponEntity != null;
+        }
+
+        public List<WeaponEntity> TryGetByMasterWRid(ushort masterWRid)
+        {
+            List<WeaponEntity> weaponEntityList = new List<WeaponEntity>();
+            weaponList.ForEach((weapon) =>
+            {
+                if (weapon.MasterId == masterWRid) weaponEntityList.Add(weapon);
+            });
+
+            return weaponEntityList;
         }
 
         public bool TryRemove(WeaponEntity entity)
         {
-            Debug.Log($"TryRemove:{entity.WeaponId}");
+            Debug.Log($"TryRemove:{entity.EntityId}");
             return weaponList.Remove(entity);
-        }
-
-        public bool TryGetByMasterWRid(ushort masterWRid, out WeaponEntity weaponEntity)
-        {
-            weaponEntity = weaponList.Find((entity) => entity.MasterId == masterWRid);
-            return weaponEntity != null;
         }
 
         public WeaponEntity[] GetAll()

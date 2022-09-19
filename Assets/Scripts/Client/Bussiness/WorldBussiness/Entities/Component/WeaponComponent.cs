@@ -12,6 +12,10 @@ namespace Game.Client.Bussiness.WorldBussiness
         public WeaponEntity[] AllWeapon;    //所有武器
         public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
         public int CurrentNum { get; private set; }    //当前武器数量
+        public bool IsReloading { get; private set; }
+        public void SetReloading(bool flag) => this.IsReloading = flag;
+        public bool IsFullReloaded => CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
+
 
         public WeaponComponent()
         {
@@ -20,12 +24,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void Ctor()
         {
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
-        }
-
-        // 获取当前武器所需子弹
-        public bool IsHoldingWeapon()
-        {
-            return CurrentWeapon != null;
         }
 
         // 拾取武器
@@ -45,6 +43,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             CurrentWeapon = weaponEntity;
             CurrentWeapon.gameObject.SetActive(true);
             AllWeapon[CurrentNum++] = weaponEntity;
+
         }
 
         // 切换武器
@@ -59,9 +58,24 @@ namespace Game.Client.Bussiness.WorldBussiness
         }
 
         //丢弃武器
+        public bool TryDropWeapon(out WeaponEntity weapon)
+        {
+            weapon = CurrentWeapon;
+            if (weapon != null)
+            {
+                weapon.ClearMaster();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void DropWeapon()
         {
-
+            if (CurrentWeapon == null) return;
+            CurrentWeapon.ClearMaster();
         }
 
     }

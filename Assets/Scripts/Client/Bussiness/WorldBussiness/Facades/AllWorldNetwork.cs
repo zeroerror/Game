@@ -12,6 +12,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         public BulletReqAndRes BulletReqAndRes { get; private set; }
         public WeaponReqAndRes WeaponReqAndRes { get; private set; }
         public ItemReqAndRes ItemReqAndRes { get; private set; }
+
+        int clientFrame;
+
         public AllWorldNetwork()
         {
             WorldRoleReqAndRes = new WorldRoleReqAndRes();

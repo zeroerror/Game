@@ -58,6 +58,22 @@ namespace Game.Server.Bussiness.WorldBussiness
         }
         Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>> itemPickUpDic;
 
+        // 记录所有武器装弹帧
+        struct FrameWeaponReloadReqMsgStruct
+        {
+            public int connId;
+            public FrameWeaponReloadReqMsg msg;
+        }
+        Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>> weaponReloadDic;
+
+        // 记录所有武器丢弃帧
+        struct FrameWeaponDropReqMsgStruct
+        {
+            public int connId;
+            public FrameWeaponDropReqMsg msg;
+        }
+        Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>> weaponDropDic;
+
         bool sceneSpawnTrigger;
         bool isSceneSpawn;
 
@@ -69,6 +85,8 @@ namespace Game.Server.Bussiness.WorldBussiness
             wRoleSpawnDic = new Dictionary<int, FrameWRoleSpawnReqMsgStruct>();
             bulletSpawnDic = new Dictionary<int, FrameBulletSpawnReqMsgStruct>();
             itemPickUpDic = new Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>>();
+            weaponReloadDic = new Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>>();
+            weaponDropDic = new Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>>();
         }
 
         public void Inject(WorldFacades worldFacades)
@@ -85,6 +103,11 @@ namespace Game.Server.Bussiness.WorldBussiness
 
             var itemRqs = worldFacades.Network.ItemReqAndRes;
             itemRqs.RegistReq_ItemPickUp(OnItemPickUp);
+
+            var weaponRqs = worldFacades.Network.WeaponReqAndRes;
+            weaponRqs.RegistReq_WeaponReload(OnWeaponReload);
+            weaponRqs.RegistReq_WeaponDrop(OnWeaponDrop);
+
         }
 
         public void Tick()
@@ -110,12 +133,16 @@ namespace Game.Server.Bussiness.WorldBussiness
             // ====== Life
             Tick_BulletLife(nextFrame);
             Tick_ActiveHookersBehaviour(nextFrame);
+
             // Client Request
             Tick_WRoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
             Tick_AllOpt(nextFrame); // Include Physics Simulation
             Tick_ItemPickUp(nextFrame);
-            // Physcis Collision
+            Tick_WeaponReload(nextFrame);
+            Tick_WeaponDrop(nextFrame);
+
+            // Physcis Col;lision
             Tick_Physics_Collision_Role(nextFrame);
             Tick_Physics_Collision_Bullet(nextFrame);
         }
@@ -131,7 +158,6 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 var msg = spawn.msg;
                 var connId = spawn.connId;
-                var clientFrameIndex = msg.clientFrameIndex;
 
                 var clientFacades = worldFacades.ClientWorldFacades;
                 var repo = clientFacades.Repo;
@@ -145,36 +171,27 @@ namespace Game.Server.Bussiness.WorldBussiness
                 roleEntity.Ctor();
                 roleEntity.SetWRid(wrid);
                 roleEntity.SetConnId(connId);
-                Debug.Log($"服务器逻辑[Spawn Role] frame:{serveFrame} wRid:{wrid}  roleEntity.MoveComponent.CurPos:{roleEntity.MoveComponent.CurPos}");
+                Debug.Log($"服务器逻辑[生成角色] serveFrame:{serveFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.CurPos}");
 
-                if (clientFrameIndex + 1 < serveFrame)
+                // ====== 发送其他角色的状态同步帧给请求者
+                var allEntity = roleRepo.GetAll();
+                for (int i = 0; i < allEntity.Length; i++)
                 {
-                    // ====== 发送其他角色的状态同步帧给请求者
-                    var allEntity = roleRepo.GetAll();
-                    for (int i = 0; i < allEntity.Length; i++)
+                    var otherRole = allEntity[i];
+                    rqs.SendUpdate_WRoleState(connId, nextFrameIndex, otherRole);
+                }
+
+                // ====== 广播请求者创建的角色给其他人
+                connIdList.ForEach((otherConnId) =>
+                {
+                    if (otherConnId != connId)
                     {
-                        var otherRole = allEntity[i];
-                        rqs.SendUpdate_WRoleState(connId, nextFrameIndex, otherRole);
+                        rqs.SendUpdate_WRoleState(otherConnId, nextFrameIndex, roleEntity);
                     }
+                });
 
-                    // ====== 广播请求者创建的角色给其他人
-                    connIdList.ForEach((otherConnId) =>
-                    {
-                        if (otherConnId != connId)
-                        {
-                            rqs.SendUpdate_WRoleState(otherConnId, nextFrameIndex, roleEntity);
-                        }
-                    });
-
-                    // ====== 回复请求者创建的角色
-                    rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity);
-
-                }
-                else
-                {
-                    Debug.Log($"服务端回复消息[生成帧] {nextFrameIndex}--------------------------------------------------------------------------");
-                    rqs.SendRes_WorldRoleSpawn(connId, nextFrameIndex, wrid, true);
-                }
+                // ====== 回复请求者创建的角色
+                rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity);
 
                 roleRepo.Add(roleEntity);
             }
@@ -229,7 +246,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 var rid = (byte)(realMsg >> 48);
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-                var role = roleRepo.Get(rid);
+                var role = roleRepo.GetByEntityId(rid);
                 var optTypeId = opt.msg.optTypeId;
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
 
@@ -294,7 +311,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 var wRid = jumpOpt.msg.wRid;
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-                var roleEntity = roleRepo.Get(wRid);
+                var roleEntity = roleRepo.GetByEntityId(wRid);
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
 
                 //服务器逻辑Jump
@@ -329,7 +346,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 float targetPosY = msg.targetPosY / 10000f;
                 float targetPosZ = msg.targetPosZ / 10000f;
                 Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                var roleEntity = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(msg.wRid);
+                var roleEntity = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.GetByEntityId(msg.wRid);
                 var moveComponent = roleEntity.MoveComponent;
                 var shootStartPoint = roleEntity.ShootPointPos;
                 Vector3 shootDir = targetPos - shootStartPoint;
@@ -361,7 +378,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 bulletEntity.SetEntityId(bulletId);
                 bulletEntity.gameObject.SetActive(true);
                 bulletRepo.Add(bulletEntity);
-                Debug.Log($"服务器逻辑[Spawn Bullet] frame {serveFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
+                Debug.Log($"服务器逻辑[生成子弹] serveFrame {serveFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
 
                 var rqs = worldFacades.Network.BulletReqAndRes;
                 connIdList.ForEach((otherConnId) =>
@@ -443,7 +460,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             bool hasHookerLoose = false;
             activeHookers.ForEach((hooker) =>
             {
-                var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.Get(hooker.MasterId);
+                var master = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.GetByEntityId(hooker.MasterId);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.SetRoleState(RoleState.Normal);
@@ -496,7 +513,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     // TODO:Add judgement like 'Can He Pick It Up?'
                     var repo = worldFacades.ClientWorldFacades.Repo;
                     var roleRepo = repo.WorldRoleRepo;
-                    var role = roleRepo.Get(msg.wRid);
+                    var role = roleRepo.GetByEntityId(msg.wRid);
                     ItemType itemType = (ItemType)msg.itemType;
                     var itemDomain = worldFacades.ClientWorldFacades.Domain.ItemDomain;
                     bool isPickUpSucceed = itemDomain.TryPickUpItem(itemType, msg.entityId, repo, role);
@@ -509,6 +526,67 @@ namespace Game.Server.Bussiness.WorldBussiness
                         });
                     }
                 }
+            }
+        }
+
+        #endregion
+
+        #region [Weapon]
+
+        void Tick_WeaponReload(int nextFrame)
+        {
+            if (weaponReloadDic.TryGetValue(nextFrame, out var queue))
+            {
+                serveFrame = nextFrame;
+                var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
+                var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
+                var rqs = worldFacades.Network.WeaponReqAndRes;
+                while (queue.TryPeek(out var msgStruct))
+                {
+                    queue.Dequeue();
+                    var msg = msgStruct.msg;
+                    var entityId = msg.entityId;
+                    if (weaponRepo.TryGetByEntityId(entityId, out var weapon))
+                    {
+                        var master = roleRepo.GetByEntityId(weapon.MasterId);
+                        if (master.TryWeaponReload())
+                        {
+                            //TODO: 装弹时间过度后才发送回客户端
+                            connIdList.ForEach((connId) =>
+                            {
+                                rqs.SendRes_WeaponReloaded(connId, serveFrame, entityId);
+                            });
+                        }
+                    }
+                }
+
+            }
+        }
+
+        void Tick_WeaponDrop(int nextFrame)
+        {
+            if (weaponDropDic.TryGetValue(nextFrame, out var queue))
+            {
+                serveFrame = nextFrame;
+                var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
+                var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
+                var rqs = worldFacades.Network.WeaponReqAndRes;
+                while (queue.TryPeek(out var msgStruct))
+                {
+                    queue.Dequeue();
+                    var msg = msgStruct.msg;
+                    var entityId = msg.entityId;
+                    if (weaponRepo.TryGetByEntityId(entityId, out var weapon))
+                    {
+                        var master = roleRepo.GetByEntityId(weapon.MasterId);
+                        master.DropWeapon();
+                        connIdList.ForEach((connId) =>
+                        {
+                            rqs.SendRes_WeaponDrop(connId, serveFrame, entityId);
+                        });
+                    }
+                }
+
             }
         }
 
@@ -659,6 +737,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             bulletSpawnDic.TryAdd(serveFrame + 1, new FrameBulletSpawnReqMsgStruct { connId = connId, msg = msg });
         }
 
+        // ========= Item
         void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
         {
             if (!itemPickUpDic.TryGetValue(serveFrame + 1, out var msgStruct))
@@ -668,6 +747,29 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
 
             msgStruct.Enqueue(new FrameItemPickUpReqMsgStruct { connId = connId, msg = msg });
+        }
+
+        // =========== Weapon
+        void OnWeaponReload(int connId, FrameWeaponReloadReqMsg msg)
+        {
+            if (!weaponReloadDic.TryGetValue(serveFrame + 1, out var msgStruct))
+            {
+                msgStruct = new Queue<FrameWeaponReloadReqMsgStruct>();
+                weaponReloadDic[serveFrame + 1] = msgStruct;
+            }
+
+            msgStruct.Enqueue(new FrameWeaponReloadReqMsgStruct { connId = connId, msg = msg });
+        }
+
+        void OnWeaponDrop(int connId, FrameWeaponDropReqMsg msg)
+        {
+            if (!weaponDropDic.TryGetValue(serveFrame + 1, out var msgStruct))
+            {
+                msgStruct = new Queue<FrameWeaponDropReqMsgStruct>();
+                weaponDropDic[serveFrame + 1] = msgStruct;
+            }
+
+            msgStruct.Enqueue(new FrameWeaponDropReqMsgStruct { connId = connId, msg = msg });
         }
 
         // ====== Scene Spawn Method
@@ -723,9 +825,8 @@ namespace Game.Server.Bussiness.WorldBussiness
                 // 生成武器资源
                 var itemDomain = worldFacades.ClientWorldFacades.Domain.ItemDomain;
                 var item = itemDomain.SpawnItem(itemType, subtype);
-                item.transform.SetParent(parent.transform);
-                item.transform.localPosition = Vector3.zero;
 
+                ushort weaponEntityId = 0;
                 switch (itemType)
                 {
                     case ItemType.Default:
@@ -733,7 +834,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     case ItemType.Weapon:
                         var weaponEntity = item.GetComponent<WeaponEntity>();
                         var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
-                        var weaponEntityId = weaponRepo.weaponIdAutoIncreaseId;
+                        weaponEntityId = weaponRepo.weaponIdAutoIncreaseId;
                         weaponEntity.Ctor();
                         weaponEntity.SetEntityId(weaponEntityId);
                         weaponRepo.Add(weaponEntity);
@@ -754,6 +855,10 @@ namespace Game.Server.Bussiness.WorldBussiness
                         break;
 
                 }
+
+                item.transform.SetParent(parent.transform);
+                item.transform.localPosition = Vector3.zero;
+                item.name += weaponEntityId;
 
                 index++;
             });

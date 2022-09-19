@@ -15,6 +15,7 @@ public class PCInputSet
     public KeyCode swithView;
     public KeyCode shoot;
     public KeyCode pickUpAssets;
+    public KeyCode weaponReload;
 
     public PCInputSet()
     {
@@ -26,6 +27,7 @@ public class PCInputSet
         swithView = KeyCode.V;
         shoot = KeyCode.Mouse0;
         pickUpAssets = KeyCode.F;
+        weaponReload = KeyCode.R;
     }
 
 }

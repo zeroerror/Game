@@ -7,13 +7,14 @@ namespace Game.Client.Bussiness.WorldBussiness
 
     public static class WorldEntry
     {
-
-
+ 
         // Facades
         static WorldFacades worldFacades;
 
         // Controller
         static WorldController worldController;
+        static WorldPhysicsController worldPhysicsController;
+        static WorldInputController worldInputController;
 
         #region [Life Cycle]
 
@@ -23,6 +24,8 @@ namespace Game.Client.Bussiness.WorldBussiness
             worldFacades = new WorldFacades();
             // == Controller ==
             worldController = new WorldController();
+            worldPhysicsController = new WorldPhysicsController();
+            worldInputController = new WorldInputController();
         }
 
         public static void Init()
@@ -36,12 +39,16 @@ namespace Game.Client.Bussiness.WorldBussiness
             worldFacades.Inject(client, inputComponent);
             // == Controller ==
             worldController.Inject(worldFacades);
+            worldPhysicsController.Inject(worldFacades);
+            worldInputController.Inject(worldFacades);
         }
 
         public static void Tick()
         {
             // == Controller ==
             worldController.Tick();
+            worldPhysicsController.Tick();
+            worldInputController.Tick();
         }
 
         public static void Update()

@@ -4,12 +4,10 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 {
 
     [ZeroMessage]
-    public class FrameWRoleSpawnReqMsg:IZeroMessage<FrameWRoleSpawnReqMsg>{
-        public int clientFrameIndex;
+    public class FrameWRoleSpawnReqMsg :IZeroMessage<FrameWRoleSpawnReqMsg>{
 
         public void FromBytes(byte[] src, ref int offset)
         {
-            clientFrameIndex = BufferReader.ReadInt32(src, ref offset);
             offset += src.Length;
         }
 
@@ -17,7 +15,6 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
         {
             int offset = 0;
             byte[] result = new byte[1000];
-            BufferWriter.WriteInt32(result, clientFrameIndex, ref offset);
             return result;
         }
     }

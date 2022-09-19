@@ -21,22 +21,28 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
-        public void SendReq_ItemPickUp(int clientFrameIndex, byte wRid, ItemType itemType, ushort entityId)
+        // ====== Send ======
+        public void SendReq_ItemPickUp(byte wRid, ItemType itemType, ushort entityId)
         {
             FrameItemPickReqMsg msg = new FrameItemPickReqMsg
             {
-                clientFrameIndex = clientFrameIndex,
                 wRid = wRid,
                 itemType = (byte)itemType,
                 entityId = entityId
             };
             _client.SendMsg(msg);
-            // Debug.Log($"[wRid:{wRid}]请求拾取 {itemType.ToString()}物件[entityId:{entityId}]");
+            Debug.Log($"[wRid:{wRid}]请求拾取 {itemType.ToString()}物件[entityId:{entityId}]");
         }
 
+        // ====== Regist ======
         public void RegistRes_ItemPickUp(Action<FrameItemPickResMsg> action)
         {
             _client.RegistMsg<FrameItemPickResMsg>(action);
+        }
+
+        public void RegistRes_ItemSpawn(Action<FrameItemSpawnResMsg> action)
+        {
+            _client.RegistMsg(action);
         }
 
     }

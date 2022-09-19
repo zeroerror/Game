@@ -27,7 +27,16 @@ namespace Game.Client.Bussiness.WorldBussiness
         // 拾取
         public void TryCollectItem_Bullet(BulletPackEntity bulletPackEntity)
         {
-            Debug.Log($"收集了子弹包");
+            // TODO: 根据配置表获取物件单位占用容量
+            // TODO: 只收集最大可收集数量
+            if (CurrentCapacity >= 300)
+            {
+                Debug.LogWarning("背包容量已满！");
+            }
+
+            CurrentCapacity += bulletPackEntity.bulletNum * 1;
+            Debug.Log($"收集了子弹包[类型:{bulletPackEntity.bulletType.ToString()} 数量:{bulletPackEntity.bulletNum}]");
+            Debug.Log($"当前背包容量:{CurrentCapacity}");
             bulletPackItemQueue.Enqueue(bulletPackEntity);
         }
 

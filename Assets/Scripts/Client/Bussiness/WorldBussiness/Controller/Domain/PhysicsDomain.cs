@@ -40,6 +40,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     var hitDir = (closestPoint - rolePos).normalized;
                     role.MoveComponent.HitSomething(hitDir);
 
+                    if (colliderExtra.collider == null || !colliderExtra.collider.enabled)
+                    {
+                        role.RemoveHitCollider(colliderExtra);
+                        return;
+                    }
+
                     if (colliderExtra.isEnter != CollisionStatus.Exit)
                     {
                         if (hitDir.y < 0) enterGroundCount++;
@@ -67,6 +73,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         else enterGroundCount--;
                         role.RemoveHitCollider(colliderExtra);
                     }
+
                 });
 
                 if (enterGroundCount <= 0) role.MoveComponent.LeaveGround();

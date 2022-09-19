@@ -12,6 +12,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
     {
         NetworkClient _client;
 
+        int clientFrame;
+        public void SetClientFrame(int clienFrame) => this.clientFrame = clienFrame;
+
         public WorldRoleReqAndRes()
         {
 
@@ -23,7 +26,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         }
 
         // == Send ==
-        public void SendReq_WRoleMove(int frameIndex, byte rid, Vector3 dir)
+        public void SendReq_WRoleMove(byte rid, Vector3 dir)
         {
             dir.Normalize();
             ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
@@ -33,14 +36,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
             FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {
-                clientFrameIndex = frameIndex,
                 optTypeId = 1,
                 msg = msg
             };
             _client.SendMsg(frameOptReqMsg);
         }
 
-        public void SendReq_WRoleRotate(int frameIndex, WorldRoleLogicEntity roleEntity)
+        public void SendReq_WRoleRotate(WorldRoleLogicEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
             var rid = roleEntity.WRid;
@@ -51,31 +53,28 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
             FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
             {
-                clientFrameIndex = frameIndex,
                 optTypeId = 2,
                 msg = msg
             };
             _client.SendMsg(frameOptReqMsg);
         }
 
-        public void SendReq_WRoleJump(int frameIndex, byte wRid)
+        public void SendReq_WRoleJump(byte wRid)
         {
             FrameJumpReqMsg frameJumpReqMsg = new FrameJumpReqMsg
             {
-                clientFrameIndex = frameIndex,
                 wRid = wRid
             };
 
             _client.SendMsg(frameJumpReqMsg);
         }
 
-        public void SendReq_WolrdRoleSpawn(int frameIndex)
+        public void SendReq_WolrdRoleSpawn()
         {
             FrameWRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameWRoleSpawnReqMsg
             {
-                clientFrameIndex = frameIndex
             };
-            _client.SendMsg<FrameWRoleSpawnReqMsg>(frameReqWRoleSpawnMsg);
+            _client.SendMsg(frameReqWRoleSpawnMsg);
         }
 
         // == Regist ==

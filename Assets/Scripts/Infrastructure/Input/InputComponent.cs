@@ -10,6 +10,8 @@ public class InputComponent
     public bool isPressJump;
     public bool isPressSwitchView;
     public bool isPressPickUpItem;
+    public bool isPressWeaponReload;
+    public bool isPressDropWeapon;
     public Vector3 grenadeThrowPoint;   //obsolete
     public Vector3 hookPoint; //obsolete
 
@@ -30,6 +32,8 @@ public class InputComponent
         isPressSwitchView = false;
         isPressJump = false;
         isPressPickUpItem = false;
+        isPressWeaponReload = false;
+        isPressDropWeapon = false;
     }
 
 }

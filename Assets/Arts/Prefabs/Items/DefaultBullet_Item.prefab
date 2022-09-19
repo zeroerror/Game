@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4734172600093579694}
   - component: {fileID: 8510945062009968139}
   - component: {fileID: 5906475554322309825}
-  - component: {fileID: 7427155245072554464}
+  - component: {fileID: 6637605190270621414}
   m_Layer: 9
   m_Name: DefaultBullet_Item
   m_TagString: Untagged
@@ -85,7 +85,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7427155245072554464
+--- !u!114 &6637605190270621414
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,11 +94,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5402340746508845844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 014d119a6799cb1448c0eb6f4437e6a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f47fbd6b2848da4d8b390055de60d74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 2
   bulletType: 0
+  bulletNum: 30
 --- !u!1 &6348179348261528665
 GameObject:
   m_ObjectHideFlags: 0

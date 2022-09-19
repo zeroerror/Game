@@ -13,9 +13,9 @@ public static class InputGameSet
 
     public static void Ctor()
     {
-        Debug.Log($"输入控制初始化完毕**************************************************************");
         PCInputSet = new PCInputSet();
         MobileInputSet = new MobileInputSet();
+        Debug.Log($"输入控制初始化完毕**************************************************************");
     }
 
     public static void TearDown()
@@ -68,33 +68,18 @@ public static class InputGameSet
         if (Input.GetKeyDown(PCInputSet.pickUpAssets))
         {
             inputComponent.isPressPickUpItem = true;
+            Debug.Log("按下‘拾取’");
         }
-        // OBSOLETE
-        // if (Input.GetKeyDown(KeyCode.G))
-        // {
-        //     var mainCam = Camera.main;
-        //     if (mainCam != null)
-        //     {
-        //         var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-        //         if (Physics.Raycast(ray, out RaycastHit hit))
-        //         {
-        //             inputComponent.grenadeThrowPoint = hit.point;
-        //         }
-        //     }
-        // }
-        // if (Input.GetKeyDown(KeyCode.T))
-        // {
-        //     var mainCam = Camera.main;
-        //     if (mainCam != null)
-        //     {
-        //         var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-        //         if (Physics.Raycast(ray, out RaycastHit hit))
-        //         {
-        //             inputComponent.hookPoint = hit.point;
-        //         }
-        //     }
-        // }
-
+        if (Input.GetKeyDown(PCInputSet.weaponReload))
+        {
+            inputComponent.isPressWeaponReload = true;
+            Debug.Log("按下‘换弹’");
+        }
+        if (Input.GetKeyDown(PCInputSet.weaponReload))
+        {
+            inputComponent.isPressDropWeapon = true;
+            Debug.Log("按下‘丢弃物器’");
+        }
     }
 
     public static void ReceiveMobileInput(ref InputComponent inputComponent)

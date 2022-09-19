@@ -10,6 +10,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
     {
         NetworkClient _client;
 
+        int clientFrame;
+        public void SetClientFrame(int clientFrame) => this.clientFrame = clientFrame;
+
         public WeaponReqAndRes()
         {
 
@@ -20,9 +23,40 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client = client;
         }
 
-        public void RegistRes_WeaponAssetsSpawn(Action<FrameItemSpawnResMsg> action)
+
+        // ====== Send ======
+        public void SendReq_WeaponReload(byte wRid, ushort entityId)
         {
-            _client.RegistMsg<FrameItemSpawnResMsg>(action);
+            FrameWeaponDropReqMsg frameDropWeaponReqMsg = new FrameWeaponDropReqMsg
+            {
+                entityId = entityId
+            };
+            _client.SendMsg(frameDropWeaponReqMsg);
+        }
+
+        public void SendReq_WeaponDrop(byte wRid, ushort entityId)
+        {
+            FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
+            {
+                entityId = entityId
+            };
+            _client.SendMsg(frameWeaponReloadReqMsg);
+        }
+
+        public void SendReq_WeaponDrop()
+        {
+
+        }
+
+        // ====== Regist ======
+        public void RegistRes_WeaponReload(Action<FrameWeaponReloadReqMsg> action)
+        {
+            _client.RegistMsg(action);
+        }
+
+        public void RegistRes_WeaponDrop(Action<FrameWeaponDropReqMsg> action)
+        {
+            _client.RegistMsg(action);
         }
 
     }

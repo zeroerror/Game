@@ -65,13 +65,13 @@ namespace Game.Client.Bussiness.WorldBussiness
             offset = new Vector3(0, 0.2f, 0);
         }
 
-        public void WeaponReload()
+        public bool TryWeaponReload()
         {
-            if (WeaponComponent.IsHoldingWeapon())
+            var curWeapon = WeaponComponent.CurrentWeapon;
+            if (curWeapon == null)
             {
                 Debug.LogWarning("当前尚未持有武器！");
-                //TODO: 徒手攻击
-                return;
+                return false;
             }
 
             // 获取武器所需子弹
@@ -89,12 +89,35 @@ namespace Game.Client.Bussiness.WorldBussiness
             int takeOut = ItemComponent.TryTakeOutItem_Bullet(30);
             if (takeOut == 0)
             {
-                Debug.LogWarning("当前武器所需子弹不足！");
-                return;
+                Debug.LogWarning($"武器[{curWeapon.name}]所需子弹不足！");
+                return false;
             }
 
-            Debug.Log($"武器换弹,当前takeout：{takeOut}");
+            Debug.Log($"武器换弹,取出子弹数量：{takeOut}");
+            curWeapon.LoadBullet(takeOut);
+            return true;
+        }
 
+        public bool TryWeaponShootBullet(int num)
+        {
+            var curWeapon = WeaponComponent.CurrentWeapon;
+            if (curWeapon == null)
+            {
+                Debug.LogWarning("当前尚未持有武器！");
+                //TODO: 徒手攻击
+                return false;
+            }
+            return curWeapon.TryFireBullet(num) == num;
+        }
+
+        public bool TryDropWeapon(out WeaponEntity weaponEntity)
+        {
+            return WeaponComponent.TryDropWeapon(out weaponEntity);
+        }
+
+        public void DropWeapon()
+        {
+            WeaponComponent.DropWeapon();
         }
 
         public bool IsIdle()
