@@ -5,12 +5,12 @@ using Game.Client.Bussiness.WorldBussiness.Interface;
 namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 {
 
-    public class ItemDoamin
+    public class ItemDomain
     {
 
         WorldFacades worldFacades;
 
-        public ItemDoamin()
+        public ItemDomain()
         {
         }
 

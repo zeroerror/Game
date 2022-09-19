@@ -713,7 +713,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             int count = itemTypeList.Count;
             ushort[] entityIdArray = new ushort[count];
             byte[] itemTypeByteArray = new byte[count];
-            Debug.Log($"服务器地图物件生成count:{count}----------------------------");
+            Debug.Log($"服务器地图物件资源开始生成[数量:{count}]----------------------------------------------------");
             int index = 0;
             itemTypeList.ForEach((itemType) =>
             {
@@ -758,6 +758,9 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 index++;
             });
+
+            Debug.Log($"地图物件资源生成完毕******************************************************");
+
 
             var rqs = worldFacades.Network.ItemReqAndRes;
             connIdList.ForEach((connId) =>

@@ -95,7 +95,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             // == Tick Server Resonse (Order By Life Cycle)
             Tick_RoleSpawn(nextFrame);
             Tick_BulletSpawn(nextFrame);
-            Tick_WeaponAssetsSpawn(nextFrame);
+            Tick_ItemAssetsSpawn(nextFrame);
 
             Tick_ItemPick(nextFrame);
 
@@ -559,7 +559,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         #endregion
 
         #region [Item]
-        void Tick_WeaponAssetsSpawn(int nextFrame)
+        void Tick_ItemAssetsSpawn(int nextFrame)
         {
             if (itemSpawnQueue.TryPeek(out var itemSpawnMsg))
             {
@@ -571,9 +571,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var entityIdArray = itemSpawnMsg.entityIdArray;
                 var fieldEntity = worldFacades.Repo.FiledEntityRepo.CurFieldEntity;
                 AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
-                Debug.Log($"itemTypeArray :{itemTypeArray.Length}");
-                Debug.Log($"subtypeArray :{subtypeArray.Length}");
-                Debug.Log($"entityIdArray :{entityIdArray.Length}");
+ 
                 for (int index = 0; index < assetPointEntities.Length; index++)
                 {
                     Transform parent = assetPointEntities[index].transform;

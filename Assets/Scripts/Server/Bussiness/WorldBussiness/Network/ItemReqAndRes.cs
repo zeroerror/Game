@@ -35,7 +35,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server.SendMsg(connId, msg);
         }
 
-        public void SendRes_ItemSpawn(int connId, int frameIndex, byte[] itemTypeArray,byte[] subtypeArray ,ushort[] entityIdArray)
+        public void SendRes_ItemSpawn(int connId, int frameIndex, byte[] itemTypeArray, byte[] subtypeArray, ushort[] entityIdArray)
         {
             FrameItemSpawnResMsg msg = new FrameItemSpawnResMsg
             {
