@@ -65,6 +65,38 @@ namespace Game.Client.Bussiness.WorldBussiness
             offset = new Vector3(0, 0.2f, 0);
         }
 
+        public void WeaponReload()
+        {
+            if (WeaponComponent.IsHoldingWeapon())
+            {
+                Debug.LogWarning("当前尚未持有武器！");
+                //TODO: 徒手攻击
+                return;
+            }
+
+            // 获取武器所需子弹
+            // TODO: 根据配置表查询武器对应所需子弹
+            // var curWeapon = WeaponComponent.CurrentWeapon;
+            // switch (curWeapon.WeaponType)
+            // {
+            //     case WeaponType.Pistol:
+            //         break;
+            //     case WeaponType.Rifle:
+            //         break;
+            //     case WeaponType.GrenadeLauncher:
+            //         break;
+            // }
+            int takeOut = ItemComponent.TryTakeOutItem_Bullet(30);
+            if (takeOut == 0)
+            {
+                Debug.LogWarning("当前武器所需子弹不足！");
+                return;
+            }
+
+            Debug.Log($"武器换弹,当前takeout：{takeOut}");
+
+        }
+
         public bool IsIdle()
         {
             return MoveComponent.Velocity == Vector3.zero;

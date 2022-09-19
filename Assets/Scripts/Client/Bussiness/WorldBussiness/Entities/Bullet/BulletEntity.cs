@@ -1,28 +1,16 @@
 using System.Collections.Generic;
-using Game.Client.Bussiness.WorldBussiness.Interface;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 using UnityEngine;
 
 namespace Game.Client.Bussiness.WorldBussiness
 {
 
-    public enum BulletType
-    {
-        DefaultBullet,
-        Grenade,
-        Hooker
-    }
-
-    public class BulletEntity : PhysicsEntity, IPickable
+    public class BulletEntity : PhysicsEntity
     {
         // Master Info
         byte masterId;
         public byte MasterId => masterId;
         public void SetMasterId(byte masterId) => this.masterId = masterId;
-
-        [SerializeField]
-        ItemType itemType;
-        public ItemType ItemType => this.itemType;
-        public void SetItemType(ItemType itemType) => this.itemType = itemType;
 
         // Bullet Info
         [SerializeField]
@@ -56,7 +44,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
             moveComponent.SetSpeed(50f);
             moveComponent.SetGravity(5f);
-            moveComponent.enable = true;
             moveComponent.isPersistentMove = true;
 
             lifeTime = 5f;

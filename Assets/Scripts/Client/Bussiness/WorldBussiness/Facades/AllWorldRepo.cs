@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         public WorldRoleRepo WorldRoleRepo { get; private set; }
         public WeaponRepo WeaponRepo { get; private set; }
         public BulletRepo BulletRepo { get; private set; }
-        public BulletItemRepo BulletItemRepo { get; private set; }
+        public BulletPackRepo BulletPackRepo { get; private set; }
 
         public AllWorldRepo()
         {
@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             WorldRoleRepo = new WorldRoleRepo();
             WeaponRepo = new WeaponRepo();
             BulletRepo = new BulletRepo();
-            BulletItemRepo = new BulletItemRepo();
+            BulletPackRepo = new BulletPackRepo();
         }
 
     }

@@ -1,6 +1,6 @@
 using System;
-using Game.Client.Bussiness.WorldBussiness.Interface;
 using UnityEngine;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness
 {

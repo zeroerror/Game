@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
-using Game.Client.Bussiness.WorldBussiness;
 using Game.Infrastructure.Generic;
-using Game.Client.Bussiness.WorldBussiness.Interface;
+using Game.Client.Bussiness.WorldBussiness;
+using Game.Server.Bussiness.WorldBussiness.Facades;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 
 namespace Game.Server.Bussiness.WorldBussiness
 {
@@ -740,16 +740,15 @@ namespace Game.Server.Bussiness.WorldBussiness
                         entityIdArray[index] = weaponEntityId;
                         weaponRepo.weaponIdAutoIncreaseId++;
                         break;
-                    case ItemType.Bullet:
-                        var bulletEntity = item.GetComponent<BulletEntity>();
-                        var bulletItemRepo = worldFacades.ClientWorldFacades.Repo.BulletItemRepo;
-                        var bulletEntityId = bulletItemRepo.bulletItemAutoIncreaseId;
-                        bulletEntity.Ctor();
-                        bulletEntity.MoveComponent.enable = false;
-                        bulletEntity.SetEntityId(bulletEntityId);
-                        bulletItemRepo.Add(bulletEntity);
+                    case ItemType.BulletPack:
+                        var bulletPackEntity = item.GetComponent<BulletPackEntity>();
+                        var bulletPackRepo = worldFacades.ClientWorldFacades.Repo.BulletPackRepo;
+                        var bulletEntityId = bulletPackRepo.bulletPackAutoIncreaseId;
+                        bulletPackEntity.Ctor();
+                        bulletPackEntity.SetEntityId(bulletEntityId);
+                        bulletPackRepo.Add(bulletPackEntity);
                         entityIdArray[index] = bulletEntityId;
-                        bulletItemRepo.bulletItemAutoIncreaseId++;
+                        bulletPackRepo.bulletPackAutoIncreaseId++;
                         break;
                     case ItemType.Pill:
                         break;
@@ -760,7 +759,6 @@ namespace Game.Server.Bussiness.WorldBussiness
             });
 
             Debug.Log($"地图物件资源生成完毕******************************************************");
-
 
             var rqs = worldFacades.Network.ItemReqAndRes;
             connIdList.ForEach((connId) =>

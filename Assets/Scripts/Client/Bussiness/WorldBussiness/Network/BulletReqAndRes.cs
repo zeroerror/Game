@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using Game.Infrastructure.Network.Client;
 using Game.Protocol.World;
-
+using Game.Infrastructure.Network.Client;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Network
 {

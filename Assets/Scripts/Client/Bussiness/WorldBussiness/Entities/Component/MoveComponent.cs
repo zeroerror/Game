@@ -104,8 +104,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             return false;
         }
 
-        public bool enable;
-
         public MoveComponent(Rigidbody rb, float speed = 0, float jumpVelocity = 0)
         {
             if (rb == null) return;
@@ -118,7 +116,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public bool TryJump()
         {
-            if (!enable) return false;
             if (!IsGrouded) return false;
             Debug.Log($"Jump");
 
@@ -133,7 +130,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Tick_Rigidbody(float fixedDeltaTime)
         {
-            if (!enable) return;
             if (fixedDeltaTime == 0) return;
 
             Vector3 vel = Vector3.zero;
@@ -159,7 +155,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Tick_Friction(float fixedDeltaTime)
         {
-            if (!enable) return;
             //模拟摩擦力
             if (IsGrouded && (Mathf.Abs(extraVelocity.x) > 0.1f || Mathf.Abs(extraVelocity.z) > 0.1f))
             {
@@ -184,7 +179,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Tick_GravityVelocity(float fixedDeltaTime)
         {
-            if (!enable) return;
             //模拟重力
             if (!IsGrouded)
             {
@@ -219,7 +213,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void MoveHitErase(Vector3 hitDir)
         {
-            if (!enable) return;
             var a = MoveVelocity.normalized;
             var b = hitDir.normalized;
             var cosValue = Vector3.Dot(a, b);
@@ -230,7 +223,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void HitSomething(Vector3 hitDir)
         {
-            if (!enable) return;
             // DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
             //  消除反方向Velocity
             EraseVelocity(hitDir);
@@ -238,13 +230,11 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void LeaveSomthing(Vector3 leaveDir)
         {
-            if (!enable) return;
             // DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
         }
 
         public void EraseVelocity(Vector3 dir)
         {
-            if (!enable) return;
             var a = rb.velocity.normalized;
             var b = dir.normalized;
             var cosValue = Vector3.Dot(a, b);
@@ -271,7 +261,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void JumpboardSpeedUp()
         {
-            if (!enable) return;
             DebugExtensions.LogWithColor($"跳板起飞！！！！！", "#48D1CC");
             extraVelocity.y += 10f;
             var v = rb.velocity;
@@ -282,7 +271,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void EnterGound()
         {
-            if (!enable) return;
             if (IsGrouded) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
@@ -291,7 +279,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void LeaveGround()
         {
-            if (!enable) return;
             if (!IsGrouded) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
@@ -300,7 +287,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void EnterWall()
         {
-            if (!enable) return;
             if (IsHitWall) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}接触墙体---------------------------", "#48D1CC");
@@ -309,7 +295,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void LeaveWall()
         {
-            if (!enable) return;
             if (!IsHitWall) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开墙体-----------------------------", "#48D1CC");
@@ -318,7 +303,6 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void HitByBullet(BulletEntity bulletEntity)
         {
-            if (!enable) return;
             var velocity = bulletEntity.MoveComponent.Velocity / 10f;
             Debug.Log($"被子弹击中 velocity add:  {velocity}");
             rb.velocity += (velocity);

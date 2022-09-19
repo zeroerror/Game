@@ -10,8 +10,8 @@ namespace Game.Client.Bussiness.WorldBussiness
         readonly int WEAPON_CAPICY = 4;
 
         public WeaponEntity[] AllWeapon;    //所有武器
-        public WeaponEntity CurrentWeapon;  //当前武器
-        public int CurrentNum;    //当前武器数量
+        public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
+        public int CurrentNum { get; private set; }    //当前武器数量
 
         public WeaponComponent()
         {
@@ -20,6 +20,12 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void Ctor()
         {
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
+        }
+
+        // 获取当前武器所需子弹
+        public bool IsHoldingWeapon()
+        {
+            return CurrentWeapon != null;
         }
 
         // 拾取武器

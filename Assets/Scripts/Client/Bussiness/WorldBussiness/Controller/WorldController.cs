@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.World;
 using Game.Client.Bussiness.EventCenter;
-using ZeroFrame.ZeroMath;
-using Game.Generic;
 using Game.Client.Bussiness.WorldBussiness.Interface;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
@@ -597,13 +595,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                             weaponEntity.SetEntityId(entityId);
                             weaponRepo.Add(weaponEntity);
                             break;
-                        case ItemType.Bullet:
-                            var bulletEntity = item.GetComponent<BulletEntity>();
-                            var bulletItemRepo = worldFacades.Repo.BulletItemRepo;
-                            bulletEntity.Ctor();
-                            bulletEntity.MoveComponent.enable = false;
-                            bulletEntity.SetEntityId(entityId);
-                            bulletItemRepo.Add(bulletEntity);
+                        case ItemType.BulletPack:
+                            var bulletPackEntity = item.GetComponent<BulletPackEntity>();
+                            var bulletPackRepo = worldFacades.Repo.BulletPackRepo;
+                            bulletPackEntity.Ctor();
+                            bulletPackEntity.SetEntityId(entityId);
+                            bulletPackRepo.Add(bulletPackEntity);
                             break;
                         case ItemType.Pill:
                             break;

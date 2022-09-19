@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.WorldBussiness.Facades;
-using Game.Infrastructure.Generic;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 {

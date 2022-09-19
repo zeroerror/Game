@@ -1,6 +1,7 @@
 using UnityEngine;
 using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Client.Bussiness.WorldBussiness.Interface;
+using Game.Client.Bussiness.WorldBussiness.Generic;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 {
@@ -29,7 +30,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                 case ItemType.Weapon:
                     itemName = ((WeaponType)sortType).ToString() + "_Item";
                     break;
-                case ItemType.Bullet:
+                case ItemType.BulletPack:
                     itemName = ((BulletType)sortType).ToString() + "_Item";
                     break;
                 case ItemType.Pill:
@@ -60,13 +61,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                         weaponRepo.TryRemove(weaponEntity);
                     }
                     break;
-                case ItemType.Bullet:
-                    var bulletItemRepo = repo.BulletItemRepo;
-                    if (bulletItemRepo.TryGetByBulletId(entityId, out BulletEntity bulletEntity))
+                case ItemType.BulletPack:
+                    var bulletPackRepo = repo.BulletPackRepo;
+                    if (bulletPackRepo.TryGetByBulletId(entityId, out BulletPackEntity bulletPackEntity))
                     {
                         isPickUpSucceed = true;
-                        role.ItemComponent.TryCollectItem_Bullet(bulletEntity);
-                        bulletItemRepo.TryRemove(bulletEntity);
+                        role.ItemComponent.TryCollectItem_Bullet(bulletPackEntity);
+                        bulletPackRepo.TryRemove(bulletPackEntity);
                     }
                     break;
                 case ItemType.Pill:
