@@ -22,13 +22,13 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
-        public void SendRes_BulletSpawn(int connId, int frameIndex, byte bulletType, ushort bulletId, byte wRid, Vector3 dir)
+        public void SendRes_BulletSpawn(int connId, int frameIndex, BulletType bulletType, ushort bulletId, byte wRid, Vector3 dir)
         {
             FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
             {
                 serverFrame = frameIndex,
                 wRid = wRid,
-                bulletType = bulletType,
+                bulletType = (byte)bulletType,
                 bulletId = bulletId,
                 shootDirX = (short)(dir.x * 100),
                 shootDirY = (short)(dir.y * 100),

@@ -23,7 +23,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public WorldRoleLogicEntity GetByEntityId(byte wRid)
         {
-            return list.Find((entity) => entity.WRid == wRid);
+            return list.Find((entity) => entity.EntityId == wRid);
+        }
+
+        public bool TryGetByEntityId(byte wRid, out WorldRoleLogicEntity entity)
+        {
+            entity = list.Find((entity) => entity.EntityId == wRid);
+            return entity != null;
         }
 
         public WorldRoleLogicEntity[] GetAll()

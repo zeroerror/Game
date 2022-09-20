@@ -38,6 +38,8 @@ namespace Game.Client.Bussiness.WorldBussiness
         public int bulletNum { get; private set; }
         public void LoadBullet(int bulletNum) => this.bulletNum = bulletNum;
 
+        public BulletType bulletType;
+
         public void Ctor()
         {
             itemType = ItemType.Weapon;
@@ -45,6 +47,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public int TryFireBullet(int num)
         {
+            Debug.Log($"武器射击，所需子弹：{num} 拥有子弹：{bulletNum}");
             if (bulletNum >= num)
             {
                 bulletNum -= num;

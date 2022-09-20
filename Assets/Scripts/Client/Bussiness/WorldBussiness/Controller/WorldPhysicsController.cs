@@ -23,14 +23,14 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         public void Tick()
         {
             // == Physics Movement
-            if (worldFacades.Repo.FiledEntityRepo.CurFieldEntity != null)
+            if (worldFacades.Repo.FiledRepo.CurFieldEntity != null)
             {
                 Tick_Physics_Movement_Role(fixedDeltaTime);
                 Tick_Physics_Movement_Bullet(fixedDeltaTime);
             }
 
             // == Physics Simulation
-            var physicsScene = worldFacades.Repo.FiledEntityRepo.CurPhysicsScene;
+            var physicsScene = worldFacades.Repo.FiledRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
 
             // == Physics Collision(Only For Client Performances Like Hit Effect,etc.)
@@ -57,13 +57,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             var domain = worldFacades.Domain.WorldRoleDomain;
             domain.Tick_RoleRigidbody(deltaTime);
 
-            var cameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+            var cameraComponent = worldFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent;
             var currentCamera = cameraComponent.CurrentCamera;
             var cameraView = cameraComponent.CurrentCameraView;
             var inputDomain = worldFacades.Domain.WorldInputDomain;
 
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            inputDomain.UpdateCameraByCameraView(worldFacades.Repo.WorldRoleRepo.Owner, cameraView, currentCamera, inputAxis);
+            inputDomain.UpdateCameraByCameraView(worldFacades.Repo.RoleRepo.Owner, cameraView, currentCamera, inputAxis);
         }
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)

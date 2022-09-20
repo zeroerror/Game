@@ -20,6 +20,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
         public bool TryGetByEntityId(ushort weaponId, out WeaponEntity weaponEntity)
         {
             weaponEntity = weaponList.Find((entity) => entity.EntityId == weaponId);
+            Debug.Assert(weaponEntity != null, $"武器{weaponId}不存在，weaponList：{weaponList.Count}");
             return weaponEntity != null;
         }
 
@@ -36,7 +37,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public bool TryRemove(WeaponEntity entity)
         {
-            Debug.Log($"TryRemove:{entity.EntityId}");
+            Debug.Log($"Repo:移除武器{entity.EntityId}");
             return weaponList.Remove(entity);
         }
 

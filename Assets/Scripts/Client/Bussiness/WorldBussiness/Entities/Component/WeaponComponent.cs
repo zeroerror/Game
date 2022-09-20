@@ -26,6 +26,18 @@ namespace Game.Client.Bussiness.WorldBussiness
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
         }
 
+        public bool TryWeaponShoot()
+        {
+            if (CurrentWeapon == null)
+            {
+                Debug.LogWarning("当前尚未持有武器！");
+                //TODO: 徒手攻击
+                return false;
+            }
+            return CurrentWeapon.TryFireBullet(1) == 1;
+        }
+
+
         // 拾取武器
         public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
         {
@@ -43,7 +55,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             CurrentWeapon = weaponEntity;
             CurrentWeapon.gameObject.SetActive(true);
             AllWeapon[CurrentNum++] = weaponEntity;
-
         }
 
         // 切换武器
@@ -58,24 +69,45 @@ namespace Game.Client.Bussiness.WorldBussiness
         }
 
         //丢弃武器
-        public bool TryDropWeapon(out WeaponEntity weapon)
+        public bool TryDropWeapon(ushort entityId, out WeaponEntity weapon)
         {
-            weapon = CurrentWeapon;
-            if (weapon != null)
+            weapon = null;
+            for (int i = 0; i < AllWeapon.Length; i++)
             {
-                weapon.ClearMaster();
-                return true;
+                var w = AllWeapon[i];
+                if (w.EntityId == entityId)
+                {
+                    weapon = w;
+                    weapon.ClearMaster();
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
-        public void DropWeapon()
+        public void DropWeapon(ushort entityId)
         {
-            if (CurrentWeapon == null) return;
-            CurrentWeapon.ClearMaster();
+            for (int i = 0; i < AllWeapon.Length; i++)
+            {
+                var w = AllWeapon[i];
+                if (w.EntityId == entityId)
+                {
+                    w.ClearMaster();
+                    return;
+                }
+            }
+            return;
+        }
+
+        public bool Exist(ushort entityId)
+        {
+            for (int i = 0; i < AllWeapon.Length; i++)
+            {
+                var w = AllWeapon[i];
+                if (w.EntityId == entityId) return true;
+            }
+
+            return false;
         }
 
     }

@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         public List<WorldRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
         {
             List<WorldRoleLogicEntity> hitRoleList = new List<WorldRoleLogicEntity>();
-            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            var roleRepo = worldFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
                 var rolePos = role.SelfPos;

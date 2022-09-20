@@ -7,16 +7,16 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
     public class AllWorldRepo
     {
 
-        public FiledEntityRepo FiledEntityRepo { get; private set; }
-        public WorldRoleRepo WorldRoleRepo { get; private set; }
+        public FiledEntityRepo FiledRepo { get; private set; }
+        public WorldRoleRepo RoleRepo { get; private set; }
         public WeaponRepo WeaponRepo { get; private set; }
         public BulletRepo BulletRepo { get; private set; }
         public BulletPackRepo BulletPackRepo { get; private set; }
 
         public AllWorldRepo()
         {
-            FiledEntityRepo = new FiledEntityRepo();
-            WorldRoleRepo = new WorldRoleRepo();
+            FiledRepo = new FiledEntityRepo();
+            RoleRepo = new WorldRoleRepo();
             WeaponRepo = new WeaponRepo();
             BulletRepo = new BulletRepo();
             BulletPackRepo = new BulletPackRepo();

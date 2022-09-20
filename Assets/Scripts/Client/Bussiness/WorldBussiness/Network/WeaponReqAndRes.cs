@@ -25,36 +25,52 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
 
         // ====== Send ======
-        public void SendReq_WeaponReload(byte wRid, ushort entityId)
+        public void SendReq_WeaponShoot(byte masterId, Vector3 targetPos)
         {
-            FrameWeaponDropReqMsg frameDropWeaponReqMsg = new FrameWeaponDropReqMsg
+            targetPos *= 10000f;
+            FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
             {
-                entityId = entityId
+                masterId = masterId,
+                targetPosX = (int)targetPos.x,
+                targetPosY = (int)targetPos.y,
+                targetPosZ = (int)targetPos.z,
             };
-            _client.SendMsg(frameDropWeaponReqMsg);
+            _client.SendMsg(frameWeaponShootReqMsg);
         }
 
-        public void SendReq_WeaponDrop(byte wRid, ushort entityId)
+        public void SendReq_WeaponReload(WorldRoleLogicEntity role)
         {
             FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
             {
-                entityId = entityId
+                masterId = role.EntityId
             };
             _client.SendMsg(frameWeaponReloadReqMsg);
+            Debug.Log("发送武器装弹请求");
         }
 
-        public void SendReq_WeaponDrop()
+        public void SendReq_WeaponDrop(WorldRoleLogicEntity role)
         {
-
+            FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
+            {
+                entityId = role.WeaponComponent.CurrentWeapon.EntityId,
+                masterId = role.EntityId
+            };
+            _client.SendMsg(frameWeaponDropReqMsg);
+            Debug.Log("发送武器丢弃请求");
         }
 
         // ====== Regist ======
-        public void RegistRes_WeaponReload(Action<FrameWeaponReloadReqMsg> action)
+        public void RegistRes_WeaponShoot(Action<FrameWeaponShootResMsg> action)
         {
             _client.RegistMsg(action);
         }
 
-        public void RegistRes_WeaponDrop(Action<FrameWeaponDropReqMsg> action)
+        public void RegistRes_WeaponReload(Action<FrameWeaponReloadResMsg> action)
+        {
+            _client.RegistMsg(action);
+        }
+
+        public void RegistRes_WeaponDrop(Action<FrameWeaponDropResMsg> action)
         {
             _client.RegistMsg(action);
         }

@@ -25,20 +25,20 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         void Tick_Input()
         {
             //没有角色就没有移动
-            var owner = worldFacades.Repo.WorldRoleRepo.Owner;
+            var owner = worldFacades.Repo.RoleRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = worldFacades.InputComponent;
             if (input.isPressJump)
             {
-                byte rid = owner.WRid;
+                byte rid = owner.EntityId;
                 worldFacades.Network.WorldRoleReqAndRes.SendReq_WRoleJump(rid);
             }
             if (input.isPressSwitchView)
             {
                 //打开第一人称视角
                 // TODO: 加切换视角的判定条件
-                var fieldCameraComponent = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent;
+                var fieldCameraComponent = worldFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent;
                 if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner.roleRenderer);
                 else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner.roleRenderer);
             }
@@ -72,25 +72,24 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 if (closestCollider != null)
                 {
                     var rqs = worldFacades.Network.ItemReqAndRes;
-                    rqs.SendReq_ItemPickUp(owner.WRid, closestPickable.ItemType, closestPickable.EntityId);
+                    rqs.SendReq_ItemPickUp(owner.EntityId, closestPickable.ItemType, closestPickable.EntityId);
                 }
             }
             if (input.isPressShoot)
             {
-                // 射击前判断流程 TODO:由服务端鉴定
-                bool canShoot;
-                int bulletNUm = 1;
-
-                if (owner.TryWeaponShootBullet(bulletNUm)) canShoot = true;
-                else if (owner.TryWeaponReload() && owner.TryWeaponShootBullet(bulletNUm)) canShoot = true;
-                else canShoot = false;
-
-                if (canShoot)
+                // 射击前 
+                // 1.客户端判断流程
+                var weaponComponent = owner.WeaponComponent;
+                Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空，无法射击");
+                Debug.Assert(!weaponComponent.IsReloading, "当前武器换弹中，无法射击");
+                if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsReloading)
                 {
-                    var cameraView = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
-                    var shotPoint = worldFacades.Domain.WorldInputDomain.GetShotPointByCameraView(cameraView, owner);
-                    byte rid = owner.WRid;
-                    worldFacades.Network.BulletReqAndRes.SendReq_BulletSpawn(BulletType.DefaultBullet, rid, shotPoint);
+                    var curCamView = worldFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
+                    var inputDomain = worldFacades.Domain.WorldInputDomain;
+                    Vector3 targetPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
+                    // 2.服务端流程
+                    var rqs = worldFacades.Network.WeaponReqAndRes;
+                    rqs.SendReq_WeaponShoot(owner.EntityId,targetPos);
                 }
 
             }
@@ -98,25 +97,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             {
                 // 换弹前判断流程
                 var weaponComponent = owner.WeaponComponent;
+                Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空");
+                Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
                 if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsReloading && !weaponComponent.IsFullReloaded)
                 {
                     weaponComponent.SetReloading(true);
                     var rqs = worldFacades.Network.WeaponReqAndRes;
-                    rqs.SendReq_WeaponReload(owner.WRid, owner.WeaponComponent.CurrentWeapon.EntityId);
+                    rqs.SendReq_WeaponReload(owner);
                 }
             }
             if (input.isPressDropWeapon)
             {
                 // 丢弃武器前判断流程 TODO:由服务端鉴定
                 var rqs = worldFacades.Network.WeaponReqAndRes;
-                rqs.SendReq_WeaponDrop(owner.WRid, owner.WeaponComponent.CurrentWeapon.EntityId);
+                rqs.SendReq_WeaponDrop(owner);
             }
 
             if (input.moveAxis != Vector3.zero)
             {
                 var moveAxis = input.moveAxis;
 
-                var cameraView = worldFacades.Repo.FiledEntityRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
+                var cameraView = worldFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
                 Vector3 moveDir = worldFacades.Domain.WorldInputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
                 owner.MoveComponent.FaceTo(moveDir);
 
@@ -131,7 +132,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                         rqs.SendReq_WRoleRotate(owner);
                     }
 
-                    byte rid = owner.WRid;
+                    byte rid = owner.EntityId;
                     rqs.SendReq_WRoleMove(rid, moveDir);
                 }
             }
@@ -150,12 +151,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         bool WillHitOtherRole(WorldRoleLogicEntity roleEntity, Vector3 moveDir)
         {
-            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            var roleRepo = worldFacades.Repo.RoleRepo;
             var array = roleRepo.GetAll();
             for (int i = 0; i < array.Length; i++)
             {
                 var r = array[i];
-                if (r.WRid == roleEntity.WRid) continue;
+                if (r.EntityId == roleEntity.EntityId) continue;
 
                 var pos1 = r.MoveComponent.CurPos;
                 var pos2 = roleEntity.MoveComponent.CurPos;

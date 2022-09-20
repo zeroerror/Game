@@ -67,6 +67,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     {
                         isPickUpSucceed = true;
                         role.ItemComponent.TryCollectItem_Bullet(bulletPackEntity);
+                        Debug.Log($"摧毁:{bulletPackEntity.gameObject.name}");
                         GameObject.Destroy(bulletPackEntity.gameObject);// TODO: 因为背包容量无法全部拾取的情况不能摧毁
                         bulletPackRepo.TryRemove(bulletPackEntity);
                     }

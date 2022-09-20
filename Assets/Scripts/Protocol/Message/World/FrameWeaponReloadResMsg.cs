@@ -5,11 +5,11 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 
     [ZeroMessage]
     public class FrameWeaponReloadResMsg:IZeroMessage<FrameWeaponReloadResMsg>{
-        public ushort entityId; //装弹武器entityId
+        public byte masterId;
 
         public void FromBytes(byte[] src, ref int offset)
         {
-            entityId = BufferReader.ReadUInt16(src, ref offset);
+            masterId = BufferReader.ReadByte(src, ref offset);
             offset += src.Length;
         }
 
@@ -17,7 +17,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
         {
             int offset = 0;
             byte[] result = new byte[1000];
-            BufferWriter.WriteUInt16(result, entityId, ref offset);
+            BufferWriter.WriteByte(result, masterId, ref offset);
             return result;
         }
     }

@@ -54,7 +54,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public void Tick_RoleRigidbody(float fixedTime)
         {
-            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            var roleRepo = worldFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
                 role.MoveComponent.Tick_Friction(fixedTime);
@@ -65,7 +65,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public void Update_RoleRenderer(float deltaTime)
         {
-            var roleRepo = worldFacades.Repo.WorldRoleRepo;
+            var roleRepo = worldFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
                 var renderer = role.roleRenderer;

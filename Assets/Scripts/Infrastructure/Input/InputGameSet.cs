@@ -68,17 +68,14 @@ public static class InputGameSet
         if (Input.GetKeyDown(PCInputSet.pickUpAssets))
         {
             inputComponent.isPressPickUpItem = true;
-            Debug.Log("按下‘拾取’");
         }
         if (Input.GetKeyDown(PCInputSet.weaponReload))
         {
             inputComponent.isPressWeaponReload = true;
-            Debug.Log("按下‘换弹’");
         }
-        if (Input.GetKeyDown(PCInputSet.weaponReload))
+        if (Input.GetKeyDown(PCInputSet.weaponDrop))
         {
             inputComponent.isPressDropWeapon = true;
-            Debug.Log("按下‘丢弃物器’");
         }
     }
 

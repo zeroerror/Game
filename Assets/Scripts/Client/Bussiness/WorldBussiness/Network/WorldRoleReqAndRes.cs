@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         public void SendReq_WRoleRotate(WorldRoleLogicEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
-            var rid = roleEntity.WRid;
+            var rid = roleEntity.EntityId;
             ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
             msg |= (ulong)(ushort)eulerAngel.x << 32;
             msg |= (ulong)(ushort)eulerAngel.y << 16;

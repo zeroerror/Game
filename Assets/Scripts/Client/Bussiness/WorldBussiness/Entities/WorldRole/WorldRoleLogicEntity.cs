@@ -18,9 +18,9 @@ namespace Game.Client.Bussiness.WorldBussiness
         public WorldRoleRendererEntity roleRenderer { get; private set; }
         public Vector3 SelfPos => transform.position;
 
-        byte wRid;
-        public byte WRid => wRid;
-        public void SetWRid(byte wRid) => this.wRid = wRid;
+        byte entityId;
+        public byte EntityId => entityId;
+        public void SetEntityId(byte entityId) => this.entityId = entityId;
 
         int connId;
         public int ConnId => connId;
@@ -98,28 +98,6 @@ namespace Game.Client.Bussiness.WorldBussiness
             return true;
         }
 
-        public bool TryWeaponShootBullet(int num)
-        {
-            var curWeapon = WeaponComponent.CurrentWeapon;
-            if (curWeapon == null)
-            {
-                Debug.LogWarning("当前尚未持有武器！");
-                //TODO: 徒手攻击
-                return false;
-            }
-            return curWeapon.TryFireBullet(num) == num;
-        }
-
-        public bool TryDropWeapon(out WeaponEntity weaponEntity)
-        {
-            return WeaponComponent.TryDropWeapon(out weaponEntity);
-        }
-
-        public void DropWeapon()
-        {
-            WeaponComponent.DropWeapon();
-        }
-
         public bool IsIdle()
         {
             return MoveComponent.Velocity == Vector3.zero;
@@ -132,7 +110,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public void Reborn()
         {
-            Debug.Log($"重生 wRid:{wRid}");
+            Debug.Log($"重生 wRid:{entityId}");
             MoveComponent.Reset();
             HealthComponent.Reset();
             IsDead = false;

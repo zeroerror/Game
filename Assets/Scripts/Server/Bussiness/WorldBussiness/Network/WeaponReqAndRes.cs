@@ -22,25 +22,43 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
         }
 
         // ====== Send ======
-        public void SendRes_WeaponReloaded(int connId, int serverFrame, ushort entityId)
+        public void SendRes_WeaponShoot(int connId, int serverFrame, byte masterId)
         {
-            FrameWeaponReloadReqMsg msg = new FrameWeaponReloadReqMsg
+            FrameWeaponShootResMsg msg = new FrameWeaponShootResMsg
             {
-                entityId = entityId,
+                masterId = masterId,
             };
             _server.SendMsg(connId, msg);
+            Debug.Log("回复武器射击请求");
         }
 
-        public void SendRes_WeaponDrop(int connId, int serverFrame, ushort entityId)
+        public void SendRes_WeaponReloaded(int connId, int serverFrame, byte masterId)
         {
-            FrameWeaponDropResMsg msg = new FrameWeaponDropResMsg
+            FrameWeaponReloadResMsg msg = new FrameWeaponReloadResMsg
             {
-                entityId = entityId,
+                masterId = masterId,
             };
             _server.SendMsg(connId, msg);
+            Debug.Log("回复武器装弹请求");
+        }
+
+        public void SendRes_WeaponDrop(int connId, int serverFrame, byte masterId, ushort entityId)
+        {
+            FrameWeaponDropResMsg msg = new FrameWeaponDropResMsg
+            {                                                                                                                           
+                entityId = entityId,
+                masterId = masterId,
+            };
+            _server.SendMsg(connId, msg);
+            Debug.Log("回复武器丢弃请求");
         }
 
         // ====== Regist ======
+        public void RegistReq_WeaponShoot(Action<int, FrameWeaponShootReqMsg> action)
+        {
+            _server.AddRegister(action);
+        }
+
         public void RegistReq_WeaponReload(Action<int, FrameWeaponReloadReqMsg> action)
         {
             _server.AddRegister(action);
