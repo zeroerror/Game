@@ -67,7 +67,7 @@ namespace Game.Client.Bussiness
 
         void OnTriggerExit(Collider collider)
         {
-            DebugExtensions.LogWithColor($"Trriger离开:{collider.gameObject.name}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"Trriger离开:{collider.transform.parent.name}", "#48D1CC");
             var ce = Find(collider);
             ce.isEnter = CollisionStatus.Exit;
         }

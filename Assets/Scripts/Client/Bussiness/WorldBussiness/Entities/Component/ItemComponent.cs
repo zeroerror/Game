@@ -45,19 +45,23 @@ namespace Game.Client.Bussiness.WorldBussiness
         {
             if (bulletPackItemQueue.TryPeek(out var bulletPackEntity))
             {
-                if (bulletPackEntity.bulletNum <= 0) return 0;
-
                 if (bulletPackEntity.bulletNum >= num)
                 {
                     bulletPackEntity.bulletNum -= num;
                     return num;
                 }
-                else
+                else if (bulletPackEntity.bulletNum > 0)
                 {
                     int realTakeOut = bulletPackEntity.bulletNum;
                     bulletPackEntity.bulletNum = 0;
                     bulletPackItemQueue.Dequeue();
                     return realTakeOut;
+                }
+                else
+                {
+                    GameObject.Destroy(bulletPackEntity);
+                    bulletPackItemQueue.Dequeue();
+                    return TryTakeOutItem_Bullet(num);
                 }
             }
 

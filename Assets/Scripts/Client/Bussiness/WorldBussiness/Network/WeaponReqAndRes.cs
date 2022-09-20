@@ -50,6 +50,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
         public void SendReq_WeaponDrop(WorldRoleLogicEntity role)
         {
+            if (role.WeaponComponent.CurrentWeapon == null) return;
+            
             FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
             {
                 entityId = role.WeaponComponent.CurrentWeapon.EntityId,

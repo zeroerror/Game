@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return item;
         }
 
-        public bool TryPickUpItem(ItemType itemType, ushort entityId, AllWorldRepo repo, WorldRoleLogicEntity role, Transform hangPoint = null)
+        public bool TryPickUpItem(ItemType itemType, ushort entityId, AllWorldRepo repo, WorldRoleLogicEntity master, Transform hangPoint = null)
         {
             bool isPickUpSucceed = false;
             switch (itemType)
@@ -54,10 +54,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     break;
                 case ItemType.Weapon:
                     var weaponRepo = repo.WeaponRepo;
-                    if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster)
+                    if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster && master.WeaponComponent.TryPickUpWeapon(weaponEntity, hangPoint))
                     {
                         isPickUpSucceed = true;
-                        role.WeaponComponent.PickUpWeapon(weaponEntity, hangPoint);
+                        weaponEntity.SetMasterId(master.EntityId);
+
                         weaponRepo.TryRemove(weaponEntity);
                     }
                     break;
@@ -66,7 +67,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     if (bulletPackRepo.TryGetByBulletId(entityId, out BulletPackEntity bulletPackEntity))
                     {
                         isPickUpSucceed = true;
-                        role.ItemComponent.TryCollectItem_Bullet(bulletPackEntity);
+                        master.ItemComponent.TryCollectItem_Bullet(bulletPackEntity);
                         Debug.Log($"摧毁:{bulletPackEntity.gameObject.name}");
                         GameObject.Destroy(bulletPackEntity.gameObject);// TODO: 因为背包容量无法全部拾取的情况不能摧毁
                         bulletPackRepo.TryRemove(bulletPackEntity);

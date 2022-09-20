@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 var rolePos = role.SelfPos;
-                // 墙体撞击：速度管理
+                // 墙体撞击的速度管理
                 var wallColliderList = GetHitField_ColliderList(role);
                 int enterGroundCount = 0;
                 int hitWallCount = 0;
@@ -39,12 +39,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     var closestPoint = collider.ClosestPoint(rolePos);
                     var hitDir = (closestPoint - rolePos).normalized;
                     role.MoveComponent.HitSomething(hitDir);
-
-                    if (colliderExtra.collider == null || !colliderExtra.collider.enabled)
-                    {
-                        role.RemoveHitCollider(colliderExtra);
-                        return;
-                    }
 
                     if (colliderExtra.isEnter != CollisionStatus.Exit)
                     {
@@ -85,6 +79,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
                 if (hitWallCount <= 0) role.MoveComponent.LeaveWall();
                 else role.MoveComponent.EnterWall();
+
             });
 
             return hitRoleList;
@@ -142,7 +137,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             List<ColliderExtra> removeList = new List<ColliderExtra>();
             physicsEntity.HitColliderListForeach((colliderExtra) =>
             {
-                if (colliderExtra.collider == null)
+                if (colliderExtra.collider == null || colliderExtra.collider.enabled == false || colliderExtra.isEnter == CollisionStatus.Exit)
                 {
                     removeList.Add(colliderExtra);
                     return;

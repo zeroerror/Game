@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 0
   itemType: 1
+  bulletType: 0
 --- !u!1 &3332383870851908396
 GameObject:
   m_ObjectHideFlags: 0
@@ -112,7 +113,6 @@ GameObject:
   - component: {fileID: 7554127966105720121}
   - component: {fileID: 6675870114806819027}
   - component: {fileID: 2176517473028580068}
-  - component: {fileID: 2251854843253160541}
   m_Layer: 9
   m_Name: fuse_07
   m_TagString: Untagged
@@ -185,20 +185,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2251854843253160541
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3332383870851908396}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -363113371877163117, guid: 1cc03cbb51606e04faa898feb8fab8e3, type: 3}
 --- !u!1 &5182242099263656237
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,7 +293,6 @@ GameObject:
   - component: {fileID: 8911496994042223598}
   - component: {fileID: 5094037209399183675}
   - component: {fileID: 7536208328877940854}
-  - component: {fileID: 6632399113185803153}
   m_Layer: 9
   m_Name: SM_Trigger_Guard_For_Army_Pistol
   m_TagString: Untagged
@@ -380,20 +365,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6632399113185803153
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8175926344769634673}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 3027352995994444199, guid: 1cc03cbb51606e04faa898feb8fab8e3, type: 3}
 --- !u!1 &8330209047013289618
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,7 +376,6 @@ GameObject:
   - component: {fileID: 1681097208753349311}
   - component: {fileID: 3071039392990986124}
   - component: {fileID: 1527666419200974886}
-  - component: {fileID: 747399633970726359}
   m_Layer: 9
   m_Name: SM_Gate_For_Army_Pistol
   m_TagString: Untagged
@@ -479,17 +449,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &747399633970726359
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8330209047013289618}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -5702142217984191708, guid: 1cc03cbb51606e04faa898feb8fab8e3, type: 3}

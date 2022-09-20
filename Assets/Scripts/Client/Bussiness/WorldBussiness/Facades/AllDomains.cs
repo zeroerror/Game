@@ -13,6 +13,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         public BulletDomain BulletDomain { get; private set; }
         public ItemDomain ItemDomain { get; private set; }
         public PhysicsDomain PhysicsDomain { get; private set; }
+        public WeaponDomain WeaponDomain { get; private set; }
+        
 
         public AllDomains()
         {
@@ -22,6 +24,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             BulletDomain = new BulletDomain();
             ItemDomain = new ItemDomain();
             PhysicsDomain = new PhysicsDomain();
+            WeaponDomain = new WeaponDomain();
         }
 
         // todo: obsolete
@@ -32,6 +35,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
             BulletDomain.Inject(facades);
             ItemDomain.Inject(facades);
             PhysicsDomain.Inject(facades);
+            WeaponDomain.Inject(facades);
         }
     }
 

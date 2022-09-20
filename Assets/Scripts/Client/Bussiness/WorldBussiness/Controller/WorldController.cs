@@ -426,6 +426,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     item.transform.SetParent(parent);
                     item.transform.localPosition = Vector3.zero;
                     item.name += entityId;
+                    Debug.Log(entityId);
 
                     // Entity以及Repo
                     switch (itemType)
@@ -468,9 +469,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var repo = worldFacades.Repo;
                 var roleRepo = repo.RoleRepo;
                 var role = roleRepo.GetByEntityId(msg.wRid);
-                Debug.Log(role.roleRenderer.handPoint.name);
-                itemDomain.TryPickUpItem(itemType, itemEntityId, repo, role, role.roleRenderer.handPoint);
-                Debug.Log($"[wRid:{masterWRID}]拾取 {itemType.ToString()}物件[entityId:{itemEntityId}]");
+                if (itemDomain.TryPickUpItem(itemType, itemEntityId, repo, role, role.roleRenderer.handPoint))
+                {
+                    Debug.Log($"[wRid:{masterWRID}]拾取 {itemType.ToString()}物件[entityId:{itemEntityId}]");
+                }
 
             }
         }
@@ -518,24 +520,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             while (weaponDropQueue.TryPeek(out var msg))
             {
                 weaponDropQueue.Dequeue();
-
-                var weaponRepo = worldFacades.Repo.WeaponRepo;
-                var roleRepo = worldFacades.Repo.RoleRepo;
-                var master = roleRepo.GetByEntityId(msg.masterId);
-                if (master.WeaponComponent.TryDropWeapon(msg.entityId, out var weapon))
-                {
-                    Debug.Log($"角色[{msg.masterId}] 丢弃武器[{weapon.EntityId}]---");
-                    weapon.transform.SetParent(null);
-                    weaponRepo.Add(weapon);
-                    var colliders = weapon.transform.GetComponentsInChildren<Collider>();
-                    for (int i = 0; i < colliders.Length; i++)
-                    {
-                        var c = colliders[i];
-                        c.enabled = true;
-                    }
-                }
+                var master = worldFacades.Repo.RoleRepo.GetByEntityId(msg.masterId);
+                master.WeaponComponent.TryDropWeapon(msg.entityId, out var weaponEntity);
+                worldFacades.Domain.WeaponDomain.ReuseWeapon(weaponEntity, master.MoveComponent.CurPos);
             }
         }
+
 
         #endregion
 

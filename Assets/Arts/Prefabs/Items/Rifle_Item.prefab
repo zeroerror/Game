@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 1
   itemType: 1
+  bulletType: 0
 --- !u!1 &2739236041744508303
 GameObject:
   m_ObjectHideFlags: 0
@@ -99,7 +100,6 @@ GameObject:
   - component: {fileID: 8191212167644352069}
   - component: {fileID: 5186269362392170220}
   - component: {fileID: 8656943889377119498}
-  - component: {fileID: 3241689583412420109}
   m_Layer: 9
   m_Name: SM_Handguard_For_Submachine_Gun_02.001
   m_TagString: Untagged
@@ -172,20 +172,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3241689583412420109
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3247912063087913395}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -5660776807706767902, guid: 77fd3f23017f637479f20255333ee7b0, type: 3}
 --- !u!1 &3650998735727510304
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,7 +183,6 @@ GameObject:
   - component: {fileID: 6983656696256048835}
   - component: {fileID: 8494843856728404874}
   - component: {fileID: 2667783484183593760}
-  - component: {fileID: 48731150251427907}
   m_Layer: 9
   m_Name: SM_Gate_For_Special_Submachine_Gun_Clean
   m_TagString: Untagged
@@ -270,20 +255,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &48731150251427907
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3650998735727510304}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -3913396978607132834, guid: 77fd3f23017f637479f20255333ee7b0, type: 3}
 --- !u!1 &4111268206918560136
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,7 +266,6 @@ GameObject:
   - component: {fileID: 4079894133888849359}
   - component: {fileID: 8371678417948133545}
   - component: {fileID: 2179977921026843854}
-  - component: {fileID: 1801836454473402190}
   m_Layer: 9
   m_Name: SM_Trigger_Hook_For_Special_Submachine_Gun_Clean
   m_TagString: Untagged
@@ -368,20 +338,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1801836454473402190
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4111268206918560136}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7287652987053118440, guid: 77fd3f23017f637479f20255333ee7b0, type: 3}
 --- !u!1 &6013732556554788954
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,7 +349,6 @@ GameObject:
   - component: {fileID: 2559794361712839084}
   - component: {fileID: 137346599992274122}
   - component: {fileID: 2219937953969116422}
-  - component: {fileID: 3406075475609259745}
   m_Layer: 9
   m_Name: SM_Special_Submachine_Gun_Clean
   m_TagString: Untagged
@@ -470,20 +425,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3406075475609259745
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6013732556554788954}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -5793873684414432915, guid: 77fd3f23017f637479f20255333ee7b0, type: 3}
 --- !u!1 &6523778436962340827
 GameObject:
   m_ObjectHideFlags: 0
@@ -592,7 +533,6 @@ GameObject:
   - component: {fileID: 2957064583153100836}
   - component: {fileID: 1810856463225589800}
   - component: {fileID: 8830413704586801970}
-  - component: {fileID: 857752433127664324}
   m_Layer: 9
   m_Name: SM_Fuse_For_Special_Submachine_Gun_Clean
   m_TagString: Untagged
@@ -665,20 +605,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &857752433127664324
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7780752085900079647}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 144871261846672271, guid: 77fd3f23017f637479f20255333ee7b0, type: 3}
 --- !u!1 &8969381660579942138
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +616,6 @@ GameObject:
   - component: {fileID: 8706673167065135327}
   - component: {fileID: 463063719146288425}
   - component: {fileID: 4056351484777485982}
-  - component: {fileID: 3852425225472901692}
   m_Layer: 9
   m_Name: SM_Trigger_For_Special_Submachine_Gun_Clean
   m_TagString: Untagged
@@ -763,20 +688,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3852425225472901692
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8969381660579942138}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -1848279379420067699, guid: 77fd3f23017f637479f20255333ee7b0, type: 3}
 --- !u!1001 &8042080697366035479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -784,16 +695,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3926765263119240122}
     m_Modifications:
-    - target: {fileID: -6145858274300624029, guid: 580b4dae3deb3ea4e975a4bf33fa4387,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 573880616416225341, guid: 580b4dae3deb3ea4e975a4bf33fa4387,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     - target: {fileID: 1710798027388048210, guid: 580b4dae3deb3ea4e975a4bf33fa4387,
         type: 3}
       propertyPath: m_RootOrder
@@ -854,11 +755,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Vertical_Handle_01
       objectReference: {fileID: 0}
-    - target: {fileID: 2086900632376510952, guid: 580b4dae3deb3ea4e975a4bf33fa4387,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 580b4dae3deb3ea4e975a4bf33fa4387, type: 3}
 --- !u!4 &8657832136371367749 stripped
@@ -874,20 +770,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3926765263119240122}
     m_Modifications:
-    - target: {fileID: 2896082621188901658, guid: eebf9633a5556074fa8426026d1c460f,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4993484941224657800, guid: eebf9633a5556074fa8426026d1c460f,
         type: 3}
       propertyPath: m_Name
       value: SM_Magazine_For_Special_Submachine_Gun
-      objectReference: {fileID: 0}
-    - target: {fileID: 4993484941224657800, guid: eebf9633a5556074fa8426026d1c460f,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 5622670142858402098, guid: eebf9633a5556074fa8426026d1c460f,
         type: 3}
@@ -944,11 +830,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6794964717474079325, guid: eebf9633a5556074fa8426026d1c460f,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eebf9633a5556074fa8426026d1c460f, type: 3}
 --- !u!4 &2421961871101253311 stripped
@@ -964,16 +845,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3926765263119240122}
     m_Modifications:
-    - target: {fileID: 2210478995085363473, guid: c90d4b87a9347fd43ad0fb549ee1f938,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2468832776731300984, guid: c90d4b87a9347fd43ad0fb549ee1f938,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     - target: {fileID: 3605169472827485975, guid: c90d4b87a9347fd43ad0fb549ee1f938,
         type: 3}
       propertyPath: m_RootOrder
@@ -1034,11 +905,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Tactical_Block
       objectReference: {fileID: 0}
-    - target: {fileID: 4126407921313953197, guid: c90d4b87a9347fd43ad0fb549ee1f938,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c90d4b87a9347fd43ad0fb549ee1f938, type: 3}
 --- !u!4 &6742758637550402611 stripped
@@ -1054,11 +920,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3926765263119240122}
     m_Modifications:
-    - target: {fileID: -5020512350469986534, guid: cdf94fedf7b2c124ab933abe0e1c5b00,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7453544284289774953, guid: cdf94fedf7b2c124ab933abe0e1c5b00,
         type: 3}
       propertyPath: m_RootOrder
@@ -1119,16 +980,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Handguard_For_Submachine_Gun_02
       objectReference: {fileID: 0}
-    - target: {fileID: 7799002713627062227, guid: cdf94fedf7b2c124ab933abe0e1c5b00,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8591570483212963334, guid: cdf94fedf7b2c124ab933abe0e1c5b00,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cdf94fedf7b2c124ab933abe0e1c5b00, type: 3}
 --- !u!4 &642742338766886144 stripped
@@ -1144,20 +995,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3926765263119240122}
     m_Modifications:
-    - target: {fileID: 3163827163541970179, guid: f1934d0715948b54d83e420685e0d87b,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     - target: {fileID: 3524295934362598614, guid: f1934d0715948b54d83e420685e0d87b,
         type: 3}
       propertyPath: m_Name
       value: SM_Butt_Of_The_Rifle_For_Special_Submachine_Gun_Clean
-      objectReference: {fileID: 0}
-    - target: {fileID: 3524295934362598614, guid: f1934d0715948b54d83e420685e0d87b,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4297279389801473644, guid: f1934d0715948b54d83e420685e0d87b,
         type: 3}
@@ -1214,11 +1055,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7953881247599636279, guid: f1934d0715948b54d83e420685e0d87b,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f1934d0715948b54d83e420685e0d87b, type: 3}
 --- !u!4 &6068658905194805963 stripped
@@ -1234,11 +1070,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3926765263119240122}
     m_Modifications:
-    - target: {fileID: -2155776625152338445, guid: 59325158d2140a4428c7bc6d792cb605,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 296271022618848544, guid: 59325158d2140a4428c7bc6d792cb605,
         type: 3}
       propertyPath: m_RootOrder
@@ -1299,16 +1130,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Collimator_Sight_B_01
       objectReference: {fileID: 0}
-    - target: {fileID: 1105422879291373466, guid: 59325158d2140a4428c7bc6d792cb605,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 1465847119292126799, guid: 59325158d2140a4428c7bc6d792cb605,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59325158d2140a4428c7bc6d792cb605, type: 3}
 --- !u!4 &7748343265421120853 stripped
@@ -1328,11 +1149,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Muffler_04
-      objectReference: {fileID: 0}
-    - target: {fileID: 2480372255489688415, guid: 5c9ddf07179e6a9488ccb9ebb6c30ba7,
-        type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 2965582696979552741, guid: 5c9ddf07179e6a9488ccb9ebb6c30ba7,
         type: 3}
@@ -1389,16 +1205,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3643746740646562651, guid: 5c9ddf07179e6a9488ccb9ebb6c30ba7,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4137947262516798090, guid: 5c9ddf07179e6a9488ccb9ebb6c30ba7,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c9ddf07179e6a9488ccb9ebb6c30ba7, type: 3}
 --- !u!4 &5097204005127380999 stripped

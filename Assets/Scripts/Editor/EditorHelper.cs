@@ -49,4 +49,18 @@ public static class EditorHelper
         Debug.Log($"启用Convex个数：{allMeshFilter.Length}");
     }
 
+    [MenuItem("GameObject/移除所有Collider")]
+    static void RmoveAllCollider()
+    {
+        var chosenGo = Selection.activeGameObject;
+        var allColliders = chosenGo.transform.GetComponentsInChildren<Collider>();
+        for (int i = 0; i < allColliders.Length; i++)
+        {
+            GameObject.DestroyImmediate(allColliders[i]);
+        }
+        Debug.Log($"移除Collider个数：{allColliders.Length}");
+    }
+
+
+
 }

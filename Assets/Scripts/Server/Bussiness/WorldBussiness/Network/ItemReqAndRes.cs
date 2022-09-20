@@ -2,6 +2,7 @@ using System;
 using Game.Protocol.World;
 using Game.Infrastructure.Network.Server;
 using Game.Client.Bussiness.WorldBussiness.Generic;
+using UnityEngine;
 
 namespace Game.Server.Bussiness.WorldBussiness.Network
 {

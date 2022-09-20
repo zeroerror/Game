@@ -39,22 +39,36 @@ namespace Game.Client.Bussiness.WorldBussiness
 
 
         // 拾取武器
-        public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
+        public bool TryPickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
         {
-            if (CurrentNum >= WEAPON_CAPICY) return;
+            if (CurrentNum >= WEAPON_CAPICY)
+            {
+                Debug.LogWarning($"达到武器持有上限{WEAPON_CAPICY}!");
+                return false;
+            }
 
-            Debug.Log($"拾取武器:{weaponEntity.WeaponType.ToString()}");
             var colliders = weaponEntity.GetComponentsInChildren<Collider>();
             for (int i = 0; i < colliders.Length; i++)
             {
                 colliders[i].enabled = false;
             }
-            //武器挂点
+
+            if (hangPoint != null) Debug.Log($"{weaponEntity.transform.name} 武器挂点:{hangPoint.name}");
             weaponEntity.transform.SetParent(hangPoint);
             weaponEntity.transform.localPosition = Vector3.zero;
             CurrentWeapon = weaponEntity;
             CurrentWeapon.gameObject.SetActive(true);
-            AllWeapon[CurrentNum++] = weaponEntity;
+
+            for (int i = 0; i < AllWeapon.Length; i++)
+            {
+                if (AllWeapon[i] == null)
+                {
+                    AllWeapon[i] = weaponEntity;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // 切换武器
@@ -75,13 +89,28 @@ namespace Game.Client.Bussiness.WorldBussiness
             for (int i = 0; i < AllWeapon.Length; i++)
             {
                 var w = AllWeapon[i];
+                if (w == null) continue;
+
                 if (w.EntityId == entityId)
                 {
                     weapon = w;
+                    AllWeapon[i] = null;
                     weapon.ClearMaster();
+                    CurrentNum--;
+                    for (int j = 0; j < AllWeapon.Length; j++)
+                    {
+                        var curWeapon = AllWeapon[j];
+                        if (curWeapon != null)
+                        {
+                            CurrentWeapon = curWeapon;
+                            break;
+                        }
+                    }
                     return true;
                 }
             }
+
+            Debug.Log($"CurrentNum:{CurrentNum} 丢弃武器失败 entityId:{entityId}");
             return false;
         }
 
@@ -92,6 +121,7 @@ namespace Game.Client.Bussiness.WorldBussiness
                 var w = AllWeapon[i];
                 if (w.EntityId == entityId)
                 {
+                    AllWeapon[i] = null;
                     w.ClearMaster();
                     return;
                 }
@@ -99,15 +129,15 @@ namespace Game.Client.Bussiness.WorldBussiness
             return;
         }
 
-        public bool Exist(ushort entityId)
+        public WeaponEntity GetWeapon(ushort entityId)
         {
             for (int i = 0; i < AllWeapon.Length; i++)
             {
                 var w = AllWeapon[i];
-                if (w.EntityId == entityId) return true;
+                if (w.EntityId == entityId) return w;
             }
 
-            return false;
+            return null;
         }
 
     }

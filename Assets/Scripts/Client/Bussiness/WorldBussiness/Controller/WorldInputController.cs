@@ -51,6 +51,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 Collider closestCollider = null;
                 IPickable closestPickable = null;
                 Vector3 ownerPos = owner.MoveComponent.CurPos;
+                Debug.Log($"想要拾取物品，周围可拾取数量为:{nearItemList.Count}");
 
                 nearItemList.ForEach((item) =>
                 {
@@ -58,6 +59,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
                     var pickable = item.collider.GetComponentInParent<IPickable>();
                     if (pickable == null) return;
+
+                    Debug.Log($"item:{item.collider.transform.parent.name}");
 
                     var collider = item.collider;
                     var dis = Vector3.Distance(collider.transform.position, ownerPos);
@@ -89,7 +92,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                     Vector3 targetPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
                     // 2.服务端流程
                     var rqs = worldFacades.Network.WeaponReqAndRes;
-                    rqs.SendReq_WeaponShoot(owner.EntityId,targetPos);
+                    rqs.SendReq_WeaponShoot(owner.EntityId, targetPos);
                 }
 
             }
@@ -98,8 +101,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 // 换弹前判断流程
                 var weaponComponent = owner.WeaponComponent;
                 Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空");
-                Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
-                if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsReloading && !weaponComponent.IsFullReloaded)
+                // Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
+                if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsFullReloaded)
                 {
                     weaponComponent.SetReloading(true);
                     var rqs = worldFacades.Network.WeaponReqAndRes;

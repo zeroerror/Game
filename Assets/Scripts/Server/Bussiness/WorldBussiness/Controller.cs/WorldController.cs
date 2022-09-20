@@ -653,6 +653,9 @@ namespace Game.Server.Bussiness.WorldBussiness
                     if (roleRepo.TryGetByEntityId(masterId, out var master)
                     && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
                     {
+                        // 服务器逻辑
+                        worldFacades.ClientWorldFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.CurPos);
+
                         connIdList.ForEach((connId) =>
                         {
                             rqs.SendRes_WeaponDrop(connId, serveFrame, masterId, entityId);
@@ -855,7 +858,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
 
             msgStruct.Enqueue(new FrameWeaponDropReqMsgStruct { connId = connId, msg = msg });
-            Debug.Log("收到武器换弹请求");
+            Debug.Log("收到武器丢弃请求");
         }
 
         // ====== Scene Spawn Method
@@ -912,7 +915,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 var itemDomain = worldFacades.ClientWorldFacades.Domain.ItemDomain;
                 var item = itemDomain.SpawnItem(itemType, subtype);
 
-                ushort weaponEntityId = 0;
+                ushort entityId = 0;
                 switch (itemType)
                 {
                     case ItemType.Default:
@@ -920,23 +923,22 @@ namespace Game.Server.Bussiness.WorldBussiness
                     case ItemType.Weapon:
                         var weaponEntity = item.GetComponent<WeaponEntity>();
                         var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
-                        weaponEntityId = weaponRepo.weaponIdAutoIncreaseId;
+                        entityId = weaponRepo.WeaponIdAutoIncreaseId;
                         weaponEntity.Ctor();
-                        weaponEntity.SetEntityId(weaponEntityId);
+                        weaponEntity.SetEntityId(entityId);
                         weaponRepo.Add(weaponEntity);
-                        Debug.Log($"生成武器资源：weaponEntityId:{weaponEntityId}");
-                        entityIdArray[index] = weaponEntityId;
-                        weaponRepo.weaponIdAutoIncreaseId++;
+                        Debug.Log($"生成武器资源:{entityId}");
+                        entityIdArray[index] = entityId;
                         break;
                     case ItemType.BulletPack:
                         var bulletPackEntity = item.GetComponent<BulletPackEntity>();
                         var bulletPackRepo = worldFacades.ClientWorldFacades.Repo.BulletPackRepo;
-                        var bulletEntityId = bulletPackRepo.bulletPackAutoIncreaseId;
+                        entityId = bulletPackRepo.bulletPackAutoIncreaseId;
                         bulletPackEntity.Ctor();
-                        bulletPackEntity.SetEntityId(bulletEntityId);
+                        bulletPackEntity.SetEntityId(entityId);
                         bulletPackRepo.Add(bulletPackEntity);
-                        Debug.Log($"bulletEntityId:{bulletEntityId}");
-                        entityIdArray[index] = bulletEntityId;
+                        Debug.Log($"生成子弹包资源:{entityId}");
+                        entityIdArray[index] = entityId;
                         bulletPackRepo.bulletPackAutoIncreaseId++;
                         break;
                     case ItemType.Pill:
@@ -946,7 +948,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                 item.transform.SetParent(parent.transform);
                 item.transform.localPosition = Vector3.zero;
-                item.name += weaponEntityId;
+                item.name += entityId;
 
                 index++;
             });

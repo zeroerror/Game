@@ -218,7 +218,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             var cosValue = Vector3.Dot(a, b);
             var reduceVelocity = MoveVelocity * cosValue;
             moveVelocity -= reduceVelocity;
-            DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
         }
 
         public void HitSomething(Vector3 hitDir)
