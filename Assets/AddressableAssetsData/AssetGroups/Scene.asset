@@ -23,7 +23,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - Scene
   - m_GUID: 251c388429026704581fe26af7fab62a
-    m_Address: WorldChooseScene
+    m_Address: world_server_choose_scene
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene

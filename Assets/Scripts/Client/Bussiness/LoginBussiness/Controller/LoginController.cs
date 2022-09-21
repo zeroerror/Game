@@ -65,10 +65,11 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
             if (msg.status == 1)
             {
                 Debug.Log($"登录成功! 你的userToken:{msg.userToken}");
-                NetworkEventCenter.InvokeLoginSuccessHandler();
+                NetworkEventCenter.SetLoginSuccess(msg);
                 loginTrigger = msg.status;
-            }else{
-
+            }
+            else
+            {
                 Debug.Log("登录失败!账户或密码不正确！");
             }
         }
@@ -79,7 +80,9 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
             {
                 Debug.Log("注册成功!");
                 registTrigger = msg.status;
-            }else{
+            }
+            else
+            {
                 Debug.Log("账户名已被注册!");
             }
         }

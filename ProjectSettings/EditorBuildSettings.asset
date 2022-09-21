@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Map_v1.unity
     guid: 5a463281e6e238742a45430f11e82829
   - enabled: 0
-    path: Assets/Scenes/WorldChooseScene.unity
+    path: Assets/Scenes/world_server_choose_scene.unity
     guid: 251c388429026704581fe26af7fab62a
   - enabled: 0
     path: Assets/Scenes/TEST.unity

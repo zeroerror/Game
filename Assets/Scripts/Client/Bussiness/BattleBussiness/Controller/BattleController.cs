@@ -4,6 +4,7 @@ using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Protocol.Login;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -35,7 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public BattleController()
         {
             // Between Bussiness
-            NetworkEventCenter.RegistLoginSuccess(EnterBattleChooseScene);
+            NetworkEventCenter.RegistLoginSuccess(EnterWorldServerChooseScene);
 
             roleSpawnQueue = new Queue<FrameWRoleSpawnResMsg>();
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
@@ -608,25 +609,34 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Network Event Center]
 
-        async void EnterBattleChooseScene()
+        async void EnterWorldServerChooseScene(LoginResMessage msg)
         {
-            // 当前有加载好的场景，则不加载
-            var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            if (curFieldEntity != null) return;
+            // // 当前有加载好的场景，则不加载
+            // var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            // if (curFieldEntity != null) return;
 
-            // Load Scene And Spawn Field
+            // // Load Scene And Spawn Field
+            // var domain = battleFacades.Domain;
+            // var fieldEntity = await domain.BattleSpawnDomain.SpawnCityScene();
+            // Cursor.lockState = CursorLockMode.Locked;
+            // Cursor.visible = true;
+            // fieldEntity.SetFieldId(1);
+            // var fieldEntityRepo = battleFacades.Repo.FiledRepo;
+            // var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
+            // fieldEntityRepo.Add(fieldEntity);
+            // fieldEntityRepo.SetPhysicsScene(physicsScene);
+            // // Send Spawn Role Message
+            // var rqs = battleFacades.Network.BattleRoleReqAndRes;
+            // rqs.SendReq_WolrdRoleSpawn();
+
             var domain = battleFacades.Domain;
-            var fieldEntity = await domain.BattleSpawnDomain.SpawnCityScene();
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = true;
-            fieldEntity.SetFieldId(1);
-            var fieldEntityRepo = battleFacades.Repo.FiledRepo;
-            var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
-            fieldEntityRepo.Add(fieldEntity);
-            fieldEntityRepo.SetPhysicsScene(physicsScene);
-            // Send Spawn Role Message
-            var rqs = battleFacades.Network.BattleRoleReqAndRes;
-            rqs.SendReq_WolrdRoleSpawn();
+            var fieldEntity = await domain.BattleSpawnDomain.SpawnWorldServerChooseScene();
+            var worldSerHosts = msg.worldServerHosts;
+            var worldSerPorts = msg.worldServerPorts;
+            for (int i = 0; i < worldSerHosts.Length; i++)
+            {
+                Debug.Log($"世界服 {i} Host:{worldSerHosts[i]}  Port:{worldSerPorts[i]}");
+            }
         }
 
         #endregion

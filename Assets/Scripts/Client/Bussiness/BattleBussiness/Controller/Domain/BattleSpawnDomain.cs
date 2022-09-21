@@ -22,9 +22,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = battleFacades;
         }
 
-        public async Task<FieldEntity> SpawnBattleChooseScene()=> await SpawnScene("BattleChooseScene");
+        public async Task<FieldEntity> SpawnBattleChooseScene() => await SpawnScene("BattleChooseScene");
 
         public async Task<FieldEntity> SpawnCityScene() => await SpawnScene("scene_city");
+
+        public async Task<FieldEntity> SpawnWorldServerChooseScene() => await SpawnScene("world_server_choose_scene");
 
         public async Task<FieldEntity> SpawnScene(string sceneName)
         {

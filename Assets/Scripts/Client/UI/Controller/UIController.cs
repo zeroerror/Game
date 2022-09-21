@@ -1,6 +1,7 @@
 using Game.UI.Event;
 using Game.UI.Manager;
 using Game.Client.Bussiness.EventCenter;
+using Game.Protocol.Login;
 
 namespace Game.UI.Controller
 {
@@ -40,9 +41,10 @@ namespace Game.UI.Controller
             }
         }
 
-        static void CloseLoginPanel()
+        static void CloseLoginPanel(LoginResMessage msg)
         {
             UIManager.CloseUI("Home_LoginPanel");
+            // UIManager.OpenUI("Home_WorldServerPanel");
         }
 
     }

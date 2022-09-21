@@ -87,7 +87,9 @@ namespace Game.Server.Bussiness.LoginBussiness
                 networkServer.SendMsg<LoginResMessage>(ev.connID, new LoginResMessage
                 {
                     status = status,
-                    userToken = status != 0 ? System.DateTime.Now.ToString() : string.Empty
+                    userToken = status != 0 ? System.DateTime.Now.ToString() : string.Empty,
+                    worldServerHosts = NetworkConfig.WORLDSERVER_HOST,
+                    worldServerPorts = NetworkConfig.WORLDSERVER_PORT
                 });
             }
         }
@@ -106,7 +108,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 // MYSQL OPARATION
                 try
                 {
-                        Debug.Log($"注册账户请求 账户名：'{ev.name}'  密码'{ev.pwd}'-------------------------------");
+                    Debug.Log($"注册账户请求 账户名：'{ev.name}'  密码'{ev.pwd}'-------------------------------");
                     var reader = MySqlHelper.ExecuteReader(DatabaseConfig.ConnStr, "select * from account");
                     while (reader.GetEnumerator().MoveNext())
                     {
