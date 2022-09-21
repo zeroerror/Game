@@ -46,7 +46,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void SetBulletCapacity(int capacity) => this.bulletCapacity = capacity;
 
         public int bulletNum { get; private set; }
-        public void LoadBullet(int bulletNum) => this.bulletNum = bulletNum;
+        public void LoadBullet(int bulletNum) => this.bulletNum += bulletNum;
 
         public BulletType bulletType;
 

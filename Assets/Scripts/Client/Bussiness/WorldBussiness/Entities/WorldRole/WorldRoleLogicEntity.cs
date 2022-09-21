@@ -65,8 +65,9 @@ namespace Game.Client.Bussiness.WorldBussiness
             offset = new Vector3(0, 0.2f, 0);
         }
 
-        public bool TryWeaponReload()
+        public bool TryWeaponReload(out int realTakeOut)
         {
+            realTakeOut = 0;
             var curWeapon = WeaponComponent.CurrentWeapon;
             if (curWeapon == null)
             {
@@ -86,15 +87,62 @@ namespace Game.Client.Bussiness.WorldBussiness
             //     case WeaponType.GrenadeLauncher:
             //         break;
             // }
-            int takeOut = ItemComponent.TryTakeOutItem_Bullet(30);
-            if (takeOut == 0)
+
+            realTakeOut = ItemComponent.TryTakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum);
+            if (realTakeOut == 0)
             {
                 Debug.LogWarning($"武器[{curWeapon.name}]所需子弹不足！");
                 return false;
             }
 
-            Debug.Log($"武器换弹,取出子弹数量：{takeOut}");
-            curWeapon.LoadBullet(takeOut);
+            Debug.Log($"武器换弹,取出子弹数量：{realTakeOut}");
+            curWeapon.LoadBullet(realTakeOut);
+            WeaponComponent.SetReloading(false);
+            return true;
+        }
+
+        public void WeaponReload(int reloadBulletNum)
+        {
+            var curWeapon = WeaponComponent.CurrentWeapon;
+            if (curWeapon == null)
+            {
+                Debug.LogWarning("当前尚未持有武器！");
+                return;
+            }
+
+            var realTakeOut = ItemComponent.TryTakeOutItem_Bullet(reloadBulletNum);
+            if (realTakeOut == 0)
+            {
+                Debug.LogWarning($"武器[{curWeapon.name}]所需子弹不足！");
+                return;
+            }
+
+            Debug.Log($"武器换弹,取出子弹数量：{realTakeOut}");
+            curWeapon.LoadBullet(realTakeOut);
+            WeaponComponent.SetReloading(false);
+            return;
+        }
+
+        public bool CanWeaponReload()
+        {
+            var curWeapon = WeaponComponent.CurrentWeapon;
+            if (curWeapon == null)
+            {
+                Debug.LogWarning("当前尚未持有武器！");
+                return false;
+            }
+
+            if (WeaponComponent.IsFullReloaded)
+            {
+                Debug.LogWarning("当前武器已经装满子弹");
+                return false;
+            }
+            if (!ItemComponent.HasItem_Bullet(1))
+            {
+                Debug.LogWarning("当前1颗子弹都没了");
+                return false;
+            }
+
             return true;
         }
 

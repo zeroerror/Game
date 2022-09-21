@@ -507,11 +507,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
                 var roleRepo = worldFacades.Repo.RoleRepo;
                 var master = roleRepo.GetByEntityId(msg.masterId);
-                if (master.TryWeaponReload())
-                {
-                    Debug.Log($"角色:{msg.masterId}换弹---");
-                    master.WeaponComponent.SetReloading(false);
-                }
+                var reloadBulletNum = msg.reloadBulletNum;
+                master.WeaponReload(reloadBulletNum);
             }
         }
 

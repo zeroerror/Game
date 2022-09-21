@@ -593,12 +593,12 @@ namespace Game.Server.Bussiness.WorldBussiness
                     var masterId = msg.masterId;
                     if (roleRepo.TryGetByEntityId(masterId, out var master))
                     {
-                        if (master.TryWeaponReload())
+                        if (master.TryWeaponReload(out int reloadBulletNum))
                         {
                             //TODO: 装弹时间过后才发送回客户端
                             connIdList.ForEach((connId) =>
                             {
-                                rqs.SendRes_WeaponReloaded(connId, serveFrame, masterId);
+                                rqs.SendRes_WeaponReloaded(connId, serveFrame, masterId, reloadBulletNum);
                             });
                         }
                     }

@@ -39,11 +39,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             Debug.Log("回复武器射击请求");
         }
 
-        public void SendRes_WeaponReloaded(int connId, int serverFrame, byte masterId)
+        public void SendRes_WeaponReloaded(int connId, int serverFrame, byte masterId, int reloadBulletNum)
         {
             FrameWeaponReloadResMsg msg = new FrameWeaponReloadResMsg
             {
                 masterId = masterId,
+                reloadBulletNum = (byte)reloadBulletNum
             };
             _server.SendMsg(connId, msg);
             sendCount++;

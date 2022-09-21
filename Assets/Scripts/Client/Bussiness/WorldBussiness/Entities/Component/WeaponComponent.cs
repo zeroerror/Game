@@ -16,7 +16,6 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void SetReloading(bool flag) => this.IsReloading = flag;
         public bool IsFullReloaded => CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
 
-
         public WeaponComponent()
         {
         }
@@ -93,24 +92,31 @@ namespace Game.Client.Bussiness.WorldBussiness
 
                 if (w.EntityId == entityId)
                 {
+                    Debug.Log($"丢弃武器{entityId}");
                     weapon = w;
-                    AllWeapon[i] = null;
                     weapon.ClearMaster();
+
+                    AllWeapon[i] = null;
+                    CurrentWeapon = null;
+
                     CurrentNum--;
+
                     for (int j = 0; j < AllWeapon.Length; j++)
                     {
                         var curWeapon = AllWeapon[j];
                         if (curWeapon != null)
                         {
                             CurrentWeapon = curWeapon;
+                            Debug.Log($"当前武器:{CurrentWeapon.EntityId}");
                             break;
                         }
                     }
+
                     return true;
                 }
             }
 
-            Debug.Log($"CurrentNum:{CurrentNum} 丢弃武器失败 entityId:{entityId}");
+            Debug.LogWarning($"CurrentNum:{CurrentNum} 丢弃武器失败 entityId:{entityId}");
             return false;
         }
 

@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         {
             FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
             {
-                masterId = role.EntityId
+                masterId = role.EntityId,
             };
             _client.SendMsg(frameWeaponReloadReqMsg);
             Debug.Log("发送武器装弹请求");
@@ -51,7 +51,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
         public void SendReq_WeaponDrop(WorldRoleLogicEntity role)
         {
             if (role.WeaponComponent.CurrentWeapon == null) return;
-            
+
             FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
             {
                 entityId = role.WeaponComponent.CurrentWeapon.EntityId,

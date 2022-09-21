@@ -68,6 +68,21 @@ namespace Game.Client.Bussiness.WorldBussiness
             return 0;
         }
 
+        public bool HasItem_Bullet(int num)
+        {
+            int total = 0;
+            var e = bulletPackItemQueue.GetEnumerator();
+            while (e.MoveNext())
+            {
+
+                var bulletPackEntity = e.Current;
+                total += bulletPackEntity.bulletNum;
+                if (total >= num) return true;
+            }
+
+            return false;
+        }
+
         //丢弃
         public IPickable[] DropItems(ItemType itemtype, int num)
         {

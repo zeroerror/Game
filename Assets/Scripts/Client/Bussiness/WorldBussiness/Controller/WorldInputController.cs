@@ -102,7 +102,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var weaponComponent = owner.WeaponComponent;
                 Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空");
                 // Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
-                if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsFullReloaded)
+                if (owner.CanWeaponReload())
                 {
                     weaponComponent.SetReloading(true);
                     var rqs = worldFacades.Network.WeaponReqAndRes;
