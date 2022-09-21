@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Client.Bussiness.BattleBussiness
 {
     [Serializable]
     public struct ItemGenProbability

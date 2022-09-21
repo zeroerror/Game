@@ -1,30 +1,30 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness.Facades;
-using Game.Client.Bussiness.WorldBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
-namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
+namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
     public class BulletDomain
     {
 
-        WorldFacades worldFacades;
+        BattleFacades battleFacades;
 
         public BulletDomain()
         {
         }
 
-        public void Inject(WorldFacades facades)
+        public void Inject(BattleFacades facades)
         {
-            this.worldFacades = facades;
+            this.battleFacades = facades;
         }
 
         public BulletEntity SpawnBullet(Transform parent, BulletType bulletType)
         {
             string bulletPrefabName = bulletType.ToString();
 
-            if (worldFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
+            if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public List<BulletEntity> Tick_BulletLife(float deltaTime)
         {
-            var bulletRepo = worldFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bulletEntity) =>
             {
@@ -55,7 +55,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public void Tick_Bullet(float fixedDeltaTime)
         {
-            var bulletRepo = worldFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 switch (bullet.BulletType)
@@ -79,7 +79,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
         public List<HookerEntity> GetActiveHookerList()
         {
             List<HookerEntity> hookerEntities = new List<HookerEntity>();
-            var bulletRepo = worldFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 if (bullet is HookerEntity hookerEntity && hookerEntity.GrabPoint != null)

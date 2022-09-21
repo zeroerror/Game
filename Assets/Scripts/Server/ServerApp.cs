@@ -1,12 +1,9 @@
-using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using Game.Protocol.Client2World;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Server.Facades;
 using Game.Server.Bussiness.LoginBussiness;
-using Game.Server.Bussiness.WorldBussiness;
-using Game.Server.Bussiness.WorldBussiness.Facades;
+using Game.Server.Bussiness.BattleBussiness;
 
 namespace Game.Server
 {
@@ -18,7 +15,7 @@ namespace Game.Server
         AllServerNetwork allServerNetwork;
 
         // Entry
-        WorldEntry worldEntry;
+        BattleEntry battleEntry;
         LoginEntry loginEntry;
 
         void Awake()
@@ -28,10 +25,10 @@ namespace Game.Server
             StartServer();
 
             // == Entry ==
-            // WorldEntry
-            worldEntry = new WorldEntry();
-            worldEntry.Inject(allServerNetwork.networkServer, UnityEngine.Time.fixedDeltaTime);
-            worldEntry.Init();
+            // BattleEntry
+            battleEntry = new BattleEntry();
+            battleEntry.Inject(allServerNetwork.networkServer, UnityEngine.Time.fixedDeltaTime);
+            battleEntry.Init();
             // LoginEntry
             loginEntry = new LoginEntry();
             loginEntry.Inject(allServerNetwork.networkServer);
@@ -45,7 +42,7 @@ namespace Game.Server
         void FixedUpdate()
         {
             // == Entry ==
-            worldEntry.Tick();
+            battleEntry.Tick();
             loginEntry.Tick();
 
         }

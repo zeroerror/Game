@@ -1,7 +1,7 @@
 using UnityEngine;
 using Game.Generic;
 
-namespace Game.Client.Bussiness.WorldBussiness.Shot
+namespace Game.Client.Bussiness.BattleBussiness.Shot
 {
 
     public struct MoveComponentShot

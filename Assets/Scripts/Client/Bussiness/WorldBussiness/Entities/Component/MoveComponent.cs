@@ -1,9 +1,9 @@
 using UnityEngine;
 using Game.Generic;
-using Game.Client.Bussiness.WorldBussiness.Shot;
+using Game.Client.Bussiness.BattleBussiness.Shot;
 using System;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Client.Bussiness.BattleBussiness
 {
 
     public class MoveComponent

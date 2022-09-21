@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Client.Bussiness.BattleBussiness
 {
 
     public class AnimatorComponent

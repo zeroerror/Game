@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness.Generic;
-using Game.Client.Bussiness.WorldBussiness.Interface;
+using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Interface;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Client.Bussiness.BattleBussiness
 {
 
     public class ItemComponent

@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
-using Game.Protocol.World;
+using Game.Protocol.Battle;
 using Game.Infrastructure.Network.Client;
-using Game.Client.Bussiness.WorldBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
-namespace Game.Client.Bussiness.WorldBussiness.Network
+namespace Game.Client.Bussiness.BattleBussiness.Network
 {
 
     public class BulletReqAndRes

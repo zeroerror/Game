@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Game.Client.Bussiness.WorldBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 using UnityEngine;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Client.Bussiness.BattleBussiness
 {
 
     public class BulletEntity : PhysicsEntity
@@ -36,7 +36,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void AddExistTime(float time) => existTime += time;
 
         // Physics Queue
-        public Queue<WorldRoleLogicEntity> HitRoleQueue { get; private set; }
+        public Queue<BattleRoleLogicEntity> HitRoleQueue { get; private set; }
         public Queue<GameObject> HitFieldQueue { get; private set; }
 
         public void Ctor()
@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             moveComponent.isPersistentMove = true;
 
             lifeTime = 5f;
-            HitRoleQueue = new Queue<WorldRoleLogicEntity>();
+            HitRoleQueue = new Queue<BattleRoleLogicEntity>();
             HitFieldQueue = new Queue<GameObject>();
             Init();
         }

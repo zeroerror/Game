@@ -9,8 +9,8 @@ namespace Game.Client
 
         public static Transform UICamTrans { get; private set; }
 
-        public static Transform WorldCamTrans { get; private set; }
-        public static void SetWorldCamTrans(Transform trans) => WorldCamTrans = trans;
+        public static Transform BattleCamTrans { get; private set; }
+        public static void SetBattleCamTrans(Transform trans) => BattleCamTrans = trans;
 
         public static CinemachineExtra CinemachineExtra { get; private set; }
         public static void SetCinemachineExtra(CinemachineExtra cinemachineExtra) => CinemachineExtra = cinemachineExtra;
@@ -27,12 +27,12 @@ namespace Game.Client
 
         public static void AddCullingMask(string layer)
         {
-            WorldCamTrans.GetComponent<Camera>().cullingMask |= (1 << LayerMask.NameToLayer(layer));
+            BattleCamTrans.GetComponent<Camera>().cullingMask |= (1 << LayerMask.NameToLayer(layer));
         }
 
         public static void RemoveCullingMask(string layer)
         {
-            WorldCamTrans.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer(layer));
+            BattleCamTrans.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer(layer));
         }
 
         static void CreateUICamera()

@@ -1,7 +1,7 @@
 using UnityEngine;
 using Game.Generic;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Client.Bussiness.BattleBussiness
 {
 
     public class HealthComponent

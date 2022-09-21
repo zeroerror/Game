@@ -1,31 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
-namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
+namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
     public class PhysicsDomain
     {
-        WorldFacades worldFacades;
+        BattleFacades battleFacades;
 
         public PhysicsDomain()
         {
         }
 
-        public void Inject(WorldFacades facades)
+        public void Inject(BattleFacades facades)
         {
-            this.worldFacades = facades;
+            this.battleFacades = facades;
         }
 
         public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
         public List<ColliderExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Item");
         public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
-        public List<WorldRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
+        public List<BattleRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
         {
-            List<WorldRoleLogicEntity> hitRoleList = new List<WorldRoleLogicEntity>();
-            var roleRepo = worldFacades.Repo.RoleRepo;
+            List<BattleRoleLogicEntity> hitRoleList = new List<BattleRoleLogicEntity>();
+            var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
                 var rolePos = role.SelfPos;
@@ -85,7 +85,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return hitRoleList;
         }
 
-        public void Tick_RoleMoveHitErase(WorldRoleLogicEntity role)
+        public void Tick_RoleMoveHitErase(BattleRoleLogicEntity role)
         {
             var rolePos = role.SelfPos;
             // 墙体撞击：速度管理
@@ -101,7 +101,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
 
         public void Refresh_BulletHit()
         {
-            var bulletRepo = worldFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 var roleColliderList = GetHitRole_ColliderList(bullet);
@@ -111,7 +111,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     if (colliderExtra.isEnter == CollisionStatus.Enter)
                     {
                         colliderExtra.isEnter = CollisionStatus.Stay;
-                        var role = colliderExtra.collider.GetComponent<WorldRoleLogicEntity>();
+                        var role = colliderExtra.collider.GetComponent<BattleRoleLogicEntity>();
                         hitRoleQueue.Enqueue(role);
                     }
                 });

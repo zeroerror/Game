@@ -1,7 +1,7 @@
 using ZeroFrame.Protocol;
 using Game.Protocol.Login;
 using Game.Protocol.Client2World;
-using Game.Protocol.World;
+using Game.Protocol.Battle;
 using System;using System.Collections.Generic;namespace Game.Protocol
 {
 

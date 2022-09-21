@@ -1,4 +1,4 @@
-namespace Game.Client.Bussiness.WorldBussiness.Generic
+namespace Game.Client.Bussiness.BattleBussiness.Generic
 {
 
     public enum ItemType

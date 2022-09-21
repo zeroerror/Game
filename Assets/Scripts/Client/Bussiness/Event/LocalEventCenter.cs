@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness;
+using Game.Client.Bussiness.BattleBussiness;
 
 namespace Game.Client.Bussiness.EventCenter
 {
@@ -10,8 +10,8 @@ namespace Game.Client.Bussiness.EventCenter
     /// </summary>
     public static class LocalEventCenter
     {
-        // == WorldBussiness ==
-        // WorldChoose Scene Loaded
+        // == BattleBussiness ==
+        // BattleChoose Scene Loaded
         static Action sceneLoaded_Action;
         static Action<string> sceneLoaded_Handler;
         public static void Regist_SceneLoadedHandler(Action<string> action) => sceneLoaded_Handler += action;
@@ -26,13 +26,13 @@ namespace Game.Client.Bussiness.EventCenter
                 }
             };
 
-        static Action worldRoleSpawn_Action;
-        static Action<WorldRoleLogicEntity> worldRoleSpawn_Handler;
-        public static void Regist_WorldRoleSpawnHandler(Action<WorldRoleLogicEntity> action) => worldRoleSpawn_Handler += action;
-        public static void Invoke_WorldRoleSpawnHandler(WorldRoleLogicEntity entity) => worldRoleSpawn_Action = () =>
+        static Action battleRoleSpawn_Action;
+        static Action<BattleRoleLogicEntity> battleRoleSpawn_Handler;
+        public static void Regist_BattleRoleSpawnHandler(Action<BattleRoleLogicEntity> action) => battleRoleSpawn_Handler += action;
+        public static void Invoke_BattleRoleSpawnHandler(BattleRoleLogicEntity entity) => battleRoleSpawn_Action = () =>
             {
-                if (worldRoleSpawn_Handler == null) return;
-                var list = worldRoleSpawn_Handler.GetInvocationList();
+                if (battleRoleSpawn_Handler == null) return;
+                var list = battleRoleSpawn_Handler.GetInvocationList();
                 for (int i = 0; i < list.Length; i++)
                 {
                     var action = list[i];
@@ -55,11 +55,11 @@ namespace Game.Client.Bussiness.EventCenter
                 sceneLoaded_Action = null;
             }
 
-            if (worldRoleSpawn_Action != null)
+            if (battleRoleSpawn_Action != null)
             {
-                Debug.Log("worldRoleSpawn_Action");
-                worldRoleSpawn_Action.Invoke();
-                worldRoleSpawn_Action = null;
+                Debug.Log("battleRoleSpawn_Action");
+                battleRoleSpawn_Action.Invoke();
+                battleRoleSpawn_Action = null;
             }
         }
 

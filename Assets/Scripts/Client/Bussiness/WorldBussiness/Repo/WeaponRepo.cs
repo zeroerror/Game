@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Game.Client.Bussiness.WorldBussiness.Repo
+namespace Game.Client.Bussiness.BattleBussiness.Repo
 {
 
     public class WeaponRepo

@@ -1,27 +1,27 @@
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
-namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
+namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
     public class WeaponDomain
     {
 
-        WorldFacades worldFacades;
+        BattleFacades battleFacades;
 
         public WeaponDomain()
         {
         }
 
-        public void Inject(WorldFacades facades)
+        public void Inject(BattleFacades facades)
         {
-            this.worldFacades = facades;
+            this.battleFacades = facades;
         }
 
         public void ReuseWeapon(WeaponEntity weapon, Vector3 dropPos)
         {
-            var weaponRepo = worldFacades.Repo.WeaponRepo;
-            var roleRepo = worldFacades.Repo.RoleRepo;
+            var weaponRepo = battleFacades.Repo.WeaponRepo;
+            var roleRepo = battleFacades.Repo.RoleRepo;
             weapon.transform.SetParent(null);
             weapon.transform.position = dropPos;
             weapon.ClearMaster();

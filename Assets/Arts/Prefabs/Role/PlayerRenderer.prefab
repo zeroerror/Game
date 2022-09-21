@@ -3749,7 +3749,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8718535296734940577}
   - component: {fileID: 1618048361448071387}
-  - component: {fileID: 8581699308674742954}
+  - component: {fileID: 1504278094851976278}
   m_Layer: 6
   m_Name: PlayerRenderer
   m_TagString: Untagged
@@ -3793,7 +3793,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &8581699308674742954
+--- !u!114 &1504278094851976278
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3802,7 +3802,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5666984566536126386}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49761840691247a4bb6d0cc48c0aa10f, type: 3}
+  m_Script: {fileID: 11500000, guid: 246c61d492d4b36419c26a171b8b14bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   handPoint: {fileID: 7983722290381163202}

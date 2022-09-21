@@ -8,12 +8,10 @@ using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Client.Facades;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness;
-using Game.Client.Bussiness.WorldBussiness;
+using Game.Client.Bussiness.BattleBussiness;
 using Game.UI;
 using Game.UI.Assets;
 using Game.UI.Manager;
-using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace Game.Client
 {
@@ -43,11 +41,11 @@ namespace Game.Client
             LoginEntry.Ctor();
             LoginEntry.Inject(AllClientNetwork.networkClient);
             LoginEntry.Init();
-            // World
-            WorldEntry.Ctor();
+            // Battle
+            BattleEntry.Ctor();
             _inputComponent = new InputComponent();
-            WorldEntry.Inject(AllClientNetwork.networkClient, _inputComponent);
-            WorldEntry.Init();
+            BattleEntry.Inject(AllClientNetwork.networkClient, _inputComponent);
+            BattleEntry.Init();
             // UI
             UIEntry.Ctor();
 
@@ -83,7 +81,7 @@ namespace Game.Client
         {
             // == Entry ==
             LoginEntry.Tick();
-            WorldEntry.Tick();
+            BattleEntry.Tick();
             UIEntry.Tick();
 
             // == EventCenter ==
@@ -94,7 +92,7 @@ namespace Game.Client
         void Update()
         {
             InputGameSet.Receive_Input(ref _inputComponent);
-            WorldEntry.Update();
+            BattleEntry.Update();
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
@@ -137,7 +135,7 @@ namespace Game.Client
         void OnDestroy()
         {
             LoginEntry.TearDown();
-            WorldEntry.TearDown();
+            BattleEntry.TearDown();
             UIEntry.TearDown();
             InputGameSet.TearDown();
 

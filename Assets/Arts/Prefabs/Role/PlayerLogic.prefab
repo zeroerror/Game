@@ -3750,7 +3750,7 @@ GameObject:
   - component: {fileID: 8718535296734940577}
   - component: {fileID: 6301970116837501575}
   - component: {fileID: 2132031221355962208}
-  - component: {fileID: 5349849695959644061}
+  - component: {fileID: 9044304043049411741}
   m_Layer: 6
   m_Name: PlayerLogic
   m_TagString: Untagged
@@ -3804,7 +3804,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.47, y: 1.6, z: 1}
   m_Center: {x: 0, y: 0, z: 0.13}
---- !u!114 &5349849695959644061
+--- !u!114 &9044304043049411741
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3813,10 +3813,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5666984566536126386}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a893091cb4c2cfa4481460ea8b522429, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a869ae89333f2143a582a9bf6d88085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsOldState: 0
 --- !u!1 &5734713072989455083
 GameObject:
   m_ObjectHideFlags: 0

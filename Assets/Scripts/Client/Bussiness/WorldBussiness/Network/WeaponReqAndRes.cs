@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
-using Game.Protocol.World;
+using Game.Protocol.Battle;
 using Game.Infrastructure.Network.Client;
 
-namespace Game.Client.Bussiness.WorldBussiness.Network
+namespace Game.Client.Bussiness.BattleBussiness.Network
 {
 
     public class WeaponReqAndRes
@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _client.SendMsg(frameWeaponShootReqMsg);
         }
 
-        public void SendReq_WeaponReload(WorldRoleLogicEntity role)
+        public void SendReq_WeaponReload(BattleRoleLogicEntity role)
         {
             FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
             {
@@ -48,7 +48,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             Debug.Log("发送武器装弹请求");
         }
 
-        public void SendReq_WeaponDrop(WorldRoleLogicEntity role)
+        public void SendReq_WeaponDrop(BattleRoleLogicEntity role)
         {
             if (role.WeaponComponent.CurrentWeapon == null) return;
 

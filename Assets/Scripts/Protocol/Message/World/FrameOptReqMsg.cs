@@ -1,6 +1,6 @@
 using System;
 using ZeroFrame.Protocol;
-using ZeroFrame.Buffer;namespace Game.Protocol.World
+using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 {
 
     [ZeroMessage]

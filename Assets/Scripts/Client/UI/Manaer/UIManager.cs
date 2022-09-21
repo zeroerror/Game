@@ -192,9 +192,9 @@ namespace Game.UI.Manager
         public static GameObject UIRoot { get; private set; }
         static Canvas _uiRootCanvas;
         static RectTransform _uiRootRt;
-        static GameObject _worldUIRoot;
-        static Canvas _worldUIRootCanvas;
-        static RectTransform _worldUIRootRt;
+        static GameObject _battleUIRoot;
+        static Canvas _battleUIRootCanvas;
+        static RectTransform _battleUIRootRt;
         static RectTransform _uiMainView;
         static Dictionary<string, Transform> _uiLayerDic = new Dictionary<string, Transform>();
         static Dictionary<string, Transform> _uiDic = new Dictionary<string, Transform>();

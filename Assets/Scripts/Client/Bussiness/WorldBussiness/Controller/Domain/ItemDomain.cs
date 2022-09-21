@@ -1,23 +1,23 @@
 using UnityEngine;
-using Game.Client.Bussiness.WorldBussiness.Facades;
-using Game.Client.Bussiness.WorldBussiness.Interface;
-using Game.Client.Bussiness.WorldBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Interface;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
-namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
+namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
     public class ItemDomain
     {
 
-        WorldFacades worldFacades;
+        BattleFacades battleFacades;
 
         public ItemDomain()
         {
         }
 
-        public void Inject(WorldFacades facades)
+        public void Inject(BattleFacades facades)
         {
-            this.worldFacades = facades;
+            this.battleFacades = facades;
         }
 
         public GameObject SpawnItem(ItemType itemType, byte sortType)
@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
                     break;
 
             }
-            var itemAssets = worldFacades.Assets.ItemAsset;
+            var itemAssets = battleFacades.Assets.ItemAsset;
             Debug.Log($"生成物件：{itemName}");
             itemAssets.TryGetByName(itemName, out GameObject item);
             item = GameObject.Instantiate(item);
@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller.Domain
             return item;
         }
 
-        public bool TryPickUpItem(ItemType itemType, ushort entityId, AllWorldRepo repo, WorldRoleLogicEntity master, Transform hangPoint = null)
+        public bool TryPickUpItem(ItemType itemType, ushort entityId, AllBattleRepo repo, BattleRoleLogicEntity master, Transform hangPoint = null)
         {
             bool isPickUpSucceed = false;
             switch (itemType)

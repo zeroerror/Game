@@ -4,7 +4,7 @@ using UnityEngine.AddressableAssets;
 using Game.Generic;
 using System;
 
-namespace Game.Client.Bussiness.WorldBussiness.Assets
+namespace Game.Client.Bussiness.BattleBussiness.Assets
 {
 
     public class ItemAsset

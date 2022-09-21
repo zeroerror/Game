@@ -1,15 +1,15 @@
-using Game.Client.Bussiness.WorldBussiness.Facades;
-using Game.Client.Bussiness.WorldBussiness.Controller.Domain;
+using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Controller.Domain;
 
-namespace Game.Client.Bussiness.WorldBussiness.Facades
+namespace Game.Client.Bussiness.BattleBussiness.Facades
 {
 
     public class AllDomains
     {
 
-        public WorldSpawnDomain WorldSpawnDomain { get; private set; }
-        public WorldRoleDomain WorldRoleDomain { get; private set; }
-        public WorldInputDomain WorldInputDomain { get; private set; }
+        public BattleSpawnDomain BattleSpawnDomain { get; private set; }
+        public BattleRoleDomain BattleRoleDomain { get; private set; }
+        public BattleInputDomain BattleInputDomain { get; private set; }
         public BulletDomain BulletDomain { get; private set; }
         public ItemDomain ItemDomain { get; private set; }
         public PhysicsDomain PhysicsDomain { get; private set; }
@@ -18,9 +18,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
 
         public AllDomains()
         {
-            WorldSpawnDomain = new WorldSpawnDomain();
-            WorldRoleDomain = new WorldRoleDomain();
-            WorldInputDomain = new WorldInputDomain();
+            BattleSpawnDomain = new BattleSpawnDomain();
+            BattleRoleDomain = new BattleRoleDomain();
+            BattleInputDomain = new BattleInputDomain();
             BulletDomain = new BulletDomain();
             ItemDomain = new ItemDomain();
             PhysicsDomain = new PhysicsDomain();
@@ -28,10 +28,10 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
         }
 
         // todo: obsolete
-        public void Inject(WorldFacades facades)
+        public void Inject(BattleFacades facades)
         {
-            WorldSpawnDomain.Inject(facades);
-            WorldRoleDomain.Inject(facades);
+            BattleSpawnDomain.Inject(facades);
+            BattleRoleDomain.Inject(facades);
             BulletDomain.Inject(facades);
             ItemDomain.Inject(facades);
             PhysicsDomain.Inject(facades);
