@@ -11,6 +11,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
     public class BulletReqAndRes
     {
         NetworkServer _server;
+        int serverFrame;
+        public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
+
+        int sendCount;
+        public int SendCount => sendCount;
+        public void ClearSendCount() => sendCount = 0;
 
         public BulletReqAndRes()
         {
@@ -22,11 +28,13 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             _server = server;
         }
 
-        public void SendRes_BulletSpawn(int connId, int frameIndex, BulletType bulletType, ushort bulletId, byte wRid, Vector3 dir)
+        // ====== Send ======
+
+        public void SendRes_BulletSpawn(int connId, BulletType bulletType, ushort bulletId, byte wRid, Vector3 dir)
         {
             FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
             {
-                serverFrame = frameIndex,
+                serverFrame = serverFrame,
                 wRid = wRid,
                 bulletType = (byte)bulletType,
                 bulletId = bulletId,
@@ -37,28 +45,30 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
 
             _server.SendMsg(connId, msg);
             // Debug.Log($"dir.z:{dir.z} shootDirZ :{msg.shootDirZ}");
+            sendCount++;
         }
 
-        public void SendRes_BulletHitRole(int connId, int frame, ushort bulletId, byte wRid)
+        public void SendRes_BulletHitRole(int connId, ushort bulletId, byte wRid)
         {
             FrameBulletHitRoleResMsg msg = new FrameBulletHitRoleResMsg
             {
-                serverFrame = frame,
+                serverFrame = serverFrame,
                 bulletId = bulletId,
                 wRid = wRid
             };
 
             _server.SendMsg(connId, msg);
+            sendCount++;
         }
 
-        public void SendRes_BulletHitWall(int connId, int frame, BulletEntity bulletEntity)
+        public void SendRes_BulletHitWall(int connId, BulletEntity bulletEntity)
         {
             var bulletPos = bulletEntity.MoveComponent.CurPos;
             Debug.Log($"SendRes_BulletHitWall: bulletPos  {bulletPos}");
             bulletPos *= 10000f;
             FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
             {
-                serverFrame = frame,
+                serverFrame = serverFrame,
                 bulletId = bulletEntity.EntityId,
                 posX = (int)bulletPos.x,
                 posY = (int)bulletPos.y,
@@ -66,9 +76,10 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             };
 
             _server.SendMsg(connId, msg);
+            sendCount++;
         }
 
-        public void SendRes_BulletTearDown(int connId, int serverFrame, BulletType bulletType, byte wRid, ushort bulletId, Vector3 pos)
+        public void SendRes_BulletTearDown(int connId, BulletType bulletType, byte wRid, ushort bulletId, Vector3 pos)
         {
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{wRid}");
             FrameBulletTearDownResMsg msg = new FrameBulletTearDownResMsg
@@ -83,6 +94,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             };
 
             _server.SendMsg(connId, msg);
+            sendCount++;
         }
 
 

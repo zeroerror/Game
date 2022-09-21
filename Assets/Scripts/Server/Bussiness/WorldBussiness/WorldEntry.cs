@@ -9,20 +9,26 @@ namespace Game.Server.Bussiness.WorldBussiness
         WorldFacades worldFacades;
 
         WorldController worldController;
+        WorldPhysicsController worldPhysicsController;
+        WorldNetworkController worldNetworkController;
 
         public WorldEntry()
         {
             worldFacades = new WorldFacades();
             worldController = new WorldController();
+            worldPhysicsController = new WorldPhysicsController();
+            worldNetworkController = new WorldNetworkController();
         }
 
-        public void Inject(NetworkServer server)
+        public void Inject(NetworkServer server, float fixedDeltaTime)
         {
             // Facades
             worldFacades.Inject(server);
 
             // Conntroller
-            worldController.Inject(worldFacades);
+            worldController.Inject(worldFacades, fixedDeltaTime);
+            worldPhysicsController.Inject(worldFacades, fixedDeltaTime);
+            worldNetworkController.Inject(worldFacades, fixedDeltaTime);
         }
 
         public void Init()
@@ -33,8 +39,9 @@ namespace Game.Server.Bussiness.WorldBussiness
         public void Tick()
         {
             worldController.Tick();
+            worldPhysicsController.Tick();
+            worldNetworkController.Tick();
         }
-
 
     }
 

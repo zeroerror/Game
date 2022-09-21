@@ -10,6 +10,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
     public class WeaponReqAndRes
     {
         NetworkServer _server;
+        int serverFrame;
+        public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
+
+        int sendCount;
+        public int SendCount => sendCount;
+        public void ClearSendCount() => sendCount = 0;
 
         public WeaponReqAndRes()
         {
@@ -22,13 +28,14 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
         }
 
         // ====== Send ======
-        public void SendRes_WeaponShoot(int connId, int serverFrame, byte masterId)
+        public void SendRes_WeaponShoot(int connId, byte masterId)
         {
             FrameWeaponShootResMsg msg = new FrameWeaponShootResMsg
             {
                 masterId = masterId,
             };
             _server.SendMsg(connId, msg);
+            sendCount++;
             Debug.Log("回复武器射击请求");
         }
 
@@ -39,17 +46,19 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
                 masterId = masterId,
             };
             _server.SendMsg(connId, msg);
+            sendCount++;
             Debug.Log("回复武器装弹请求");
         }
 
         public void SendRes_WeaponDrop(int connId, int serverFrame, byte masterId, ushort entityId)
         {
             FrameWeaponDropResMsg msg = new FrameWeaponDropResMsg
-            {                                                                                                                           
+            {
                 entityId = entityId,
                 masterId = masterId,
             };
             _server.SendMsg(connId, msg);
+            sendCount++;
             Debug.Log("回复武器丢弃请求");
         }
 

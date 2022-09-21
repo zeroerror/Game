@@ -10,6 +10,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
     public class ItemReqAndRes
     {
         NetworkServer _server;
+        int serverFrame;
+        public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
+
+        int sendCount;
+        public int SendCount => sendCount;
+        public void ClearSendCount() => sendCount = 0;
 
         public ItemReqAndRes()
         {
@@ -32,6 +38,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
                 entityId = entityId
             };
             _server.SendMsg(connId, msg);
+            sendCount++;
         }
 
         public void SendRes_ItemSpawn(int connId, int frameIndex, byte[] itemTypeArray, byte[] subtypeArray, ushort[] entityIdArray)
@@ -45,6 +52,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
             };
 
             _server.SendMsg(connId, msg);
+            sendCount++;
         }
 
         // ====== Regist ======

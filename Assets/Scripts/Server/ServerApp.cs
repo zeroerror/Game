@@ -30,7 +30,7 @@ namespace Game.Server
             // == Entry ==
             // WorldEntry
             worldEntry = new WorldEntry();
-            worldEntry.Inject(allServerNetwork.networkServer);
+            worldEntry.Inject(allServerNetwork.networkServer, UnityEngine.Time.fixedDeltaTime);
             worldEntry.Init();
             // LoginEntry
             loginEntry = new LoginEntry();

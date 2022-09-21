@@ -12,15 +12,20 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
     public class WorldRoleReqAndRes
     {
         NetworkServer _server;
+        int serverFrame;
+        public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
+
+        int sendCount;
+        public int SendCount => sendCount;
+        public void ClearSendCount() => sendCount = 0;
 
         public void Inject(NetworkServer server)
         {
             _server = server;
         }
 
-
         // == Send ==
-        public void SendUpdate_WRoleState(int connId, int serverFrameIndex, WorldRoleLogicEntity role)
+        public void SendUpdate_WRoleState(int connId, WorldRoleLogicEntity role)
         {
             // Position
             var pos = role.MoveComponent.CurPos;
@@ -52,7 +57,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
 
             WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
             {
-                serverFrameIndex = serverFrameIndex,
+                serverFrameIndex = serverFrame,
                 wRid = role.EntityId,
                 roleState = (int)role.RoleState,
                 x = x,
@@ -71,18 +76,20 @@ namespace Game.Server.Bussiness.WorldBussiness.Network
                 isOwner = connId == role.ConnId
             };
             _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);
+            sendCount++;
         }
 
-        public void SendRes_WorldRoleSpawn(int connId, int frameIndex, byte wRoleId, bool isOwner)
+        public void SendRes_WorldRoleSpawn(int connId, byte wRoleId, bool isOwner)
         {
             FrameWRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameWRoleSpawnResMsg
             {
-                serverFrame = frameIndex,
+                serverFrame = serverFrame,
                 wRoleId = wRoleId,
                 isOwner = isOwner
             };
             _server.SendMsg<FrameWRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
-            Debug.Log($"服务端回复帧消息 serverFrameIndex:{frameIndex} connId:{connId} ---->确认人物生成");
+            Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");
+            sendCount++;
         }
 
         // == Regist ==

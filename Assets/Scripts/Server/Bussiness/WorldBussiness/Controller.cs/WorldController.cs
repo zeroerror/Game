@@ -5,6 +5,7 @@ using Game.Infrastructure.Generic;
 using Game.Client.Bussiness.WorldBussiness;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Client.Bussiness.WorldBussiness.Generic;
+using Game.Server.Bussiness.Center;
 
 namespace Game.Server.Bussiness.WorldBussiness
 {
@@ -12,11 +13,12 @@ namespace Game.Server.Bussiness.WorldBussiness
     public class WorldController
     {
         WorldFacades worldFacades;
-        int serveFrame;
-        float fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;  //0.03f
+        float fixedDeltaTime;  //0.03f
 
-        // 记录当前所有ConnId
-        List<int> connIdList;
+        public int serveFrame => worldFacades.Network.ServeFrame;
+
+        // 当前所有ConnId
+        List<int> connIdList => worldFacades.Network.connIdList;
 
         // 记录所有操作帧
         struct FrameOptReqMsgStruct
@@ -24,7 +26,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameOptReqMsg msg;
         }
-        Dictionary<int, List<FrameOptReqMsgStruct>> wRoleOptQueueDic;
+        Dictionary<int, Queue<FrameOptReqMsgStruct>> wRoleOptQueueDic;
 
         // 移动记录所有跳跃帧
         struct FrameJumpReqMsgStruct
@@ -32,15 +34,15 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameJumpReqMsg msg;
         }
-        Dictionary<int, List<FrameJumpReqMsgStruct>> jumpOptDic;//TODO: --> Queue
+        Dictionary<int, Queue<FrameJumpReqMsgStruct>> jumpOptQueueDic;//TODO: --> Queue
 
-        // 记录所有生成帧
+        // 记录所有角色生成帧
         struct FrameWRoleSpawnReqMsgStruct
         {
             public int connId;
             public FrameWRoleSpawnReqMsg msg;
         }
-        Dictionary<int, FrameWRoleSpawnReqMsgStruct> wRoleSpawnDic;//TODO: --> Queue
+        Dictionary<int, Queue<FrameWRoleSpawnReqMsgStruct>> wRoleSpawQueuenDic;//TODO: --> Queue
 
         // 记录所有子弹生成帧
         struct FrameBulletSpawnReqMsgStruct
@@ -48,7 +50,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameBulletSpawnReqMsg msg;
         }
-        Dictionary<int, FrameBulletSpawnReqMsgStruct> bulletSpawnDic;   //TODO: --> Queue
+        Dictionary<int, Queue<FrameBulletSpawnReqMsgStruct>> bulletSpawnQueueDic;   //TODO: --> 
 
         // 记录所有拾取物件帧
         struct FrameItemPickUpReqMsgStruct
@@ -56,7 +58,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameItemPickReqMsg msg;
         }
-        Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>> itemPickUpDic;
+        Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>> itemPickUpQueueDic;
 
         // 记录所有武器射击帧
         struct FrameWeaponShootReqMsgStruct
@@ -64,7 +66,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameWeaponShootReqMsg msg;
         }
-        Dictionary<int, Queue<FrameWeaponShootReqMsgStruct>> weaponShootDic;
+        Dictionary<int, Queue<FrameWeaponShootReqMsgStruct>> weaponShootQueueDic;
 
         // 记录所有武器装弹帧
         struct FrameWeaponReloadReqMsgStruct
@@ -72,7 +74,7 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameWeaponReloadReqMsg msg;
         }
-        Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>> weaponReloadDic;
+        Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>> weaponReloadQueueDic;
 
         // 记录所有武器丢弃帧
         struct FrameWeaponDropReqMsgStruct
@@ -80,27 +82,27 @@ namespace Game.Server.Bussiness.WorldBussiness
             public int connId;
             public FrameWeaponDropReqMsg msg;
         }
-        Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>> weaponDropDic;
+        Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>> weaponDropQueueDic;
 
         bool sceneSpawnTrigger;
         bool isSceneSpawn;
 
         public WorldController()
         {
-            connIdList = new List<int>();
-            wRoleOptQueueDic = new Dictionary<int, List<FrameOptReqMsgStruct>>();
-            jumpOptDic = new Dictionary<int, List<FrameJumpReqMsgStruct>>();
-            wRoleSpawnDic = new Dictionary<int, FrameWRoleSpawnReqMsgStruct>();
-            bulletSpawnDic = new Dictionary<int, FrameBulletSpawnReqMsgStruct>();
-            itemPickUpDic = new Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>>();
-            weaponShootDic = new Dictionary<int, Queue<FrameWeaponShootReqMsgStruct>>();
-            weaponReloadDic = new Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>>();
-            weaponDropDic = new Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>>();
+            wRoleOptQueueDic = new Dictionary<int, Queue<FrameOptReqMsgStruct>>();
+            jumpOptQueueDic = new Dictionary<int, Queue<FrameJumpReqMsgStruct>>();
+            wRoleSpawQueuenDic = new Dictionary<int, Queue<FrameWRoleSpawnReqMsgStruct>>();
+            bulletSpawnQueueDic = new Dictionary<int, Queue<FrameBulletSpawnReqMsgStruct>>();
+            itemPickUpQueueDic = new Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>>();
+            weaponShootQueueDic = new Dictionary<int, Queue<FrameWeaponShootReqMsgStruct>>();
+            weaponReloadQueueDic = new Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>>();
+            weaponDropQueueDic = new Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>>();
         }
 
-        public void Inject(WorldFacades worldFacades)
+        public void Inject(WorldFacades worldFacades, float fixedDeltaTime)
         {
             this.worldFacades = worldFacades;
+            this.fixedDeltaTime = fixedDeltaTime;
 
             var roleRqs = worldFacades.Network.WorldRoleReqAndRes;
             roleRqs.RegistReq_WorldRoleOpt(OnWoldRoleOpt);
@@ -129,130 +131,109 @@ namespace Game.Server.Bussiness.WorldBussiness
                 sceneSpawnTrigger = false;
             }
             if (!isSceneSpawn) return;
-            int nextFrame = serveFrame + 1;
-
-            // Physics Simulation
-            Tick_Physics_Movement_Bullet(fixedDeltaTime);
-            if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList) || optList.Count == 0)
-            {
-                Tick_Physics_Movement_Role(fixedDeltaTime);
-                var physicsScene = worldFacades.ClientWorldFacades.Repo.FiledRepo.CurPhysicsScene;
-                physicsScene.Simulate(fixedDeltaTime);
-            }
 
             // ====== Life
-            Tick_BulletLife(nextFrame);
-            Tick_ActiveHookersBehaviour(nextFrame);
+            Tick_BulletLife();
+            Tick_ActiveHookersBehaviour();
 
             // Client Request
-            Tick_WRoleSpawn(nextFrame);
-            Tick_BulletSpawn(nextFrame);
+            Tick_WRoleSpawn();
+            Tick_BulletSpawn();
 
-            Tick_ItemPickUp(nextFrame);
-            Tick_WeaponShoot(nextFrame);
-            Tick_WeaponReload(nextFrame);
-            Tick_WeaponDrop(nextFrame);
+            Tick_ItemPickUp();
+            Tick_WeaponShoot();
+            Tick_WeaponReload();
+            Tick_WeaponDrop();
 
-            Tick_AllOpt(nextFrame); // Include Physics Simulation
+            Tick_AllOpt(); // Include Physics Simulation
 
-            // Physcis Col;lision
-            Tick_Physics_Collision_Role(nextFrame);
-            Tick_Physics_Collision_Bullet(nextFrame);
+
         }
 
         #region [Client Requst]
 
         #region [Role]
-        void Tick_WRoleSpawn(int nextFrameIndex)
+        void Tick_WRoleSpawn()
         {
-            if (wRoleSpawnDic.TryGetValue(nextFrameIndex, out var spawn))
+            if (wRoleSpawQueuenDic.TryGetValue(serveFrame, out var queue))
             {
-                serveFrame = nextFrameIndex;
-
-                var msg = spawn.msg;
-                var connId = spawn.connId;
-
-                var clientFacades = worldFacades.ClientWorldFacades;
-                var repo = clientFacades.Repo;
-                var fieldEntity = repo.FiledRepo.Get(1);
-                var rqs = worldFacades.Network.WorldRoleReqAndRes;
-                var roleRepo = repo.RoleRepo;
-                var wrid = roleRepo.Size;
-
-                // 服务器逻辑
-                var roleEntity = clientFacades.Domain.WorldRoleDomain.SpawnWorldRoleLogic(fieldEntity.transform);
-                roleEntity.Ctor();
-                roleEntity.SetEntityId(wrid);
-                roleEntity.SetConnId(connId);
-                Debug.Log($"服务器逻辑[生成角色] serveFrame:{serveFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.CurPos}");
-
-                // ====== 发送其他角色的状态同步帧给请求者
-                var allEntity = roleRepo.GetAll();
-                for (int i = 0; i < allEntity.Length; i++)
+                while (queue.TryDequeue(out var msgStruct))
                 {
-                    var otherRole = allEntity[i];
-                    rqs.SendUpdate_WRoleState(connId, nextFrameIndex, otherRole);
-                }
+                    var msg = msgStruct.msg;
+                    var connId = msgStruct.connId;
 
-                // ====== 广播请求者创建的角色给其他人
-                connIdList.ForEach((otherConnId) =>
-                {
-                    if (otherConnId != connId)
+                    var clientFacades = worldFacades.ClientWorldFacades;
+                    var repo = clientFacades.Repo;
+                    var fieldEntity = repo.FiledRepo.Get(1);
+                    var rqs = worldFacades.Network.WorldRoleReqAndRes;
+                    var roleRepo = repo.RoleRepo;
+                    var wrid = roleRepo.Size;
+
+                    // 服务器逻辑
+                    var roleEntity = clientFacades.Domain.WorldRoleDomain.SpawnWorldRoleLogic(fieldEntity.transform);
+                    roleEntity.Ctor();
+                    roleEntity.SetEntityId(wrid);
+                    roleEntity.SetConnId(connId);
+                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{serveFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.CurPos}");
+
+                    // ====== 发送其他角色的状态同步帧给请求者
+                    var allEntity = roleRepo.GetAll();
+                    for (int i = 0; i < allEntity.Length; i++)
                     {
-                        rqs.SendUpdate_WRoleState(otherConnId, nextFrameIndex, roleEntity);
+                        var otherRole = allEntity[i];
+                        rqs.SendUpdate_WRoleState(connId, otherRole);
                     }
-                });
 
-                // ====== 回复请求者创建的角色
-                rqs.SendUpdate_WRoleState(connId, nextFrameIndex, roleEntity);
+                    // ====== 广播请求者创建的角色给其他人
+                    connIdList.ForEach((otherConnId) =>
+                    {
+                        if (otherConnId != connId)
+                        {
+                            rqs.SendUpdate_WRoleState(otherConnId, roleEntity);
+                        }
+                    });
 
-                roleRepo.Add(roleEntity);
+                    // ====== 回复请求者创建的角色
+                    rqs.SendUpdate_WRoleState(connId, roleEntity);
+
+                    roleRepo.Add(roleEntity);
+                }
             }
         }
 
         void Tick_RoleStateIdle(int nextFrame)
         {
             //人物静止和运动 2个状态
-            bool isNextFrame = false;
             var WorldRoleRepo = worldFacades.ClientWorldFacades.Repo.RoleRepo;
             WorldRoleRepo.Foreach((roleEntity) =>
             {
                 if (roleEntity.IsIdle() && roleEntity.RoleState != RoleState.Normal)
                 {
-                    isNextFrame = true;
                     roleEntity.SetRoleState(RoleState.Normal);
 
                     var rqs = worldFacades.Network.WorldRoleReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
+                        rqs.SendUpdate_WRoleState(connId, roleEntity);
                     });
                 }
             });
-
-            if (isNextFrame)
-            {
-                serveFrame = nextFrame;
-            }
         }
 
-        void Tick_AllOpt(int nextFrame)
+        void Tick_AllOpt()
         {
-            Tick_JumpOpt(nextFrame);
-            Tick_MoveAndRotateOpt(nextFrame);
+            Tick_JumpOpt();
+            Tick_MoveAndRotateOpt();
         }
 
-        void Tick_MoveAndRotateOpt(int nextFrame)
+        void Tick_MoveAndRotateOpt()
         {
-            if (!wRoleOptQueueDic.TryGetValue(nextFrame, out var optList)) return;
+            if (!wRoleOptQueueDic.TryGetValue(serveFrame, out var optQueue)) return;
 
-            serveFrame = nextFrame;
+            EventCenter.stopPhyscisOneFrame = true;
 
-            while (optList.Count != 0)
+            while (optQueue.TryDequeue(out var opt))
             {
-                var lastIndex = optList.Count - 1;
-                var opt = optList[lastIndex];
-
                 var msg = opt.msg;
                 var realMsg = msg.msg;
                 var connId = opt.connId;
@@ -286,7 +267,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                     //发送状态同步帧
                     connIdList.ForEach((otherConnId) =>
                     {
-                        rqs.SendUpdate_WRoleState(otherConnId, nextFrame, role);
+                        rqs.SendUpdate_WRoleState(otherConnId, role);
                     });
 
                 }
@@ -303,26 +284,23 @@ namespace Game.Server.Bussiness.WorldBussiness
                         if (otherConnId != connId)
                         {
                             //只广播给非本人
-                            rqs.SendUpdate_WRoleState(otherConnId, nextFrame, role);
+                            rqs.SendUpdate_WRoleState(otherConnId, role);
                         }
                     });
                 }
 
-                optList.RemoveAt(lastIndex);
             }
         }
 
-        void Tick_JumpOpt(int nextFrame)
+        void Tick_JumpOpt()
         {
-            if (!jumpOptDic.TryGetValue(nextFrame, out var jumpOptList)) return;
-            serveFrame = nextFrame;
+            if (!jumpOptQueueDic.TryGetValue(serveFrame, out var optQueue)) return;
 
-            while (jumpOptList.Count != 0)
+            while (optQueue.TryDequeue(out var opt))
             {
-                var lastIndex = jumpOptList.Count - 1;
-                var jumpOpt = jumpOptList[lastIndex];
+                var lastIndex = optQueue.Count - 1;
 
-                var wRid = jumpOpt.msg.wRid;
+                var wRid = opt.msg.wRid;
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.RoleRepo;
                 var roleEntity = roleRepo.GetByEntityId(wRid);
                 var rqs = worldFacades.Network.WorldRoleReqAndRes;
@@ -334,75 +312,76 @@ namespace Game.Server.Bussiness.WorldBussiness
                     //发送状态同步帧
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendUpdate_WRoleState(connId, nextFrame, roleEntity);
+                        rqs.SendUpdate_WRoleState(connId, roleEntity);
                     });
                 }
 
-                jumpOptList.RemoveAt(lastIndex);
             }
         }
         #endregion
 
         #region [Bullet]
-        void Tick_BulletSpawn(int nextFrame)
+        void Tick_BulletSpawn()
         {
-            if (bulletSpawnDic.TryGetValue(nextFrame, out var bulletSpawn))
+            if (bulletSpawnQueueDic.TryGetValue(serveFrame, out var spawnQueue))
             {
-                serveFrame = nextFrame;
 
-                int connId = bulletSpawn.connId;
-                var msg = bulletSpawn.msg;
-
-                var bulletTypeByte = msg.bulletType;
-                byte wRid = msg.wRid;
-                float targetPosX = msg.targetPosX / 10000f;
-                float targetPosY = msg.targetPosY / 10000f;
-                float targetPosZ = msg.targetPosZ / 10000f;
-                Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                var roleEntity = worldFacades.ClientWorldFacades.Repo.RoleRepo.GetByEntityId(msg.wRid);
-                var moveComponent = roleEntity.MoveComponent;
-                var shootStartPoint = roleEntity.ShootPointPos;
-                Vector3 shootDir = targetPos - shootStartPoint;
-                shootDir.Normalize();
-
-                // 服务器逻辑
-                var bulletType = (BulletType)bulletTypeByte;
-                var clientFacades = worldFacades.ClientWorldFacades;
-                var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
-
-                var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                var bulletRepo = clientFacades.Repo.BulletRepo;
-                var bulletId = bulletRepo.BulletCount;
-                bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
-                bulletEntity.MoveComponent.SetForward(shootDir);
-                bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
-                switch (bulletType)
+                while (spawnQueue.TryDequeue(out var spawn))
                 {
-                    case BulletType.DefaultBullet:
-                        break;
-                    case BulletType.Grenade:
-                        break;
-                    case BulletType.Hooker:
-                        var hookerEntity = (HookerEntity)bulletEntity;
-                        hookerEntity.SetMasterWRid(roleEntity.EntityId);
-                        hookerEntity.SetMasterGrabPoint(roleEntity.transform);
-                        break;
+                    int connId = spawn.connId;
+                    var msg = spawn.msg;
+
+                    var bulletTypeByte = msg.bulletType;
+                    byte wRid = msg.wRid;
+                    float targetPosX = msg.targetPosX / 10000f;
+                    float targetPosY = msg.targetPosY / 10000f;
+                    float targetPosZ = msg.targetPosZ / 10000f;
+                    Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
+                    var roleEntity = worldFacades.ClientWorldFacades.Repo.RoleRepo.GetByEntityId(msg.wRid);
+                    var moveComponent = roleEntity.MoveComponent;
+                    var shootStartPoint = roleEntity.ShootPointPos;
+                    Vector3 shootDir = targetPos - shootStartPoint;
+                    shootDir.Normalize();
+
+                    // 服务器逻辑
+                    var bulletType = (BulletType)bulletTypeByte;
+                    var clientFacades = worldFacades.ClientWorldFacades;
+                    var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
+
+                    var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
+                    var bulletRepo = clientFacades.Repo.BulletRepo;
+                    var bulletId = bulletRepo.BulletCount;
+                    bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
+                    bulletEntity.MoveComponent.SetForward(shootDir);
+                    bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
+                    switch (bulletType)
+                    {
+                        case BulletType.DefaultBullet:
+                            break;
+                        case BulletType.Grenade:
+                            break;
+                        case BulletType.Hooker:
+                            var hookerEntity = (HookerEntity)bulletEntity;
+                            hookerEntity.SetMasterWRid(roleEntity.EntityId);
+                            hookerEntity.SetMasterGrabPoint(roleEntity.transform);
+                            break;
+                    }
+                    bulletEntity.SetMasterId(wRid);
+                    bulletEntity.SetEntityId(bulletId);
+                    bulletEntity.gameObject.SetActive(true);
+                    bulletRepo.Add(bulletEntity);
+                    Debug.Log($"服务器逻辑[生成子弹] serveFrame {serveFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
+
+                    var rqs = worldFacades.Network.BulletReqAndRes;
+                    connIdList.ForEach((otherConnId) =>
+                    {
+                        rqs.SendRes_BulletSpawn(otherConnId, bulletType, bulletId, wRid, shootDir);
+                    });
                 }
-                bulletEntity.SetMasterId(wRid);
-                bulletEntity.SetEntityId(bulletId);
-                bulletEntity.gameObject.SetActive(true);
-                bulletRepo.Add(bulletEntity);
-                Debug.Log($"服务器逻辑[生成子弹] serveFrame {serveFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
-
-                var rqs = worldFacades.Network.BulletReqAndRes;
-                connIdList.ForEach((otherConnId) =>
-                {
-                    rqs.SendRes_BulletSpawn(otherConnId, serveFrame, bulletType, bulletId, wRid, shootDir);
-                });
             }
         }
 
-        void Tick_BulletLife(int nextFrame)
+        void Tick_BulletLife()
         {
             var tearDownList = worldFacades.ClientWorldFacades.Domain.BulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
             if (tearDownList.Count == 0) return;
@@ -448,7 +427,7 @@ namespace Game.Server.Bussiness.WorldBussiness
                 connIdList.ForEach((connId) =>
                 {
                     // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletTearDown(connId, serveFrame, bulletType, bulletEntity.MasterId, bulletEntity.EntityId, bulletEntity.MoveComponent.CurPos);
+                    bulletRqs.SendRes_BulletTearDown(connId, bulletType, bulletEntity.MasterId, bulletEntity.EntityId, bulletEntity.MoveComponent.CurPos);
                 });
                 while (effectRoleQueue.TryDequeue(out var role))
                 {
@@ -456,32 +435,28 @@ namespace Game.Server.Bussiness.WorldBussiness
                     connIdList.ForEach((connId) =>
                     {
                         // 广播被影响角色的最新状态消息
-                        roleRqs.SendUpdate_WRoleState(connId, serveFrame, role);
+                        roleRqs.SendUpdate_WRoleState(connId, role);
                     });
                 }
 
             });
-
-            serveFrame = nextFrame;
         }
 
-        void Tick_ActiveHookersBehaviour(int nextFrame)
+        void Tick_ActiveHookersBehaviour()
         {
             var activeHookers = worldFacades.ClientWorldFacades.Domain.BulletDomain.GetActiveHookerList();
             List<WorldRoleLogicEntity> roleList = new List<WorldRoleLogicEntity>();
             var rqs = worldFacades.Network.WorldRoleReqAndRes;
-            bool hasHookerLoose = false;
             activeHookers.ForEach((hooker) =>
             {
                 var master = worldFacades.ClientWorldFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterId);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.SetRoleState(RoleState.Normal);
-                    hasHookerLoose = true;
                     //发送爪钩断开后的角色状态帧
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendUpdate_WRoleState(connId, serveFrame, master);
+                        rqs.SendUpdate_WRoleState(connId, master);
                     });
                     return;
                 }
@@ -503,20 +478,18 @@ namespace Game.Server.Bussiness.WorldBussiness
                 //发送爪钩作用力后的角色状态帧
                 connIdList.ForEach((connId) =>
                 {
-                    rqs.SendUpdate_WRoleState(connId, serveFrame, master);
+                    rqs.SendUpdate_WRoleState(connId, master);
                 });
             });
 
-            if (roleList.Count != 0 || hasHookerLoose) serveFrame = nextFrame;
         }
         #endregion
 
         #region [Item]
-        void Tick_ItemPickUp(int nextFrame)
+        void Tick_ItemPickUp()
         {
-            if (itemPickUpDic.TryGetValue(nextFrame, out var itemPickQueue))
+            if (itemPickUpQueueDic.TryGetValue(serveFrame, out var itemPickQueue))
             {
-                serveFrame = nextFrame;
                 while (itemPickQueue.TryPeek(out var msgStruct))
                 {
                     itemPickQueue.Dequeue();
@@ -550,11 +523,10 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         #region [Weapon]
 
-        void Tick_WeaponShoot(int nextFrame)
+        void Tick_WeaponShoot()
         {
-            if (weaponShootDic.TryGetValue(nextFrame, out var queue))
+            if (weaponShootQueueDic.TryGetValue(serveFrame, out var queue))
             {
-                serveFrame = nextFrame;
                 var clientFacades = worldFacades.ClientWorldFacades;
                 var weaponRepo = clientFacades.Repo.WeaponRepo;
                 var roleRepo = clientFacades.Repo.RoleRepo;
@@ -597,8 +569,8 @@ namespace Game.Server.Bussiness.WorldBussiness
 
                             connIdList.ForEach((connId) =>
                             {
-                                weaponRqs.SendRes_WeaponShoot(connId, serveFrame, masterId);
-                                bulletRqs.SendRes_BulletSpawn(connId, serveFrame, bulletType, bulletId, masterId, shootDir);
+                                weaponRqs.SendRes_WeaponShoot(connId, masterId);
+                                bulletRqs.SendRes_BulletSpawn(connId, bulletType, bulletId, masterId, shootDir);
                             });
                             Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{masterId}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
                         }
@@ -607,11 +579,10 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
         }
 
-        void Tick_WeaponReload(int nextFrame)
+        void Tick_WeaponReload()
         {
-            if (weaponReloadDic.TryGetValue(nextFrame, out var queue))
+            if (weaponReloadQueueDic.TryGetValue(serveFrame, out var queue))
             {
-                serveFrame = nextFrame;
                 var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.RoleRepo;
                 var rqs = worldFacades.Network.WeaponReqAndRes;
@@ -636,11 +607,10 @@ namespace Game.Server.Bussiness.WorldBussiness
             }
         }
 
-        void Tick_WeaponDrop(int nextFrame)
+        void Tick_WeaponDrop()
         {
-            if (weaponDropDic.TryGetValue(nextFrame, out var queue))
+            if (weaponDropQueueDic.TryGetValue(serveFrame, out var queue))
             {
-                serveFrame = nextFrame;
                 var weaponRepo = worldFacades.ClientWorldFacades.Repo.WeaponRepo;
                 var roleRepo = worldFacades.ClientWorldFacades.Repo.RoleRepo;
                 var rqs = worldFacades.Network.WeaponReqAndRes;
@@ -669,156 +639,66 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         #endregion
 
-        #region [Physics]
 
-        // 地形造成的减速 TODO:滑铲加速
-        void Tick_Physics_Collision_Role(int nextFrame)
-        {
-            var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
-            var roleList = physicsDomain.Tick_AllRoleHitEnter(fixedDeltaTime);
-            var rqs = worldFacades.Network.WorldRoleReqAndRes;
-            roleList.ForEach((role) =>
-            {
-                connIdList.ForEach((connId) =>
-                {
-                    rqs.SendUpdate_WRoleState(connId, serveFrame, role);
-                });
-            });
-
-            if (roleList.Count != 0) serveFrame = nextFrame;
-        }
-
-        void Tick_Physics_Collision_Bullet(int nextFrame)
-        {
-            var physicsDomain = worldFacades.ClientWorldFacades.Domain.PhysicsDomain;
-            physicsDomain.Refresh_BulletHit();
-
-            var bulletDomain = worldFacades.ClientWorldFacades.Domain.BulletDomain;
-            var bulletRepo = worldFacades.ClientWorldFacades.Repo.BulletRepo;
-            List<BulletEntity> removeList = new List<BulletEntity>();
-            bulletRepo.Foreach((bullet) =>
-            {
-                bool isHitSomething = false;
-                if (bullet.HitRoleQueue.TryDequeue(out var wrole))
-                {
-                    isHitSomething = true;
-                    // Server Logic
-                    wrole.HealthComponent.HurtByBullet(bullet);
-                    wrole.MoveComponent.HitByBullet(bullet);
-                    if (wrole.HealthComponent.IsDead)
-                    {
-                        wrole.TearDown();
-                        wrole.Reborn();
-                    }
-                    // Notice Client
-                    var rqs = worldFacades.Network.BulletReqAndRes;
-                    connIdList.ForEach((connId) =>
-                    {
-                        rqs.SendRes_BulletHitRole(connId, serveFrame, bullet.EntityId, wrole.EntityId);
-                    });
-
-                }
-                if (bullet.HitFieldQueue.TryDequeue(out var field))
-                {
-                    isHitSomething = true;
-                    // TODO:Server Logic
-                    // Notice Client
-                    var rqs = worldFacades.Network.BulletReqAndRes;
-                    connIdList.ForEach((connId) =>
-                    {
-                        rqs.SendRes_BulletHitWall(connId, serveFrame, bullet);
-                    });
-                }
-
-                if (isHitSomething)
-                {
-                    serveFrame = nextFrame;
-                    // Server Logic
-                    if (bullet.BulletType == BulletType.DefaultBullet)
-                    {
-                        // 普通子弹的逻辑，只是单纯的移除
-                        removeList.Add(bullet);
-                    }
-                    if (bullet is HookerEntity hookerEntity)
-                    {
-                        // 爪钩逻辑
-                        if (field != null) hookerEntity.TryGrabSomthing(field.transform);
-                        if (wrole != null) hookerEntity.TryGrabSomthing(wrole.transform);
-                    }
-                    else if (bullet is GrenadeEntity grenadeEntity)
-                    {
-                        // 手雷逻辑: 速度清零
-                        grenadeEntity.MoveComponent.SetMoveVelocity(Vector3.zero);
-                    }
-
-                }
-            });
-            removeList.ForEach((bullet) =>
-            {
-                bullet.TearDown();
-                bulletRepo.TryRemove(bullet);
-            });
-        }
-
-        void Tick_Physics_Movement_Role(float fixedDeltaTime)
-        {
-            var domain = worldFacades.ClientWorldFacades.Domain.WorldRoleDomain;
-            domain.Tick_RoleRigidbody(fixedDeltaTime);
-        }
-
-        void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
-        {
-            var domain = worldFacades.ClientWorldFacades.Domain.BulletDomain;
-            domain.Tick_Bullet(fixedDeltaTime);
-        }
-
-        #endregion
 
         // ====== Network
         // Role
         void OnWoldRoleOpt(int connId, FrameOptReqMsg msg)
         {
-            if (!wRoleOptQueueDic.TryGetValue(serveFrame + 1, out var optQueue))
+            if (!wRoleOptQueueDic.TryGetValue(serveFrame, out var optQueue))
             {
-                optQueue = new List<FrameOptReqMsgStruct>();
-                wRoleOptQueueDic[serveFrame + 1] = optQueue;
+                optQueue = new Queue<FrameOptReqMsgStruct>();
+                wRoleOptQueueDic[serveFrame] = optQueue;
             }
 
-            optQueue.Add(new FrameOptReqMsgStruct { connId = connId, msg = msg });
+            optQueue.Enqueue(new FrameOptReqMsgStruct { connId = connId, msg = msg });
         }
 
         void OnWoldRoleJump(int connId, FrameJumpReqMsg msg)
         {
-            if (!jumpOptDic.TryGetValue(serveFrame + 1, out var jumpOptList))
+            if (!jumpOptQueueDic.TryGetValue(serveFrame, out var jumpOptList))
             {
-                jumpOptList = new List<FrameJumpReqMsgStruct>();
-                jumpOptDic[serveFrame + 1] = jumpOptList;
+                jumpOptList = new Queue<FrameJumpReqMsgStruct>();
+                jumpOptQueueDic[serveFrame] = jumpOptList;
             }
 
-            jumpOptList.Add(new FrameJumpReqMsgStruct { connId = connId, msg = msg });
+            jumpOptList.Enqueue(new FrameJumpReqMsgStruct { connId = connId, msg = msg });
         }
 
         void OnWoldRoleSpawn(int connId, FrameWRoleSpawnReqMsg msg)
         {
-            wRoleSpawnDic.TryAdd(serveFrame + 1, new FrameWRoleSpawnReqMsgStruct { connId = connId, msg = msg });
+            if (!wRoleSpawQueuenDic.TryGetValue(serveFrame, out var queue))
+            {
+                queue = new Queue<FrameWRoleSpawnReqMsgStruct>();
+                wRoleSpawQueuenDic[serveFrame] = queue;
+            }
+
+            queue.Enqueue(new FrameWRoleSpawnReqMsgStruct { connId = connId, msg = msg });
+
             // TODO:连接服和世界服分离
             connIdList.Add(connId);
-            // 创建场景
+            // 创建场景(First Time)
             sceneSpawnTrigger = true;
         }
 
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
-            bulletSpawnDic.TryAdd(serveFrame + 1, new FrameBulletSpawnReqMsgStruct { connId = connId, msg = msg });
+            if (!bulletSpawnQueueDic.TryGetValue(serveFrame, out var queue))
+            {
+                queue = new Queue<FrameBulletSpawnReqMsgStruct>();
+                bulletSpawnQueueDic[serveFrame] = queue;
+            }
+
+            queue.Enqueue(new FrameBulletSpawnReqMsgStruct { connId = connId, msg = msg });
         }
 
         // ========= Item
         void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
         {
-            if (!itemPickUpDic.TryGetValue(serveFrame + 1, out var msgStruct))
+            if (!itemPickUpQueueDic.TryGetValue(serveFrame, out var msgStruct))
             {
                 msgStruct = new Queue<FrameItemPickUpReqMsgStruct>();
-                itemPickUpDic[serveFrame + 1] = msgStruct;
+                itemPickUpQueueDic[serveFrame] = msgStruct;
             }
 
             msgStruct.Enqueue(new FrameItemPickUpReqMsgStruct { connId = connId, msg = msg });
@@ -827,10 +707,10 @@ namespace Game.Server.Bussiness.WorldBussiness
         // =========== Weapon
         void OnWeaponShoot(int connId, FrameWeaponShootReqMsg msg)
         {
-            if (!weaponShootDic.TryGetValue(serveFrame + 1, out var msgStruct))
+            if (!weaponShootQueueDic.TryGetValue(serveFrame, out var msgStruct))
             {
                 msgStruct = new Queue<FrameWeaponShootReqMsgStruct>();
-                weaponShootDic[serveFrame + 1] = msgStruct;
+                weaponShootQueueDic[serveFrame] = msgStruct;
             }
 
             msgStruct.Enqueue(new FrameWeaponShootReqMsgStruct { connId = connId, msg = msg });
@@ -839,10 +719,10 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         void OnWeaponReload(int connId, FrameWeaponReloadReqMsg msg)
         {
-            if (!weaponReloadDic.TryGetValue(serveFrame + 1, out var msgStruct))
+            if (!weaponReloadQueueDic.TryGetValue(serveFrame, out var msgStruct))
             {
                 msgStruct = new Queue<FrameWeaponReloadReqMsgStruct>();
-                weaponReloadDic[serveFrame + 1] = msgStruct;
+                weaponReloadQueueDic[serveFrame] = msgStruct;
             }
 
             msgStruct.Enqueue(new FrameWeaponReloadReqMsgStruct { connId = connId, msg = msg });
@@ -851,10 +731,10 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         void OnWeaponDrop(int connId, FrameWeaponDropReqMsg msg)
         {
-            if (!weaponDropDic.TryGetValue(serveFrame + 1, out var msgStruct))
+            if (!weaponDropQueueDic.TryGetValue(serveFrame, out var msgStruct))
             {
                 msgStruct = new Queue<FrameWeaponDropReqMsgStruct>();
-                weaponDropDic[serveFrame + 1] = msgStruct;
+                weaponDropQueueDic[serveFrame] = msgStruct;
             }
 
             msgStruct.Enqueue(new FrameWeaponDropReqMsgStruct { connId = connId, msg = msg });

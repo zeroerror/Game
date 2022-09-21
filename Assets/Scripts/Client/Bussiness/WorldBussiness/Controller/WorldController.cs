@@ -541,7 +541,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         void OnWorldRoleSpawn(FrameWRoleSpawnResMsg msg)
         {
-            // Debug.Log("加入角色生成队列");
+            Debug.Log("加入角色生成队列");
             roleSpawnQueue.Enqueue(msg);
         }
         #endregion
