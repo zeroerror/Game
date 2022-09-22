@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 9114815929425682445}
   - component: {fileID: 6998272725665190617}
   m_Layer: 5
-  m_Name: Ser1
+  m_Name: WorldServerPanel_Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

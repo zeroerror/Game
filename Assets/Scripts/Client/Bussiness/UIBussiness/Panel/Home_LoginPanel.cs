@@ -1,17 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ZeroUIFrame;
-using Game.UI.Event;
-using Game.Client.Bussiness.LoginBussiness.Controllers;
+using Game.Bussiness.UIBussiness;
 using Game.Client.Bussiness.EventCenter;
 
-namespace Game.UI.Panel
+namespace Game.Client.Bussiness.UIBussiness.Panel
 {
 
     public class Home_LoginPanel : UIBehavior
     {
         InputField _name;
         InputField _Pwd;
+        UIEventCenter uIEventCenter;
 
         void Awake()
         {
@@ -20,6 +20,9 @@ namespace Game.UI.Panel
 
             SetOnClick("LoginBtn", SendLoginMsg);
             SetOnClick("RegistBtn", SendRegistAccountMsg);
+
+            uIEventCenter = args[0] as UIEventCenter;
+            Debug.Assert(uIEventCenter != null);
 
             NetworkEventCenter.RegistLoginSuccess(OnLoginSuccess);
         }
@@ -32,14 +35,12 @@ namespace Game.UI.Panel
 
         void SendRegistAccountMsg(params object[] args)
         {
-            LoginController.SendRegistAccountMsg(_name.text, _Pwd.text);
+            // LoginController.SendRegistAccountMsg(_name.text, _Pwd.text);
         }
 
         void OnLoginSuccess(string[] worldSerHosts, ushort[] ports)
         {
-            Debug.Log($"UIController: 世界服 {worldSerHosts[0]}:{ports[0]}");
-            UIEventCenter.EnqueueOpenQueue("Home_WorldServerPanel");
-            UIEventCenter.EnqueueTearDownQueue("Home_LoginPanel");
+            uIEventCenter.EnqueueTearDownQueue("Home_LoginPanel");
         }
 
     }

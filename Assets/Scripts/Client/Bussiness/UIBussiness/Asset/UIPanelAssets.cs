@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Game.Generic;
 
-namespace Game.UI.Assets
+namespace Game.Bussiness.UIBussiness
 {
 
     public static class UIPanelAssets
@@ -28,7 +28,7 @@ namespace Game.UI.Assets
         {
             all = null;
         }
-        
+
         public static GameObject Get(string name)
         {
             all.TryGetValue(name, out GameObject go);

@@ -4,10 +4,11 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using ZeroUIFrame;
 using Game.Generic;
-using Game.UI.Assets;
+using Game.Bussiness.UIBussiness;
 
-namespace Game.UI.Manager
+namespace Game.Bussiness.UIBussiness
 {
 
     public static class UIManager
@@ -60,7 +61,7 @@ namespace Game.UI.Manager
             return _CheckUI(uiName, ref ui) && ui.gameObject.activeInHierarchy;
         }
 
-        public static void OpenUI(string uiName, params object[] args)
+        public static UIBehavior OpenUI(string uiName, params object[] args)
         {
             Transform ui = null;
             if (!_CheckUI(uiName, ref ui))
@@ -68,15 +69,20 @@ namespace Game.UI.Manager
                 if (!_TryCreateUI(uiName, ref ui))
                 {
                     Debug.LogError(string.Format("UI: {0} 不存在！", uiName));
-                    return;
+                    return null;
                 }
                 else
                 {
-                    Debug.Log(new StringBuilder("UI: ").Append(uiName).Append(" Loaded------"));
+                    Debug.Log(new StringBuilder("UI: ").Append(uiName).Append(" Loaded*************"));
                 }
             }
 
-            if (ui.gameObject.activeInHierarchy) return;
+            var uIBehavior = ui.GetComponent<UIBehavior>();
+
+            // 传参args
+            uIBehavior.args = args;
+
+            if (ui.gameObject.activeInHierarchy) return uIBehavior;
 
             Canvas canvas;
             if (!ui.GetComponent<Canvas>()) canvas = ui.gameObject.AddComponent<Canvas>();
@@ -95,11 +101,12 @@ namespace Game.UI.Manager
                 Debug.Log(new StringBuilder("UI: ").Append(uiName).Append(" ReOpened---"));
             }
 
-            // TODO: 传参args
             value.y++;
             canvas.sortingOrder = value.x + value.y;
             ui.gameObject.SetActive(true);
             _layerSortingDic[layer] = value;
+
+            return uIBehavior;
         }
 
         public static void CloseUI(string uiName)

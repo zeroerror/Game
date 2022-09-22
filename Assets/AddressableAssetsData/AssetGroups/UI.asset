@@ -28,6 +28,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI
+  - m_GUID: ebd879002d4606d408520103388cff52
+    m_Address: WorldServerPanel_Item
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - UI
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

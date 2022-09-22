@@ -6,13 +6,11 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Client.Facades;
+using Game.Client.Bussiness;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.BattleBussiness;
-using Game.UI;
-using Game.UI.Assets;
-using Game.UI.Manager;
-using Game.UI.Event;
+using Game.Bussiness.UIBussiness;
 
 namespace Game.Client
 {
@@ -25,6 +23,7 @@ namespace Game.Client
         InputComponent _inputComponent;
         float time;
         bool isStarted;
+
 
         void Awake()
         {
@@ -45,7 +44,6 @@ namespace Game.Client
             // ====== EventCenter ======
             NetworkEventCenter.Ctor();
             LocalEventCenter.Ctor();
-            UIEventCenter.Ctor();
 
             // ====== Network ======
             AllClientNetwork.Ctor();
@@ -127,7 +125,6 @@ namespace Game.Client
             networkClient.OnConnectedHandle += () =>
             {
                 Debug.Log("连接登录服务器成功*************************************************************");
-                UIEventCenter.EnqueueOpenQueue("Home_LoginPanel");
             };
         }
 
