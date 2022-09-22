@@ -12,6 +12,7 @@ namespace Game.UI.Panel
     {
         void Awake()
         {
+            NetworkEventCenter.RegistLoginSuccess(OnLoginSuccess);
         }
 
         // == UI Click ==

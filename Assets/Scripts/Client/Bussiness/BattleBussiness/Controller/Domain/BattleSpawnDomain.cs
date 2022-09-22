@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             fieldEntity.CameraComponent.SetFirstViewCam(firstCam);
             fieldEntity.CameraComponent.SetThirdViewCam(thirdCam);
 
-            LocalEventCenter.Invoke_SceneLoadedHandler(scene.name);
+            // LocalEventCenter.Invoke_SceneLoadedHandler(scene.name);
             return fieldEntity;
         }
 
