@@ -12,6 +12,7 @@ using Game.Client.Bussiness.BattleBussiness;
 using Game.UI;
 using Game.UI.Assets;
 using Game.UI.Manager;
+using Game.UI.Event;
 
 namespace Game.Client
 {
@@ -23,18 +24,31 @@ namespace Game.Client
         public string CurrentSceneName { get; private set; }
         InputComponent _inputComponent;
         float time;
+        bool isStarted;
 
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
+            StartAllAsync();
+        }
 
-            // ====== Network ======
-            AllClientNetwork.Ctor();
-            StartClient();
+        async void StartAllAsync()
+        {
+            // ======  Asset ======
+            await LoadAllAsset();
+
+            // == Load Login Scene ==
+            Addressables.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
+            SceneManager.sceneLoaded -= LoginSceneLoaded;
+            SceneManager.sceneLoaded += LoginSceneLoaded;
 
             // ====== EventCenter ======
             NetworkEventCenter.Ctor();
             LocalEventCenter.Ctor();
+            UIEventCenter.Ctor();
+
+            // ====== Network ======
+            AllClientNetwork.Ctor();
 
             // ====== Entry ======
             // Login
@@ -46,39 +60,30 @@ namespace Game.Client
             _inputComponent = new InputComponent();
             BattleEntry.Inject(AllClientNetwork.networkClient, _inputComponent);
             BattleEntry.Init();
-            // UI
-            UIEntry.Ctor();
 
             // ====== Manager ======
             UIManager.Ctor();
             CameraManager.Ctor();
 
-            // ======  Asset ======
-            Action action = async () =>
-            {
-                await LoadAllAsset();
-
-                var uiCamTrans = CameraManager.UICamTrans;
-                uiCamTrans.SetParent(UIManager.UIRoot.transform, false);
-                DontDestroyOnLoad(uiCamTrans);
-
-                // == Load Login Scene ==
-                Addressables.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
-                SceneManager.sceneLoaded -= LoginSceneLoaded;
-                SceneManager.sceneLoaded += LoginSceneLoaded;
-            };
-
-            action.Invoke();
+            // ======  UI ======
+            UIEntry.Ctor();
+            var uiCamTrans = CameraManager.UICamTrans;
+            uiCamTrans.SetParent(UIManager.UIRoot.transform, false);
 
             // ======  Input ======
             InputGameSet.Ctor();
 
             // ====== Physics ======
             Physics.autoSimulation = false;
+
+            StartClient();
+            isStarted = true;
         }
 
         void FixedUpdate()
         {
+            if (!isStarted) return;
+
             // == Entry ==
             LoginEntry.Tick();
             BattleEntry.Tick();
@@ -91,6 +96,8 @@ namespace Game.Client
 
         void Update()
         {
+            if (!isStarted) return;
+
             InputGameSet.Receive_Input(ref _inputComponent);
             BattleEntry.Update();
         }
@@ -98,10 +105,6 @@ namespace Game.Client
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
             CurrentSceneName = scene.name;
-            if (CurrentSceneName == "LoginScene")
-            {
-                UIManager.OpenUI("Home_LoginPanel");
-            }
         }
 
         void StartClient()
@@ -110,12 +113,7 @@ namespace Game.Client
 
             var networkClient = AllClientNetwork.networkClient;
 
-            networkClient.OnConnectedHandle += () =>
-            {
-                Debug.Log("连接服务器成功*************************************************************");
-            };
-
-            networkClient.Connect(NetworkConfig.HOST, NetworkConfig.PORT);
+            networkClient.Connect(NetworkConfig.LOCAL_HOST, NetworkConfig.LOGIN_PORT);
 
             _clientThread = new Thread(() =>
             {
@@ -125,6 +123,12 @@ namespace Game.Client
                 }
             });
             _clientThread.Start();
+
+            networkClient.OnConnectedHandle += () =>
+            {
+                Debug.Log("连接登录服务器成功*************************************************************");
+                UIEventCenter.EnqueueOpenQueue("Home_LoginPanel");
+            };
         }
 
         async Task LoadAllAsset()

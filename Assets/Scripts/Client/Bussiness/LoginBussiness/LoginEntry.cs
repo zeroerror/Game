@@ -9,12 +9,17 @@ namespace Game.Client.Bussiness.LoginBussiness
     public static class LoginEntry
     {
 
+        static LoginController loginController;
+
         #region [Life Cycle]
 
         public static void Ctor()
         {
             // == Asset ==
             AllLoginAsset.Ctor();
+
+            // == Controller ==
+            loginController = new LoginController();
         }
 
         public static void Init()
@@ -27,13 +32,13 @@ namespace Game.Client.Bussiness.LoginBussiness
             // == Network ==
 
             // == Controller ==
-            LoginController.Inject(client);
+            loginController.Inject(client);
         }
 
         public static void Tick()
         {
             // == Controller ==
-            LoginController.Tick();
+            loginController.Tick();
         }
 
         public static void TearDown()

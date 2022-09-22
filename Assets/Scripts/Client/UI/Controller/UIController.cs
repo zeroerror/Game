@@ -1,50 +1,43 @@
 using Game.UI.Event;
 using Game.UI.Manager;
 using Game.Client.Bussiness.EventCenter;
-using Game.Protocol.Login;
+using UnityEngine;
 
 namespace Game.UI.Controller
 {
 
-    public static class UIController
+    public class UIController
     {
 
-        public static void Ctor()
-        {
-            NetworkEventCenter.RegistLoginSuccess(CloseLoginPanel);
+        public UIController(){
+
         }
 
-        public static void Tick()
+        public void Tick()
         {
             Tick_Open();
             Tick_TearDown();
         }
 
-        public static void TearDown()
+        public void TearDown()
         {
 
         }
 
-        static void Tick_Open()
+        void Tick_Open()
         {
-            if (UIEventCenter.TryDequeueOpenQueue(out string uiName))
+            while (UIEventCenter.TryDequeueOpenQueue(out string open_uiName))
             {
-                UIManager.OpenUI(uiName);
+                UIManager.OpenUI(open_uiName);
             }
         }
 
-        static void Tick_TearDown()
+        void Tick_TearDown()
         {
             if (UIEventCenter.TryDequeueTearDownQueue(out string uiName))
             {
                 UIManager.CloseUI(uiName);
             }
-        }
-
-        static void CloseLoginPanel(LoginResMessage msg)
-        {
-            UIManager.CloseUI("Home_LoginPanel");
-            // UIManager.OpenUI("Home_WorldServerPanel");
         }
 
     }

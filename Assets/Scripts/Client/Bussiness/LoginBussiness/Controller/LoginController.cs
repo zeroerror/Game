@@ -4,19 +4,25 @@ using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness.Facades;
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Login;
+using System.Collections.Generic;
 
 namespace Game.Client.Bussiness.LoginBussiness.Controllers
 {
 
-    public static class LoginController
+    public class LoginController
     {
 
-        static event Action<byte> _loginHandler;
-        static event Action<byte> _registAccountHandler;
-        static byte loginTrigger;
-        static byte registTrigger;
+        public event Action<string[], ushort[]> _loginSuccessHandler;
+        public event Action<byte> _registAccountHandler;
 
-        public static void Inject(NetworkClient client)
+        Queue<LoginResMessage> loginResQueue;
+
+        public LoginController()
+        {
+            loginResQueue = new Queue<LoginResMessage>();
+        }
+
+        public void Inject(NetworkClient client)
         {
             AllLoginAsset.LoginReqAndRes.Inject(client);
 
@@ -25,18 +31,14 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
             AllLoginAsset.LoginReqAndRes.RegistRegistAccountRes(OnRegistAccountRes);
         }
 
-        public static void Tick()
+        public void Tick()
         {
-            if (loginTrigger != 0)
+
+            while (loginResQueue.TryDequeue(out var msg))
             {
-                _loginHandler?.Invoke(loginTrigger);
-                loginTrigger = 0;
+                NetworkEventCenter.Invoke_LoginSuccessHandler(msg);
             }
-            if (registTrigger != 0)
-            {
-                _registAccountHandler?.Invoke(registTrigger);
-                registTrigger = 0;
-            }
+
         }
 
         public static void SendLoginMsg(string account, string pwd)
@@ -44,29 +46,18 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
             AllLoginAsset.LoginReqAndRes.SendLoginMsg(account, pwd);
         }
 
-        public static void AddRegister_LoginRes(Action<byte> action)
-        {
-            _loginHandler += action;
-        }
-
         public static void SendRegistAccountMsg(string account, string pwd)
         {
             AllLoginAsset.LoginReqAndRes.SendRegistAccountMsg(account, pwd);
         }
 
-        public static void AddRegister_RegistAccountRes(Action<byte> action)
-        {
-            _registAccountHandler += action;
-        }
-
         // PRIVATE FUNC
-        static void OnLoginRes(LoginResMessage msg)
+        void OnLoginRes(LoginResMessage msg)
         {
             if (msg.status == 1)
             {
                 Debug.Log($"登录成功! 你的userToken:{msg.userToken}");
-                NetworkEventCenter.SetLoginSuccess(msg);
-                loginTrigger = msg.status;
+                loginResQueue.Enqueue(msg);
             }
             else
             {
@@ -74,12 +65,11 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
             }
         }
 
-        static void OnRegistAccountRes(RegisterAccountResMessage msg)
+        void OnRegistAccountRes(RegisterAccountResMessage msg)
         {
             if (msg.status == 1)
             {
                 Debug.Log("注册成功!");
-                registTrigger = msg.status;
             }
             else
             {

@@ -609,7 +609,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Network Event Center]
 
-        async void EnterWorldServerChooseScene(LoginResMessage msg)
+        async void EnterWorldServerChooseScene(string[] worldSerHosts, ushort[] ports)
         {
             // // 当前有加载好的场景，则不加载
             // var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
@@ -631,11 +631,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             var domain = battleFacades.Domain;
             var fieldEntity = await domain.BattleSpawnDomain.SpawnWorldServerChooseScene();
-            var worldSerHosts = msg.worldServerHosts;
-            var worldSerPorts = msg.worldServerPorts;
             for (int i = 0; i < worldSerHosts.Length; i++)
             {
-                Debug.Log($"世界服 {i} Host:{worldSerHosts[i]}  Port:{worldSerPorts[i]}");
+                Debug.Log($"世界服 {i} Host:{worldSerHosts[i]}  Port:{ports[i]}");
             }
         }
 

@@ -50,14 +50,14 @@ namespace Game.Client.Bussiness.EventCenter
         {
             if (sceneLoaded_Action != null)
             {
-                Debug.Log("sceneLoaded_Action");
+                Debug.Log("场景加载------------------------------");
                 sceneLoaded_Action.Invoke();
                 sceneLoaded_Action = null;
             }
 
             if (battleRoleSpawn_Action != null)
             {
-                Debug.Log("battleRoleSpawn_Action");
+                Debug.Log("战斗角色生成-----------------------------");
                 battleRoleSpawn_Action.Invoke();
                 battleRoleSpawn_Action = null;
             }

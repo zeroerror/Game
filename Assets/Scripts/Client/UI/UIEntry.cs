@@ -6,19 +6,21 @@ namespace Game.UI
 
     public static class UIEntry
     {
+
+        static UIController uIController;
+
         public static void Ctor()
         {
-            // == Event
-            UIEventCenter.Ctor();
-
             // == Controller
-            UIController.Ctor();
+            uIController = new UIController();
         }
 
         public static void Tick()
         {
+
             // == Controller
-            UIController.Tick();
+            uIController.Tick();
+
         }
 
         public static void TearDown()
@@ -26,7 +28,7 @@ namespace Game.UI
             // == Event
             UIEventCenter.TearDown();
             // == Controller
-            UIController.TearDown();
+            uIController.TearDown();
         }
 
     }

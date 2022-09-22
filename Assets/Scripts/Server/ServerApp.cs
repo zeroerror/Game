@@ -18,20 +18,24 @@ namespace Game.Server
         BattleEntry battleEntry;
         LoginEntry loginEntry;
 
+        Thread _loginThread;
+        Thread _worldServerThread;
+
         void Awake()
         {
             // == Network ==
             allServerNetwork = new AllServerNetwork();
-            StartServer();
+            StartLoginServer();
+            StartWorldServer();
 
             // == Entry ==
             // BattleEntry
             battleEntry = new BattleEntry();
-            battleEntry.Inject(allServerNetwork.networkServer, UnityEngine.Time.fixedDeltaTime);
+            battleEntry.Inject(allServerNetwork.LoginServer, UnityEngine.Time.fixedDeltaTime);
             battleEntry.Init();
             // LoginEntry
             loginEntry = new LoginEntry();
-            loginEntry.Inject(allServerNetwork.networkServer);
+            loginEntry.Inject(allServerNetwork.LoginServer);
 
             DontDestroyOnLoad(this.gameObject);
 
@@ -47,24 +51,45 @@ namespace Game.Server
 
         }
 
-        void StartServer()
+        bool isCancel;
+        void StartLoginServer()
         {
-            Debug.Log("服务端启动！");
-            var networkServer = allServerNetwork.networkServer;
-            networkServer.StartListen(NetworkConfig.PORT);
-            new Thread(() =>
-                      {
-                          while (true)
-                          {
-                              networkServer.Tick();
-                          }
-                      }).Start();
-
+            Debug.Log("登录服启动！");
+            var networkServer = allServerNetwork.LoginServer;
+            networkServer.StartListen(NetworkConfig.LOGIN_PORT);
+            _loginThread = new Thread(() =>
+                        {
+                            while (!isCancel)
+                            {
+                                networkServer.Tick();
+                            }
+                        });
+            _loginThread.Start();
             networkServer.OnConnectedHandle += (connID) =>
             {
-                Debug.Log($"服务端: connID:{connID} 客户端连接成功-------------------------");
+                Debug.Log($"[登录服]: connID:{connID} 客户端连接成功-------------------------");
             };
 
+        }
+
+        void StartWorldServer()
+        {
+            Debug.Log("世界服启动！");
+            var worldServer = allServerNetwork.WorldServer;
+            worldServer.StartListen(NetworkConfig.WORLDSERVER_PORT[0]);
+            _worldServerThread = new Thread(() =>
+                        {
+                            while (true)
+                            {
+                                worldServer.Tick();
+                            }
+                        });
+            _worldServerThread.Start();
+
+            worldServer.OnConnectedHandle += (connID) =>
+            {
+                Debug.Log($"[世界服]: connID:{connID} 客户端连接成功-------------------------");
+            };
         }
 
     }

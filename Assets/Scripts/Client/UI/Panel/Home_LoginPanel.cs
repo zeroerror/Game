@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ZeroUIFrame;
-using Game.Client.Bussiness.LoginBussiness.Controllers;
 using Game.UI.Event;
+using Game.Client.Bussiness.LoginBussiness.Controllers;
+using Game.Client.Bussiness.EventCenter;
 
 namespace Game.UI.Panel
 {
@@ -19,13 +20,8 @@ namespace Game.UI.Panel
 
             SetOnClick("LoginBtn", SendLoginMsg);
             SetOnClick("RegistBtn", SendRegistAccountMsg);
-            LoginController.AddRegister_LoginRes((status) =>
-            {
-                if (status == 1)
-                {
-                    UIEventCenter.EnqueueOpenQueue("Home_LoginPanel");
-                }
-            });
+
+            NetworkEventCenter.RegistLoginSuccess(OnLoginSuccess);
         }
 
         // == UI Click ==
@@ -37,6 +33,13 @@ namespace Game.UI.Panel
         void SendRegistAccountMsg(params object[] args)
         {
             LoginController.SendRegistAccountMsg(_name.text, _Pwd.text);
+        }
+
+        void OnLoginSuccess(string[] worldSerHosts, ushort[] ports)
+        {
+            Debug.Log($"UIController: 世界服 {worldSerHosts[0]}:{ports[0]}");
+            UIEventCenter.EnqueueOpenQueue("Home_WorldServerPanel");
+            UIEventCenter.EnqueueTearDownQueue("Home_LoginPanel");
         }
 
     }

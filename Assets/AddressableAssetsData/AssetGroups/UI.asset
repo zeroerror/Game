@@ -23,6 +23,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - UIAssets
     - UI
+  - m_GUID: a59d71dcffa2b4d4785bda265b425584
+    m_Address: Home_WorldServerPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - UI
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:
