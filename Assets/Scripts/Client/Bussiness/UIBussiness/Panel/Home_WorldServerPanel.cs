@@ -13,13 +13,26 @@ namespace Game.Bussiness.UIBussiness.Panel
 
         void Awake()
         {
-            SetOnClick("SerGroup/Viewport/Content/Ser1", ClickConWorldSer, 0);
+
         }
 
         void OnEnable()
         {
             worldSerHosts = args[0] as string[];
             ports = args[1] as ushort[];
+            for (int i = 0; i < worldSerHosts.Length; i++)
+            {
+                var host = worldSerHosts[i];
+                var port = ports[i];
+                var go = UIManager.GetUIAsset("serverItem");
+                go = GameObject.Instantiate(go);
+                go.transform.SetParent(transform.Find("SerGroup/Viewport/Content"));
+                string name = $"serverItem{i}";
+                go.transform.name = name;
+                string path = $"SerGroup/Viewport/Content/" + name;
+                Text_SetText(path + "/host", $"{host}:{port}");
+                SetOnClick(path, ClickConWorldSer, i);
+            }
         }
 
         // == UI Click ==
@@ -31,6 +44,6 @@ namespace Game.Bussiness.UIBussiness.Panel
             UIEventCenter.ConnWorSerAction.Invoke(host, port);
         }
 
-        }
-
     }
+
+}

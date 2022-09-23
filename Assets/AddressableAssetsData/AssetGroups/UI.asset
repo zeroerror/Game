@@ -29,7 +29,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - UI
   - m_GUID: ebd879002d4606d408520103388cff52
-    m_Address: WorldServerPanel_Item
+    m_Address: serverItem
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI

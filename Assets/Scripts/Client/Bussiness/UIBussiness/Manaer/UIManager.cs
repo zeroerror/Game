@@ -109,6 +109,11 @@ namespace Game.Bussiness.UIBussiness
             return uIBehavior;
         }
 
+        public static GameObject GetUIAsset(string uiAssetName)
+        {
+            return UIPanelAssets.Get(uiAssetName);
+        }
+
         public static void CloseUI(string uiName)
         {
             Transform ui = null;

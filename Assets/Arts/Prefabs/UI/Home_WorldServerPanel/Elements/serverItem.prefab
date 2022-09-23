@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1208007173137038187}
   - component: {fileID: 2061858493081607869}
   m_Layer: 5
-  m_Name: Text (Legacy)
+  m_Name: host
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5778747, g: 0.8113208, b: 0.6289431, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.2166667, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -68,10 +68,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 50
+    m_FontSize: 32
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 5
+    m_MinSize: 3
     m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: 192.168.1.1:4000
 --- !u!1 &5797598998573348003
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 9114815929425682445}
   - component: {fileID: 6998272725665190617}
   m_Layer: 5
-  m_Name: WorldServerPanel_Item
+  m_Name: serverItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
