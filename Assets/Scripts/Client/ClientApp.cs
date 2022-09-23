@@ -43,7 +43,6 @@ namespace Game.Client
 
             // ====== EventCenter ======
             NetworkEventCenter.Ctor();
-            LocalEventCenter.Ctor();
 
             // ====== Network ======
             AllClientNetwork.Ctor();
@@ -89,7 +88,6 @@ namespace Game.Client
 
             // == EventCenter ==
             NetworkEventCenter.Tick();
-            LocalEventCenter.Tick();
         }
 
         void Update()

@@ -1,5 +1,5 @@
-using Game.Bussiness.UIBussiness;
 using UnityEngine;
+using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Bussiness.UIBussiness
 {
@@ -7,15 +7,8 @@ namespace Game.Bussiness.UIBussiness
     public class UIController
     {
 
-        UIEventCenter uIEventCenter;
-
         public UIController()
         {
-        }
-
-        public void Inject(UIEventCenter uIEventCenter)
-        {
-            this.uIEventCenter = uIEventCenter;
         }
 
         public void Tick()
@@ -31,15 +24,15 @@ namespace Game.Bussiness.UIBussiness
 
         void Tick_Open()
         {
-            while (uIEventCenter.TryDequeueOpenQueue(out var openEventModel))
+            while (UIEventCenter.TryDequeueOpenQueue(out var openEventModel))
             {
-                var uIBehavior = UIManager.OpenUI(openEventModel.uiName, uIEventCenter, openEventModel.args);
+                var uIBehavior = UIManager.OpenUI(openEventModel.uiName, openEventModel.args);
             }
         }
 
         void Tick_TearDown()
         {
-            if (uIEventCenter.TryDequeueTearDownQueue(out string uiName))
+            if (UIEventCenter.TryDequeueTearDownQueue(out string uiName))
             {
                 UIManager.CloseUI(uiName);
             }

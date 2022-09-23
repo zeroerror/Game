@@ -3,7 +3,6 @@ using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Server.Bussiness.Center;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -30,18 +29,17 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            if (!EventCenter.stopPhyscisOneFrame)
+            if (battleFacades.LocalEventCenter.hasOptPhysicsSimulated)
             {
-                // Physics Simulation
-                Tick_Physics_Movement_Bullet(fixedDeltaTime);
-                Tick_Physics_Movement_Role(fixedDeltaTime);
-                var physicsScene = battleFacades.ClientBattleFacades.Repo.FiledRepo.CurPhysicsScene;
-                physicsScene.Simulate(fixedDeltaTime);
+                battleFacades.LocalEventCenter.hasOptPhysicsSimulated = false;
+                return;
             }
-            else
-            {
-                EventCenter.stopPhyscisOneFrame = false;
-            }
+
+            // Physics Simulation
+            Tick_Physics_Movement_Bullet(fixedDeltaTime);
+            Tick_Physics_Movement_Role(fixedDeltaTime);
+            var physicsScene = battleFacades.ClientBattleFacades.Repo.FiledRepo.CurPhysicsScene;
+            physicsScene.Simulate(fixedDeltaTime);
 
             // Physcis Collision
             Tick_Physics_Collision_Role();

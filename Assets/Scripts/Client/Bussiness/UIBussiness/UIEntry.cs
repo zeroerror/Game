@@ -1,23 +1,22 @@
 using UnityEngine;
+using Game.Bussiness.UIBussiness;
 
-namespace Game.Bussiness.UIBussiness
+namespace Game.Client.Bussiness.EventCenter
 {
 
     public static class UIEntry
     {
 
-        static UIEventCenter uIEventCenter;
         static UIController uIController;
 
         public static void Ctor()
         {
-            // == Event
-            uIEventCenter = new UIEventCenter();
-            uIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_LoginPanel" });
-
+            // == EventCenter
+            UIEventCenter.Ctor();
+            UIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_LoginPanel" });
+            
             // == Controller
             uIController = new UIController();
-            uIController.Inject(uIEventCenter);
         }
 
         public static void Tick()
@@ -30,8 +29,9 @@ namespace Game.Bussiness.UIBussiness
 
         public static void TearDown()
         {
-            // == Event
-            uIEventCenter.TearDown();
+            // == EventCenter
+            UIEventCenter.TearDown();
+
             // == Controller
             uIController.TearDown();
         }

@@ -5,7 +5,6 @@ using Game.Infrastructure.Generic;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Server.Bussiness.Center;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -222,18 +221,20 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_AllOpt()
         {
-            Tick_JumpOpt();
-            Tick_MoveAndRotateOpt();
+            int dequeueCount = 0;
+            dequeueCount += Tick_JumpOpt();
+            dequeueCount += Tick_MoveAndRotateOpt();
+            if (dequeueCount != 0) battleFacades.LocalEventCenter.hasOptPhysicsSimulated = true;
         }
 
-        void Tick_MoveAndRotateOpt()
+        int Tick_MoveAndRotateOpt()
         {
-            if (!wRoleOptQueueDic.TryGetValue(serveFrame, out var optQueue)) return;
+            if (!wRoleOptQueueDic.TryGetValue(serveFrame, out var optQueue)) return 0;
 
-            EventCenter.stopPhyscisOneFrame = true;
-
+            int dequeueCount = 0;
             while (optQueue.TryDequeue(out var opt))
             {
+                dequeueCount++;
                 var msg = opt.msg;
                 var realMsg = msg.msg;
                 var connId = opt.connId;
@@ -290,16 +291,19 @@ namespace Game.Server.Bussiness.BattleBussiness
                 }
 
             }
+
+            return dequeueCount;
+
         }
 
-        void Tick_JumpOpt()
+        int Tick_JumpOpt()
         {
-            if (!jumpOptQueueDic.TryGetValue(serveFrame, out var optQueue)) return;
+            if (!jumpOptQueueDic.TryGetValue(serveFrame, out var optQueue)) return 0;
 
+            int dequeueCount = 0;
             while (optQueue.TryDequeue(out var opt))
             {
-                var lastIndex = optQueue.Count - 1;
-
+                dequeueCount++;
                 var wRid = opt.msg.wRid;
                 var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                 var roleEntity = roleRepo.GetByEntityId(wRid);
@@ -315,8 +319,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                         rqs.SendUpdate_WRoleState(connId, roleEntity);
                     });
                 }
-
             }
+
+            return dequeueCount;
         }
         #endregion
 
@@ -746,7 +751,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             // Load Scene And Spawn Field
             var domain = battleFacades.ClientBattleFacades.Domain;
-            var fieldEntity = await domain.BattleSpawnDomain.SpawnCityScene();
+            var fieldEntity = await domain.BattleSpawnDomain.SpawnGameFightScene();
             fieldEntity.SetFieldId(1);
             var fieldEntityRepo = battleFacades.ClientBattleFacades.Repo.FiledRepo;
             fieldEntityRepo.Add(fieldEntity);

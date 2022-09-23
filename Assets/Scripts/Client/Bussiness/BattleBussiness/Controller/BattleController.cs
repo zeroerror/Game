@@ -35,8 +35,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public BattleController()
         {
-            // Between Bussiness
-            NetworkEventCenter.RegistLoginSuccess(EnterWorldServerChooseScene);
 
             roleSpawnQueue = new Queue<FrameWRoleSpawnResMsg>();
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
@@ -609,7 +607,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Network Event Center]
 
-        async void EnterWorldServerChooseScene(string[] worldSerHosts, ushort[] ports)
+        async void SpawnGameFightScene(string[] worldSerHosts, ushort[] ports)
         {
             // // 当前有加载好的场景，则不加载
             // var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
@@ -630,11 +628,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             // rqs.SendReq_WolrdRoleSpawn();
 
             var domain = battleFacades.Domain;
-            var fieldEntity = await domain.BattleSpawnDomain.SpawnWorldServerChooseScene();
-            for (int i = 0; i < worldSerHosts.Length; i++)
-            {
-                Debug.Log($"世界服 {i} Host:{worldSerHosts[i]}  Port:{ports[i]}");
-            }
+            var fieldEntity = await domain.BattleSpawnDomain.SpawnGameFightScene();
         }
 
         #endregion

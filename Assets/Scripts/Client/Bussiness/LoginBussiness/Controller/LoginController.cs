@@ -20,6 +20,7 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
         public LoginController()
         {
             loginResQueue = new Queue<LoginResMessage>();
+            UIEventCenter.LoginAction += SendLoginMsg;
         }
 
         public void Inject(NetworkClient client)
@@ -41,12 +42,12 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
 
         }
 
-        public static void SendLoginMsg(string account, string pwd)
+        public void SendLoginMsg(string account, string pwd)
         {
             AllLoginAsset.LoginReqAndRes.SendLoginMsg(account, pwd);
         }
 
-        public static void SendRegistAccountMsg(string account, string pwd)
+        public void SendRegistAccountMsg(string account, string pwd)
         {
             AllLoginAsset.LoginReqAndRes.SendRegistAccountMsg(account, pwd);
         }

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -13,7 +14,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public WorldController()
         {
-
+            NetworkEventCenter.RegistLoginSuccess(SpawnWorldServerChooseScene);
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -26,30 +27,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         }
 
-        async void EnterWorldServerChooseScene(string[] worldSerHosts, ushort[] ports)
+        async void SpawnWorldServerChooseScene(string[] worldSerHosts, ushort[] ports)
         {
-            // // 当前有加载好的场景，则不加载
-            // var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            // if (curFieldEntity != null) return;
-
-            // // Load Scene And Spawn Field
-            // var domain = battleFacades.Domain;
-            // var fieldEntity = await domain.BattleSpawnDomain.SpawnCityScene();
-            // Cursor.lockState = CursorLockMode.Locked;
-            // Cursor.visible = true;
-            // fieldEntity.SetFieldId(1);
-            // var fieldEntityRepo = battleFacades.Repo.FiledRepo;
-            // var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
-            // fieldEntityRepo.Add(fieldEntity);
-            // fieldEntityRepo.SetPhysicsScene(physicsScene);
-            // // Send Spawn Role Message
-            // var rqs = battleFacades.Network.BattleRoleReqAndRes;
-            // rqs.SendReq_WolrdRoleSpawn();
             var fieldEntity = await SpawnScene("world_server_choose_scene");
-            for (int i = 0; i < worldSerHosts.Length; i++)
-            {
-                Debug.Log($"世界服 {i} Host:{worldSerHosts[i]}  Port:{ports[i]}");
-            }
+            object[] args = { worldSerHosts, ports };
+            UIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_WorldServerPanel", args = args });
         }
 
         public async Task<FieldEntity> SpawnScene(string sceneName)
