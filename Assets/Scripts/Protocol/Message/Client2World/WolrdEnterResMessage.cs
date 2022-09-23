@@ -3,7 +3,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Client2World
 {
 
     [ZeroMessage]
-    public class WolrdEnterResMessage:IZeroMessage<WolrdEnterResMessage>{
+    public class WolrdEnterResMessage :IZeroMessage<WolrdEnterResMessage>{
         public string account;
 
         public void FromBytes(byte[] src, ref int offset)

@@ -147,7 +147,7 @@ namespace Game.Server.Bussiness.LoginBussiness
             var networkServer = loginFacades.NetworkServer;
             networkServer.AddRegister<LoginReqMessage>((connId, msg) =>
             {
-                Debug.Log($"服务端: 账户登录请求 connId:{connId}  account:{msg.name}  pwd:{msg.pwd}");
+                Debug.Log($"[登录服]: 账户登录请求 connId:{connId}  account:{msg.name}  pwd:{msg.pwd}");
                 lock (loginEventList)
                 {
                     loginEventList.Add(new LoginEvent

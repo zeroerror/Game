@@ -22,11 +22,21 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             _worldServClient = client;
         }
 
-        // == Send ==
         public void ConnWorldServer(string host, ushort port)
         {
             Debug.Log($"尝试连接世界服:{host}:{port}");
             _worldServClient.Connect(host, port);
+        }
+
+        // == Send ==
+        public void SendReq_WorldEnterMsg(string account)
+        {
+            WolrdEnterReqMessage msg = new WolrdEnterReqMessage
+            {
+                account = account
+            };
+            _worldServClient.SendMsg(msg);
+            Debug.Log($"发送进入世界请求: account:{account}");
         }
 
         // == Regist ==

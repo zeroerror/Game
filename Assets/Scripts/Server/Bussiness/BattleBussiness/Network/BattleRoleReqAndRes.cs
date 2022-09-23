@@ -107,7 +107,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         // == SPAWN ==
         public void RegistReq_WolrdRoleSpawn(Action<int, FrameWRoleSpawnReqMsg> action)
         {
-            _server.AddRegister<FrameWRoleSpawnReqMsg>(action);
+            _server.AddRegister(action);
         }
 
     }

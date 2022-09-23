@@ -5,6 +5,8 @@ using Game.Infrastructure.Network.Server.Facades;
 using Game.Server.Bussiness.LoginBussiness;
 using Game.Server.Bussiness.BattleBussiness;
 using Game.Protocol.Client2World;
+using Game.Server.Bussiness.WorldBussiness;
+using Game.Server.Bussiness.EventCenter;
 
 namespace Game.Server
 {
@@ -18,6 +20,7 @@ namespace Game.Server
         // Entry
         BattleEntry battleEntry;
         LoginEntry loginEntry;
+        WorldEntry worldEntry;
 
         Thread _loginThread;
         Thread _worldServerThread;
@@ -31,13 +34,20 @@ namespace Game.Server
             StartWorldServer();
             //战斗服的启动是由客户端在世界服候创建战斗对局决定启动
 
+            // == Event Center ==
+            NetworkEventCenter.Ctor();
+
             // == Entry ==
-            // BattleEntry
-            battleEntry = new BattleEntry();
-            battleEntry.Inject(allServerNetwork.LoginServer, UnityEngine.Time.fixedDeltaTime);
             // LoginEntry
             loginEntry = new LoginEntry();
             loginEntry.Inject(allServerNetwork.LoginServer);
+            // WorldEntry
+            worldEntry = new WorldEntry();
+            worldEntry.Inject(allServerNetwork.WorldServer);
+            // BattleEntry
+            battleEntry = new BattleEntry();
+            battleEntry.Inject(allServerNetwork.BattleServer, UnityEngine.Time.fixedDeltaTime);
+
 
             DontDestroyOnLoad(this.gameObject);
 
@@ -48,8 +58,9 @@ namespace Game.Server
         void FixedUpdate()
         {
             // == Entry ==
-            battleEntry.Tick();
             loginEntry.Tick();
+            worldEntry.Tick();
+            battleEntry.Tick();
 
         }
 
@@ -97,10 +108,8 @@ namespace Game.Server
 
             worldServer.OnConnectedHandle += (connID) =>
             {
-                Debug.Log($"[世界服]: connID:{connID} 客户端连接成功-------------------------");
                 // TODO: 创建WorldController处理
-                WolrdEnterResMessage msg = new WolrdEnterResMessage { account = "testaccount" };
-                worldServer.SendMsg(connID, msg);
+                NetworkEventCenter.Invoke_NewWorldConnection(connID);
             };
         }
 

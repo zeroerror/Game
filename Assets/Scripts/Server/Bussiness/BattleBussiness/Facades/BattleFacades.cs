@@ -9,14 +9,13 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
     {
 
         public AllBattleNetwork Network { get; private set; }
-        public NetworkEventCenter NetworkEventCenter { get; private set; }
         public LocalEventCenter LocalEventCenter { get; private set; }
+
         public Game.Client.Bussiness.BattleBussiness.Facades.BattleFacades ClientBattleFacades { get; private set; }
 
         public BattleFacades()
         {
             Network = new AllBattleNetwork();
-            NetworkEventCenter = new NetworkEventCenter();
             LocalEventCenter = new LocalEventCenter();
             ClientBattleFacades = new Client.Bussiness.BattleBussiness.Facades.BattleFacades();
         }

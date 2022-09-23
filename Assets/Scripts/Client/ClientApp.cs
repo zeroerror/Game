@@ -11,6 +11,7 @@ using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Bussiness.UIBussiness;
 using Game.Client.Bussiness.WorldBussiness;
+using Game.Protocol.Client2World;
 
 namespace Game.Client
 {
@@ -35,6 +36,10 @@ namespace Game.Client
 
         async void StartAllAsync()
         {
+            // ====== Network ======
+            AllClientNetwork.Ctor();
+            StartAllClient();
+
             // ======  Asset ======
             await LoadAllAsset();
 
@@ -45,9 +50,6 @@ namespace Game.Client
 
             // ====== EventCenter ======
             NetworkEventCenter.Ctor();
-
-            // ====== Network ======
-            AllClientNetwork.Ctor();
 
             // ====== Entry ======
             // Login
@@ -76,7 +78,6 @@ namespace Game.Client
             // ====== Physics ======
             Physics.autoSimulation = false;
 
-            StartAllClient();
             isStarted = true;
         }
 
@@ -135,21 +136,22 @@ namespace Game.Client
             AllClientNetwork.worldSerClient.OnConnectedHandle += () =>
            {
                Debug.Log("连接世界服务器成功*************************************************************");
+               NetworkEventCenter.Invoke_ConnWorSerSuccessHandler();
            };
 
-            Debug.Log("启动战斗服客户端---------------------------------");
-            _battleServClientThread = new Thread(() =>
-            {
-                while (true)
-                {
-                    AllClientNetwork.battleSerClient.Tick();
-                }
-            });
-            _battleServClientThread.Start();
-            AllClientNetwork.battleSerClient.OnConnectedHandle += () =>
-           {
-               Debug.Log("连接战斗服务器成功*************************************************************");
-           };
+            //     Debug.Log("启动战斗服客户端---------------------------------");
+            //     _battleServClientThread = new Thread(() =>
+            //     {
+            //         while (true)
+            //         {
+            //             AllClientNetwork.battleSerClient.Tick();
+            //         }
+            //     });
+            //     _battleServClientThread.Start();
+            //     AllClientNetwork.battleSerClient.OnConnectedHandle += () =>
+            //    {
+            //        Debug.Log("连接战斗服务器成功*************************************************************");
+            //    };
 
         }
 
@@ -167,7 +169,6 @@ namespace Game.Client
 
             _loginServClientThread.Abort();
             _worldServClientThread.Abort();
-            _battleServClientThread.Abort();
         }
 
     }

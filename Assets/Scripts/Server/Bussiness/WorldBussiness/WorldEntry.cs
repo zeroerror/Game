@@ -1,23 +1,22 @@
-using Game.Client.Bussiness.BattleBussiness.Controller;
-using Game.Client.Bussiness.WorldBussiness.Controller;
-using Game.Client.Bussiness.WorldBussiness.Facades;
-using Game.Infrastructure.Network.Client;
+using Game.Infrastructure.Network.Server;
+using Game.Server.Bussiness.WorldBussiness.Controller;
+using Game.Server.Bussiness.WorldBussiness.Facades;
 
-namespace Game.Client.Bussiness.WorldBussiness
+namespace Game.Server.Bussiness.WorldBussiness
 {
 
-    public static class WorldEntry
+    public class WorldEntry
     {
 
         // Facades
-        static WorldFacades worldFacades;
+        WorldFacades worldFacades;
 
         // Controller
-        static WorldController worldController;
+        WorldController worldController;
 
         #region [Life Cycle]
 
-        public static void Ctor()
+        public WorldEntry()
         {
             // == Facades ==
             worldFacades = new WorldFacades();
@@ -25,16 +24,15 @@ namespace Game.Client.Bussiness.WorldBussiness
             worldController = new WorldController();
         }
 
-        public static void Inject(NetworkClient client)
+        public void Inject(NetworkServer server)
         {
             // == Facades ==
-            worldFacades.Inject(client);
+            worldFacades.Inject(server);
             worldController.Inject(worldFacades);
             // == Controller ==
-
         }
 
-        public static void Tick()
+        public void Tick()
         {
             // == Controller ==
             worldController.Tick();
