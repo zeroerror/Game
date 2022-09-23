@@ -7,11 +7,13 @@ namespace Game.Infrastructure.Network.Server.Facades
     {
         public NetworkServer LoginServer { get; private set; }
         public NetworkServer WorldServer { get; private set; }
+        public NetworkServer BattleServer { get; private set; }
 
         public AllServerNetwork()
         {
             LoginServer = new NetworkServer(4096);
             WorldServer = new NetworkServer(4096);
+            BattleServer = new NetworkServer(4096);
         }
 
 

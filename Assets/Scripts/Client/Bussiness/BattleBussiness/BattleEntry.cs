@@ -28,11 +28,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleInputController = new BattleInputController();
         }
 
-        public static void Init()
-        {
-            battleFacades.Init();
-        }
-
         public static void Inject(NetworkClient client, InputComponent inputComponent)
         {
             // == Facades ==

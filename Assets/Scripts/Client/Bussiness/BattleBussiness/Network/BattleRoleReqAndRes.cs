@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using Game.Infrastructure.Network.Client;
-using Game.Protocol.Client2World;
 using Game.Protocol.Battle;
 
 

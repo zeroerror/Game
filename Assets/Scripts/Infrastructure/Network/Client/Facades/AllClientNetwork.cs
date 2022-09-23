@@ -5,11 +5,15 @@ namespace Game.Infrastructure.Network.Client.Facades
 
     public static class AllClientNetwork
     {
-        public static NetworkClient networkClient;
+        public static NetworkClient loginSerClient;
+        public static NetworkClient worldSerClient;
+        public static NetworkClient battleSerClient;
 
         public static void Ctor()
         {
-            networkClient = new NetworkClient(1026);
+            loginSerClient = new NetworkClient(1026);
+            worldSerClient = new NetworkClient(1026);
+            battleSerClient = new NetworkClient(1026);
         }
 
 

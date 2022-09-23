@@ -51,6 +51,7 @@ public class Bezier : MonoBehaviour
         }
 
         // 公式计算坐标
+        // TODO: 改用通用公式，实现任意多阶贝赛尔曲线
         if (bezierLine.controlPoint_2 != null)
         {
             // 3阶贝赛尔曲线

@@ -88,7 +88,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 {
                     status = status,
                     userToken = status != 0 ? System.DateTime.Now.ToString() : string.Empty,
-                    worldServerHosts = NetworkConfig.WORLDSERVER_HOST,
+                    worldServerHosts = NetworkConfig.LOCAL_WORLDSERVER_HOST,
                     worldServerPorts = NetworkConfig.WORLDSERVER_PORT
                 });
             }

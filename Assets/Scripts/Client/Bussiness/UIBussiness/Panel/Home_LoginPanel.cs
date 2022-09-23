@@ -18,7 +18,7 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
             _Pwd = GetComponentFromChild<InputField>("PasswardInputField");
             SetOnClick("LoginBtn", ClickLoginBtn);
             SetOnClick("RegistBtn", ClickRegistBtn);
-            
+
             NetworkEventCenter.RegistLoginSuccess(OnLoginSuccess);
         }
 

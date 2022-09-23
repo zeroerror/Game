@@ -11,11 +11,11 @@ namespace Game.Client.Bussiness.EventCenter
         public static void RegistLoginSuccess(Action<string[], ushort[]> action) => loginResHandler += action;
         public static void Invoke_LoginSuccessHandler(LoginResMessage msg) => loginResHandler.Invoke(msg.worldServerHosts, msg.worldServerPorts);
 
-        public static void Ctor()
-        {
-        }
+        static Action<string> worldConnResHandler;
+        public static void RegistConnWorSerSuccess(Action<string> action) => worldConnResHandler += action;
+        public static void Invoke_ConnWorSerSuccessHandler(string account) => worldConnResHandler.Invoke(account);
 
-        public static void Tick()
+        public static void Ctor()
         {
         }
 

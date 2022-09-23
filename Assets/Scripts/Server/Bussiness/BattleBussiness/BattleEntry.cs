@@ -31,11 +31,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleNetworkController.Inject(battleFacades, fixedDeltaTime);
         }
 
-        public void Init()
-        {
-            battleFacades.ClientBattleFacades.Init();
-        }
-
         public void Tick()
         {
             battleController.Tick();

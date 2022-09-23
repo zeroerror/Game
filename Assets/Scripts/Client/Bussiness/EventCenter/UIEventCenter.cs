@@ -27,6 +27,9 @@ namespace Game.Client.Bussiness.EventCenter
         public static Action<string, string> LoginAction;
         public static Action<string, string> RegistAction;
 
+        // 连接世界服
+        public static Action<string, ushort> ConnWorSerAction;
+
         public static void Ctor()
         {
             uiOpenQueue = new Queue<OpenEventModel>();

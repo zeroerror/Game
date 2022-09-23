@@ -6,11 +6,11 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Client.Facades;
-using Game.Client.Bussiness;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Bussiness.UIBussiness;
+using Game.Client.Bussiness.WorldBussiness;
 
 namespace Game.Client
 {
@@ -18,7 +18,9 @@ namespace Game.Client
     public class ClientApp : MonoBehaviour
     {
 
-        Thread _clientThread;
+        Thread _loginServClientThread;
+        Thread _worldServClientThread;
+        Thread _battleServClientThread;
         public string CurrentSceneName { get; private set; }
         InputComponent _inputComponent;
         float time;
@@ -50,13 +52,14 @@ namespace Game.Client
             // ====== Entry ======
             // Login
             LoginEntry.Ctor();
-            LoginEntry.Inject(AllClientNetwork.networkClient);
-            LoginEntry.Init();
+            LoginEntry.Inject(AllClientNetwork.loginSerClient);
+            // World
+            WorldEntry.Ctor();
+            WorldEntry.Inject(AllClientNetwork.worldSerClient);
             // Battle
             BattleEntry.Ctor();
             _inputComponent = new InputComponent();
-            BattleEntry.Inject(AllClientNetwork.networkClient, _inputComponent);
-            BattleEntry.Init();
+            BattleEntry.Inject(AllClientNetwork.battleSerClient, _inputComponent);
 
             // ====== Manager ======
             UIManager.Ctor();
@@ -73,7 +76,7 @@ namespace Game.Client
             // ====== Physics ======
             Physics.autoSimulation = false;
 
-            StartClient();
+            StartAllClient();
             isStarted = true;
         }
 
@@ -83,11 +86,10 @@ namespace Game.Client
 
             // == Entry ==
             LoginEntry.Tick();
+            WorldEntry.Tick();
             BattleEntry.Tick();
             UIEntry.Tick();
 
-            // == EventCenter ==
-            NetworkEventCenter.Tick();
         }
 
         void Update()
@@ -103,27 +105,52 @@ namespace Game.Client
             CurrentSceneName = scene.name;
         }
 
-        void StartClient()
+        void StartAllClient()
         {
-            Debug.Log("启动客户端---------------------------------");
 
-            var networkClient = AllClientNetwork.networkClient;
-
-            networkClient.Connect(NetworkConfig.LOCAL_HOST, NetworkConfig.LOGIN_PORT);
-
-            _clientThread = new Thread(() =>
+            Debug.Log("启动登录服客户端---------------------------------");
+            AllClientNetwork.loginSerClient.Connect(NetworkConfig.LOCAL_LOGIN_HOST, NetworkConfig.LOGIN_PORT);
+            _loginServClientThread = new Thread(() =>
             {
                 while (true)
                 {
-                    networkClient.Tick();
+                    AllClientNetwork.loginSerClient.Tick();
                 }
             });
-            _clientThread.Start();
+            _loginServClientThread.Start();
+            AllClientNetwork.loginSerClient.OnConnectedHandle += () =>
+           {
+               Debug.Log("连接登录服务器成功*************************************************************");
+           };
 
-            networkClient.OnConnectedHandle += () =>
+            Debug.Log("启动世界服客户端---------------------------------");
+            _worldServClientThread = new Thread(() =>
             {
-                Debug.Log("连接登录服务器成功*************************************************************");
-            };
+                while (true)
+                {
+                    AllClientNetwork.worldSerClient.Tick();
+                }
+            });
+            _worldServClientThread.Start();
+            AllClientNetwork.worldSerClient.OnConnectedHandle += () =>
+           {
+               Debug.Log("连接世界服务器成功*************************************************************");
+           };
+
+            Debug.Log("启动战斗服客户端---------------------------------");
+            _battleServClientThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    AllClientNetwork.battleSerClient.Tick();
+                }
+            });
+            _battleServClientThread.Start();
+            AllClientNetwork.battleSerClient.OnConnectedHandle += () =>
+           {
+               Debug.Log("连接战斗服务器成功*************************************************************");
+           };
+
         }
 
         async Task LoadAllAsset()
@@ -138,7 +165,9 @@ namespace Game.Client
             UIEntry.TearDown();
             InputGameSet.TearDown();
 
-            _clientThread.Abort();
+            _loginServClientThread.Abort();
+            _worldServClientThread.Abort();
+            _battleServClientThread.Abort();
         }
 
     }

@@ -8,18 +8,29 @@ namespace Game.Bussiness.UIBussiness.Panel
     public class Home_WorldServerPanel : UIBehavior
     {
 
+        string[] worldSerHosts;
+        ushort[] ports;
+
         void Awake()
         {
-            var worldSerHosts = args[0] as string[];
-            var ports = args[1] as ushort[];
-            for (int i = 0; i < worldSerHosts.Length; i++)
-            {
-                Debug.Log($"{worldSerHosts[i]}:{ports[i]}");
-                // TryAddChildUI("Home_WorldServerPanel","WorldServerPanel_Item");
-            }
+            SetOnClick("SerGroup/Viewport/Content/Ser1", ClickConWorldSer, 0);
+        }
+
+        void OnEnable()
+        {
+            worldSerHosts = args[0] as string[];
+            ports = args[1] as ushort[];
         }
 
         // == UI Click ==
-    }
+        void ClickConWorldSer(params object[] args)
+        {
+            int index = (int)args[0];
+            var host = worldSerHosts[index];
+            var port = ports[index];
+            UIEventCenter.ConnWorSerAction.Invoke(host, port);
+        }
 
-}
+        }
+
+    }

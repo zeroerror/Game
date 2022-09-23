@@ -22,11 +22,6 @@ namespace Game.Client.Bussiness.LoginBussiness
             loginController = new LoginController();
         }
 
-        public static void Init()
-        {
-
-        }
-
         public static void Inject(NetworkClient client)
         {
             // == Network ==

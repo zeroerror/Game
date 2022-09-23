@@ -22,18 +22,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             Domain = new AllDomains();
             Assets = new AllBattleAssets();
             Domain.Inject(this);
+
+            // Asset Load
+            Assets.LoadAll();
         }
 
         public void Inject(NetworkClient client, InputComponent inputComponent)
         {
             Network.Inject(client);
             InputComponent = inputComponent;
-        }
-
-        public void Init()
-        {
-            // Asset Load
-            Assets.LoadAll();
         }
 
     }
