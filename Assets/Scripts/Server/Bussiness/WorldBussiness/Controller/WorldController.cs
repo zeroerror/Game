@@ -7,6 +7,7 @@ using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Server.Bussiness.EventCenter;
 using System.Collections.Generic;
 using Game.Client.Bussiness.WorldBussiness;
+using Game.Protocol.World;
 
 namespace Game.Server.Bussiness.WorldBussiness.Controller
 {
@@ -32,6 +33,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
             var rqs = worldFacades.Network.WorldReqAndRes;
             rqs.RegistReq_WorldEnter(OnWorldEnterReq);
             rqs.RegistReq_WorldLeave(OnWorldLeaveReq);
+            rqs.RegistReq_WorldRoomCreate(OnWorldRoomCreateReq);
         }
 
         public void Tick()
@@ -92,6 +94,30 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
             connIdList.ForEach((broadcastConnId) =>
             {
                 rqs.SendRes_WorldDisconnection(broadcastConnId, roleEntity.EntityId, roleEntity.Account);
+            });
+        }
+
+        void OnWorldRoomCreateReq(int connId, WorldRoomCreateReqMessage msg)
+        {
+            var rqs = worldFacades.Network.WorldReqAndRes;
+            var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
+            var roleEntity = roleRepo.GetByConnId(connId);
+
+            // 创建房间Entity
+            //
+            //
+            var roomRepo = worldFacades.ClientWorldFacades.Repo.WorldRoomRepo;
+            WorldRoomEntity roomEntity = new WorldRoomEntity();
+            roomEntity.SetEntityId(roomRepo.EntityIdAutoIncrease);
+            roomEntity.SetMasterAccount(roleEntity.Account);
+            roomEntity.SetRoomName(msg.roomName);
+
+            roomRepo.Add(roomEntity);
+
+            Debug.Log($"[世界服]: connID:{connId} 玩家{roleEntity.Account} 创建了房间 id:{roomEntity.EntityId} 名称:{roomEntity.RoomName}------------------------");
+            connIdList.ForEach((broadcastConnId) =>
+            {
+                rqs.SendRes_WorldRoomCreate(broadcastConnId, roleEntity.Account, roomEntity.EntityId, roomEntity.RoomName);
             });
         }
 

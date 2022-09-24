@@ -5,6 +5,7 @@ using Game.Infrastructure.Network.Server;
 using System;
 using Game.Protocol.Client2World;
 using UnityEngine;
+using Game.Protocol.World;
 
 namespace Game.Server.Bussiness.WorldBussiness.Facades
 {
@@ -48,6 +49,18 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
             _worldServer.SendMsg(connId, msg);
         }
 
+        public void SendRes_WorldRoomCreate(int connId, string masterAccount, int roomEntityId, string roomName)
+        {
+            WorldRoomCreateResMessage msg = new WorldRoomCreateResMessage
+            {
+                masterAccount = masterAccount,
+                roomEntityId = roomEntityId,
+                roomName = roomName
+            };
+
+            _worldServer.SendMsg(connId, msg);
+        }
+
         // ====== Regist ======
         public void RegistReq_WorldEnter(Action<int, WolrdEnterReqMessage> action)
         {
@@ -55,6 +68,11 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
         }
 
         public void RegistReq_WorldLeave(Action<int, WolrdLeaveReqMessage> action)
+        {
+            _worldServer.AddRegister(action);
+        }
+
+        public void RegistReq_WorldRoomCreate(Action<int, WorldRoomCreateReqMessage> action)
         {
             _worldServer.AddRegister(action);
         }

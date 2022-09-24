@@ -1,5 +1,5 @@
 using ZeroFrame.Protocol;
-using ZeroFrame.Buffer;namespace Game.Protocol.Client2World
+using ZeroFrame.Buffer;namespace Game.Protocol.World
 {
 
     [ZeroMessage]

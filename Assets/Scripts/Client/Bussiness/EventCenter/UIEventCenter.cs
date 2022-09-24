@@ -23,12 +23,11 @@ namespace Game.Client.Bussiness.EventCenter
         public static void EnqueueTearDownQueue(string uiName) => uiTearDownQueue.Enqueue(uiName);
         public static bool TryDequeueTearDownQueue(out string uiName) => uiTearDownQueue.TryDequeue(out uiName);
 
-        // 打开登录界面
-        public static Action<string, string> LoginAction;
-        public static Action<string, string> RegistAction;
 
-        // 连接世界服
-        public static Action<string, ushort> ConnWorSerAction;
+        public static Action<string, string> LoginAction;       // 登录
+        public static Action<string, string> RegistAction;       // 注册
+        public static Action<string, ushort> ConnWorSerAction;// 连接世界服
+        public static Action<string> WorldRoomCreateAction;   // 创建世界服内的房间
 
         public static void Ctor()
         {

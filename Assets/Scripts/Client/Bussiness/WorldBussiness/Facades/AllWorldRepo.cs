@@ -9,10 +9,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
     {
 
         public WorldRoleRepo WorldRoleRepo { get; private set; }
+        public WorldRoomRepo WorldRoomRepo { get; private set; }
 
         public AllWorldRepo()
         {
             WorldRoleRepo = new WorldRoleRepo();
+            WorldRoomRepo = new WorldRoomRepo();
         }
 
     }

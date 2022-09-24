@@ -27,6 +27,16 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
             list = new List<WorldRoleEntity>();
         }
 
+        public WorldRoleEntity GetByEntityId(int entityId)
+        {
+            return list.Find((r) => r.EntityId == entityId);
+        }
+
+        public WorldRoleEntity GetByConnId(int connId)
+        {
+            return list.Find((r) => r.ConnId == connId);
+        }
+
         public void Add(WorldRoleEntity entity)
         {
             EntityIdAutoIncrease++;

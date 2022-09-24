@@ -6,6 +6,7 @@ using Game.Client.Bussiness.WorldBussiness.Facades;
 using Game.Protocol.Client2World;
 using System.Collections.Generic;
 using Game.Protocol.Login;
+using Game.Protocol.World;
 
 namespace Game.Client.Bussiness.WorldBussiness.Controller
 {
@@ -15,17 +16,20 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
         Queue<WolrdEnterResMessage> worldEnterQueue;
         Queue<WolrdLeaveResMessage> worldLeaveQueue;
+        Queue<WorldRoomCreateResMessage> worldLRoomCreateQueue;
 
         WorldFacades worldFacades;
 
         public WorldController()
         {
-            NetworkEventCenter.RegistLoginSuccess(OnLoginSuccess);
-            NetworkEventCenter.RegistConnWorSerSuccess(SendWorldEnterReq);
+            NetworkEventCenter.Regist_LoginSuccess(OnLoginSuccess);
+            NetworkEventCenter.Regist_ConnWorSerSuccess(SendWorldEnterReq);
             UIEventCenter.ConnWorSerAction += SendConnWorSer;
+            UIEventCenter.WorldRoomCreateAction += SendCreateWorldRoomReq;
 
             worldEnterQueue = new Queue<WolrdEnterResMessage>();
             worldLeaveQueue = new Queue<WolrdLeaveResMessage>();
+            worldLRoomCreateQueue = new Queue<WorldRoomCreateResMessage>();
 
         }
 
@@ -34,13 +38,13 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             this.worldFacades = worldFacades;
             worldFacades.Network.WorldReqAndRes.RegistRes_WorldEnter(OnEnterWorldRes);
             worldFacades.Network.WorldReqAndRes.RegistRes_WorldLeave(OnLeaveWorldRes);
+            worldFacades.Network.WorldReqAndRes.RegistRes_WorldRoomCreate(OnWorldRoomCreate);
         }
 
         public void Tick()
         {
             while (worldEnterQueue.TryDequeue(out var msg))
             {
-                UIEventCenter.EnqueueTearDownQueue("Home_WorldServerPanel");
                 var entityId = msg.entityId;
                 var account = msg.account;
                 WorldRoleEntity roleEntity = new WorldRoleEntity();
@@ -49,6 +53,9 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
                 roleRepo.Add(roleEntity);
                 if (msg.isOwner) roleRepo.SetOwner(roleEntity);
+
+                UIEventCenter.EnqueueTearDownQueue("Home_WorldServerPanel");
+                UIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_WorldRoomPanel" });
                 SpawnScene("world_scene");
 
                 Debug.Log($"entityId:{entityId}  account:{account} 进入世界 当前在线人数:{roleRepo.Count}");
@@ -63,6 +70,17 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 roleRepo.RemoveByEntityId(entityId);
                 Debug.Log($"entityId:{entityId}  account:{account} 离开世界 当前在线人数:{roleRepo.Count}");
             }
+
+            while (worldLRoomCreateQueue.TryDequeue(out var msg))
+            {
+                var roomEntityId = msg.roomEntityId;
+                var roomName = msg.roomName;
+                var masterAccount = msg.masterAccount;
+
+                NetworkEventCenter.Invoke_WorldRoomCreate(masterAccount, roomName);
+                Debug.Log($"玩家[{masterAccount}]创建房间:  roomName:{roomName}  roomEntityId:{roomEntityId}  ");
+            }
+
         }
 
         void OnLoginSuccess(string account, string[] worldSerHosts, ushort[] ports)
@@ -79,8 +97,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             SpawnScene("world_choose_scene");
         }
 
-
-
         #region [SEND]
 
         void SendConnWorSer(string host, ushort port)
@@ -95,6 +111,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             rqs.SendReq_WorldEnterMsg(worldFacades.Repo.WorldRoleRepo.Account);
         }
 
+        void SendCreateWorldRoomReq(string roomName)
+        {
+            var rqs = worldFacades.Network.WorldReqAndRes;
+            rqs.SendReq_CreateWorldRoomMsg(roomName);
+        }
+
         #endregion
 
         #region [RESPONSE]
@@ -107,6 +129,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
         void OnLeaveWorldRes(WolrdLeaveResMessage msg)
         {
             worldLeaveQueue.Enqueue(msg);
+        }
+
+        void OnWorldRoomCreate(WorldRoomCreateResMessage msg)
+        {
+            worldLRoomCreateQueue.Enqueue(msg);
         }
 
         #endregion
