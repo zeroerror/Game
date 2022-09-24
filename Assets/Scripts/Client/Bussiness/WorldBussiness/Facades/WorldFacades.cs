@@ -9,10 +9,12 @@ namespace Game.Client.Bussiness.WorldBussiness.Facades
     {
 
         public AllWorldNetwork Network { get; private set; }
+        public AllWorldRepo Repo { get; private set; }
 
         public WorldFacades()
         {
             Network = new AllWorldNetwork();
+            Repo = new AllWorldRepo();
         }
 
         public void Inject(NetworkClient client)

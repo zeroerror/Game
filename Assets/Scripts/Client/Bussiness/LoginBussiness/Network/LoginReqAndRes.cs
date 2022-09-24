@@ -17,7 +17,7 @@ namespace Game.Client.Bussiness.LoginBussiness.Network
         {
             LoginReqMessage msg = new LoginReqMessage
             {
-                name = name,
+                account = name,
                 pwd = pwd
             };
             Debug.Log("Send Login Msg");

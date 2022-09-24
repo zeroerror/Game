@@ -42,7 +42,8 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         public static void TearDown()
         {
-
+            // Send Disconnection
+            worldFacades.Network.WorldReqAndRes.SendReq_WorldLeaveMsg();
         }
 
         #endregion

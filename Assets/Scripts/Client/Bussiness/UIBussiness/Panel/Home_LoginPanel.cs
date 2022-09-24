@@ -18,8 +18,6 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
             _Pwd = GetComponentFromChild<InputField>("PasswardInputField");
             SetOnClick("LoginBtn", ClickLoginBtn);
             SetOnClick("RegistBtn", ClickRegistBtn);
-
-            NetworkEventCenter.RegistLoginSuccess(OnLoginSuccess);
         }
 
         // == UI Click ==
@@ -31,11 +29,6 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
         void ClickRegistBtn(params object[] args)
         {
             UIEventCenter.RegistAction.Invoke(_name.text, _Pwd.text);
-        }
-
-        void OnLoginSuccess(string[] worldSerHosts, ushort[] ports)
-        {
-            UIEventCenter.EnqueueTearDownQueue("Home_LoginPanel");
         }
 
     }

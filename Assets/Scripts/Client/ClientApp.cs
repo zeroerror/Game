@@ -9,7 +9,7 @@ using Game.Infrastructure.Network.Client.Facades;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.BattleBussiness;
-using Game.Bussiness.UIBussiness;
+using Game.Client.Bussiness.UIBussiness;
 using Game.Client.Bussiness.WorldBussiness;
 using Game.Protocol.Client2World;
 
@@ -163,6 +163,7 @@ namespace Game.Client
         void OnDestroy()
         {
             LoginEntry.TearDown();
+            WorldEntry.TearDown();
             BattleEntry.TearDown();
             UIEntry.TearDown();
             InputGameSet.TearDown();

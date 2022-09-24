@@ -32,10 +32,12 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(WRoleStateUpdateMsg), 18);
             messageInfoDic.Add(typeof(WolrdEnterReqMessage), 19);
             messageInfoDic.Add(typeof(WolrdEnterResMessage), 20);
-            messageInfoDic.Add(typeof(LoginReqMessage), 21);
-            messageInfoDic.Add(typeof(LoginResMessage), 22);
-            messageInfoDic.Add(typeof(RegisterAccountReqMessage), 23);
-            messageInfoDic.Add(typeof(RegisterAccountResMessage), 24);
+            messageInfoDic.Add(typeof(WolrdLeaveReqMessage), 21);
+            messageInfoDic.Add(typeof(WolrdLeaveResMessage), 22);
+            messageInfoDic.Add(typeof(LoginReqMessage), 23);
+            messageInfoDic.Add(typeof(LoginResMessage), 24);
+            messageInfoDic.Add(typeof(RegisterAccountReqMessage), 25);
+            messageInfoDic.Add(typeof(RegisterAccountResMessage), 26);
 
         }
 

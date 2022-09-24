@@ -10,10 +10,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
     {
 
         public AllWorldNetwork Network { get; private set; }
+        public Game.Client.Bussiness.WorldBussiness.Facades.WorldFacades ClientWorldFacades { get; private set; }
 
         public WorldFacades()
         {
             Network = new AllWorldNetwork();
+            ClientWorldFacades = new Client.Bussiness.WorldBussiness.Facades.WorldFacades();
         }
 
         public void Inject(NetworkServer server)

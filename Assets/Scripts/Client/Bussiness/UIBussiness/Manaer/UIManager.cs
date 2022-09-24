@@ -6,9 +6,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using ZeroUIFrame;
 using Game.Generic;
-using Game.Bussiness.UIBussiness;
 
-namespace Game.Bussiness.UIBussiness
+namespace Game.Client.Bussiness.UIBussiness
 {
 
     public static class UIManager

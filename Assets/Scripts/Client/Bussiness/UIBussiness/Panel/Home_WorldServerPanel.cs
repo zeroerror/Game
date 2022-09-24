@@ -1,6 +1,7 @@
 using UnityEngine;
 using ZeroUIFrame;
 using Game.Client.Bussiness.EventCenter;
+using Game.Client.Bussiness.UIBussiness;
 
 namespace Game.Bussiness.UIBussiness.Panel
 {
@@ -18,8 +19,8 @@ namespace Game.Bussiness.UIBussiness.Panel
 
         void OnEnable()
         {
-            worldSerHosts = args[0] as string[];
-            ports = args[1] as ushort[];
+            worldSerHosts = args[1] as string[];
+            ports = args[2] as ushort[];
             for (int i = 0; i < worldSerHosts.Length; i++)
             {
                 var host = worldSerHosts[i];

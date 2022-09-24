@@ -108,8 +108,12 @@ namespace Game.Server
 
             worldServer.OnConnectedHandle += (connID) =>
             {
-                // TODO: 创建WorldController处理
-                NetworkEventCenter.Invoke_NewWorldConnection(connID);
+                NetworkEventCenter.Invoke_WorldConnection(connID);
+            };
+
+            worldServer.OnDisconnectedHandle += (connID) =>
+            {
+                NetworkEventCenter.Invoke_WorldDisconnection(connID);
             };
         }
 

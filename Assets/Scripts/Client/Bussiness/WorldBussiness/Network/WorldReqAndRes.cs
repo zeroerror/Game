@@ -39,11 +39,25 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
             Debug.Log($"发送进入世界请求: account:{account}");
         }
 
+        public void SendReq_WorldLeaveMsg()
+        {
+            WolrdLeaveReqMessage msg = new WolrdLeaveReqMessage
+            {
+            };
+            _worldServClient.SendMsg(msg);
+            Debug.Log($"发送离开世界请求");
+        }
+
         // == Regist ==
 
         public void RegistRes_WorldEnter(Action<WolrdEnterResMessage> action)
         {
-            _worldServClient.RegistMsg<WolrdEnterResMessage>(action);
+            _worldServClient.RegistMsg(action);
+        }
+
+        public void RegistRes_WorldLeave(Action<WolrdLeaveResMessage> action)
+        {
+            _worldServClient.RegistMsg(action);
         }
 
     }

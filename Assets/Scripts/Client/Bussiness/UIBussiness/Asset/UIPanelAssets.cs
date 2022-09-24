@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Game.Generic;
 
-namespace Game.Bussiness.UIBussiness
+namespace Game.Client.Bussiness.UIBussiness
 {
 
     public static class UIPanelAssets

@@ -26,10 +26,22 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
 
         // ====== Send ======
 
-        public void SendRes_WorldConnection(int connId, string account)
+        public void SendRes_WorldConnection(int connId, int entityId, string account, bool isOwner)
         {
             WolrdEnterResMessage msg = new WolrdEnterResMessage
             {
+                entityId = entityId,
+                account = account,
+                isOwner = isOwner
+            };
+
+            _worldServer.SendMsg(connId, msg);
+        }
+        public void SendRes_WorldDisconnection(int connId, int entityId, string account)
+        {
+            WolrdLeaveResMessage msg = new WolrdLeaveResMessage
+            {
+                entityId = entityId,
                 account = account
             };
 
@@ -37,7 +49,12 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
         }
 
         // ====== Regist ======
-        public void RegistReq_WorldConnection(Action<int, WolrdEnterReqMessage> action)
+        public void RegistReq_WorldEnter(Action<int, WolrdEnterReqMessage> action)
+        {
+            _worldServer.AddRegister(action);
+        }
+
+        public void RegistReq_WorldLeave(Action<int, WolrdLeaveReqMessage> action)
         {
             _worldServer.AddRegister(action);
         }

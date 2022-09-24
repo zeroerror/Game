@@ -58,7 +58,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 loginEventList.Remove(ev);
                 var msg = ev.msg;
 
-                if (msg.name == null) return;
+                if (msg.account == null) return;
                 if (msg.pwd == null) return;
 
                 byte status = 0;
@@ -87,9 +87,10 @@ namespace Game.Server.Bussiness.LoginBussiness
                 networkServer.SendMsg<LoginResMessage>(ev.connID, new LoginResMessage
                 {
                     status = status,
-                    userToken = status != 0 ? System.DateTime.Now.ToString() : string.Empty,
+                    account = msg.account,
                     worldServerHosts = NetworkConfig.LOCAL_WORLDSERVER_HOST,
-                    worldServerPorts = NetworkConfig.WORLDSERVER_PORT
+                    worldServerPorts = NetworkConfig.WORLDSERVER_PORT,
+                    userToken = status != 0 ? System.DateTime.Now.ToString() : string.Empty,
                 });
             }
         }
@@ -147,7 +148,7 @@ namespace Game.Server.Bussiness.LoginBussiness
             var networkServer = loginFacades.NetworkServer;
             networkServer.AddRegister<LoginReqMessage>((connId, msg) =>
             {
-                Debug.Log($"[登录服]: 账户登录请求 connId:{connId}  account:{msg.name}  pwd:{msg.pwd}");
+                Debug.Log($"[登录服]: 账户登录请求 connId:{connId}  account:{msg.account}  pwd:{msg.pwd}");
                 lock (loginEventList)
                 {
                     loginEventList.Add(new LoginEvent
