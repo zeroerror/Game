@@ -32,7 +32,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             if (input.isPressJump)
             {
                 byte rid = owner.EntityId;
-                battleFacades.Network.BattleRoleReqAndRes.SendReq_RoleJump(rid);
+                battleFacades.Network.RoleReqAndRes.SendReq_RoleJump(rid);
             }
             if (input.isPressSwitchView)
             {
@@ -127,7 +127,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 if (!WillHitOtherRole(owner, moveDir))
                 {
-                    var rqs = battleFacades.Network.BattleRoleReqAndRes;
+                    var rqs = battleFacades.Network.RoleReqAndRes;
                     if (owner.MoveComponent.IsEulerAngleNeedFlush())
                     {
                         owner.MoveComponent.FlushEulerAngle();
@@ -146,7 +146,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 owner.MoveComponent.FlushEulerAngle();
                 //客户端鉴权旋转角度同步
-                var rqs = battleFacades.Network.BattleRoleReqAndRes;
+                var rqs = battleFacades.Network.RoleReqAndRes;
                 rqs.SendReq_RoleRotate(owner);
             }
 

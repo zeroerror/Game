@@ -56,7 +56,7 @@ namespace Game.Bussiness.UIBussiness.Panel
             ushort port = (ushort)args[1];
 
             UIEventCenter.WorldRoomEnter.Invoke(host, port);
-            UIEventCenter.EnqueueTearDownQueue("Home_WorldRoomPanel");
+            UIEventCenter.AddToTearDown("Home_WorldRoomPanel");
         }
 
     }

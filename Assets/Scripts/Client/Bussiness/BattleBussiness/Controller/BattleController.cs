@@ -4,7 +4,6 @@ using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Protocol.Login;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -56,6 +55,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 battleFacades.Network.BattleReqAndRes.ConnBattleServer(host, port);
             });
+            UIEventCenter.MoveAction += ((moveAxis) =>
+            {
+                battleFacades.InputComponent.moveAxis = new Vector3(moveAxis.x, 0, moveAxis.y);
+            });
             NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
             {
                 battleBegin = true;
@@ -66,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             this.battleFacades = battleFacades;
 
-            var roleRqs = battleFacades.Network.BattleRoleReqAndRes;
+            var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
             roleRqs.RegistUpdate_WRole(OnWRoleSync);
 
@@ -630,16 +633,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             // Load Scene And Spawn Field
             var domain = battleFacades.Domain;
             var fieldEntity = await domain.BattleSpawnDomain.SpawnGameFightScene();
-            Cursor.lockState = CursorLockMode.Locked;
+            // Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = true;
             fieldEntity.SetFieldId(1);
             var fieldEntityRepo = battleFacades.Repo.FiledRepo;
             var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(physicsScene);
+            // Load UI  
+            UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
             // Send Spawn Role Message
-            var rqs = battleFacades.Network.BattleRoleReqAndRes;
+            var rqs = battleFacades.Network.RoleReqAndRes;
             rqs.SendReq_BattleRoleSpawn();
+
         }
 
         #endregion

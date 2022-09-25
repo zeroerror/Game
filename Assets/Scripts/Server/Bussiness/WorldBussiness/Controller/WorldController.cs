@@ -122,11 +122,11 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
                  roleEntity.Account,
                   roomEntity.EntityId,
                    roomEntity.RoomName,
-                    NetworkConfig.LOCAL_BATTLESERVER_HOST[0],
+                    NetworkConfig.BATTLESERVER_HOST[0],
                      NetworkConfig.BATTLESERVER_PORT[0]);
             });
             Debug.Log($"[世界服]: connID:{connId} 玩家{roleEntity.Account} 创建了房间 id:{roomEntity.EntityId} 名称:{roomEntity.RoomName}------------------------");
-            Debug.Log($"[世界服]:创建战斗服 Host:{NetworkConfig.LOCAL_BATTLESERVER_HOST[0]} Port:{NetworkConfig.BATTLESERVER_PORT[0]} ------------------------");
+            Debug.Log($"[世界服]:创建战斗服 Host:{NetworkConfig.BATTLESERVER_HOST[0]} Port:{NetworkConfig.BATTLESERVER_PORT[0]} ------------------------");
             ServerNetworkEventCenter.Invoke_BattleServerNeedCreate();
         }
 

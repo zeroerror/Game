@@ -54,8 +54,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 roleRepo.Add(roleEntity);
                 if (msg.isOwner) roleRepo.SetOwner(roleEntity);
 
-                UIEventCenter.EnqueueTearDownQueue("Home_WorldServerPanel");
-                UIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_WorldRoomPanel" });
+                UIEventCenter.AddToTearDown("Home_WorldServerPanel");
+                UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_WorldRoomPanel" });
                 SpawnScene("world_scene");
 
                 Debug.Log($"entityId:{entityId}  account:{account} 进入世界 当前在线人数:{roleRepo.Count}");
@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             while (worldLeaveQueue.TryDequeue(out var msg))
             {
-                UIEventCenter.EnqueueTearDownQueue("Home_WorldServerPanel");
+                UIEventCenter.AddToTearDown("Home_WorldServerPanel");
                 var entityId = msg.entityId;
                 var account = msg.account;
                 var roleRepo = worldFacades.Repo.WorldRoleRepo;
@@ -92,8 +92,8 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
 
             // UI
             object[] args = { account, worldSerHosts, ports };
-            UIEventCenter.EnqueueTearDownQueue("Home_LoginPanel");
-            UIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_WorldServerPanel", args = args });
+            UIEventCenter.AddToTearDown("Home_LoginPanel");
+            UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_WorldServerPanel", args = args });
 
             // Scene
             SpawnScene("world_choose_scene");

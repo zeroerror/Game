@@ -13,7 +13,7 @@ namespace Game.Client.Bussiness.EventCenter
         {
             // == EventCenter
             UIEventCenter.Ctor();
-            UIEventCenter.EnqueueOpenQueue(new OpenEventModel { uiName = "Home_LoginPanel" });
+            UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_LoginPanel" });
             
             // == Controller
             uIController = new UIController();

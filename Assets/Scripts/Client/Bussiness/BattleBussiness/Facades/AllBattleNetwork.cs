@@ -8,7 +8,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     {
 
         // Network
-        public BattleRoleReqAndRes BattleRoleReqAndRes { get; private set; }
+        public BattleRoleReqAndRes RoleReqAndRes { get; private set; }
         public BulletReqAndRes BulletReqAndRes { get; private set; }
         public WeaponReqAndRes WeaponReqAndRes { get; private set; }
         public ItemReqAndRes ItemReqAndRes { get; private set; }
@@ -18,7 +18,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public AllBattleNetwork()
         {
-            BattleRoleReqAndRes = new BattleRoleReqAndRes();
+            RoleReqAndRes = new BattleRoleReqAndRes();
             BulletReqAndRes = new BulletReqAndRes();
             WeaponReqAndRes = new WeaponReqAndRes();
             ItemReqAndRes = new ItemReqAndRes();
@@ -27,7 +27,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public void Inject(NetworkClient client)
         {
-            BattleRoleReqAndRes.Inject(client);
+            RoleReqAndRes.Inject(client);
             BulletReqAndRes.Inject(client);
             WeaponReqAndRes.Inject(client);
             ItemReqAndRes.Inject(client);

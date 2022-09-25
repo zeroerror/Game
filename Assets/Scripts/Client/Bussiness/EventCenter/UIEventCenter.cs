@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Client.Bussiness.EventCenter
 {
@@ -15,12 +16,12 @@ namespace Game.Client.Bussiness.EventCenter
 
         // UI界面打开事件
         static Queue<OpenEventModel> uiOpenQueue;
-        public static void EnqueueOpenQueue(OpenEventModel openEventModel) => uiOpenQueue.Enqueue(openEventModel);
+        public static void AddToOpen(OpenEventModel openEventModel) => uiOpenQueue.Enqueue(openEventModel);
         public static bool TryDequeueOpenQueue(out OpenEventModel openEventModel) => uiOpenQueue.TryDequeue(out openEventModel);
 
         // UI界面关闭事件
         static Queue<string> uiTearDownQueue;
-        public static void EnqueueTearDownQueue(string uiName) => uiTearDownQueue.Enqueue(uiName);
+        public static void AddToTearDown(string uiName) => uiTearDownQueue.Enqueue(uiName);
         public static bool TryDequeueTearDownQueue(out string uiName) => uiTearDownQueue.TryDequeue(out uiName);
 
 
@@ -29,6 +30,7 @@ namespace Game.Client.Bussiness.EventCenter
         public static Action<string, ushort> ConnWorSerAction;// 连接世界服
         public static Action<string> WorldRoomCreateAction;   // 创建世界服内的房间
         public static Action<string, ushort> WorldRoomEnter;   // 进入战斗服房间
+        public static Action<Vector2> MoveAction;   // 战斗移动操作
 
         public static void Ctor()
         {

@@ -636,43 +636,56 @@ namespace Game.Server.Bussiness.BattleBussiness
         // Role
         void OnRoleMove(int connId, FrameRoleMoveReqMsg msg)
         {
-            long key = (long)serveFrame << 32;
-            key |= (long)connId;
-            if (!roleMoveMsgDic.TryGetValue(key, out var opt))
+            lock (roleMoveMsgDic)
             {
-                roleMoveMsgDic[key] = msg;
+                long key = (long)serveFrame << 32;
+                key |= (long)connId;
+                if (!roleMoveMsgDic.TryGetValue(key, out var opt))
+                {
+                    roleMoveMsgDic[key] = msg;
+                }
             }
         }
         void OnRoleRotate(int connId, FrameRoleRotateReqMsg msg)
         {
-            long key = (long)serveFrame << 32;
-            key |= (long)connId;
-            if (!roleRotateMsgDic.TryGetValue(key, out var opt))
+            lock (roleMoveMsgDic)
             {
-                roleRotateMsgDic[key] = msg;
+                long key = (long)serveFrame << 32;
+                key |= (long)connId;
+                if (!roleRotateMsgDic.TryGetValue(key, out var opt))
+                {
+                    roleRotateMsgDic[key] = msg;
+                }
             }
         }
 
         void OnRoleJump(int connId, FrameJumpReqMsg msg)
         {
-            if (!jumpOptQueueDic.TryGetValue(serveFrame, out var jumpOptList))
+            lock (jumpOptQueueDic)
             {
-                jumpOptList = new Queue<FrameJumpReqMsgStruct>();
-                jumpOptQueueDic[serveFrame] = jumpOptList;
-            }
+                if (!jumpOptQueueDic.TryGetValue(serveFrame, out var jumpOptList))
+                {
+                    jumpOptList = new Queue<FrameJumpReqMsgStruct>();
+                    jumpOptQueueDic[serveFrame] = jumpOptList;
+                }
 
-            jumpOptList.Enqueue(new FrameJumpReqMsgStruct { connId = connId, msg = msg });
+                jumpOptList.Enqueue(new FrameJumpReqMsgStruct { connId = connId, msg = msg });
+            }
         }
 
         void OnBattleRoleSpawn(int connId, FrameBattleRoleSpawnReqMsg msg)
         {
-            if (!wRoleSpawQueuenDic.TryGetValue(serveFrame, out var queue))
+            lock (wRoleSpawQueuenDic)
             {
-                queue = new Queue<FrameWRoleSpawnReqMsgStruct>();
-                wRoleSpawQueuenDic[serveFrame] = queue;
-            }
+                Debug.Log($"[战斗Controller] 战斗角色生成请求");
+                if (!wRoleSpawQueuenDic.TryGetValue(serveFrame, out var queue))
+                {
+                    queue = new Queue<FrameWRoleSpawnReqMsgStruct>();
+                    wRoleSpawQueuenDic[serveFrame] = queue;
+                }
 
-            queue.Enqueue(new FrameWRoleSpawnReqMsgStruct { connId = connId, msg = msg });
+                queue.Enqueue(new FrameWRoleSpawnReqMsgStruct { connId = connId, msg = msg });
+            }
 
             // TODO:连接服和世界服分离
             connIdList.Add(connId);
@@ -682,62 +695,77 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
-            if (!bulletSpawnQueueDic.TryGetValue(serveFrame, out var queue))
+            lock (bulletSpawnQueueDic)
             {
-                queue = new Queue<FrameBulletSpawnReqMsgStruct>();
-                bulletSpawnQueueDic[serveFrame] = queue;
-            }
+                if (!bulletSpawnQueueDic.TryGetValue(serveFrame, out var queue))
+                {
+                    queue = new Queue<FrameBulletSpawnReqMsgStruct>();
+                    bulletSpawnQueueDic[serveFrame] = queue;
+                }
 
-            queue.Enqueue(new FrameBulletSpawnReqMsgStruct { connId = connId, msg = msg });
+                queue.Enqueue(new FrameBulletSpawnReqMsgStruct { connId = connId, msg = msg });
+            }
         }
 
         // ========= Item
         void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
         {
-            if (!itemPickUpQueueDic.TryGetValue(serveFrame, out var msgStruct))
+            lock (itemPickUpQueueDic)
             {
-                msgStruct = new Queue<FrameItemPickUpReqMsgStruct>();
-                itemPickUpQueueDic[serveFrame] = msgStruct;
-            }
+                if (!itemPickUpQueueDic.TryGetValue(serveFrame, out var msgStruct))
+                {
+                    msgStruct = new Queue<FrameItemPickUpReqMsgStruct>();
+                    itemPickUpQueueDic[serveFrame] = msgStruct;
+                }
 
-            msgStruct.Enqueue(new FrameItemPickUpReqMsgStruct { connId = connId, msg = msg });
+                msgStruct.Enqueue(new FrameItemPickUpReqMsgStruct { connId = connId, msg = msg });
+            }
         }
 
         // =========== Weapon
         void OnWeaponShoot(int connId, FrameWeaponShootReqMsg msg)
         {
-            if (!weaponShootQueueDic.TryGetValue(serveFrame, out var msgStruct))
+            lock (weaponShootQueueDic)
             {
-                msgStruct = new Queue<FrameWeaponShootReqMsgStruct>();
-                weaponShootQueueDic[serveFrame] = msgStruct;
-            }
+                if (!weaponShootQueueDic.TryGetValue(serveFrame, out var msgStruct))
+                {
+                    msgStruct = new Queue<FrameWeaponShootReqMsgStruct>();
+                    weaponShootQueueDic[serveFrame] = msgStruct;
+                }
 
-            msgStruct.Enqueue(new FrameWeaponShootReqMsgStruct { connId = connId, msg = msg });
-            Debug.Log("收到武器射击请求");
+                msgStruct.Enqueue(new FrameWeaponShootReqMsgStruct { connId = connId, msg = msg });
+                Debug.Log("收到武器射击请求");
+            }
         }
 
         void OnWeaponReload(int connId, FrameWeaponReloadReqMsg msg)
         {
-            if (!weaponReloadQueueDic.TryGetValue(serveFrame, out var msgStruct))
+            lock (weaponReloadQueueDic)
             {
-                msgStruct = new Queue<FrameWeaponReloadReqMsgStruct>();
-                weaponReloadQueueDic[serveFrame] = msgStruct;
-            }
+                if (!weaponReloadQueueDic.TryGetValue(serveFrame, out var msgStruct))
+                {
+                    msgStruct = new Queue<FrameWeaponReloadReqMsgStruct>();
+                    weaponReloadQueueDic[serveFrame] = msgStruct;
+                }
 
-            msgStruct.Enqueue(new FrameWeaponReloadReqMsgStruct { connId = connId, msg = msg });
-            Debug.Log("收到武器换弹请求");
+                msgStruct.Enqueue(new FrameWeaponReloadReqMsgStruct { connId = connId, msg = msg });
+                Debug.Log("收到武器换弹请求");
+            }
         }
 
         void OnWeaponDrop(int connId, FrameWeaponDropReqMsg msg)
         {
-            if (!weaponDropQueueDic.TryGetValue(serveFrame, out var msgStruct))
+            lock (weaponDropQueueDic)
             {
-                msgStruct = new Queue<FrameWeaponDropReqMsgStruct>();
-                weaponDropQueueDic[serveFrame] = msgStruct;
-            }
+                if (!weaponDropQueueDic.TryGetValue(serveFrame, out var msgStruct))
+                {
+                    msgStruct = new Queue<FrameWeaponDropReqMsgStruct>();
+                    weaponDropQueueDic[serveFrame] = msgStruct;
+                }
 
-            msgStruct.Enqueue(new FrameWeaponDropReqMsgStruct { connId = connId, msg = msg });
-            Debug.Log("收到武器丢弃请求");
+                msgStruct.Enqueue(new FrameWeaponDropReqMsgStruct { connId = connId, msg = msg });
+                Debug.Log("收到武器丢弃请求");
+            }
         }
 
         // ====== Scene Spawn Method

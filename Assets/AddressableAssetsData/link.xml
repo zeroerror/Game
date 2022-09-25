@@ -1,0 +1,105 @@
+<linker>
+  <assembly fullname="Cinemachine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="Cinemachine.CinemachineBrain" preserve="all" />
+    <type fullname="Cinemachine.CinemachineComposer" preserve="all" />
+    <type fullname="Cinemachine.CinemachineFramingTransposer" preserve="all" />
+    <type fullname="Cinemachine.CinemachinePipeline" preserve="all" />
+    <type fullname="Cinemachine.CinemachineVirtualCamera" preserve="all" />
+    <type fullname="Cinemachine.CinemachineBlendDefinition" preserve="nothing" serialized="true" />
+    <type fullname="Cinemachine.CinemachineBrain/BrainEvent" preserve="nothing" serialized="true" />
+    <type fullname="Cinemachine.CinemachineBrain/VcamActivatedEvent" preserve="nothing" serialized="true" />
+    <type fullname="Cinemachine.CinemachineVirtualCameraBase/TransitionParams" preserve="nothing" serialized="true" />
+    <type fullname="Cinemachine.LensSettings" preserve="nothing" serialized="true" />
+  </assembly>
+  <assembly fullname="Game.Client.Bussiness, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="Game.Bussiness.UIBussiness.Panel.Home_WorldRoomPanel" preserve="all" />
+    <type fullname="Game.Bussiness.UIBussiness.Panel.Home_WorldServerPanel" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.BattleRoleLogicEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.BattleRoleRendererEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.BulletEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.BulletPackEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.GrenadeEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.HookerEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.BattleBussiness.WeaponEntity" preserve="all" />
+    <type fullname="Game.Client.Bussiness.UIBussiness.Panel.Home_BattleOptPanel" preserve="all" />
+    <type fullname="Game.Client.Bussiness.UIBussiness.Panel.Home_LoginPanel" preserve="all" />
+  </assembly>
+  <assembly fullname="Game.Infrastructure, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="Game.Infrastructure.Input.CinemachineExtra" preserve="all" />
+  </assembly>
+  <assembly fullname="Game.ThridParty, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="VariableJoystick" preserve="all" />
+  </assembly>
+  <assembly fullname="Unity.Addressables, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
+    <type fullname="UnityEngine.AddressableAssets.Addressables" preserve="all" />
+  </assembly>
+  <assembly fullname="Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
+    <type fullname="UnityEngine.ResourceManagement.ResourceProviders.AssetBundleProvider" preserve="all" />
+    <type fullname="UnityEngine.ResourceManagement.ResourceProviders.BundledAssetProvider" preserve="all" />
+    <type fullname="UnityEngine.ResourceManagement.ResourceProviders.InstanceProvider" preserve="all" />
+    <type fullname="UnityEngine.ResourceManagement.ResourceProviders.LegacyResourcesProvider" preserve="all" />
+    <type fullname="UnityEngine.ResourceManagement.ResourceProviders.SceneProvider" preserve="all" />
+    <type fullname="UnityEngine.ResourceManagement.Util.SerializedType" preserve="all" />
+  </assembly>
+  <assembly fullname="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.AnimationClip" preserve="all" />
+    <type fullname="UnityEngine.Animator" preserve="all" />
+    <type fullname="UnityEngine.Avatar" preserve="all" />
+    <type fullname="UnityEngine.RuntimeAnimatorController" preserve="all" />
+  </assembly>
+  <assembly fullname="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.AudioListener" preserve="all" />
+  </assembly>
+  <assembly fullname="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.Camera" preserve="all" />
+    <type fullname="UnityEngine.Cubemap" preserve="all" />
+    <type fullname="UnityEngine.GameObject" preserve="all" />
+    <type fullname="UnityEngine.LightingSettings" preserve="all" />
+    <type fullname="UnityEngine.LightmapSettings" preserve="all" />
+    <type fullname="UnityEngine.LightProbes" preserve="all" />
+    <type fullname="UnityEngine.Material" preserve="all" />
+    <type fullname="UnityEngine.Mesh" preserve="all" />
+    <type fullname="UnityEngine.MeshFilter" preserve="all" />
+    <type fullname="UnityEngine.MeshRenderer" preserve="all" />
+    <type fullname="UnityEngine.Object" preserve="all" />
+    <type fullname="UnityEngine.RectTransform" preserve="all" />
+    <type fullname="UnityEngine.RenderSettings" preserve="all" />
+    <type fullname="UnityEngine.Shader" preserve="all" />
+    <type fullname="UnityEngine.SkinnedMeshRenderer" preserve="all" />
+    <type fullname="UnityEngine.Sprite" preserve="all" />
+    <type fullname="UnityEngine.Texture2D" preserve="all" />
+    <type fullname="UnityEngine.Transform" preserve="all" />
+    <type fullname="UnityEngine.Events.PersistentCallGroup" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.RectOffset" preserve="nothing" serialized="true" />
+  </assembly>
+  <assembly fullname="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.BoxCollider" preserve="all" />
+    <type fullname="UnityEngine.CapsuleCollider" preserve="all" />
+    <type fullname="UnityEngine.PhysicMaterial" preserve="all" />
+    <type fullname="UnityEngine.Rigidbody" preserve="all" />
+    <type fullname="UnityEngine.SphereCollider" preserve="all" />
+  </assembly>
+  <assembly fullname="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.UI.Button" preserve="all" />
+    <type fullname="UnityEngine.UI.GridLayoutGroup" preserve="all" />
+    <type fullname="UnityEngine.UI.Image" preserve="all" />
+    <type fullname="UnityEngine.UI.InputField" preserve="all" />
+    <type fullname="UnityEngine.UI.Mask" preserve="all" />
+    <type fullname="UnityEngine.UI.ScrollRect" preserve="all" />
+    <type fullname="UnityEngine.UI.Text" preserve="all" />
+    <type fullname="UnityEngine.UI.AnimationTriggers" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.Button/ButtonClickedEvent" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.ColorBlock" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.FontData" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.InputField/EndEditEvent" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.InputField/OnChangeEvent" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.InputField/SubmitEvent" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.MaskableGraphic/CullStateChangedEvent" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.Navigation" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.ScrollRect/ScrollRectEvent" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.UI.SpriteState" preserve="nothing" serialized="true" />
+  </assembly>
+  <assembly fullname="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.CanvasRenderer" preserve="all" />
+  </assembly>
+</linker>
