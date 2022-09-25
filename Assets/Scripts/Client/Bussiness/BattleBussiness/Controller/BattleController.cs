@@ -14,7 +14,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         BattleFacades battleFacades;
         float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
         // 服务器下发的生成队列
-        Queue<FrameWRoleSpawnResMsg> roleSpawnQueue;
+        Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
         Queue<FrameItemSpawnResMsg> itemSpawnQueue;
         // 服务器下发的物理事件队列
@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         Queue<FrameBulletHitWallResMsg> bulletHitWallQueue;
         Queue<FrameBulletTearDownResMsg> bulletTearDownQueue;
         // 服务器下发的人物状态同步队列
-        Queue<WRoleStateUpdateMsg> stateQueue;
+        Queue<BattleRoleStateUpdateMsg> roleStateQueue;
         // 服务器下发的资源拾取队列
         Queue<FrameItemPickResMsg> itemPickQueue;
 
@@ -33,10 +33,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         // 服务器下发的武器丢弃队列
         Queue<FrameWeaponDropResMsg> weaponDropQueue;
 
+        bool battleBegin;
         public BattleController()
         {
 
-            roleSpawnQueue = new Queue<FrameWRoleSpawnResMsg>();
+            roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
             itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
 
@@ -44,12 +45,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletHitWallQueue = new Queue<FrameBulletHitWallResMsg>();
             bulletTearDownQueue = new Queue<FrameBulletTearDownResMsg>();
 
-            stateQueue = new Queue<WRoleStateUpdateMsg>();
+            roleStateQueue = new Queue<BattleRoleStateUpdateMsg>();
 
             itemPickQueue = new Queue<FrameItemPickResMsg>();
             weaponShootQueue = new Queue<FrameWeaponShootResMsg>();
             weaponReloadQueue = new Queue<FrameWeaponReloadResMsg>();
             weaponDropQueue = new Queue<FrameWeaponDropResMsg>();
+
+            UIEventCenter.WorldRoomEnter += ((host, port) =>
+            {
+                battleFacades.Network.BattleReqAndRes.ConnBattleServer(host, port);
+            });
+            NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
+            {
+                battleBegin = true;
+            });
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -78,6 +88,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick()
         {
+            if (battleBegin)
+            {
+                GameFightStart();
+                battleBegin = false;
+            }
+
             float deltaTime = UnityEngine.Time.deltaTime;
 
             // == Server Response Physics 
@@ -132,9 +148,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Role]
         void Tick_RoleStateSync()
         {
-            while (stateQueue.TryPeek(out var stateMsg))
+            while (roleStateQueue.TryPeek(out var stateMsg))
             {
-                stateQueue.Dequeue();
+                roleStateQueue.Dequeue();
 
                 RoleState roleState = (RoleState)stateMsg.roleState;
                 float x = stateMsg.x / 10000f;
@@ -194,7 +210,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 switch (roleState)
                 {
                     case RoleState.Normal:
-                        animatorComponent.PlayIdle();
                         break;
                     case RoleState.Move:
                         if (moveComponent.IsGrouded) animatorComponent.PlayRun();
@@ -424,7 +439,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     item.transform.SetParent(parent);
                     item.transform.localPosition = Vector3.zero;
                     item.name += entityId;
-                    Debug.Log(entityId);
 
                     // Entity以及Repo
                     switch (itemType)
@@ -529,12 +543,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Server Response]
 
         #region [ROLE] 
-        void OnWRoleSync(WRoleStateUpdateMsg msg)
+        void OnWRoleSync(BattleRoleStateUpdateMsg msg)
         {
-            stateQueue.Enqueue(msg);
+            roleStateQueue.Enqueue(msg);
         }
 
-        void OnBattleRoleSpawn(FrameWRoleSpawnResMsg msg)
+        void OnBattleRoleSpawn(FrameBattleRoleSpawnResMsg msg)
         {
             Debug.Log("加入角色生成队列");
             roleSpawnQueue.Enqueue(msg);
@@ -607,28 +621,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Network Event Center]
 
-        async void SpawnGameFightScene(string[] worldSerHosts, ushort[] ports)
+        async void GameFightStart()
         {
             // // 当前有加载好的场景，则不加载
             // var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
             // if (curFieldEntity != null) return;
 
-            // // Load Scene And Spawn Field
-            // var domain = battleFacades.Domain;
-            // var fieldEntity = await domain.BattleSpawnDomain.SpawnCityScene();
-            // Cursor.lockState = CursorLockMode.Locked;
-            // Cursor.visible = true;
-            // fieldEntity.SetFieldId(1);
-            // var fieldEntityRepo = battleFacades.Repo.FiledRepo;
-            // var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
-            // fieldEntityRepo.Add(fieldEntity);
-            // fieldEntityRepo.SetPhysicsScene(physicsScene);
-            // // Send Spawn Role Message
-            // var rqs = battleFacades.Network.BattleRoleReqAndRes;
-            // rqs.SendReq_WolrdRoleSpawn();
-
+            // Load Scene And Spawn Field
             var domain = battleFacades.Domain;
             var fieldEntity = await domain.BattleSpawnDomain.SpawnGameFightScene();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = true;
+            fieldEntity.SetFieldId(1);
+            var fieldEntityRepo = battleFacades.Repo.FiledRepo;
+            var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
+            fieldEntityRepo.Add(fieldEntity);
+            fieldEntityRepo.SetPhysicsScene(physicsScene);
+            // Send Spawn Role Message
+            var rqs = battleFacades.Network.BattleRoleReqAndRes;
+            rqs.SendReq_BattleRoleSpawn();
         }
 
         #endregion

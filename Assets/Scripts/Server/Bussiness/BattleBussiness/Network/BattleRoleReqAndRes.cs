@@ -53,9 +53,9 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             int gravityVelocity = (int)(role.MoveComponent.GravityVelocity * 10000);
 
-            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrameIndex} connId:{connId} wRid:{role.EntityId} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}","#008000");
+            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.EntityId} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
 
-            WRoleStateUpdateMsg msg = new WRoleStateUpdateMsg
+            BattleRoleStateUpdateMsg msg = new BattleRoleStateUpdateMsg
             {
                 serverFrameIndex = serverFrame,
                 wRid = role.EntityId,
@@ -75,28 +75,33 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 gravityVelocity = gravityVelocity,
                 isOwner = connId == role.ConnId
             };
-            _server.SendMsg<WRoleStateUpdateMsg>(connId, msg);
+            _server.SendMsg<BattleRoleStateUpdateMsg>(connId, msg);
             sendCount++;
         }
 
         public void SendRes_BattleRoleSpawn(int connId, byte wRoleId, bool isOwner)
         {
-            FrameWRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameWRoleSpawnResMsg
+            FrameBattleRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameBattleRoleSpawnResMsg
             {
                 serverFrame = serverFrame,
                 wRoleId = wRoleId,
                 isOwner = isOwner
             };
-            _server.SendMsg<FrameWRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
+            _server.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
             Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");
             sendCount++;
         }
 
         // == Regist ==
         // == OPT ==
-        public void RegistReq_BattleRoleOpt(Action<int, FrameOptReqMsg> action)
+        public void RegistReq_RoleMove(Action<int, FrameRoleMoveReqMsg> action)
         {
-            _server.AddRegister<FrameOptReqMsg>(action);
+            _server.AddRegister(action);
+        }
+
+        public void RegistReq_RoleRotate(Action<int, FrameRoleRotateReqMsg> action)
+        {
+            _server.AddRegister(action);
         }
 
         public void RegistReq_Jump(Action<int, FrameJumpReqMsg> action)
@@ -105,7 +110,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         // == SPAWN ==
-        public void RegistReq_WolrdRoleSpawn(Action<int, FrameWRoleSpawnReqMsg> action)
+        public void RegistReq_BattleRoleSpawn(Action<int, FrameBattleRoleSpawnReqMsg> action)
         {
             _server.AddRegister(action);
         }

@@ -20,11 +20,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void PlayIdle()
         {
+            if (IsInState("Idle")) return;
             animator.Play("Idle");
         }
 
         public void PlayRun()
         {
+            if (IsInState("Run")) return;
             animator.Play("Run");
         }
 
@@ -35,6 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void PlayHooking()
         {
+            if (IsInState("Hooking")) return;
             animator.Play("Hooking");
         }
 

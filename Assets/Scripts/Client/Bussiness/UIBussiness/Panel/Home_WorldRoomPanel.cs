@@ -26,7 +26,7 @@ namespace Game.Bussiness.UIBussiness.Panel
         }
 
         // == Network ==
-        void CreateRoomSuccess(string masterAccount, string roomName)
+        void CreateRoomSuccess(string masterAccount, string roomName, string host, ushort port)
         {
             var go = UIManager.GetUIAsset("RoomItem");
             go = GameObject.Instantiate(go);
@@ -38,12 +38,25 @@ namespace Game.Bussiness.UIBussiness.Panel
             string path = $"{content}/{go.transform.name}";
             string info = $"房间名:{roomName} \n 房主:{masterAccount} ";
             Text_SetText(path + "/Info", info);
+            SetOnClick(path, ClickRoom, host, port); //一个人限制创建一个房间
+
+            SetActive("CreateRoom", false); //一个人限制创建一个房间
         }
 
         // == UI Click ==
         void ClickCreateRoomBtn(params object[] args)
         {
             UIEventCenter.WorldRoomCreateAction.Invoke(roomNameInput.text);
+        }
+
+        void ClickRoom(params object[] args)
+        {
+            //点击进入
+            string host = (string)args[0];
+            ushort port = (ushort)args[1];
+
+            UIEventCenter.WorldRoomEnter.Invoke(host, port);
+            UIEventCenter.EnqueueTearDownQueue("Home_WorldRoomPanel");
         }
 
     }

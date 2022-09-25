@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // == Send ==
-        public void SendReq_WRoleMove(byte rid, Vector3 dir)
+        public void SendReq_RoleMove(byte rid, Vector3 dir)
         {
             dir.Normalize();
             ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
@@ -33,15 +33,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             msg |= (ulong)(ushort)(dir.y * 100) << 16;
             msg |= (ulong)(ushort)(dir.z * 100);
 
-            FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
+            FrameRoleMoveReqMsg frameRoleMoveReqMsg = new FrameRoleMoveReqMsg
             {
-                optTypeId = 1,
                 msg = msg
             };
-            _client.SendMsg(frameOptReqMsg);
+            _client.SendMsg(frameRoleMoveReqMsg);
         }
 
-        public void SendReq_WRoleRotate(BattleRoleLogicEntity roleEntity)
+        public void SendReq_RoleRotate(BattleRoleLogicEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
             var rid = roleEntity.EntityId;
@@ -50,15 +49,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             msg |= (ulong)(ushort)eulerAngel.y << 16;
             msg |= (ulong)(ushort)eulerAngel.z;
 
-            FrameOptReqMsg frameOptReqMsg = new FrameOptReqMsg
+            FrameRoleRotateReqMsg frameRoleRotateReqMsg = new FrameRoleRotateReqMsg
             {
-                optTypeId = 2,
                 msg = msg
             };
-            _client.SendMsg(frameOptReqMsg);
+            _client.SendMsg(frameRoleRotateReqMsg);
         }
 
-        public void SendReq_WRoleJump(byte wRid)
+        public void SendReq_RoleJump(byte wRid)
         {
             FrameJumpReqMsg frameJumpReqMsg = new FrameJumpReqMsg
             {
@@ -68,9 +66,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             _client.SendMsg(frameJumpReqMsg);
         }
 
-        public void SendReq_WolrdRoleSpawn()
+        public void SendReq_BattleRoleSpawn()
         {
-            FrameWRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameWRoleSpawnReqMsg
+            FrameBattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameBattleRoleSpawnReqMsg
             {
             };
             _client.SendMsg(frameReqWRoleSpawnMsg);
@@ -78,14 +76,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         // == Regist ==
 
-        public void RegistRes_BattleRoleSpawn(Action<FrameWRoleSpawnResMsg> action)
+        public void RegistRes_BattleRoleSpawn(Action<FrameBattleRoleSpawnResMsg> action)
         {
-            _client.RegistMsg<FrameWRoleSpawnResMsg>(action);
+            _client.RegistMsg<FrameBattleRoleSpawnResMsg>(action);
         }
 
-        public void RegistUpdate_WRole(Action<WRoleStateUpdateMsg> action)
+        public void RegistUpdate_WRole(Action<BattleRoleStateUpdateMsg> action)
         {
-            _client.RegistMsg<WRoleStateUpdateMsg>(action);
+            _client.RegistMsg<BattleRoleStateUpdateMsg>(action);
         }
 
 

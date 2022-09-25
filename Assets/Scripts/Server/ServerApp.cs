@@ -35,7 +35,8 @@ namespace Game.Server
             //战斗服的启动是由客户端在世界服候创建战斗对局决定启动
 
             // == Event Center ==
-            NetworkEventCenter.Ctor();
+            ServerNetworkEventCenter.Ctor();
+            ServerNetworkEventCenter.Regist_BattleServerNeedCreate(StartBatllteServer);
 
             // == Entry ==
             // LoginEntry
@@ -61,7 +62,6 @@ namespace Game.Server
             loginEntry.Tick();
             worldEntry.Tick();
             battleEntry.Tick();
-
         }
 
         void OnDestroy()
@@ -108,12 +108,12 @@ namespace Game.Server
 
             worldServer.OnConnectedHandle += (connID) =>
             {
-                NetworkEventCenter.Invoke_WorldConnection(connID);
+                ServerNetworkEventCenter.Invoke_WorldConnection(connID);
             };
 
             worldServer.OnDisconnectedHandle += (connID) =>
             {
-                NetworkEventCenter.Invoke_WorldDisconnection(connID);
+                ServerNetworkEventCenter.Invoke_WorldDisconnection(connID);
             };
         }
 
@@ -135,6 +135,7 @@ namespace Game.Server
             battleServer.OnConnectedHandle += (connID) =>
             {
                 Debug.Log($"[战斗服]: connID:{connID} 客户端连接成功-------------------------");
+                ServerNetworkEventCenter.battleSerConnect.Invoke(connID);
             };
         }
 

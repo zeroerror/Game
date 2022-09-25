@@ -74,7 +74,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 else
                 {
                     role.MoveComponent.EnterGound();
-                    if (role.IsAllowEnterNormal()) role.SetRoleState(RoleState.Normal);
                 }
 
                 if (hitWallCount <= 0) role.MoveComponent.LeaveWall();
@@ -85,17 +84,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return hitRoleList;
         }
 
-        public void Tick_RoleMoveHitErase(BattleRoleLogicEntity role)
+        public void Tick_RoleMoveHitErase()
         {
-            var rolePos = role.SelfPos;
-            // 墙体撞击：速度管理
-            var wallColliderList = GetHitField_ColliderList(role);
-            wallColliderList.ForEach((colliderExtra) =>
+            var roleRepo = battleFacades.Repo.RoleRepo;
+            roleRepo.Foreach((role) =>
             {
-                var collider = colliderExtra.collider;
-                var closestPoint = collider.ClosestPoint(rolePos);
-                var hitDir = (closestPoint - rolePos).normalized;
-                role.MoveComponent.MoveHitErase(hitDir);
+                var rolePos = role.SelfPos;
+                // 墙体撞击：速度管理
+                var wallColliderList = GetHitField_ColliderList(role);
+                wallColliderList.ForEach((colliderExtra) =>
+                {
+                    var collider = colliderExtra.collider;
+                    var closestPoint = collider.ClosestPoint(rolePos);
+                    var hitDir = (closestPoint - rolePos).normalized;
+                    role.MoveComponent.MoveHitErase(hitDir);
+                });
             });
         }
 

@@ -11,6 +11,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
     {
 
         // Network
+        public BattleReqAndRes BattleReqAndRes { get; private set; }
         public BattleRoleReqAndRes BattleRoleReqAndRes { get; private set; }
         public BulletReqAndRes BulletReqAndRes { get; private set; }
         public WeaponReqAndRes WeaponReqAndRes { get; private set; }
@@ -23,6 +24,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
 
         public AllBattleNetwork()
         {
+            BattleReqAndRes = new BattleReqAndRes();
             BattleRoleReqAndRes = new BattleRoleReqAndRes();
             BulletReqAndRes = new BulletReqAndRes();
             WeaponReqAndRes = new WeaponReqAndRes();
@@ -33,6 +35,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
 
         public void Inject(NetworkServer server)
         {
+            BattleReqAndRes.Inject(server);
             BattleRoleReqAndRes.Inject(server);
             BulletReqAndRes.Inject(server);
             WeaponReqAndRes.Inject(server);
@@ -48,17 +51,18 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
             totalSendCount += ItemReqAndRes.SendCount;
             if (totalSendCount > 0)
             {
-                serverFrame++;
                 BattleRoleReqAndRes.ClearSendCount();
                 BulletReqAndRes.ClearSendCount();
                 WeaponReqAndRes.ClearSendCount();
                 ItemReqAndRes.ClearSendCount();
 
+                serverFrame++;
+                Debug.Log($"状态帧更新--------------------------> {serverFrame}");
+
                 BattleRoleReqAndRes.SetServerFrame(serverFrame);
                 BulletReqAndRes.SetServerFrame(serverFrame);
                 WeaponReqAndRes.SetServerFrame(serverFrame);
                 ItemReqAndRes.SetServerFrame(serverFrame);
-                Debug.Log($"状态帧更新--------------------------> {serverFrame}");
             }
         }
 

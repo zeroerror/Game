@@ -43,19 +43,21 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
             WolrdLeaveResMessage msg = new WolrdLeaveResMessage
             {
                 entityId = entityId,
-                account = account
+                account = account,
             };
 
             _worldServer.SendMsg(connId, msg);
         }
 
-        public void SendRes_WorldRoomCreate(int connId, string masterAccount, int roomEntityId, string roomName)
+        public void SendRes_WorldRoomCreate(int connId, string masterAccount, int roomEntityId, string roomName, string host, ushort port)
         {
             WorldRoomCreateResMessage msg = new WorldRoomCreateResMessage
             {
                 masterAccount = masterAccount,
                 roomEntityId = roomEntityId,
-                roomName = roomName
+                roomName = roomName,
+                host = host,
+                port = port,
             };
 
             _worldServer.SendMsg(connId, msg);

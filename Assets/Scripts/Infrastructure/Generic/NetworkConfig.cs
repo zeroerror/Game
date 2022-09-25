@@ -12,6 +12,7 @@ namespace Game.Infrastructure.Generic
         public static readonly string[] WORLDSERVER_HOST = new string[] { "175.178.150.50" };
         public static readonly ushort[] WORLDSERVER_PORT = new ushort[] { 4001 };
 
+        public static readonly string[] LOCAL_BATTLESERVER_HOST = new string[] { "localhost" };
         public static readonly string[] BATTLESERVER_HOST = new string[] { "175.178.150.50" };
         public static readonly ushort[] BATTLESERVER_PORT = new ushort[] { 4002 };
 

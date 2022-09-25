@@ -87,7 +87,7 @@ namespace Game.Server.Bussiness.LoginBussiness
                 networkServer.SendMsg<LoginResMessage>(ev.connID, new LoginResMessage
                 {
                     status = status,
-                    account = msg.account,
+                account = msg.account,
                     worldServerHosts = NetworkConfig.LOCAL_WORLDSERVER_HOST,
                     worldServerPorts = NetworkConfig.WORLDSERVER_PORT,
                     userToken = status != 0 ? System.DateTime.Now.ToString() : string.Empty,

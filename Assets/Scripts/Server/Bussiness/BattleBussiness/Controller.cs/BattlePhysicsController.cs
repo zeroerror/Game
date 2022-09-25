@@ -29,12 +29,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            if (battleFacades.LocalEventCenter.hasOptPhysicsSimulated)
-            {
-                battleFacades.LocalEventCenter.hasOptPhysicsSimulated = false;
-                return;
-            }
-
             // Physics Simulation
             Tick_Physics_Movement_Bullet(fixedDeltaTime);
             Tick_Physics_Movement_Role(fixedDeltaTime);
@@ -139,6 +133,8 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             var domain = battleFacades.ClientBattleFacades.Domain.BattleRoleDomain;
             domain.Tick_RoleRigidbody(fixedDeltaTime);
+            var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
+            physicsDomain.Tick_RoleMoveHitErase();
         }
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)

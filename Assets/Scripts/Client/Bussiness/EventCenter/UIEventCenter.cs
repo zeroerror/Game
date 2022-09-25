@@ -28,6 +28,7 @@ namespace Game.Client.Bussiness.EventCenter
         public static Action<string, string> RegistAction;       // 注册
         public static Action<string, ushort> ConnWorSerAction;// 连接世界服
         public static Action<string> WorldRoomCreateAction;   // 创建世界服内的房间
+        public static Action<string, ushort> WorldRoomEnter;   // 进入战斗服房间
 
         public static void Ctor()
         {

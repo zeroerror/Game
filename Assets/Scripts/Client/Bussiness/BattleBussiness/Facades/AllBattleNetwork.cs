@@ -12,6 +12,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public BulletReqAndRes BulletReqAndRes { get; private set; }
         public WeaponReqAndRes WeaponReqAndRes { get; private set; }
         public ItemReqAndRes ItemReqAndRes { get; private set; }
+        public BattleReqAndRes BattleReqAndRes { get; private set; }
 
         int clientFrame;
 
@@ -21,6 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             BulletReqAndRes = new BulletReqAndRes();
             WeaponReqAndRes = new WeaponReqAndRes();
             ItemReqAndRes = new ItemReqAndRes();
+            BattleReqAndRes = new BattleReqAndRes();
         }
 
         public void Inject(NetworkClient client)
@@ -29,6 +31,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             BulletReqAndRes.Inject(client);
             WeaponReqAndRes.Inject(client);
             ItemReqAndRes.Inject(client);
+            BattleReqAndRes.Inject(client);
         }
 
     }

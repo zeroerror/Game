@@ -17,9 +17,14 @@ namespace Game.Client.Bussiness.EventCenter
         public static void Regist_ConnWorSerSuccess(Action action) => worldConnResHandler += action;
         public static void Invoke_ConnWorSerSuccessHandler() => worldConnResHandler.Invoke();
 
-        static Action<string, string> worldRoomCreateResHandler;
-        public static void Regist_WorldRoomCreate(Action<string, string> action) => worldRoomCreateResHandler += action;
-        public static void Invoke_WorldRoomCreate(string masterAccount, string roomName) => worldRoomCreateResHandler.Invoke(masterAccount, roomName);
+        static Action<string, string, string, ushort> worldRoomCreateResHandler;
+        public static void Regist_WorldRoomCreate(Action<string, string, string, ushort> action) => worldRoomCreateResHandler += action;
+        public static void Invoke_WorldRoomCreate(string masterAccount, string roomName, string host, ushort port) => worldRoomCreateResHandler.Invoke(masterAccount, roomName, host, port);
+
+        static Action battleSerConnectHandler;
+        public static void Regist_BattleSerConnectHandler(Action action) => battleSerConnectHandler += action;
+        public static void Invoke_BattleSerConnectHandler() => battleSerConnectHandler.Invoke();
+
 
         public static void Ctor()
         {

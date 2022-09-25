@@ -76,9 +76,11 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
                 var roomEntityId = msg.roomEntityId;
                 var roomName = msg.roomName;
                 var masterAccount = msg.masterAccount;
+                var host = msg.host;
+                var port = msg.port;
 
-                NetworkEventCenter.Invoke_WorldRoomCreate(masterAccount, roomName);
-                Debug.Log($"玩家[{masterAccount}]创建房间:  roomName:{roomName}  roomEntityId:{roomEntityId}  ");
+                NetworkEventCenter.Invoke_WorldRoomCreate(masterAccount, roomName, host, port);
+                Debug.Log($"玩家[{masterAccount}]创建了战斗房间:  roomName:{roomName}  roomEntityId:{roomEntityId} 战斗服 {host}:{port} ");
             }
 
         }

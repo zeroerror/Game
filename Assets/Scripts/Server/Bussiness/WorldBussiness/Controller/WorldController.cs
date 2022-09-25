@@ -8,6 +8,7 @@ using Game.Server.Bussiness.EventCenter;
 using System.Collections.Generic;
 using Game.Client.Bussiness.WorldBussiness;
 using Game.Protocol.World;
+using Game.Infrastructure.Generic;
 
 namespace Game.Server.Bussiness.WorldBussiness.Controller
 {
@@ -20,8 +21,8 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
 
         public WorldController()
         {
-            NetworkEventCenter.Regist_WorldConnection(OnWorldConnection);
-            NetworkEventCenter.Regist_WorldDisconnection(OnWorldDisconnection);
+            ServerNetworkEventCenter.Regist_WorldConnection(OnWorldConnection);
+            ServerNetworkEventCenter.Regist_WorldDisconnection(OnWorldDisconnection);
 
             connIdList = new List<int>();
         }
@@ -117,8 +118,16 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
             Debug.Log($"[世界服]: connID:{connId} 玩家{roleEntity.Account} 创建了房间 id:{roomEntity.EntityId} 名称:{roomEntity.RoomName}------------------------");
             connIdList.ForEach((broadcastConnId) =>
             {
-                rqs.SendRes_WorldRoomCreate(broadcastConnId, roleEntity.Account, roomEntity.EntityId, roomEntity.RoomName);
+                rqs.SendRes_WorldRoomCreate(broadcastConnId,
+                 roleEntity.Account,
+                  roomEntity.EntityId,
+                   roomEntity.RoomName,
+                    NetworkConfig.LOCAL_BATTLESERVER_HOST[0],
+                     NetworkConfig.BATTLESERVER_PORT[0]);
             });
+            Debug.Log($"[世界服]: connID:{connId} 玩家{roleEntity.Account} 创建了房间 id:{roomEntity.EntityId} 名称:{roomEntity.RoomName}------------------------");
+            Debug.Log($"[世界服]:创建战斗服 Host:{NetworkConfig.LOCAL_BATTLESERVER_HOST[0]} Port:{NetworkConfig.BATTLESERVER_PORT[0]} ------------------------");
+            ServerNetworkEventCenter.Invoke_BattleServerNeedCreate();
         }
 
         #endregion

@@ -71,7 +71,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var renderer = role.roleRenderer;
                 renderer.transform.position = Vector3.Lerp(renderer.transform.position, role.MoveComponent.CurPos, deltaTime * renderer.posAdjust);
                 renderer.transform.rotation = Quaternion.Lerp(renderer.transform.rotation, role.MoveComponent.Rotation, deltaTime * renderer.rotAdjust);
-
+                if (role.MoveComponent.Velocity.magnitude < 0.1f)
+                {
+                    role.roleRenderer.noMoveTime += deltaTime;
+                    if (role.roleRenderer.noMoveTime > 0.1f) role.roleRenderer.AnimatorComponent.PlayIdle();
+                }
+                else
+                {
+                    role.roleRenderer.noMoveTime = 0;
+                }
             });
         }
 
