@@ -119,6 +119,12 @@ namespace Game.Server
 
         void StartBatllteServer()
         {
+            if (_battleServerThread != null)
+            {
+                Debug.Log($"战斗服已经启动了！！！");
+                return;
+            }
+
             var port = NetworkConfig.BATTLESERVER_PORT[0];
             Debug.Log($"战斗服启动！端口:{port}");
             var battleServer = allServerNetwork.BattleServer;

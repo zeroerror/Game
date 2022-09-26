@@ -109,7 +109,7 @@ namespace Game.Client
         void StartAllClient()
         {
             Debug.Log("启动登录服客户端---------------------------------");
-            AllClientNetwork.loginSerClient.Connect(NetworkConfig.LOCAL_LOGIN_HOST, NetworkConfig.LOGIN_PORT);
+            AllClientNetwork.loginSerClient.Connect(NetworkConfig.LOGIN_HOST, NetworkConfig.LOGIN_PORT);
             _loginServClientThread = new Thread(() =>
             {
                 while (true)

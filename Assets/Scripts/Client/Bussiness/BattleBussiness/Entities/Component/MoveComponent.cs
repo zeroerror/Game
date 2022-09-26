@@ -45,6 +45,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             dir.Normalize();
             dir = dir.FixDecimal(2);
             this.moveVelocity = dir * speed;
+            Debug.Log($"移动方向:{dir}");
         }
 
         // == 跳跃速度 2

@@ -252,7 +252,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var role = roleRepo.GetByEntityId(rid);
 
                     // ------------移动
-                    Vector3 dir = new Vector3((short)(realMsg >> 32) / 100f, (short)(realMsg >> 16) / 100f, (short)realMsg / 100f);
+                    Vector3 dir = new Vector3((short)(ushort)(realMsg >> 32) / 100f, (short)(ushort)(realMsg >> 16) / 100f, (short)(ushort)realMsg / 100f);
 
                     //服务器逻辑
                     role.MoveComponent.ActivateMoveVelocity(dir);

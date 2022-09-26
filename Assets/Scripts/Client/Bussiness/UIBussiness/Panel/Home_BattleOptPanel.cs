@@ -1,16 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ZeroUIFrame;
-using Game.Bussiness.UIBussiness;
 using Game.Client.Bussiness.EventCenter;
-using UnityEngine.EventSystems;
 
 namespace Game.Client.Bussiness.UIBussiness.Panel
 {
 
     public class Home_BattleOptPanel : UIBehavior
     {
+
         VariableJoystick VariableJoystick;
+
         void Awake()
         {
             VariableJoystick = transform.Find("Joystick").GetComponent<VariableJoystick>();
@@ -22,7 +22,6 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
         {
             UIEventCenter.MoveAction.Invoke(moveAxis);
         }
-        // == UI Click ==
 
     }
 
