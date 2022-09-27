@@ -101,7 +101,9 @@ namespace Game.Client.Bussiness
 
         bool Exist(Collider collider)
         {
-            CollisionExtra colliderExtra = hitCollisionList.Find((ce) => ce.collision.Equals(collider));
+            CollisionExtra colliderExtra = hitCollisionList.Find((ce) =>
+            ce.collision != null ? ce.collision.collider.Equals(collider) :
+             ce.collider.Equals(collider));
             return colliderExtra != null;
         }
 

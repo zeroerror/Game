@@ -18,9 +18,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public List<CollisionExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
-        public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Item");
-        public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
+        public List<CollisionExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Field");
+        public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Item");
+        public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Role");
 
         public List<BattleRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
         {
@@ -161,14 +161,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        List<CollisionExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
+        List<CollisionExtra> GetCollisionExtraList(PhysicsEntity physicsEntity, string layerName)
         {
             List<CollisionExtra> collisionList = new List<CollisionExtra>();
             List<CollisionExtra> removeList = new List<CollisionExtra>();
             physicsEntity.HitColliderListForeach((collisionExtra) =>
             {
+                string name = string.Empty;
                 if (collisionExtra.collision != null)
                 {
+                    name = LayerMask.LayerToName(collisionExtra.collision.gameObject.layer);
                     if (collisionExtra.collision.collider == null || collisionExtra.collision.collider.enabled == false || collisionExtra.isEnter == CollisionStatus.Exit)
                     {
                         removeList.Add(collisionExtra);
@@ -177,12 +179,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 }
                 else if (collisionExtra.collider == null || collisionExtra.collider.enabled == false || collisionExtra.isEnter == CollisionStatus.Exit)
                 {
+                    name = LayerMask.LayerToName(collisionExtra.collider.gameObject.layer);
                     removeList.Add(collisionExtra);
                     return;
                 }
 
-
-                var name = LayerMask.LayerToName(collisionExtra.collision.gameObject.layer);
                 //= 墙体
                 if (name == layerName)
                 {
