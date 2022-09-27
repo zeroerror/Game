@@ -17,8 +17,23 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 37d93d84fdbbb694cbc6e8671374b44d
   m_SerializeEntries:
-  - m_GUID: c7e7bfcab55d9f142af601d085aaf870
-    m_Address: BattleRendererScene
+  - m_GUID: 04c32e747247e0341989a765fba1568f
+    m_Address: login_scene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Scene
+  - m_GUID: 251c388429026704581fe26af7fab62a
+    m_Address: world_choose_scene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Scene
+  - m_GUID: 237c5b22efcf0494d857f2f386164439
+    m_Address: world_scene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Scene
+  - m_GUID: b32f9224a7f8a6f4eb5a631e4ece1fa9
+    m_Address: scene_city
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene

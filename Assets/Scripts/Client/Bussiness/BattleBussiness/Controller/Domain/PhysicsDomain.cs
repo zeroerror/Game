@@ -18,9 +18,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public List<ColliderExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
-        public List<ColliderExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Item");
-        public List<ColliderExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
+        public List<CollisionExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Field");
+        public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Item");
+        public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetColliderList(physicsEntity, "Role");
 
         public List<BattleRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
         {
@@ -30,14 +30,29 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var rolePos = role.SelfPos;
                 // 墙体撞击的速度管理
-                var wallColliderList = GetHitField_ColliderList(role);
+                var fieldColliderList = GetHitField_ColliderList(role);
                 int enterGroundCount = 0;
                 int hitWallCount = 0;
-                wallColliderList.ForEach((colliderExtra) =>
+                fieldColliderList.ForEach((colliderExtra) =>
                 {
-                    var collider = colliderExtra.collider;
-                    var closestPoint = collider.ClosestPoint(rolePos);
+                    var collision = colliderExtra.collision;
+                    var closestPoint = collision.collider.bounds.ClosestPoint(rolePos);
+                    bool hasContact = true;
+                    if (closestPoint == rolePos)
+                    {
+                        if (collision.contactCount != 0)
+                        {
+                            closestPoint = collision.GetContact(0).point;
+                            colliderExtra.lastContactPoint = closestPoint;
+                        }
+                        else
+                        {
+                            closestPoint = colliderExtra.lastContactPoint;
+                            hasContact = false;
+                        }
+                    }
                     var hitDir = (closestPoint - rolePos).normalized;
+                    if (!hasContact) hitDir = -hitDir;
                     role.MoveComponent.HitSomething(hitDir);
 
                     if (colliderExtra.isEnter != CollisionStatus.Exit)
@@ -49,7 +64,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     if (colliderExtra.isEnter == CollisionStatus.Enter)
                     {
                         colliderExtra.isEnter = CollisionStatus.Stay;
-                        if (collider.gameObject.tag == "Jumpboard")
+                        if (collision.gameObject.tag == "Jumpboard")
                         {
                             role.MoveComponent.JumpboardSpeedUp();
                         }
@@ -65,7 +80,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                         role.MoveComponent.LeaveSomthing(leaveDir);
                         if (leaveDir.y < 0f) hitWallCount--;
                         else enterGroundCount--;
-                        role.RemoveHitCollider(colliderExtra);
+                        role.RemoveHitCollision(colliderExtra);
                     }
 
                 });
@@ -94,8 +109,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var wallColliderList = GetHitField_ColliderList(role);
                 wallColliderList.ForEach((colliderExtra) =>
                 {
-                    var collider = colliderExtra.collider;
-                    var closestPoint = collider.ClosestPoint(rolePos);
+                    var collision = colliderExtra.collision;
+                    var closestPoint = collision.collider.bounds.ClosestPoint(rolePos);
+                    if (closestPoint == rolePos)
+                    {
+                        if (collision.contactCount != 0)
+                        {
+                            closestPoint = collision.GetContact(0).point;
+                            colliderExtra.lastContactPoint = closestPoint;
+                        }
+                        else
+                        {
+                            closestPoint = colliderExtra.lastContactPoint;
+                        }
+                    }
                     var hitDir = (closestPoint - rolePos).normalized;
                     role.MoveComponent.MoveHitErase(hitDir);
                 });
@@ -126,7 +153,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     if (colliderExtra.isEnter == CollisionStatus.Enter)
                     {
                         colliderExtra.isEnter = CollisionStatus.Stay;
-                        var field = colliderExtra.collider.gameObject;
+                        var field = colliderExtra.collision.gameObject;
                         hitWallQueue.Enqueue(field);
                     }
                 });
@@ -134,32 +161,41 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        List<ColliderExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
+        List<CollisionExtra> GetColliderList(PhysicsEntity physicsEntity, string layerName)
         {
-            List<ColliderExtra> colliderList = new List<ColliderExtra>();
-            List<ColliderExtra> removeList = new List<ColliderExtra>();
-            physicsEntity.HitColliderListForeach((colliderExtra) =>
+            List<CollisionExtra> collisionList = new List<CollisionExtra>();
+            List<CollisionExtra> removeList = new List<CollisionExtra>();
+            physicsEntity.HitColliderListForeach((collisionExtra) =>
             {
-                if (colliderExtra.collider == null || colliderExtra.collider.enabled == false || colliderExtra.isEnter == CollisionStatus.Exit)
+                if (collisionExtra.collision != null)
                 {
-                    removeList.Add(colliderExtra);
+                    if (collisionExtra.collision.collider == null || collisionExtra.collision.collider.enabled == false || collisionExtra.isEnter == CollisionStatus.Exit)
+                    {
+                        removeList.Add(collisionExtra);
+                        return;
+                    }
+                }
+                else if (collisionExtra.collider == null || collisionExtra.collider.enabled == false || collisionExtra.isEnter == CollisionStatus.Exit)
+                {
+                    removeList.Add(collisionExtra);
                     return;
                 }
 
-                var name = LayerMask.LayerToName(colliderExtra.collider.gameObject.layer);
+
+                var name = LayerMask.LayerToName(collisionExtra.collision.gameObject.layer);
                 //= 墙体
                 if (name == layerName)
                 {
-                    colliderList.Add(colliderExtra);
+                    collisionList.Add(collisionExtra);
                 }
             });
 
             removeList.ForEach((ce) =>
             {
-                physicsEntity.RemoveHitCollider(ce);
+                physicsEntity.RemoveHitCollision(ce);
             });
 
-            return colliderList;
+            return collisionList;
         }
 
     }

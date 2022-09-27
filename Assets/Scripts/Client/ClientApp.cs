@@ -44,7 +44,7 @@ namespace Game.Client
             await LoadAllAsset();
 
             // == Load Login Scene ==
-            Addressables.LoadSceneAsync("LoginScene", LoadSceneMode.Single);
+            Addressables.LoadSceneAsync("login_scene", LoadSceneMode.Single);
             SceneManager.sceneLoaded -= LoginSceneLoaded;
             SceneManager.sceneLoaded += LoginSceneLoaded;
 

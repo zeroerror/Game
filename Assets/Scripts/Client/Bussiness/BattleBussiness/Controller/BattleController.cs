@@ -55,10 +55,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 battleFacades.Network.BattleReqAndRes.ConnBattleServer(host, port);
             });
-            UIEventCenter.MoveAction += ((moveAxis) =>
-            {
-                battleFacades.InputComponent.moveAxis = new Vector3(moveAxis.x, 0, moveAxis.y);
-            });
             NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
             {
                 battleBegin = true;

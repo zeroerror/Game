@@ -6,10 +6,10 @@ public class InputComponent
 {
 
     public Vector3 moveAxis;
-    public bool isPressShoot;
+    public bool isPressFire;
     public bool isPressJump;
     public bool isPressSwitchView;
-    public bool isPressPickUpItem;
+    public bool isPressPick;
     public bool isPressWeaponReload;
     public bool isPressDropWeapon;
     public Vector3 grenadeThrowPoint;   //obsolete
@@ -28,10 +28,10 @@ public class InputComponent
         grenadeThrowPoint.Reset();
         hookPoint.Reset();
 
-        isPressShoot = false;
+        isPressFire = false;
         isPressSwitchView = false;
         isPressJump = false;
-        isPressPickUpItem = false;
+        isPressPick = false;
         isPressWeaponReload = false;
         isPressDropWeapon = false;
     }

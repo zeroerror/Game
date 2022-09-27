@@ -3,17 +3,10 @@ using UnityEngine;
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Battle;
 using System.Runtime.InteropServices;
+using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
-
-    [StructLayout(LayoutKind.Explicit)]
-    public struct FloatContent {
-        [FieldOffset(0)]
-        public float fvalue;
-        [FieldOffset(0)]
-        public int ivalue;
-    }
 
     public class BattleRoleReqAndRes
     {
@@ -24,10 +17,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public BattleRoleReqAndRes()
         {
-            float x = -50;
-            Debug.Log((ulong)(ushort)(uint)(x));
-
-
         }
 
         public void Inject(NetworkClient client)
@@ -38,12 +27,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         // == Send ==
         public void SendReq_RoleMove(byte rid, Vector3 dir)
         {
+            var d = dir;
             dir.Normalize();
-            Debug.Log($"DIR:{dir}");
             ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
-            msg |= (ulong)(ushort)(uint)(dir.x * 100) << 32;
-            msg |= (ulong)(ushort)(dir.y * 100) << 16;
-            msg |= (ulong)(ushort)(dir.z * 100);
+            msg |= (ulong)(ushort)(int)(dir.x * 100) << 32;
+            msg |= (ulong)(ushort)(int)(dir.y * 100) << 16;
+            msg |= (ulong)(ushort)(int)(dir.z * 100);
             FrameRoleMoveReqMsg frameRoleMoveReqMsg = new FrameRoleMoveReqMsg
             {
                 msg = msg

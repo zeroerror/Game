@@ -63,11 +63,11 @@ public static class InputGameSet
         }
         if (Input.GetKeyDown(PCInputSet.shoot))
         {
-            inputComponent.isPressShoot = true;
+            inputComponent.isPressFire = true;
         }
         if (Input.GetKeyDown(PCInputSet.pickUpAssets))
         {
-            inputComponent.isPressPickUpItem = true;
+            inputComponent.isPressPick = true;
         }
         if (Input.GetKeyDown(PCInputSet.weaponReload))
         {
@@ -89,7 +89,7 @@ public static class InputGameSet
         }
         if (MobileInputSet.isPressShoot)
         {
-            inputComponent.isPressShoot = true;
+            inputComponent.isPressFire = true;
             MobileInputSet.isPressShoot = false;
         }
         if (MobileInputSet.isPressSwichingView)

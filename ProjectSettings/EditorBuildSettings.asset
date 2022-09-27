@@ -5,11 +5,11 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/ClientApp.unity
+  - enabled: 1
+    path: Assets/Scenes/client_entry.unity
     guid: ddecd5858106b934ab3b08447af5f135
   - enabled: 0
-    path: Assets/Scenes/LoginScene.unity
+    path: Assets/Scenes/login_scene.unity
     guid: 04c32e747247e0341989a765fba1568f
   - enabled: 0
     path: Assets/Scenes/world_choose_scene.unity
@@ -17,18 +17,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/world_scene.unity
     guid: 237c5b22efcf0494d857f2f386164439
-  - enabled: 1
-    path: Assets/Scenes/ServerApp.unity
+  - enabled: 0
+    path: Assets/Scenes/server_entry.unity
     guid: 28102f8116a744d4fb2d094f17d290e6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/scene_city.unity
     guid: b32f9224a7f8a6f4eb5a631e4ece1fa9
   - enabled: 0
-    path: Assets/Scenes/Map_v1.unity
-    guid: 5a463281e6e238742a45430f11e82829
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 0
-    path: Assets/Scenes/test.unity
-    guid: 34e052f35e87662498458c34b918d949
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: fa2eeb674b8444647b9c824b4590f79d,
       type: 2}

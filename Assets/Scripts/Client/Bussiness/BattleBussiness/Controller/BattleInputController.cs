@@ -1,7 +1,7 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Interface;
-using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -11,6 +11,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         BattleFacades battleFacades;
         float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
+
+        public BattleInputController()
+        {
+            UIEventCenter.MoveAction += ((moveAxis) => battleFacades.InputComponent.moveAxis = new Vector3(moveAxis.x, 0, moveAxis.y));
+            UIEventCenter.PickAction += (() => battleFacades.InputComponent.isPressPick = true);
+            UIEventCenter.FireAction += (() => battleFacades.InputComponent.isPressFire = true);
+            UIEventCenter.ReloadAction += (() => battleFacades.InputComponent.isPressWeaponReload = true);
+            UIEventCenter.JumpAction += (() => battleFacades.InputComponent.isPressJump = true);
+            UIEventCenter.DropWeaponAction += (() => battleFacades.InputComponent.isPressDropWeapon = true);
+        }
 
         public void Inject(BattleFacades battleFacades)
         {
@@ -42,7 +52,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner.roleRenderer);
                 else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner.roleRenderer);
             }
-            if (input.isPressPickUpItem)
+            if (input.isPressPick)
             {
                 // 拾取物品
                 var domain = battleFacades.Domain.PhysicsDomain;
@@ -60,9 +70,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     var pickable = item.collider.GetComponentInParent<IPickable>();
                     if (pickable == null) return;
 
-                    Debug.Log($"item:{item.collider.transform.parent.name}");
+                    Debug.Log($"item:{item.collision.transform.parent.name}");
 
-                    var collider = item.collider;
+                    var collider = item.collision;
                     var dis = Vector3.Distance(collider.transform.position, ownerPos);
                     if (dis < closestDis)
                     {
@@ -78,7 +88,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     rqs.SendReq_ItemPickUp(owner.EntityId, closestPickable.ItemType, closestPickable.EntityId);
                 }
             }
-            if (input.isPressShoot)
+            if (input.isPressFire)
             {
                 // 射击前 
                 // 1.客户端判断流程

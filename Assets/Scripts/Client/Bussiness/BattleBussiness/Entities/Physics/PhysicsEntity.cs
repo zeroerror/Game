@@ -15,25 +15,27 @@ namespace Game.Client.Bussiness
         Exit
     }
 
-    public class ColliderExtra
+    public class CollisionExtra
     {
         public CollisionStatus isEnter;
+        public Collision collision;
         public Collider collider;
+        public Vector3 lastContactPoint;
     }
 
     public class PhysicsEntity : MonoBehaviour
     {
-        List<ColliderExtra> hitColliderList;
+        List<CollisionExtra> hitCollisionList;
 
         void Awake()
         {
             Debug.Log($"PhysicsEntity Created! {gameObject.name}");
-            hitColliderList = new List<ColliderExtra>();
+            hitCollisionList = new List<CollisionExtra>();
         }
 
-        public void HitColliderListForeach(Action<ColliderExtra> action)
+        public void HitColliderListForeach(Action<CollisionExtra> action)
         {
-            hitColliderList.ForEach((collider) =>
+            hitCollisionList.ForEach((collider) =>
             {
                 action.Invoke(collider);
             });
@@ -41,20 +43,20 @@ namespace Game.Client.Bussiness
 
         public bool RemoveHitCollider(Collider collider)
         {
-            var e = hitColliderList.GetEnumerator();
+            var e = hitCollisionList.GetEnumerator();
             while (e.MoveNext())
             {
-                if (e.Current.collider.Equals(collider))
+                if (e.Current.collision.Equals(collider))
                 {
                     break;
                 }
             }
-            return hitColliderList.Remove(e.Current);
+            return hitCollisionList.Remove(e.Current);
         }
 
-        public bool RemoveHitCollider(ColliderExtra colliderExtra)
+        public bool RemoveHitCollision(CollisionExtra colliderExtra)
         {
-            return hitColliderList.Remove(colliderExtra);
+            return hitCollisionList.Remove(colliderExtra);
         }
 
 
@@ -62,7 +64,8 @@ namespace Game.Client.Bussiness
         void OnTriggerEnter(Collider collider)
         {
             // DebugExtensions.LogWithColor($"Trriger接触:{collider.gameObject.name}", "#48D1CC");
-            if (!Exist(collider)) hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collider });
+            Collision collision = new Collision();
+            if (!Exist(collider)) hitCollisionList.Add(new CollisionExtra { isEnter = CollisionStatus.Enter, collider = collider });
         }
 
         void OnTriggerExit(Collider collider)
@@ -77,7 +80,7 @@ namespace Game.Client.Bussiness
             if (!Exist(collision.collider))
             {
                 // DebugExtensions.LogWithColor($"Collision接触:{collision.gameObject.name}", "#48D1CC");
-                hitColliderList.Add(new ColliderExtra { isEnter = CollisionStatus.Enter, collider = collision.collider });
+                hitCollisionList.Add(new CollisionExtra { isEnter = CollisionStatus.Enter, collision = collision });
             }
         }
 
@@ -88,14 +91,17 @@ namespace Game.Client.Bussiness
             ce.isEnter = CollisionStatus.Exit;
         }
 
-        ColliderExtra Find(Collider collider)
+        CollisionExtra Find(Collider collider)
         {
-            return hitColliderList.Find((colliderExtra) => colliderExtra.collider.Equals(collider));
+            return hitCollisionList.Find((colliderExtra) =>
+            colliderExtra.collision != null ?
+            colliderExtra.collision.collider.Equals(collider)
+            : colliderExtra.collider.Equals(collider));
         }
 
         bool Exist(Collider collider)
         {
-            ColliderExtra colliderExtra = hitColliderList.Find((ce) => ce.collider.Equals(collider));
+            CollisionExtra colliderExtra = hitCollisionList.Find((ce) => ce.collision.Equals(collider));
             return colliderExtra != null;
         }
 
