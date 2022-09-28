@@ -12,11 +12,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         protected override void Init()
         {
             base.Init();
-            SetLifeTime(3f);
             ExplosionRadius = 7f;
             moveComponent.isPersistentMove = false;
-            moveComponent.SetSpeed(10f);
-            moveComponent.SetGravity(5f);
             moveComponent.isPersistentMove = true;
         }
 

@@ -22,9 +22,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         protected override void Init()
         {
-            moveComponent.SetSpeed(30f);//Hooker速度
-            moveComponent.SetGravity(0f);//重力加速度
-            SetLifeTime(2f); //Hooker生命周期
             masterGrabEnd = new GameObject();
             lineRenderer = new LineRenderer();
         }

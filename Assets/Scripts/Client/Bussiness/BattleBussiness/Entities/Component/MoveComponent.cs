@@ -6,18 +6,21 @@ using System;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
+    [Serializable]
     public class MoveComponent
     {
 
-        // TODO: INJECT
+        [SerializeField]
         float speed;
-        public void SetSpeed(float speed) => this.speed = speed;
+
+        [SerializeField]
+        float jumpSpeed;
+        public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
+
+        public bool isPersistentMove;
 
         float maximumSpeed = float.MaxValue;
         public void SetMaximumSpeed(float speed) => this.maximumSpeed = speed;
-
-        float jumpSpeed;
-        public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
 
         // TODO: 滑铲摩擦力
         float frictionReduce = 10f;
@@ -34,8 +37,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 Velocity => rb.velocity;
         public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
 
-        public bool isPersistentMove;
-
         // == 移动速度 1
         Vector3 moveVelocity;
         public Vector3 MoveVelocity => moveVelocity;
@@ -45,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             dir.Normalize();
             dir = dir.FixDecimal(2);
             this.moveVelocity = dir * speed;
-            Debug.Log($"移动方向:{dir}");
+            Debug.Log($"移动:{moveVelocity}");
         }
 
         // == 跳跃速度 2
@@ -64,8 +65,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void AddExtraVelocity(Vector3 addVelocity) => this.extraVelocity += addVelocity.FixDecimal(4);
 
         // == 地球引力
-        float _gravity;
-        public void SetGravity(float _gravity) => this._gravity = _gravity;
+        public float gravity;
 
         // == 碰撞状态
         public bool IsGrouded { get; private set; }
@@ -105,14 +105,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             return false;
         }
 
-        public MoveComponent(Rigidbody rb, float speed = 0, float jumpVelocity = 0)
+        public void Inject(Rigidbody rb)
         {
             if (rb == null) return;
             this.rb = rb;
-            this.speed = speed;
-            this.jumpSpeed = jumpVelocity;
             rb.useGravity = false;  //关闭地球引力
-            _gravity = 50f;
         }
 
         public bool TryJump()
@@ -183,16 +180,16 @@ namespace Game.Client.Bussiness.BattleBussiness
             //模拟重力
             if (!IsGrouded)
             {
-                _gravityVelocity -= (fixedDeltaTime * _gravity);
+                _gravityVelocity -= (fixedDeltaTime * gravity);
                 if (extraVelocity.y > 0)
                 {
-                    extraVelocity.y -= (fixedDeltaTime * _gravity);
+                    extraVelocity.y -= (fixedDeltaTime * gravity);
                     if (extraVelocity.y < 0) extraVelocity.y = 0;
                 }
 
                 if (moveVelocity.y > 0)
                 {
-                    moveVelocity.y -= (fixedDeltaTime * _gravity);
+                    moveVelocity.y -= (fixedDeltaTime * gravity);
                     if (moveVelocity.y < 0) moveVelocity.y = 0;
                 }
             }
@@ -219,7 +216,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             var cosValue = Vector3.Dot(a, b);
             var reduceVelocity = MoveVelocity * cosValue;
             moveVelocity -= reduceVelocity;
-            // DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
+            if (cosValue != 0)
+            {
+                DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度:{reduceVelocity}---->新'moveVelocity速度':{moveVelocity}", "#48D1CC");
+            }
         }
 
         public void HitSomething(Vector3 hitDir)

@@ -127,3 +127,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b65cb65eb2da98a40bdcb20955ea5bab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletType: 0
+  moveComponent:
+    speed: 5
+    jumpSpeed: 0
+    isPersistentMove: 0
+    gravity: 100

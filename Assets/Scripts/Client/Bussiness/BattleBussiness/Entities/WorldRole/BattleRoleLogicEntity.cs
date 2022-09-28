@@ -31,7 +31,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
 
         // == Component ==
-        public MoveComponent MoveComponent { get; private set; }
+        [SerializeField]
+        public MoveComponent moveComponent;
+        public MoveComponent MoveComponent => moveComponent;
         public HealthComponent HealthComponent { get; private set; }
         public WeaponComponent WeaponComponent { get; private set; }
         public ItemComponent ItemComponent { get; private set; }
@@ -49,8 +51,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             // == Component
-            MoveComponent = new MoveComponent(transform.GetComponentInParent<Rigidbody>(), 4f, 4f);
-            MoveComponent.SetMaximumSpeed(30f);
+            // moveComponent = new MoveComponent();
+            moveComponent.Inject(transform.GetComponentInParent<Rigidbody>());
+            moveComponent.SetMaximumSpeed(30f);
 
             HealthComponent = new HealthComponent(100f);
 

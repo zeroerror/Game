@@ -17,23 +17,28 @@ namespace Game.Client.Bussiness
 
     public class CollisionExtra
     {
+
         public CollisionStatus isEnter;
+
         public Collision collision;
-        public Collider collider;
+
+        public Collider colliderForTrigger;
+        public Collider Collider => collision != null ? collision.collider : colliderForTrigger;
+
         public Vector3 lastContactPoint;
     }
 
-    public class PhysicsEntity : MonoBehaviour
+    public class  PhysicsEntity : MonoBehaviour
     {
         List<CollisionExtra> hitCollisionList;
 
         void Awake()
         {
-            Debug.Log($"PhysicsEntity Created! {gameObject.name}");
+            // Debug.Log($"PhysicsEntity Created! {gameObject.name}");
             hitCollisionList = new List<CollisionExtra>();
         }
 
-        public void HitColliderListForeach(Action<CollisionExtra> action)
+        public void HitCollisionExtraListForeach(Action<CollisionExtra> action)
         {
             hitCollisionList.ForEach((collider) =>
             {
@@ -54,7 +59,7 @@ namespace Game.Client.Bussiness
             return hitCollisionList.Remove(e.Current);
         }
 
-        public bool RemoveHitCollision(CollisionExtra colliderExtra)
+        public bool RemoveHitCollisionExtra(CollisionExtra colliderExtra)
         {
             return hitCollisionList.Remove(colliderExtra);
         }
@@ -63,16 +68,21 @@ namespace Game.Client.Bussiness
         //====== Unity Physics 
         void OnTriggerEnter(Collider collider)
         {
-            // DebugExtensions.LogWithColor($"Trriger接触:{collider.gameObject.name}", "#48D1CC");
-            Collision collision = new Collision();
-            if (!Exist(collider)) hitCollisionList.Add(new CollisionExtra { isEnter = CollisionStatus.Enter, collider = collider });
+            if (!Exist(collider))
+            {
+                hitCollisionList.Add(new CollisionExtra { isEnter = CollisionStatus.Enter, colliderForTrigger = collider });
+                DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layer:{LayerMask.LayerToName(collider.gameObject.layer)}", "#48D1CC");
+            }
         }
 
         void OnTriggerExit(Collider collider)
         {
-            // DebugExtensions.LogWithColor($"Trriger离开:{collider.transform.parent.name}", "#48D1CC");
             var ce = Find(collider);
-            ce.isEnter = CollisionStatus.Exit;
+            if (ce != null)
+            {
+                ce.isEnter = CollisionStatus.Exit;
+                // DebugExtensions.LogWithColor($"Trigger离开:{collider.name} layer:{LayerMask.LayerToName(collider.gameObject.layer)}", "#48D1CC");
+            }
         }
 
         void OnCollisionEnter(Collision collision)
@@ -86,24 +96,22 @@ namespace Game.Client.Bussiness
 
         void OnCollisionExit(Collision collision)
         {
-            // DebugExtensions.LogWithColor($"Collision离开:{collision.gameObject.name}", "#48D1CC");
             var ce = Find(collision.collider);
-            ce.isEnter = CollisionStatus.Exit;
+            if (ce != null)
+            {
+                ce.isEnter = CollisionStatus.Exit;
+                // DebugExtensions.LogWithColor($"Collision离开:{collision.gameObject.name}", "#48D1CC");
+            }
         }
 
         CollisionExtra Find(Collider collider)
         {
-            return hitCollisionList.Find((colliderExtra) =>
-            colliderExtra.collision != null ?
-            colliderExtra.collision.collider.Equals(collider)
-            : colliderExtra.collider.Equals(collider));
+            return hitCollisionList.Find((colliderExtra) => colliderExtra.Collider.Equals(collider));
         }
 
         bool Exist(Collider collider)
         {
-            CollisionExtra colliderExtra = hitCollisionList.Find((ce) =>
-            ce.collision != null ? ce.collision.collider.Equals(collider) :
-             ce.collider.Equals(collider));
+            CollisionExtra colliderExtra = hitCollisionList.Find((ce) => ce.Collider.Equals(collider));
             return colliderExtra != null;
         }
 

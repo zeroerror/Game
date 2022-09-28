@@ -67,17 +67,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     if (item.isEnter == CollisionStatus.Exit) return;
 
-                    var pickable = item.collider.GetComponentInParent<IPickable>();
+                    var pickable = item.colliderForTrigger.GetComponentInParent<IPickable>();
                     if (pickable == null) return;
 
-                    Debug.Log($"item:{item.collision.transform.parent.name}");
+                    var collider = item.Collider;
+                    Debug.Log($"item:{collider.transform.parent.name}");
 
-                    var collider = item.collision;
                     var dis = Vector3.Distance(collider.transform.position, ownerPos);
                     if (dis < closestDis)
                     {
                         closestDis = dis;
-                        closestCollider = item.collider;
+                        closestCollider = item.colliderForTrigger;
                         closestPickable = pickable;
                     }
                 });

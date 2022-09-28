@@ -507,9 +507,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5025518183936463075}
-  - component: {fileID: -4112192073314608198}
   - component: {fileID: -5318200333741146272}
   - component: {fileID: 8574383917767885314}
+  - component: {fileID: -4112192073314608198}
   m_Layer: 7
   m_Name: Hooker
   m_TagString: Untagged
@@ -533,18 +533,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-4112192073314608198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6570924423354423703}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4fdb7917b240f4d93b0dfeedcbe12d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &-5318200333741146272
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -574,6 +562,24 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4, z: 0.4}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4112192073314608198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6570924423354423703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d4fdb7917b240f4d93b0dfeedcbe12d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletType: 2
+  moveComponent:
+    speed: 30
+    isPersistentMove: 1
+    gravity: 0
+  lifeTime: 1
 --- !u!1 &7139085051752670550
 GameObject:
   m_ObjectHideFlags: 0

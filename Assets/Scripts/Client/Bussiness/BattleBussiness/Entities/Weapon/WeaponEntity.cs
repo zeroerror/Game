@@ -36,7 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 var c = colliders[i];
                 c.enabled = true;
-                c.isTrigger = true;
+                c.isTrigger = true; 
             }
             hasMaster = false;
         }

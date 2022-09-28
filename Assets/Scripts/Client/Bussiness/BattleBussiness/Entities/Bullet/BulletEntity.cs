@@ -22,10 +22,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         public ushort EntityId => entityId;
         public void SetEntityId(ushort entityId) => this.entityId = entityId;
 
+        [SerializeField]
         protected MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
 
         // Life 
+
         float lifeTime;
         public float LifeTime => lifeTime;
         public void SetLifeTime(float lifeTime) => this.lifeTime = lifeTime;
@@ -41,12 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Ctor()
         {
-            moveComponent = new MoveComponent(transform.GetComponent<Rigidbody>());
-            moveComponent.SetSpeed(50f);
-            moveComponent.SetGravity(5f);
-            moveComponent.isPersistentMove = true;
-
-            lifeTime = 5f;
+            moveComponent.Inject(transform.GetComponent<Rigidbody>());
             HitRoleQueue = new Queue<BattleRoleLogicEntity>();
             HitFieldQueue = new Queue<GameObject>();
             Init();
