@@ -58,16 +58,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var domain = battleFacades.Domain.PhysicsDomain;
                 var nearItemList = domain.GetHitItem_ColliderList(owner);
                 float closestDis = float.MaxValue;
-                Collider closestCollider = null;
+                GameObject closestGo = null;
                 IPickable closestPickable = null;
                 Vector3 ownerPos = owner.MoveComponent.CurPos;
                 Debug.Log($"想要拾取物品，周围可拾取数量为:{nearItemList.Count}");
 
                 nearItemList.ForEach((item) =>
                 {
-                    if (item.isEnter == CollisionStatus.Exit) return;
+                    if (item.status == CollisionStatus.Exit) return;
 
-                    var pickable = item.colliderForTrigger.GetComponentInParent<IPickable>();
+                    var pickable = item.gameObject.GetComponentInParent<IPickable>();
                     if (pickable == null) return;
 
                     var collider = item.Collider;
@@ -77,12 +77,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     if (dis < closestDis)
                     {
                         closestDis = dis;
-                        closestCollider = item.colliderForTrigger;
+                        closestGo = item.gameObject;
                         closestPickable = pickable;
                     }
                 });
 
-                if (closestCollider != null)
+                if (closestGo != null)
                 {
                     var rqs = battleFacades.Network.ItemReqAndRes;
                     rqs.SendReq_ItemPickUp(owner.EntityId, closestPickable.ItemType, closestPickable.EntityId);

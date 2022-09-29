@@ -71,15 +71,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var renderer = role.roleRenderer;
                 renderer.transform.position = Vector3.Lerp(renderer.transform.position, role.MoveComponent.CurPos, deltaTime * renderer.posAdjust);
                 renderer.transform.rotation = Quaternion.Lerp(renderer.transform.rotation, role.MoveComponent.Rotation, deltaTime * renderer.rotAdjust);
-                if (role.MoveComponent.Velocity.magnitude < 0.1f)
+
+                bool isOwner = role.EntityId == battleFacades.Repo.RoleRepo.Owner.EntityId;
+                var inputComponent = battleFacades.InputComponent;
+                if (isOwner && inputComponent.moveAxis != Vector3.zero)
+                {
+                    role.roleRenderer.AnimatorComponent.PlayRun();
+                    return;
+                }
+                
+                if (!isOwner && role.MoveComponent.Velocity.magnitude < 0.1f)
                 {
                     role.roleRenderer.noMoveTime += deltaTime;
-                    if (role.roleRenderer.noMoveTime > 0.1f) role.roleRenderer.AnimatorComponent.PlayIdle();
+                    if (role.roleRenderer.noMoveTime > 0.2f) role.roleRenderer.AnimatorComponent.PlayIdle();
+                    return;
                 }
-                else
-                {
-                    role.roleRenderer.noMoveTime = 0;
-                }
+
+                role.roleRenderer.noMoveTime = 0;
             });
         }
 
