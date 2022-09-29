@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness
 
         public Collision collision;
         public GameObject gameObject;
-        public Collider Collider => gameObject.GetComponent<Collider>();
+        public Collider Collider => gameObject != null ? gameObject.GetComponent<Collider>() : null;
 
         public string layerName;
 

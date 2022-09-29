@@ -28,6 +28,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         // Life 
 
+        [SerializeField]
         float lifeTime;
         public float LifeTime => lifeTime;
         public void SetLifeTime(float lifeTime) => this.lifeTime = lifeTime;
