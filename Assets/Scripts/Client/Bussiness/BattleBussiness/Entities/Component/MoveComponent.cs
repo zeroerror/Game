@@ -197,7 +197,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Reset()
         {
-            rb.position = new Vector3(0, 10f, 0);
+            LeaveGround();
             rb.velocity = Vector3.zero;
             rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
         }
@@ -305,8 +305,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void HitByBullet(BulletEntity bulletEntity)
         {
             var velocity = bulletEntity.MoveComponent.Velocity / 10f;
-            Debug.Log($"被子弹击中 velocity add:  {velocity}");
-            rb.velocity += (velocity);
+            Debug.Log($"被子弹击中 extraVelocity 增加:  {velocity}");
+            extraVelocity += velocity;
         }
 
         #endregion

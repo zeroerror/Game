@@ -102,38 +102,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public void Refresh_BulletHit()
-        {
-            var bulletRepo = battleFacades.Repo.BulletRepo;
-            bulletRepo.Foreach((bullet) =>
-            {
-                var roleColliderList = GetHitRole_ColliderList(bullet);
-                var hitRoleQueue = bullet.HitRoleQueue;
-                roleColliderList.ForEach((colliderExtra) =>
-                {
-                    if (colliderExtra.status == CollisionStatus.Enter)
-                    {
-                        colliderExtra.status = CollisionStatus.Stay;
-                        var role = colliderExtra.gameObject.GetComponent<BattleRoleLogicEntity>();
-                        hitRoleQueue.Enqueue(role);
-                    }
-                });
-
-                var fieldColliderList = GetHitField_ColliderList(bullet);
-                var hitWallQueue = bullet.HitFieldQueue;
-                fieldColliderList.ForEach((colliderExtra) =>
-                {
-                    if (colliderExtra.status == CollisionStatus.Enter)
-                    {
-                        colliderExtra.status = CollisionStatus.Stay;
-                        var field = colliderExtra.Collider.gameObject;
-                        hitWallQueue.Enqueue(field);
-                    }
-                });
-
-            });
-        }
-
         List<CollisionExtra> GetCollisionExtraList(PhysicsEntity physicsEntity, string layerName)
         {
             List<CollisionExtra> collisionList = new List<CollisionExtra>();

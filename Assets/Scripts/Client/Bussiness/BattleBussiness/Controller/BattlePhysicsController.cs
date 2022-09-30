@@ -47,8 +47,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_Physics_Collision_Bullet()
         {
-            var physicsDomain = battleFacades.Domain.PhysicsDomain;
-            physicsDomain.Refresh_BulletHit();
             // TODO:客户端这边就负责击中特效啥的
         }
 

@@ -38,15 +38,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float ExistTime => existTime;
         public void AddExistTime(float time) => existTime += time;
 
-        // Physics Queue
-        public Queue<BattleRoleLogicEntity> HitRoleQueue { get; private set; }
-        public Queue<GameObject> HitFieldQueue { get; private set; }
-
         public void Ctor()
         {
             moveComponent.Inject(transform.GetComponent<Rigidbody>());
-            HitRoleQueue = new Queue<BattleRoleLogicEntity>();
-            HitFieldQueue = new Queue<GameObject>();
             Init();
         }
 
@@ -59,13 +53,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             Destroy(gameObject);
         }
-
-        // Unity Physics 
-
-        public virtual void EnterTrigger(Collider collision) { }
-        public virtual void ExitTrigger(Collider collision) { }
-        public virtual void EnterCollision(Collision collision) { }
-        public virtual void ExitCollision(Collision collision) { }
 
     }
 

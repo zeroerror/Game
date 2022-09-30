@@ -59,12 +59,12 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             _server.SendMsg(connId, msg);
             sendCount++;
+            Debug.Log($"发送子弹击中角色消息 wRid {wRid}");
         }
 
-        public void SendRes_BulletHitWall(int connId, BulletEntity bulletEntity)
+        public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)
         {
             var bulletPos = bulletEntity.MoveComponent.CurPos;
-            Debug.Log($"SendRes_BulletHitWall: bulletPos  {bulletPos}");
             bulletPos *= 10000f;
             FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
             {
@@ -77,6 +77,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             _server.SendMsg(connId, msg);
             sendCount++;
+            Debug.Log($"发送子弹击中墙壁消息 ");
         }
 
         public void SendRes_BulletTearDown(int connId, BulletType bulletType, byte wRid, ushort bulletId, Vector3 pos)

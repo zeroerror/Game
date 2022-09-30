@@ -61,46 +61,53 @@ namespace Game.Server.Bussiness.BattleBussiness
         void Tick_Physics_Collision_Bullet()
         {
             var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
-            physicsDomain.Refresh_BulletHit();
 
             var bulletDomain = battleFacades.ClientBattleFacades.Domain.BulletDomain;
             var bulletRepo = battleFacades.ClientBattleFacades.Repo.BulletRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bullet) =>
             {
-                bool isHitSomething = false;
-                if (bullet.HitRoleQueue.TryDequeue(out var wrole))
+                var hitRoleList = physicsDomain.GetHitRole_ColliderList(bullet);
+                Transform roleTrans = null;
+                hitRoleList.ForEach((ce) =>
                 {
-                    isHitSomething = true;
+                    roleTrans = ce.gameObject.transform;
                     // Server Logic
-                    wrole.HealthComponent.HurtByBullet(bullet);
-                    wrole.MoveComponent.HitByBullet(bullet);
-                    if (wrole.HealthComponent.IsDead)
+                    var role = ce.gameObject.GetComponentInParent<BattleRoleLogicEntity>();
+                    if (bullet.MasterId != role.EntityId)
                     {
-                        wrole.TearDown();
-                        wrole.Reborn();
+                        Debug.Log($"打中敌人 bullet.MasterId ：{bullet.MasterId} role.EntityId ：{role.EntityId} ");
+                        role.HealthComponent.HurtByBullet(bullet);
+                        role.MoveComponent.HitByBullet(bullet);
+                        if (role.HealthComponent.IsDead)
+                        {
+                            role.TearDown();
+                            role.Reborn();
+                        }
+                        // Notice Client
+                        var rqs = battleFacades.Network.BulletReqAndRes;
+                        connIdList.ForEach((connId) =>
+                        {
+                            rqs.SendRes_BulletHitRole(connId, bullet.EntityId, role.EntityId);
+                        });
                     }
-                    // Notice Client
-                    var rqs = battleFacades.Network.BulletReqAndRes;
-                    connIdList.ForEach((connId) =>
-                    {
-                        rqs.SendRes_BulletHitRole(connId, bullet.EntityId, wrole.EntityId);
-                    });
 
-                }
-                if (bullet.HitFieldQueue.TryDequeue(out var field))
+                });
+
+                var hitFieldList = physicsDomain.GetHitField_ColliderList(bullet);
+                Transform field = null;
+                hitFieldList.ForEach((ce) =>
                 {
-                    isHitSomething = true;
-                    // TODO:Server Logic
                     // Notice Client
                     var rqs = battleFacades.Network.BulletReqAndRes;
                     connIdList.ForEach((connId) =>
                     {
-                        rqs.SendRes_BulletHitWall(connId, bullet);
+                        rqs.SendRes_BulletHitField(connId, bullet);
                     });
-                }
+                    field = ce.gameObject.transform;
+                });
 
-                if (isHitSomething)
+                if (hitRoleList.Count != 0 || hitFieldList.Count != 0)
                 {
                     // Server Logic
                     if (bullet.BulletType == BulletType.DefaultBullet)
@@ -108,11 +115,12 @@ namespace Game.Server.Bussiness.BattleBussiness
                         // 普通子弹的逻辑，只是单纯的移除
                         removeList.Add(bullet);
                     }
+
                     if (bullet is HookerEntity hookerEntity)
                     {
                         // 爪钩逻辑
-                        if (field != null) hookerEntity.TryGrabSomthing(field.transform);
-                        if (wrole != null) hookerEntity.TryGrabSomthing(wrole.transform);
+                        hookerEntity.TryGrabSomthing(field);
+                        hookerEntity.TryGrabSomthing(roleTrans);
                     }
                     else if (bullet is GrenadeEntity grenadeEntity)
                     {

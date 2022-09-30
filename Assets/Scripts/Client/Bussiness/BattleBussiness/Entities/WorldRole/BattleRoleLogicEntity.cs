@@ -108,8 +108,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Reborn()
         {
-            Debug.Log($"重生 wRid:{entityId}");
-            MoveComponent.Reset();
+            Debug.Log($" wRid:{entityId} 重生----------------------------------");
+            moveComponent.Reset();
+            moveComponent.SetCurPos(SelfPos + new Vector3(0, 5f, 0));
             HealthComponent.Reset();
             IsDead = false;
         }
