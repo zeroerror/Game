@@ -7,7 +7,7 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class WeaponComponent
     {
 
-        readonly int WEAPON_CAPICY = 4;
+        readonly int WEAPON_CAPICY = 1;
 
         public WeaponEntity[] AllWeapon;    //所有武器
         public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
@@ -55,6 +55,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (hangPoint != null) Debug.Log($"{weaponEntity.transform.name} 武器挂点:{hangPoint.name}");
             weaponEntity.transform.SetParent(hangPoint);
             weaponEntity.transform.localPosition = Vector3.zero;
+            weaponEntity.transform.localRotation = Quaternion.identity;
             CurrentWeapon = weaponEntity;
             CurrentWeapon.gameObject.SetActive(true);
 

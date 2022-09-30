@@ -18,7 +18,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         [SerializeField]
         ItemType itemType;
         public ItemType ItemType => itemType;
-        public void SetItemType(ItemType itemType) => this.itemType = itemType;
+
+        [SerializeField]
+        int reloadFrame;
+        public int ReloadFrame => reloadFrame;
 
         byte masterWRid;
         public byte MasterId => masterWRid;
@@ -36,7 +39,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 var c = colliders[i];
                 c.enabled = true;
-                c.isTrigger = true; 
+                c.isTrigger = true;
             }
             hasMaster = false;
         }

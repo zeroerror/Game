@@ -114,8 +114,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool TryJump()
         {
-            // if (!IsGrouded) return false;
-            Debug.Log($"Jump");
+            if (!IsGrouded) return false;
+            Debug.Log($"跳");
 
             var v = rb.velocity;
             v.y = 0;

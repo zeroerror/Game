@@ -24,15 +24,32 @@ namespace Game.Client.Bussiness.BattleBussiness
             animator.Play("Idle");
         }
 
+        public void PlayIdleWithGun()
+        {
+            if (IsInState("Idle_With_Gun")) return;
+            animator.Play("Idle_With_Gun");
+        }
+
         public void PlayRun()
         {
             if (IsInState("Run")) return;
             animator.Play("Run");
         }
 
+        public void PlayRunWithGun()
+        {
+            if (IsInState("Run_WithGun")) return;
+            animator.Play("Run_WithGun");
+        }
+
         public void PlayJump()
         {
             animator.CrossFade("Jump", 0.1f);
+        }
+
+        public void PlayShoot()
+        {
+            animator.Play("Shoot", 0, 0);
         }
 
         public void PlayHooking()

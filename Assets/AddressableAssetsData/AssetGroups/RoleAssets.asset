@@ -27,6 +27,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Role
+  - m_GUID: 37c99ac8d7e5b9c4484004635441a1a2
+    m_Address: player_renderer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Role
+  - m_GUID: 42136c702523b294cb7e7a2c3ff5826f
+    m_Address: player_logic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Role
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

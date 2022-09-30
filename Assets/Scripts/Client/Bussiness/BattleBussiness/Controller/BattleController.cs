@@ -25,13 +25,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         // 服务器下发的资源拾取队列
         Queue<FrameItemPickResMsg> itemPickQueue;
 
-        // 服务器下发的武器射击队列
-        Queue<FrameWeaponShootResMsg> weaponShootQueue;
-        // 服务器下发的武器换弹队列
-        Queue<FrameWeaponReloadResMsg> weaponReloadQueue;
-        // 服务器下发的武器丢弃队列
-        Queue<FrameWeaponDropResMsg> weaponDropQueue;
-
         bool battleBegin;
         public BattleController()
         {
@@ -47,9 +40,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             roleStateQueue = new Queue<BattleRoleStateUpdateMsg>();
 
             itemPickQueue = new Queue<FrameItemPickResMsg>();
-            weaponShootQueue = new Queue<FrameWeaponShootResMsg>();
-            weaponReloadQueue = new Queue<FrameWeaponReloadResMsg>();
-            weaponDropQueue = new Queue<FrameWeaponDropResMsg>();
 
             UIEventCenter.WorldRoomEnter += ((host, port) =>
             {
@@ -74,11 +64,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletRqs.RegistRes_BulletHitRole(OnBulletHitRole);
             bulletRqs.RegistRes_BulletHitWall(OnBulletHitWall);
             bulletRqs.RegistRes_BulletTearDown(OnBulletTearDown);
-
-            var weaponRqs = battleFacades.Network.WeaponReqAndRes;
-            weaponRqs.RegistRes_WeaponShoot(OnWeaponShoot);
-            weaponRqs.RegistRes_WeaponReload(OnWeaponReload);
-            weaponRqs.RegistRes_WeaponDrop(OnWeaponDrop);
 
             var ItemReqAndRes = battleFacades.Network.ItemReqAndRes;
             ItemReqAndRes.RegistRes_ItemSpawn(OnItemSpawn);
@@ -107,38 +92,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Tick_BulletSpawn();
             Tick_ItemAssetsSpawn();
 
-            Tick_WeaponShoot();
-            Tick_WeaponReload();
-            Tick_WeaponDrop();
+   
             Tick_ItemPick();
 
         }
 
         #region [Input]
-
-        #endregion
-
-        #region [Renderer]
-
-        public void Update_RoleRenderer(float deltaTime)
-        {
-            var domain = battleFacades.Domain.BattleRoleDomain;
-            domain.Update_RoleRenderer(deltaTime);
-        }
-
-        public void Update_Camera()
-        {
-            var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            if (curFieldEntity == null) return;
-
-            var cameraComponent = curFieldEntity.CameraComponent;
-            var currentCam = cameraComponent.CurrentCamera;
-            var cameraView = cameraComponent.CurrentCameraView;
-            var inputDomain = battleFacades.Domain.BattleInputDomain;
-            Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
-            inputDomain.UpdateCameraByCameraView(battleFacades.Repo.RoleRepo.Owner, cameraView, currentCam, inputAxis);
-        }
 
         #endregion
 
@@ -206,12 +165,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var animatorComponent = roleLogic.roleRenderer.AnimatorComponent;
                 var moveComponent = roleLogic.MoveComponent;
+                var weaponComponent = roleLogic.WeaponComponent;
                 switch (roleState)
                 {
                     case RoleState.Normal:
                         break;
                     case RoleState.Move:
-                        if (moveComponent.IsGrouded) animatorComponent.PlayRun();
+                        if (moveComponent.IsGrouded)
+                        {
+                            if (weaponComponent.CurrentWeapon == null) animatorComponent.PlayRun();
+                            else animatorComponent.PlayRunWithGun();
+                        }
                         break;
                     case RoleState.Jump:
                         if (roleLogic.RoleState != RoleState.Jump)
@@ -489,54 +453,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
         #endregion
 
-        #region [Weapon]
-
-        void Tick_WeaponShoot()
-        {
-
-            var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
-            while (weaponShootQueue.TryPeek(out var msg))
-            {
-                weaponShootQueue.Dequeue();
-
-                var roleRepo = battleFacades.Repo.RoleRepo;
-                var master = roleRepo.GetByEntityId(msg.masterId);
-                if (master.WeaponComponent.TryWeaponShoot())
-                {
-                    var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
-                    var domain = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                    Debug.Log($"角色:{msg.masterId}射击zidan:{bulletType.ToString()}---");
-                }
-            }
-        }
-
-        void Tick_WeaponReload()
-        {
-            while (weaponReloadQueue.TryPeek(out var msg))
-            {
-                weaponReloadQueue.Dequeue();
-
-                var roleRepo = battleFacades.Repo.RoleRepo;
-                var master = roleRepo.GetByEntityId(msg.masterId);
-                var reloadBulletNum = msg.reloadBulletNum;
-                master.WeaponReload(reloadBulletNum);
-            }
-        }
-
-        void Tick_WeaponDrop()
-        {
-            while (weaponDropQueue.TryPeek(out var msg))
-            {
-                weaponDropQueue.Dequeue();
-                var master = battleFacades.Repo.RoleRepo.GetByEntityId(msg.masterId);
-                master.WeaponComponent.TryDropWeapon(msg.entityId, out var weaponEntity);
-                battleFacades.Domain.WeaponDomain.ReuseWeapon(weaponEntity, master.MoveComponent.CurPos);
-            }
-        }
-
-
-        #endregion
-
         #endregion
 
         #region [Server Response]
@@ -594,27 +510,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
         #endregion
 
-        #region [Weapon]
-
-        void OnWeaponShoot(FrameWeaponShootResMsg msg)
-        {
-            Debug.Log($"加入武器射击队列");
-            weaponShootQueue.Enqueue(msg);
-        }
-
-        void OnWeaponReload(FrameWeaponReloadResMsg msg)
-        {
-            Debug.Log($"加入武器换弹结束队列");
-            weaponReloadQueue.Enqueue(msg);
-        }
-
-        void OnWeaponDrop(FrameWeaponDropResMsg msg)
-        {
-            Debug.Log($"加入武器丢弃队列");
-            weaponDropQueue.Enqueue(msg);
-        }
-
-        #endregion
+      
 
         #endregion
 

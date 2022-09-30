@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public BattleRoleLogicEntity SpawnBattleRoleLogic(Transform parent)
         {
-            string rolePrefabName = "PlayerLogic";
+            string rolePrefabName = "player_logic";
             Debug.Log("生成" + rolePrefabName);
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
             {
@@ -40,7 +40,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public BattleRoleRendererEntity SpawnBattleRoleRenderer(Transform parent)
         {
-            string rolePrefabName = "PlayerRenderer";
+            string rolePrefabName = "player_renderer";
             Debug.Log("生成" + rolePrefabName);
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
             {
@@ -68,22 +68,34 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
-                var renderer = role.roleRenderer;
-                renderer.transform.position = Vector3.Lerp(renderer.transform.position, role.MoveComponent.CurPos, deltaTime * renderer.posAdjust);
-                renderer.transform.rotation = Quaternion.Lerp(renderer.transform.rotation, role.MoveComponent.Rotation, deltaTime * renderer.rotAdjust);
+                var roleRenderer = role.roleRenderer;
+                roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, role.MoveComponent.CurPos, deltaTime * roleRenderer.posAdjust);
+                roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, role.MoveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
 
-                bool isOwner = role.EntityId == battleFacades.Repo.RoleRepo.Owner.EntityId;
+                var animatorComponent = roleRenderer.AnimatorComponent;
+                var weaponComponent = role.WeaponComponent;
+
                 var inputComponent = battleFacades.InputComponent;
+
+                var owner = battleFacades.Repo.RoleRepo.Owner;
+                bool isOwner = owner.EntityId == role.EntityId;
+
                 if (isOwner && inputComponent.moveAxis != Vector3.zero)
                 {
-                    role.roleRenderer.AnimatorComponent.PlayRun();
+                    if (weaponComponent.CurrentWeapon == null) animatorComponent.PlayRun();
+                    else animatorComponent.PlayRunWithGun();
                     return;
                 }
-                
-                if (!isOwner && role.MoveComponent.Velocity.magnitude < 0.1f)
+
+                if (role.MoveComponent.Velocity.magnitude < 0.1f)
                 {
-                    role.roleRenderer.noMoveTime += deltaTime;
-                    if (role.roleRenderer.noMoveTime > 0.2f) role.roleRenderer.AnimatorComponent.PlayIdle();
+                    roleRenderer.noMoveTime += deltaTime;
+                    if (roleRenderer.noMoveTime > 0.2f && !roleRenderer.AnimatorComponent.IsInState("Shoot"))
+                    {
+                        bool hasGun = role.WeaponComponent.CurrentWeapon != null;
+                        if (hasGun) roleRenderer.AnimatorComponent.PlayIdleWithGun();
+                        else roleRenderer.AnimatorComponent.PlayIdle();
+                    }
                     return;
                 }
 
