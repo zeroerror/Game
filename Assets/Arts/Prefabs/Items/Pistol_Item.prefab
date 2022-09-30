@@ -131,7 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 0
   itemType: 1
-  reloadFrame: 0
+  reloadFrame: 30
   bulletType: 0
 --- !u!1 &1547304428853953181
 GameObject:

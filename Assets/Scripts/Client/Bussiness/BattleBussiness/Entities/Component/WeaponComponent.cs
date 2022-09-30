@@ -13,7 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
         public int CurrentNum { get; private set; }    //当前武器数量
         public bool IsReloading { get; private set; }
-        public void SetReloading(bool flag) => this.IsReloading = flag;
+
         public bool IsFullReloaded => CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
 
         public WeaponComponent()
@@ -23,6 +23,20 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
+        }
+
+        public void BeginReloading()
+        {
+            this.IsReloading = true;
+            CurrentWeapon.ResetCurrentReloadingFrame();
+        }
+
+        public void FinishReloading(int reloadBulletNum)
+        {
+            IsReloading = false;
+            CurrentWeapon.LoadBullet(reloadBulletNum);
+            Debug.Log($"武器装弹：{reloadBulletNum}");
+            return;
         }
 
         public bool TryWeaponShoot()

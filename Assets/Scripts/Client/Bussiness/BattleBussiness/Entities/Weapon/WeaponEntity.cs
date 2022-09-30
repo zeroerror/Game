@@ -21,7 +21,10 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         [SerializeField]
         int reloadFrame;
-        public int ReloadFrame => reloadFrame;
+        int curReloadingFrame;
+        public int CurReloadingFrame => curReloadingFrame;
+        public void ResetCurrentReloadingFrame() => curReloadingFrame = reloadFrame;
+        public void ReduceCurReloadingFrame() => curReloadingFrame--;
 
         byte masterWRid;
         public byte MasterId => masterWRid;

@@ -99,6 +99,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 2
   itemType: 1
+  reloadFrame: 90
+  bulletType: 0
 --- !u!1 &7984027852196034228
 GameObject:
   m_ObjectHideFlags: 0

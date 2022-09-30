@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 var master = roleRepo.GetByEntityId(msg.masterId);
                 var reloadBulletNum = msg.reloadBulletNum;
-                master.WeaponReload(reloadBulletNum);
+                master.WeaponComponent.FinishReloading(reloadBulletNum);
             }
         }
 

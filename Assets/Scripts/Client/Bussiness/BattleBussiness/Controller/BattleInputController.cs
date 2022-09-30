@@ -114,7 +114,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 // Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
                 if (owner.CanWeaponReload())
                 {
-                    weaponComponent.SetReloading(true);
+                    weaponComponent.BeginReloading();
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     rqs.SendReq_WeaponReload(owner);
                 }

@@ -11,6 +11,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleController battleController;
         BattlePhysicsController battlePhysicsController;
         BattleNetworkController battleNetworkController;
+        BattleWeaponController battleWeaponController;
 
         public BattleEntry()
         {
@@ -18,6 +19,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleController = new BattleController();
             battlePhysicsController = new BattlePhysicsController();
             battleNetworkController = new BattleNetworkController();
+            battleWeaponController = new BattleWeaponController();
         }
 
         public void Inject(NetworkServer server, float fixedDeltaTime)
@@ -29,6 +31,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleController.Inject(battleFacades, fixedDeltaTime);
             battlePhysicsController.Inject(battleFacades, fixedDeltaTime);
             battleNetworkController.Inject(battleFacades, fixedDeltaTime);
+            battleWeaponController.Inject(battleFacades, fixedDeltaTime);
         }
 
         public void Tick()
@@ -36,6 +39,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleController.Tick();
             battlePhysicsController.Tick();
             battleNetworkController.Tick();
+            battleWeaponController.Tick();
         }
 
     }

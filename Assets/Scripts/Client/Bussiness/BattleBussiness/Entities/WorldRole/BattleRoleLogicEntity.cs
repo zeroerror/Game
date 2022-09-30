@@ -67,62 +67,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             offset = new Vector3(0, 0.2f, 0);
         }
 
-        public bool TryWeaponReload(out int realTakeOut)
-        {
-            realTakeOut = 0;
-            var curWeapon = WeaponComponent.CurrentWeapon;
-            if (curWeapon == null)
-            {
-                Debug.LogWarning("当前尚未持有武器！");
-                return false;
-            }
-
-            // 获取武器所需子弹
-            // TODO: 根据配置表查询武器对应所需子弹
-            // var curWeapon = WeaponComponent.CurrentWeapon;
-            // switch (curWeapon.WeaponType)
-            // {
-            //     case WeaponType.Pistol:
-            //         break;
-            //     case WeaponType.Rifle:
-            //         break;
-            //     case WeaponType.GrenadeLauncher:
-            //         break;
-            // }
-
-            realTakeOut = ItemComponent.TryTakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum);
-            if (realTakeOut == 0)
-            {
-                Debug.LogWarning($"武器[{curWeapon.name}]所需子弹不足！");
-                return false;
-            }
-
-            Debug.Log($"武器换弹,取出子弹数量：{realTakeOut}");
-            curWeapon.LoadBullet(realTakeOut);
-            WeaponComponent.SetReloading(false);
-            return true;
-        }
-
-        public void WeaponReload(int reloadBulletNum)
+        public int FetchCurWeaponBullets()
         {
             var curWeapon = WeaponComponent.CurrentWeapon;
-            if (curWeapon == null)
-            {
-                Debug.LogWarning("当前尚未持有武器！");
-                return;
-            }
-
-            var realTakeOut = ItemComponent.TryTakeOutItem_Bullet(reloadBulletNum);
-            if (realTakeOut == 0)
-            {
-                Debug.LogWarning($"武器[{curWeapon.name}]所需子弹不足！");
-                return;
-            }
-
-            Debug.Log($"武器换弹,取出子弹数量：{realTakeOut}");
-            curWeapon.LoadBullet(realTakeOut);
-            WeaponComponent.SetReloading(false);
-            return;
+            return ItemComponent.TryTakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
         }
 
         public bool CanWeaponReload()
