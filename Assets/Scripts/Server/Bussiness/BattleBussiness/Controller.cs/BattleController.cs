@@ -25,12 +25,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         Dictionary<long, FrameRoleRotateReqMsg> roleRotateMsgDic;
 
         // 移动记录所有跳跃帧
-        struct FrameJumpReqMsgStruct
-        {
-            public int connId;
-            public FrameJumpReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameJumpReqMsgStruct>> jumpOptQueueDic;//TODO: --> Queue
+        Dictionary<long, FrameJumpReqMsg> jumpOptMsgDic;
 
         // 记录所有角色生成帧
         struct FrameWRoleSpawnReqMsgStruct
@@ -73,7 +68,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
 
-            jumpOptQueueDic = new Dictionary<int, Queue<FrameJumpReqMsgStruct>>();
+            jumpOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
             wRoleSpawQueuenDic = new Dictionary<int, Queue<FrameWRoleSpawnReqMsgStruct>>();
             bulletSpawnQueueDic = new Dictionary<int, Queue<FrameBulletSpawnReqMsgStruct>>();
             itemPickUpQueueDic = new Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>>();
@@ -249,32 +244,33 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
 
-        int Tick_JumpOpt()
+        void Tick_JumpOpt()
         {
-            if (!jumpOptQueueDic.TryGetValue(ServeFrame, out var optQueue)) return 0;
-
-            int dequeueCount = 0;
-            while (optQueue.TryDequeue(out var opt))
+            ConnIdList.ForEach((connId) =>
             {
-                dequeueCount++;
-                var wRid = opt.msg.wRid;
-                var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                var roleEntity = roleRepo.GetByEntityId(wRid);
-                var rqs = battleFacades.Network.BattleRoleReqAndRes;
-
-                //服务器逻辑Jump
-                if (roleEntity.MoveComponent.TryJump())
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+                if (jumpOptMsgDic.TryGetValue(key, out var opt))
                 {
-                    if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
-                    //发送状态同步帧
-                    ConnIdList.ForEach((connId) =>
-                    {
-                        rqs.SendUpdate_WRoleState(connId, roleEntity);
-                    });
-                }
-            }
+                    var wRid = opt.wRid;
+                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
+                    var roleEntity = roleRepo.GetByEntityId(wRid);
+                    var rqs = battleFacades.Network.BattleRoleReqAndRes;
 
-            return dequeueCount;
+                    //服务器逻辑Jump
+                    if (roleEntity.MoveComponent.TryJump())
+                    {
+                        if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
+                        //发送状态同步帧
+                        ConnIdList.ForEach((connId) =>
+                        {
+                            rqs.SendUpdate_WRoleState(connId, roleEntity);
+                        });
+                    }
+                }
+
+            });
+
         }
         #endregion
 
@@ -488,14 +484,35 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             lock (roleMoveMsgDic)
             {
+
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
+
                 if (!roleMoveMsgDic.TryGetValue(key, out var opt))
                 {
                     roleMoveMsgDic[key] = msg;
                 }
+
             }
         }
+
+        void OnRoleJump(int connId, FrameJumpReqMsg msg)
+        {
+            lock (jumpOptMsgDic)
+            {
+
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+                Debug.Log($"OnRoleJump ADD key:{key}");
+
+                if (!jumpOptMsgDic.TryGetValue(key, out var opt))
+                {
+                    jumpOptMsgDic[key] = msg;
+                }
+
+            }
+        }
+
         void OnRoleRotate(int connId, FrameRoleRotateReqMsg msg)
         {
             lock (roleMoveMsgDic)
@@ -506,20 +523,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     roleRotateMsgDic[key] = msg;
                 }
-            }
-        }
-
-        void OnRoleJump(int connId, FrameJumpReqMsg msg)
-        {
-            lock (jumpOptQueueDic)
-            {
-                if (!jumpOptQueueDic.TryGetValue(ServeFrame, out var jumpOptList))
-                {
-                    jumpOptList = new Queue<FrameJumpReqMsgStruct>();
-                    jumpOptQueueDic[ServeFrame] = jumpOptList;
-                }
-
-                jumpOptList.Enqueue(new FrameJumpReqMsgStruct { connId = connId, msg = msg });
             }
         }
 
