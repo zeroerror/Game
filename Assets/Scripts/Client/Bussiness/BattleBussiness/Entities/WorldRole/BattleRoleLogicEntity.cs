@@ -75,6 +75,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool CanWeaponReload()
         {
+            if (WeaponComponent.IsReloading)
+            {
+                return false;
+            }
+
             var curWeapon = WeaponComponent.CurrentWeapon;
             if (curWeapon == null)
             {

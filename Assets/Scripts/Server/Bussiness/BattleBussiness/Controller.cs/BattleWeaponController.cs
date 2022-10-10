@@ -129,6 +129,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
+                Debug.Log($"weaponReloadMsgDic: key {key}");
                 if (weaponReloadMsgDic.TryGetValue(key, out var msg))
                 {
                     var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
@@ -223,6 +224,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
+                Debug.Log($"OnWeaponReload weaponReloadMsgDic: key {key}");
                 if (!weaponReloadMsgDic.TryGetValue(key, out var _))
                 {
                     weaponReloadMsgDic[key] = msg;

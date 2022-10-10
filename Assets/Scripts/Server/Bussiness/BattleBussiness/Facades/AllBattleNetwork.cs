@@ -45,12 +45,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
         public void Tick()
         {
             int totalSendCount = 0;
+            totalSendCount += BattleReqAndRes.SendCount;
             totalSendCount += BattleRoleReqAndRes.SendCount;
             totalSendCount += BulletReqAndRes.SendCount;
             totalSendCount += WeaponReqAndRes.SendCount;
             totalSendCount += ItemReqAndRes.SendCount;
             if (totalSendCount > 0)
             {
+                BattleReqAndRes.ClearSendCount();
                 BattleRoleReqAndRes.ClearSendCount();
                 BulletReqAndRes.ClearSendCount();
                 WeaponReqAndRes.ClearSendCount();
@@ -59,6 +61,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
                 serverFrame++;
                 Debug.Log($"状态帧更新--------------------------> {serverFrame}");
 
+                BattleReqAndRes.SetServerFrame(serverFrame);
                 BattleRoleReqAndRes.SetServerFrame(serverFrame);
                 BulletReqAndRes.SetServerFrame(serverFrame);
                 WeaponReqAndRes.SetServerFrame(serverFrame);

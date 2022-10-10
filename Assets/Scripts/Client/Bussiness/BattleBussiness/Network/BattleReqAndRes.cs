@@ -29,6 +29,24 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             battleClient.Connect(host, port);
         }
 
+        // ====== Send ======
+        public void SendReq_HeartBeat()
+        {
+            BattleHeartbeatReqMsg battleHeartbeatReqMsg = new BattleHeartbeatReqMsg
+            {
+            };
+
+            battleClient.SendMsg(battleHeartbeatReqMsg);
+            Debug.Log($"发送心跳消息");
+        }
+
+        // ====== Regist ======
+        public void RegistRes_HeartBeat(Action<BattleHeartbeatResMsg> action)
+        {
+            battleClient.RegistMsg(action);
+            Debug.Log($"收到心跳消息");
+        }
+
     }
 
 }

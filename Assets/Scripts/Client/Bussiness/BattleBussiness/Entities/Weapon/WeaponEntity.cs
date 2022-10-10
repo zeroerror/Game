@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public int TryFireBullet(int num)
         {
-            Debug.Log($"武器射击，所需子弹：{num} 当前拥有子弹：{bulletNum}");
+            // Debug.Log($"武器射击，所需子弹：{num} 当前拥有子弹：{bulletNum}");
             if (bulletNum >= num)
             {
                 bulletNum -= num;

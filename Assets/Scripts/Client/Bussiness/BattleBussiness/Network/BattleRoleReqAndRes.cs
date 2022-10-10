@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
     public class BattleRoleReqAndRes
     {
-        NetworkClient _client;
+        NetworkClient battleClient;
 
         int clientFrame;
         public void SetClientFrame(int clienFrame) => this.clientFrame = clienFrame;
@@ -21,7 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void Inject(NetworkClient client)
         {
-            _client = client;
+            battleClient = client;
         }
 
         // == Send ==
@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             {
                 msg = msg
             };
-            _client.SendMsg(frameRoleMoveReqMsg);
+            battleClient.SendMsg(frameRoleMoveReqMsg);
         }
 
         public void SendReq_RoleRotate(BattleRoleLogicEntity roleEntity)
@@ -53,7 +53,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             {
                 msg = msg
             };
-            _client.SendMsg(frameRoleRotateReqMsg);
+            battleClient.SendMsg(frameRoleRotateReqMsg);
         }
 
         public void SendReq_RoleJump(byte wRid)
@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
                 wRid = wRid
             };
 
-            _client.SendMsg(frameJumpReqMsg);
+            battleClient.SendMsg(frameJumpReqMsg);
         }
 
         public void SendReq_BattleRoleSpawn()
@@ -71,19 +71,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             FrameBattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameBattleRoleSpawnReqMsg
             {
             };
-            _client.SendMsg(frameReqWRoleSpawnMsg);
+            battleClient.SendMsg(frameReqWRoleSpawnMsg);
         }
 
         // == Regist ==
 
         public void RegistRes_BattleRoleSpawn(Action<FrameBattleRoleSpawnResMsg> action)
         {
-            _client.RegistMsg<FrameBattleRoleSpawnResMsg>(action);
+            battleClient.RegistMsg(action);
         }
 
         public void RegistUpdate_WRole(Action<BattleRoleStateUpdateMsg> action)
         {
-            _client.RegistMsg<BattleRoleStateUpdateMsg>(action);
+            battleClient.RegistMsg(action);
         }
 
 

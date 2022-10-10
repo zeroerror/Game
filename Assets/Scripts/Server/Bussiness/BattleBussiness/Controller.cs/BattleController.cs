@@ -24,6 +24,10 @@ namespace Game.Server.Bussiness.BattleBussiness
         public int ServeFrame => battleFacades.Network.ServeFrame;
         List<int> ConnIdList => battleFacades.Network.connIdList;
 
+        // ====== 心跳 ======
+        // - 所有客户端心跳帧
+        Dictionary<long, BattleHeartbeatReqMsg> heartbeatMsgDic;
+
         // ====== 角色 ======
         // - 所有生成帧
         Dictionary<long, FrameBattleRoleSpawnReqMsg> roleSpawnMsgDic;
@@ -50,6 +54,8 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
             });
 
+            heartbeatMsgDic = new Dictionary<long, BattleHeartbeatReqMsg>();
+
             roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
@@ -65,12 +71,15 @@ namespace Game.Server.Bussiness.BattleBussiness
             this.battleFacades = battleFacades;
             this.fixedDeltaTime = fixedDeltaTime;
 
+            var battleRqs = battleFacades.Network.BattleReqAndRes;
+            battleRqs.RegistReq_HeartBeat(OnHeartbeat);
+
             var roleRqs = battleFacades.Network.BattleRoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMove);
             roleRqs.RegistReq_RoleRotate(OnRoleRotate);
 
             roleRqs.RegistReq_Jump(OnRoleJump);
-            roleRqs.RegistReq_BattleRoleSpawn(OnBattleRoleSpawn);
+            roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawn);
 
             var bulletRqs = battleFacades.Network.BulletReqAndRes;
             bulletRqs.RegistReq_BulletSpawn(OnBulletSpawn);
@@ -100,13 +109,13 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             Tick_ItemPickUp();
 
-
             Tick_JumpOpt();
             Tick_MoveAndRotateOpt();
 
+            Tick_Heartbeat();
         }
 
-        #region [Client Requst]
+        #region [Tick Request]
 
         #region [Role]
         void Tick_WRoleSpawn()
@@ -463,11 +472,26 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #endregion
 
+        void Tick_Heartbeat()
+        {
+            ConnIdList.ForEach((connId) =>
+            {
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (heartbeatMsgDic.TryGetValue(key, out var _))
+                {
+                    var rqs = battleFacades.Network.BattleReqAndRes;
+                    rqs.SendRes_HeartBeat(connId);
+                }
+            });
+        }
 
         #endregion
 
-        // ====== Network
-        // Role
+        #region [Network]
+
+        #region [Role]
         void OnRoleMove(int connId, FrameRoleMoveReqMsg msg)
         {
             lock (roleMoveMsgDic)
@@ -513,7 +537,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnBattleRoleSpawn(int connId, FrameBattleRoleSpawnReqMsg msg)
+        void OnRoleSpawn(int connId, FrameBattleRoleSpawnReqMsg msg)
         {
             lock (roleSpawnMsgDic)
             {
@@ -533,7 +557,9 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
 
         }
+        #endregion
 
+        #region [Bullet]
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
             lock (bulletSpawnMsgDic)
@@ -547,8 +573,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                 }
             }
         }
+        #endregion
 
-        // ========= Item
+        #region [Item]
         void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
         {
             lock (itemPickUpMsgDic)
@@ -561,8 +588,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                 }
             }
         }
+        #endregion
 
-        // ====== Scene Spawn Method
+        #region [Scene Spawn Method]
         async void SpawBattleChooseScene()
         {
             // Load Scene And Spawn Field
@@ -661,7 +689,27 @@ namespace Game.Server.Bussiness.BattleBussiness
             //     rqs.SendRes_ItemSpawn(connId, serveFrame, itemTypeByteArray, subTypeList.ToArray(), entityIdArray);
             // });
         }
+        #endregion
+
+        void OnHeartbeat(int connId, BattleHeartbeatReqMsg msg)
+        {
+            lock (roleMoveMsgDic)
+            {
+
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (!heartbeatMsgDic.TryGetValue(key, out var _))
+                {
+                    heartbeatMsgDic[key] = msg;
+                }
+
+            }
+        }
+
+        #endregion
 
     }
+
 
 }

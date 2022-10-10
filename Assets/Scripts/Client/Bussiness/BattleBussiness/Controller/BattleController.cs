@@ -26,6 +26,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         Queue<FrameItemPickResMsg> itemPickQueue;
 
         bool battleBegin;
+        bool hasSpawnScene;
+
         public BattleController()
         {
 
@@ -55,6 +57,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             this.battleFacades = battleFacades;
 
+            var battleRqs = battleFacades.Network.BattleReqAndRes;
+            battleRqs.RegistRes_HeartBeat(OnHeartbeatRes);
+
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
             roleRqs.RegistUpdate_WRole(OnWRoleSync);
@@ -72,10 +77,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick()
         {
-            if (battleBegin)
+            if (battleBegin && !hasSpawnScene)
             {
                 GameFightStart();
-                battleBegin = false;
+                hasSpawnScene = true;
             }
 
             float deltaTime = UnityEngine.Time.deltaTime;
@@ -92,9 +97,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Tick_BulletSpawn();
             Tick_ItemAssetsSpawn();
 
-   
             Tick_ItemPick();
 
+            // == Heartbeat
+            // if (hasSpawnScene) battleFacades.Network.BattleReqAndRes.SendReq_HeartBeat();
         }
 
         #region [Input]
@@ -510,7 +516,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
         #endregion
 
-      
+        // Heartbeat
+        void OnHeartbeatRes(BattleHeartbeatResMsg msg)
+        {
+            Debug.Log("收到心跳");
+        }
 
         #endregion
 
