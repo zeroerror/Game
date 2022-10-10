@@ -16,34 +16,19 @@ namespace Game.Server.Bussiness.BattleBussiness
         List<int> ConnIdList => battleFacades.Network.connIdList;
 
         // 记录所有武器射击帧
-        struct FrameWeaponShootReqMsgStruct
-        {
-            public int connId;
-            public FrameWeaponShootReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameWeaponShootReqMsgStruct>> weaponShootQueueDic;
+        Dictionary<long, FrameWeaponShootReqMsg> weaponShootMsgDic;
 
         // 记录所有武器装弹帧
-        struct FrameWeaponReloadReqMsgStruct
-        {
-            public int connId;
-            public FrameWeaponReloadReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>> weaponReloadQueueDic;
+        Dictionary<long, FrameWeaponReloadReqMsg> weaponReloadMsgDic;
 
         // 记录所有武器丢弃帧
-        struct FrameWeaponDropReqMsgStruct
-        {
-            public int connId;
-            public FrameWeaponDropReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>> weaponDropQueueDic;
+        Dictionary<long, FrameWeaponDropReqMsg> weaponDropMsgDic;
 
         public BattleWeaponController()
         {
-            weaponShootQueueDic = new Dictionary<int, Queue<FrameWeaponShootReqMsgStruct>>();
-            weaponReloadQueueDic = new Dictionary<int, Queue<FrameWeaponReloadReqMsgStruct>>();
-            weaponDropQueueDic = new Dictionary<int, Queue<FrameWeaponDropReqMsgStruct>>();
+            weaponShootMsgDic = new Dictionary<long, FrameWeaponShootReqMsg>();
+            weaponReloadMsgDic = new Dictionary<long, FrameWeaponReloadReqMsg>();
+            weaponDropMsgDic = new Dictionary<long, FrameWeaponDropReqMsg>();
         }
 
         public void Inject(BattleFacades battleFacades, float fixedDeltaTime)
@@ -79,22 +64,24 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_WeaponShoot()
         {
-            if (weaponShootQueueDic.TryGetValue(ServeFrame, out var queue))
+
+            ConnIdList.ForEach((connId) =>
             {
-                var clientFacades = battleFacades.ClientBattleFacades;
-                var weaponRepo = clientFacades.Repo.WeaponRepo;
-                var roleRepo = clientFacades.Repo.RoleRepo;
-                var bulletRepo = clientFacades.Repo.BulletRepo;
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
 
-                var weaponRqs = battleFacades.Network.WeaponReqAndRes;
-                var bulletRqs = battleFacades.Network.BulletReqAndRes;
-
-                var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
-
-                while (queue.TryPeek(out var msgStruct))
+                if (weaponShootMsgDic.TryGetValue(key, out var msg))
                 {
-                    queue.Dequeue();
-                    var msg = msgStruct.msg;
+                    var clientFacades = battleFacades.ClientBattleFacades;
+                    var weaponRepo = clientFacades.Repo.WeaponRepo;
+                    var roleRepo = clientFacades.Repo.RoleRepo;
+                    var bulletRepo = clientFacades.Repo.BulletRepo;
+
+                    var weaponRqs = battleFacades.Network.WeaponReqAndRes;
+                    var bulletRqs = battleFacades.Network.BulletReqAndRes;
+
+                    var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
+
                     var masterId = msg.masterId;
 
                     if (roleRepo.TryGetByEntityId(masterId, out var master))
@@ -130,26 +117,29 @@ namespace Game.Server.Bussiness.BattleBussiness
                         }
                     }
                 }
-            }
+
+            });
+
         }
 
         void Tick_WeaponReloadBegin()
         {
-            if (weaponReloadQueueDic.TryGetValue(ServeFrame, out var queue))
+            ConnIdList.ForEach((connId) =>
             {
-                var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
-                var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                while (queue.TryDequeue(out var msgStruct))
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (weaponReloadMsgDic.TryGetValue(key, out var msg))
                 {
-                    var msg = msgStruct.msg;
+                    var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
+                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                     var masterId = msg.masterId;
                     if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
                     {
                         master.WeaponComponent.BeginReloading();
                     }
                 }
-
-            }
+            });
         }
 
         void Tick_ReloadingFrame()
@@ -181,19 +171,20 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_WeaponDrop()
         {
-            if (weaponDropQueueDic.TryGetValue(ServeFrame, out var queue))
+            ConnIdList.ForEach((connId) =>
             {
-                var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
-                var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                var rqs = battleFacades.Network.WeaponReqAndRes;
-                while (queue.TryPeek(out var msgStruct))
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (weaponDropMsgDic.TryGetValue(key, out var msg))
                 {
-                    queue.Dequeue();
-                    var msg = msgStruct.msg;
+                    var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
+                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
+                    var rqs = battleFacades.Network.WeaponReqAndRes;
                     var entityId = msg.entityId;
                     var masterId = msg.masterId;
                     if (roleRepo.TryGetByEntityId(masterId, out var master)
-                    && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
+                        && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
                     {
                         // 服务器逻辑
                         battleFacades.ClientBattleFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.CurPos);
@@ -204,7 +195,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         });
                     }
                 }
-            }
+            });
         }
 
         #endregion
@@ -212,45 +203,47 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Req]
         void OnWeaponShoot(int connId, FrameWeaponShootReqMsg msg)
         {
-            lock (weaponShootQueueDic)
+            lock (weaponShootMsgDic)
             {
-                if (!weaponShootQueueDic.TryGetValue(ServeFrame, out var msgStruct))
-                {
-                    msgStruct = new Queue<FrameWeaponShootReqMsgStruct>();
-                    weaponShootQueueDic[ServeFrame] = msgStruct;
-                }
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
 
-                msgStruct.Enqueue(new FrameWeaponShootReqMsgStruct { connId = connId, msg = msg });
+                if (!weaponShootMsgDic.TryGetValue(key, out var _))
+                {
+                    weaponShootMsgDic[key] = msg;
+                }
                 Debug.Log("收到武器射击请求");
             }
         }
 
         void OnWeaponReload(int connId, FrameWeaponReloadReqMsg msg)
         {
-            lock (weaponReloadQueueDic)
+            lock (weaponReloadMsgDic)
             {
-                if (!weaponReloadQueueDic.TryGetValue(ServeFrame, out var msgStruct))
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (!weaponReloadMsgDic.TryGetValue(key, out var _))
                 {
-                    msgStruct = new Queue<FrameWeaponReloadReqMsgStruct>();
-                    weaponReloadQueueDic[ServeFrame] = msgStruct;
+                    weaponReloadMsgDic[key] = msg;
                 }
 
-                msgStruct.Enqueue(new FrameWeaponReloadReqMsgStruct { connId = connId, msg = msg });
                 Debug.Log("收到武器换弹请求");
             }
         }
 
         void OnWeaponDrop(int connId, FrameWeaponDropReqMsg msg)
         {
-            lock (weaponDropQueueDic)
+            lock (weaponDropMsgDic)
             {
-                if (!weaponDropQueueDic.TryGetValue(ServeFrame, out var msgStruct))
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (!weaponDropMsgDic.TryGetValue(key, out var _))
                 {
-                    msgStruct = new Queue<FrameWeaponDropReqMsgStruct>();
-                    weaponDropQueueDic[ServeFrame] = msgStruct;
+                    weaponDropMsgDic[key] = msg;
                 }
 
-                msgStruct.Enqueue(new FrameWeaponDropReqMsgStruct { connId = connId, msg = msg });
                 Debug.Log("收到武器丢弃请求");
             }
         }

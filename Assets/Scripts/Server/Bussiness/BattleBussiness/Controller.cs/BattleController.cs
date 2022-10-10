@@ -16,38 +16,33 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleFacades battleFacades;
         float fixedDeltaTime;  //0.03f
 
-        // NetWorkd Info
+        // Scene Spawn Trigger
+        bool sceneSpawnTrigger;
+        bool isSceneSpawn;
+
+        // NetWork Info
         public int ServeFrame => battleFacades.Network.ServeFrame;
         List<int> ConnIdList => battleFacades.Network.connIdList;
 
         // ====== 角色 ======
-        // 所有生成帧
-        Dictionary<long, FrameBattleRoleSpawnReqMsg> roleSpawnDic;
-        // 所有操作帧
+        // - 所有生成帧
+        Dictionary<long, FrameBattleRoleSpawnReqMsg> roleSpawnMsgDic;
+        // -所有操作帧
         Dictionary<long, FrameRoleMoveReqMsg> roleMoveMsgDic;
         Dictionary<long, FrameRoleRotateReqMsg> roleRotateMsgDic;
-        // 所有跳跃帧
+        // - 所有跳跃帧
         Dictionary<long, FrameJumpReqMsg> jumpOptMsgDic;
 
         // ====== 子弹 ======
-        // 记录所有子弹生成帧
-        Dictionary<long, FrameBulletSpawnReqMsg> bulletSpawnDic;   //TODO: --> 
+        // - 所有子弹生成帧
+        Dictionary<long, FrameBulletSpawnReqMsg> bulletSpawnMsgDic;
+        // - 所有拾取物件帧
+        Dictionary<long, FrameItemPickReqMsg> itemPickUpMsgDic;
 
-        // 记录所有拾取物件帧
-        struct FrameItemPickUpReqMsgStruct
-        {
-            public int connId;
-            public FrameItemPickReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>> itemPickUpQueueDic;
-
-        // 地图生成资源数据
+        // ====== 地图生成资源数据 ======
         ushort[] entityIdArray;
         byte[] itemTypeByteArray;
         List<byte> subTypeList = new List<byte>();
-
-        bool sceneSpawnTrigger;
-        bool isSceneSpawn;
 
         public BattleController()
         {
@@ -55,14 +50,14 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
             });
 
-            roleSpawnDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
+            roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
             jumpOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
 
-            bulletSpawnDic = new Dictionary<long, FrameBulletSpawnReqMsg>();
+            bulletSpawnMsgDic = new Dictionary<long, FrameBulletSpawnReqMsg>();
 
-            itemPickUpQueueDic = new Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>>();
+            itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
         }
 
         public void Inject(BattleFacades battleFacades, float fixedDeltaTime)
@@ -121,7 +116,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (roleSpawnDic.TryGetValue(key, out var msg))
+                if (roleSpawnMsgDic.TryGetValue(key, out var msg))
                 {
                     var clientFacades = battleFacades.ClientBattleFacades;
                     var repo = clientFacades.Repo;
@@ -274,7 +269,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (bulletSpawnDic.TryGetValue(key, out var msg))
+                if (bulletSpawnMsgDic.TryGetValue(key, out var msg))
                 {
                     var bulletTypeByte = msg.bulletType;
                     byte wRid = msg.wRid;
@@ -434,14 +429,14 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Item]
         void Tick_ItemPickUp()
         {
-            if (itemPickUpQueueDic.TryGetValue(ServeFrame, out var itemPickQueue))
-            {
-                while (itemPickQueue.TryPeek(out var msgStruct))
-                {
-                    itemPickQueue.Dequeue();
 
-                    int connId = msgStruct.connId;
-                    var msg = msgStruct.msg;
+            ConnIdList.ForEach((connId) =>
+            {
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                if (itemPickUpMsgDic.TryGetValue(key, out var msg))
+                {
                     // TODO:Add judgement like 'Can He Pick It Up?'
                     var repo = battleFacades.ClientBattleFacades.Repo;
                     var roleRepo = repo.RoleRepo;
@@ -462,7 +457,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                         Debug.Log($"{itemType.ToString()}物品拾取失败");
                     }
                 }
-            }
+            });
+
         }
 
         #endregion
@@ -519,15 +515,15 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnBattleRoleSpawn(int connId, FrameBattleRoleSpawnReqMsg msg)
         {
-            lock (roleSpawnDic)
+            lock (roleSpawnMsgDic)
             {
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
                 Debug.Log($"[战斗Controller] 战斗角色生成请求 key:{key}");
-                if (!roleSpawnDic.TryGetValue(key, out var _))
+                if (!roleSpawnMsgDic.TryGetValue(key, out var _))
                 {
-                    roleSpawnDic[key] = msg;
+                    roleSpawnMsgDic[key] = msg;
                 }
 
                 ConnIdList.Add(connId); //角色生成后添加至连接名单
@@ -540,14 +536,14 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
-            lock (bulletSpawnDic)
+            lock (bulletSpawnMsgDic)
             {
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (!bulletSpawnDic.TryGetValue(key, out var _))
+                if (!bulletSpawnMsgDic.TryGetValue(key, out var _))
                 {
-                    bulletSpawnDic[key] = msg;
+                    bulletSpawnMsgDic[key] = msg;
                 }
             }
         }
@@ -555,15 +551,14 @@ namespace Game.Server.Bussiness.BattleBussiness
         // ========= Item
         void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
         {
-            lock (itemPickUpQueueDic)
+            lock (itemPickUpMsgDic)
             {
-                if (!itemPickUpQueueDic.TryGetValue(ServeFrame, out var msgStruct))
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+                if (!itemPickUpMsgDic.TryGetValue(key, out var _))
                 {
-                    msgStruct = new Queue<FrameItemPickUpReqMsgStruct>();
-                    itemPickUpQueueDic[ServeFrame] = msgStruct;
+                    itemPickUpMsgDic[key] = msg;
                 }
-
-                msgStruct.Enqueue(new FrameItemPickUpReqMsgStruct { connId = connId, msg = msg });
             }
         }
 
