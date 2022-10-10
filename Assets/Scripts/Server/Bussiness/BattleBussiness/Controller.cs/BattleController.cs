@@ -20,28 +20,18 @@ namespace Game.Server.Bussiness.BattleBussiness
         public int ServeFrame => battleFacades.Network.ServeFrame;
         List<int> ConnIdList => battleFacades.Network.connIdList;
 
-        // 记录所有操作帧
+        // ====== 角色 ======
+        // 所有生成帧
+        Dictionary<long, FrameBattleRoleSpawnReqMsg> roleSpawnDic;
+        // 所有操作帧
         Dictionary<long, FrameRoleMoveReqMsg> roleMoveMsgDic;
         Dictionary<long, FrameRoleRotateReqMsg> roleRotateMsgDic;
-
-        // 移动记录所有跳跃帧
+        // 所有跳跃帧
         Dictionary<long, FrameJumpReqMsg> jumpOptMsgDic;
 
-        // 记录所有角色生成帧
-        struct FrameWRoleSpawnReqMsgStruct
-        {
-            public int connId;
-            public FrameBattleRoleSpawnReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameWRoleSpawnReqMsgStruct>> wRoleSpawQueuenDic;//TODO: --> Queue
-
+        // ====== 子弹 ======
         // 记录所有子弹生成帧
-        struct FrameBulletSpawnReqMsgStruct
-        {
-            public int connId;
-            public FrameBulletSpawnReqMsg msg;
-        }
-        Dictionary<int, Queue<FrameBulletSpawnReqMsgStruct>> bulletSpawnQueueDic;   //TODO: --> 
+        Dictionary<long, FrameBulletSpawnReqMsg> bulletSpawnDic;   //TODO: --> 
 
         // 记录所有拾取物件帧
         struct FrameItemPickUpReqMsgStruct
@@ -65,12 +55,13 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
             });
 
+            roleSpawnDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
-
             jumpOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
-            wRoleSpawQueuenDic = new Dictionary<int, Queue<FrameWRoleSpawnReqMsgStruct>>();
-            bulletSpawnQueueDic = new Dictionary<int, Queue<FrameBulletSpawnReqMsgStruct>>();
+
+            bulletSpawnDic = new Dictionary<long, FrameBulletSpawnReqMsg>();
+
             itemPickUpQueueDic = new Dictionary<int, Queue<FrameItemPickUpReqMsgStruct>>();
         }
 
@@ -125,13 +116,13 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Role]
         void Tick_WRoleSpawn()
         {
-            if (wRoleSpawQueuenDic.TryGetValue(ServeFrame, out var queue))
+            ConnIdList.ForEach((connId) =>
             {
-                while (queue.TryDequeue(out var msgStruct))
-                {
-                    var msg = msgStruct.msg;
-                    var connId = msgStruct.connId;
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
 
+                if (roleSpawnDic.TryGetValue(key, out var msg))
+                {
                     var clientFacades = battleFacades.ClientBattleFacades;
                     var repo = clientFacades.Repo;
                     var fieldEntity = repo.FiledRepo.Get(1);
@@ -173,7 +164,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     roleRepo.Add(roleEntity);
                 }
-            }
+            });
         }
 
         void Tick_RoleStateIdle(int nextFrame)
@@ -277,14 +268,14 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Bullet]
         void Tick_BulletSpawn()
         {
-            if (bulletSpawnQueueDic.TryGetValue(ServeFrame, out var spawnQueue))
+
+            ConnIdList.ForEach((connId) =>
             {
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
 
-                while (spawnQueue.TryDequeue(out var spawn))
+                if (bulletSpawnDic.TryGetValue(key, out var msg))
                 {
-                    int connId = spawn.connId;
-                    var msg = spawn.msg;
-
                     var bulletTypeByte = msg.bulletType;
                     byte wRid = msg.wRid;
                     float targetPosX = msg.targetPosX / 10000f;
@@ -332,7 +323,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                         rqs.SendRes_BulletSpawn(otherConnId, bulletType, bulletId, wRid, shootDir);
                     });
                 }
-            }
+            });
+
         }
 
         void Tick_BulletLife()
@@ -503,7 +495,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
-                Debug.Log($"OnRoleJump ADD key:{key}");
 
                 if (!jumpOptMsgDic.TryGetValue(key, out var opt))
                 {
@@ -528,35 +519,36 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnBattleRoleSpawn(int connId, FrameBattleRoleSpawnReqMsg msg)
         {
-            lock (wRoleSpawQueuenDic)
+            lock (roleSpawnDic)
             {
-                Debug.Log($"[战斗Controller] 战斗角色生成请求");
-                if (!wRoleSpawQueuenDic.TryGetValue(ServeFrame, out var queue))
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
+
+                Debug.Log($"[战斗Controller] 战斗角色生成请求 key:{key}");
+                if (!roleSpawnDic.TryGetValue(key, out var _))
                 {
-                    queue = new Queue<FrameWRoleSpawnReqMsgStruct>();
-                    wRoleSpawQueuenDic[ServeFrame] = queue;
+                    roleSpawnDic[key] = msg;
                 }
 
-                queue.Enqueue(new FrameWRoleSpawnReqMsgStruct { connId = connId, msg = msg });
+                ConnIdList.Add(connId); //角色生成后添加至连接名单
+
+                sceneSpawnTrigger = true;// 创建场景(First Time)
+
             }
 
-            // TODO:连接服和世界服分离
-            ConnIdList.Add(connId);
-            // 创建场景(First Time)
-            sceneSpawnTrigger = true;
         }
 
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
-            lock (bulletSpawnQueueDic)
+            lock (bulletSpawnDic)
             {
-                if (!bulletSpawnQueueDic.TryGetValue(ServeFrame, out var queue))
-                {
-                    queue = new Queue<FrameBulletSpawnReqMsgStruct>();
-                    bulletSpawnQueueDic[ServeFrame] = queue;
-                }
+                long key = (long)ServeFrame << 32;
+                key |= (long)connId;
 
-                queue.Enqueue(new FrameBulletSpawnReqMsgStruct { connId = connId, msg = msg });
+                if (!bulletSpawnDic.TryGetValue(key, out var _))
+                {
+                    bulletSpawnDic[key] = msg;
+                }
             }
         }
 
