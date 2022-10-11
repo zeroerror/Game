@@ -35,7 +35,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             this.masterWRid = masterWRid;
             hasMaster = true;
         }
-        public void ClearMaster()
+        public void Clear()
         {
             var colliders = transform.GetComponentsInChildren<Collider>();
             for (int i = 0; i < colliders.Length; i++)

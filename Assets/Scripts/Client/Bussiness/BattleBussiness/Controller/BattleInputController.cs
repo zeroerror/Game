@@ -94,7 +94,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 // 1.客户端判断流程
                 var weaponComponent = owner.WeaponComponent;
                 Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空，无法射击");
-                Debug.Assert(!weaponComponent.IsReloading, "当前武器换弹中，无法射击");
+                Debug.Assert(!weaponComponent.IsReloading, "换弹中，无法射击");
                 if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsReloading)
                 {
                     var curCamView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;

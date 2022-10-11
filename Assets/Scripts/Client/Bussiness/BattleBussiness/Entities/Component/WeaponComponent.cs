@@ -107,14 +107,23 @@ namespace Game.Client.Bussiness.BattleBussiness
 
                 if (w.EntityId == entityId)
                 {
-                    Debug.Log($"丢弃武器{entityId}");
                     weapon = w;
-                    weapon.ClearMaster();
+                    weapon.Clear();
 
                     AllWeapon[i] = null;
-                    CurrentWeapon = null;
-
                     CurrentNum--;
+
+                    //是否为丢弃当前武器
+                    if (CurrentWeapon == weapon)
+                    {
+                        IsReloading = false;
+                        CurrentWeapon = null;
+                        Debug.Log($"丢弃当前武器 {w.WeaponType.ToString()}");
+                    }
+                    else
+                    {
+                        Debug.Log($"丢弃其他武器 {w.WeaponType.ToString()}");
+                    }
 
                     for (int j = 0; j < AllWeapon.Length; j++)
                     {
@@ -143,7 +152,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 if (w.EntityId == entityId)
                 {
                     AllWeapon[i] = null;
-                    w.ClearMaster();
+                    w.Clear();
                     return;
                 }
             }

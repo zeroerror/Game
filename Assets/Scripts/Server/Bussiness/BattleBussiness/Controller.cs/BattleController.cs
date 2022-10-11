@@ -127,6 +127,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (roleSpawnMsgDic.TryGetValue(key, out var msg))
                 {
+                    roleSpawnMsgDic[key] = null;
+
                     var clientFacades = battleFacades.ClientBattleFacades;
                     var repo = clientFacades.Repo;
                     var fieldEntity = repo.FiledRepo.Get(1);
@@ -201,6 +203,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (roleMoveMsgDic.TryGetValue(key, out var moveMsg))
                 {
+                    roleMoveMsgDic[key] = null;
+
                     var realMsg = moveMsg.msg;
 
                     var rid = (byte)(realMsg >> 48);
@@ -247,6 +251,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                 key |= (long)connId;
                 if (jumpOptMsgDic.TryGetValue(key, out var opt))
                 {
+                    jumpOptMsgDic[key] = null;
+                    
                     var wRid = opt.wRid;
                     var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                     var roleEntity = roleRepo.GetByEntityId(wRid);
@@ -280,6 +286,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (bulletSpawnMsgDic.TryGetValue(key, out var msg))
                 {
+                    bulletSpawnMsgDic[key] = null;
+
                     var bulletTypeByte = msg.bulletType;
                     byte wRid = msg.wRid;
                     float targetPosX = msg.targetPosX / 10000f;
@@ -446,6 +454,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (itemPickUpMsgDic.TryGetValue(key, out var msg))
                 {
+                    itemPickUpMsgDic[key] = null;
+
                     // TODO:Add judgement like 'Can He Pick It Up?'
                     var repo = battleFacades.ClientBattleFacades.Repo;
                     var roleRepo = repo.RoleRepo;
@@ -481,6 +491,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (heartbeatMsgDic.TryGetValue(key, out var _))
                 {
+                    heartbeatMsgDic[key] = null;
+
                     var rqs = battleFacades.Network.BattleReqAndRes;
                     rqs.SendRes_HeartBeat(connId);
                 }
@@ -512,7 +524,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             lock (jumpOptMsgDic)
             {
-
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
@@ -684,11 +695,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             Debug.Log($"地图物件资源生成完毕******************************************************");
 
-            // var rqs = battleFacades.Network.ItemReqAndRes;
-            // connIdList.ForEach((connId) =>
-            // {
-            //     rqs.SendRes_ItemSpawn(connId, serveFrame, itemTypeByteArray, subTypeList.ToArray(), entityIdArray);
-            // });
         }
         #endregion
 

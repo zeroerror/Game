@@ -24,7 +24,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleRepo;
             weapon.transform.SetParent(null);
             weapon.transform.position = dropPos;
-            weapon.ClearMaster();
+            weapon.Clear();
             weaponRepo.Add(weapon);
         }
 

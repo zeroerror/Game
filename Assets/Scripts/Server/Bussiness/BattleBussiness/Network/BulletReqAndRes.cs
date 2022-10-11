@@ -35,11 +35,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void TickAllRegistAction()
         {
-            actionList.ForEach((action) =>
+            lock (actionList)
             {
-                action.Invoke();
-            });
-            actionList.Clear();
+                actionList.ForEach((action) =>
+                       {
+                           action.Invoke();
+                       });
+                actionList.Clear();
+            }
         }
 
         #region [Send]
