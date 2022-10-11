@@ -5,6 +5,8 @@ using Game.Protocol.Battle;
 using Game.Infrastructure.Network.Server;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using UnityEngine;
+using System.Collections.Generic;
+using ZeroFrame.Protocol;
 
 namespace Game.Server.Bussiness.BattleBussiness.Network
 {
@@ -19,14 +21,25 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public int SendCount => sendCount;
         public void ClearSendCount() => sendCount = 0;
 
+        List<Action> actionList;
+
         public BattleReqAndRes()
         {
-
+            actionList = new List<Action>();
         }
 
         public void Inject(NetworkServer server)
         {
             battleServer = server;
+        }
+
+        public void TickAllRegistAction()
+        {
+            actionList.ForEach((action) =>
+            {
+                action.Invoke();
+            });
+            actionList.Clear();
         }
 
         // ====== Send ======
@@ -44,8 +57,20 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         // ====== Regist ======
         public void RegistReq_HeartBeat(Action<int, BattleHeartbeatReqMsg> action)
         {
-            battleServer.AddRegister(action);
+            AddRegister(action);
             Debug.Log($"收到心跳消息");
+        }
+
+        // Private Func
+        void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
+        {
+            battleServer.AddRegister<T>((connId, msg) =>
+            {
+                actionList.Add(() =>
+                {
+                    action.Invoke(connId, msg);
+                });
+            });
         }
 
     }

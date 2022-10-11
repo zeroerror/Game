@@ -4,13 +4,15 @@ using Game.Infrastructure.Network.Server;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using ZeroFrame.Protocol;
+using System.Collections.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness.Network
 {
 
     public class BulletReqAndRes
     {
-        NetworkServer _server;
+        NetworkServer battleServer;
         int serverFrame;
         public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
 
@@ -18,17 +20,29 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public int SendCount => sendCount;
         public void ClearSendCount() => sendCount = 0;
 
+        List<Action> actionList;
+
         public BulletReqAndRes()
         {
-
+            actionList = new List<Action>();
+            actionList.Clear();
         }
 
         public void Inject(NetworkServer server)
         {
-            _server = server;
+            battleServer = server;
         }
 
-        // ====== Send ======
+        public void TickAllRegistAction()
+        {
+            actionList.ForEach((action) =>
+            {
+                action.Invoke();
+            });
+            actionList.Clear();
+        }
+
+        #region [Send]
 
         public void SendRes_BulletSpawn(int connId, BulletType bulletType, ushort bulletId, byte wRid, Vector3 dir)
         {
@@ -43,7 +57,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 shootDirZ = (short)(dir.z * 100),
             };
 
-            _server.SendMsg(connId, msg);
+            battleServer.SendMsg(connId, msg);
             // Debug.Log($"dir.z:{dir.z} shootDirZ :{msg.shootDirZ}");
             sendCount++;
         }
@@ -57,7 +71,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 wRid = wRid
             };
 
-            _server.SendMsg(connId, msg);
+            battleServer.SendMsg(connId, msg);
             sendCount++;
             Debug.Log($"发送子弹击中角色消息 wRid {wRid}");
         }
@@ -75,7 +89,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 posZ = (int)bulletPos.z,
             };
 
-            _server.SendMsg(connId, msg);
+            battleServer.SendMsg(connId, msg);
             sendCount++;
             Debug.Log($"发送子弹击中墙壁消息 ");
         }
@@ -94,15 +108,31 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 posZ = (int)(pos.z * 10000f)
             };
 
-            _server.SendMsg(connId, msg);
+            battleServer.SendMsg(connId, msg);
             sendCount++;
         }
 
+        #endregion
 
-        // == Regist ==
+        #region [Regist]
+
         public void RegistReq_BulletSpawn(Action<int, FrameBulletSpawnReqMsg> action)
         {
-            _server.AddRegister<FrameBulletSpawnReqMsg>(action);
+            AddRegister(action);
+        }
+
+        #endregion
+
+        // Private Func
+        void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
+        {
+            battleServer.AddRegister<T>((connId, msg) =>
+            {
+                actionList.Add(() =>
+                {
+                    action.Invoke(connId, msg);
+                });
+            });
         }
 
     }

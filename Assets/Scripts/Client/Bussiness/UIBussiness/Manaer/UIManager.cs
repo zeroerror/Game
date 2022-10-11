@@ -24,7 +24,7 @@ namespace Game.Client.Bussiness.UIBussiness
             _uiRootRt = UIRoot.GetComponent<RectTransform>();
             GameObject.DontDestroyOnLoad(UIRoot);
             CanvasScaler tempScale = UIRoot.GetComponent<CanvasScaler>();
-            tempScale.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            tempScale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             tempScale.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             tempScale.referenceResolution = UIDef.UIResolution;
             _uiRootRt.position = Vector3.zero;//CanvasScaler 会进行重置坐标 等其加载完成

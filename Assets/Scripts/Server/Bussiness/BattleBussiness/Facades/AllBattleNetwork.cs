@@ -44,6 +44,12 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
 
         public void Tick()
         {
+            BattleReqAndRes.TickAllRegistAction();
+            BattleRoleReqAndRes.TickAllRegistAction();
+            BulletReqAndRes.TickAllRegistAction();
+            WeaponReqAndRes.TickAllRegistAction();
+            ItemReqAndRes.TickAllRegistAction();
+
             int totalSendCount = 0;
             totalSendCount += BattleReqAndRes.SendCount;
             totalSendCount += BattleRoleReqAndRes.SendCount;

@@ -36,10 +36,10 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            battleController.Tick();
-            battlePhysicsController.Tick();
             battleNetworkController.Tick();
+            battlePhysicsController.Tick();
             battleWeaponController.Tick();
+            battleController.Tick();
         }
 
     }

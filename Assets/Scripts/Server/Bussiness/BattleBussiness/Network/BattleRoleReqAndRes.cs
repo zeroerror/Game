@@ -1,17 +1,17 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Game.Infrastructure.Network.Server;
-using Game.Protocol.Client2World;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.BattleBussiness;
-using Game.Generic;
+using ZeroFrame.Protocol;
 
 namespace Game.Server.Bussiness.BattleBussiness.Network
 {
 
     public class BattleRoleReqAndRes
     {
-        NetworkServer _server;
+        NetworkServer battleServer;
         int serverFrame;
         public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
 
@@ -19,12 +19,28 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public int SendCount => sendCount;
         public void ClearSendCount() => sendCount = 0;
 
-        public void Inject(NetworkServer server)
+        List<Action> actionList;
+
+        public BattleRoleReqAndRes()
         {
-            _server = server;
+            actionList = new List<Action>();
         }
 
-        // == Send ==
+        public void Inject(NetworkServer server)
+        {
+            battleServer = server;
+        }
+
+        public void TickAllRegistAction()
+        {
+            actionList.ForEach((action) =>
+            {
+                action.Invoke();
+            });
+            actionList.Clear();
+        }
+
+        #region [Send]
         public void SendUpdate_WRoleState(int connId, BattleRoleLogicEntity role)
         {
             // Position
@@ -75,7 +91,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 gravityVelocity = gravityVelocity,
                 isOwner = connId == role.ConnId
             };
-            _server.SendMsg<BattleRoleStateUpdateMsg>(connId, msg);
+            battleServer.SendMsg<BattleRoleStateUpdateMsg>(connId, msg);
             sendCount++;
         }
 
@@ -87,32 +103,48 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 wRoleId = wRoleId,
                 isOwner = isOwner
             };
-            _server.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
+            battleServer.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
             Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");
             sendCount++;
         }
+        #endregion
 
-        // == Regist ==
+        #region [Regist]
+
         // == OPT ==
         public void RegistReq_RoleMove(Action<int, FrameRoleMoveReqMsg> action)
         {
-            _server.AddRegister(action);
+            AddRegister(action);
         }
 
         public void RegistReq_RoleRotate(Action<int, FrameRoleRotateReqMsg> action)
         {
-            _server.AddRegister(action);
+            AddRegister(action);
         }
 
         public void RegistReq_Jump(Action<int, FrameJumpReqMsg> action)
         {
-            _server.AddRegister(action);
+            AddRegister(action);
         }
 
         // == SPAWN ==
         public void RegistReq_BattleRoleSpawn(Action<int, FrameBattleRoleSpawnReqMsg> action)
         {
-            _server.AddRegister(action);
+            AddRegister(action);
+        }
+
+        #endregion
+
+        // Private Func
+        void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
+        {
+            battleServer.AddRegister<T>((connId, msg) =>
+            {
+                actionList.Add(() =>
+                {
+                    action.Invoke(connId, msg);
+                });
+            });
         }
 
     }

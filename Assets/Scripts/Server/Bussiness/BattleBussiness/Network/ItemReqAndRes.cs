@@ -3,13 +3,15 @@ using Game.Protocol.Battle;
 using Game.Infrastructure.Network.Server;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using UnityEngine;
+using ZeroFrame.Protocol;
+using System.Collections.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness.Network
 {
 
     public class ItemReqAndRes
     {
-        NetworkServer _server;
+        NetworkServer battleServer;
         int serverFrame;
         public void SetServerFrame(int serveFrame) => this.serverFrame = serveFrame;
 
@@ -17,17 +19,30 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public int SendCount => sendCount;
         public void ClearSendCount() => sendCount = 0;
 
+        List<Action> actionList;
+
         public ItemReqAndRes()
         {
-
+            actionList = new List<Action>();
+            actionList.Clear();
         }
 
         public void Inject(NetworkServer server)
         {
-            _server = server;
+            battleServer = server;
         }
 
-        // ====== Send ======
+        public void TickAllRegistAction()
+        {
+            actionList.ForEach((action) =>
+            {
+                action.Invoke();
+            });
+            actionList.Clear();
+        }
+
+        #region [Send]
+
         public void SendRes_ItemPickUp(int connId, int frameIndex, byte wRid, ItemType itemType, ushort entityId)
         {
             FrameItemPickResMsg msg = new FrameItemPickResMsg
@@ -37,7 +52,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 itemType = (byte)itemType,
                 entityId = entityId
             };
-            _server.SendMsg(connId, msg);
+            battleServer.SendMsg(connId, msg);
             sendCount++;
             Debug.Log($"SendRes_ItemPickUp connId:{connId}");
         }
@@ -52,15 +67,32 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 entityIdArray = entityIdArray
             };
 
-            _server.SendMsg(connId, msg);
+            battleServer.SendMsg(connId, msg);
             sendCount++;
         }
 
-        // ====== Regist ======
+        #endregion
+
+        #region [Regist]
+
         public void RegistReq_ItemPickUp(Action<int, FrameItemPickReqMsg> action)
         {
-            _server.AddRegister<FrameItemPickReqMsg>(action);
+            AddRegister(action);
         }
+
+        // Private Func
+        void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
+        {
+            battleServer.AddRegister<T>((connId, msg) =>
+            {
+                actionList.Add(() =>
+                {
+                    action.Invoke(connId, msg);
+                });
+            });
+        }
+
+        #endregion
 
     }
 

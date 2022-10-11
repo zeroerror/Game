@@ -562,6 +562,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Bullet]
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
+            Debug.Log("OnBulletSpawn");
             lock (bulletSpawnMsgDic)
             {
                 long key = (long)ServeFrame << 32;
