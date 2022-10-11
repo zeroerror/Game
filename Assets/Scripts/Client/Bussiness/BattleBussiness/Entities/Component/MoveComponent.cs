@@ -180,11 +180,14 @@ namespace Game.Client.Bussiness.BattleBussiness
             //模拟重力
             if (!IsGrouded)
             {
-                _gravityVelocity -= (fixedDeltaTime * gravity);
                 if (extraVelocity.y > 0)
                 {
                     extraVelocity.y -= (fixedDeltaTime * gravity);
                     if (extraVelocity.y < 0) extraVelocity.y = 0;
+                }
+                else
+                {
+                    _gravityVelocity -= (fixedDeltaTime * gravity);
                 }
 
                 if (moveVelocity.y > 0)
@@ -263,11 +266,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void JumpboardSpeedUp()
         {
             DebugExtensions.LogWithColor($"跳板起飞！！！！！", "#48D1CC");
-            extraVelocity.y += 10f;
-            var v = rb.velocity;
-            v.y = 0;
-            extraVelocity += v * 5f;
-            DebugExtensions.LogWithColor($"跳板起飞  rb.velocity:{rb.velocity} extraVelocity:{extraVelocity}", "#48D1CC");
+            extraVelocity.y += 2f;
+            var addVelocity = rb.velocity;
+            addVelocity.y = 0;
+            addVelocity = addVelocity * 5f;
+            extraVelocity += addVelocity * 5f;
+            DebugExtensions.LogWithColor($"跳板起飞  addVelocity:{addVelocity} extraVelocity:{extraVelocity}", "#48D1CC");
         }
 
         public void EnterGound()

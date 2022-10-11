@@ -127,6 +127,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (roleSpawnMsgDic.TryGetValue(key, out var msg))
                 {
+                    if (msg == null)
+                    {
+                        return;
+                    }
+
                     roleSpawnMsgDic[key] = null;
 
                     var clientFacades = battleFacades.ClientBattleFacades;
@@ -201,11 +206,16 @@ namespace Game.Server.Bussiness.BattleBussiness
                 var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                 var rqs = battleFacades.Network.BattleRoleReqAndRes;
 
-                if (roleMoveMsgDic.TryGetValue(key, out var moveMsg))
+                if (roleMoveMsgDic.TryGetValue(key, out var msg))
                 {
+                    if (msg == null)
+                    {
+                        return;
+                    }
+
                     roleMoveMsgDic[key] = null;
 
-                    var realMsg = moveMsg.msg;
+                    var realMsg = msg.msg;
 
                     var rid = (byte)(realMsg >> 48);
                     var role = roleRepo.GetByEntityId(rid);
@@ -249,11 +259,16 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
-                if (jumpOptMsgDic.TryGetValue(key, out var opt))
+                if (jumpOptMsgDic.TryGetValue(key, out var msg))
                 {
+                    if (msg == null)
+                    {
+                        return;
+                    }
+
                     jumpOptMsgDic[key] = null;
-                    
-                    var wRid = opt.wRid;
+
+                    var wRid = msg.wRid;
                     var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                     var roleEntity = roleRepo.GetByEntityId(wRid);
                     var rqs = battleFacades.Network.BattleRoleReqAndRes;
@@ -273,6 +288,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
 
         }
+
         #endregion
 
         #region [Bullet]
@@ -286,6 +302,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (bulletSpawnMsgDic.TryGetValue(key, out var msg))
                 {
+                    if (msg == null)
+                    {
+                        return;
+                    }
+
                     bulletSpawnMsgDic[key] = null;
 
                     var bulletTypeByte = msg.bulletType;
@@ -454,6 +475,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (itemPickUpMsgDic.TryGetValue(key, out var msg))
                 {
+                    if (msg == null)
+                    {
+                        return;
+                    }
+
                     itemPickUpMsgDic[key] = null;
 
                     // TODO:Add judgement like 'Can He Pick It Up?'
@@ -489,8 +515,13 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (heartbeatMsgDic.TryGetValue(key, out var _))
+                if (heartbeatMsgDic.TryGetValue(key, out var msg))
                 {
+                    if (msg == null)
+                    {
+                        return;
+                    }
+
                     heartbeatMsgDic[key] = null;
 
                     var rqs = battleFacades.Network.BattleReqAndRes;
