@@ -4,6 +4,7 @@ using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -146,8 +147,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     var fieldEntity = fieldRepo.Get(1);
                     var domain = battleFacades.Domain.BattleRoleDomain;
                     roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.transform);
-                    roleLogic.IDComponent.SetEntityId(wRoleId);
                     roleLogic.Ctor();
+                    roleLogic.IDComponent.SetEntityId(wRoleId);
 
                     var roleRenderer = domain.SpawnBattleRoleRenderer(fieldEntity.Role_Group_Renderer);
                     roleRenderer.SetWRid(wRoleId);
@@ -167,7 +168,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         Debug.Log($"人物状态同步帧(roleLogic[{wRoleId}]丢失，重新生成)");
                     }
                 }
-                // DebugExtensions.LogWithColor($"人物状态同步帧 : {ClientFrame}  wRid:{stateMsg.wRid} 角色状态:{roleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{gravityVelocity}  旋转角度：{eulerAngle}","#008000");
 
                 var animatorComponent = roleLogic.roleRenderer.AnimatorComponent;
                 var moveComponent = roleLogic.MoveComponent;
@@ -216,8 +216,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var fieldEntity = repo.FiledRepo.Get(1);
                 var domain = battleFacades.Domain.BattleRoleDomain;
                 var roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.Role_Group_Logic);
-                roleLogic.IDComponent.SetEntityId(wRoleId);
                 roleLogic.Ctor();
+                roleLogic.IDComponent.SetEntityId(wRoleId);
 
                 var roleRenderer = domain.SpawnBattleRoleRenderer(fieldEntity.Role_Group_Renderer);
                 roleRenderer.SetWRid(wRoleId);
@@ -466,6 +466,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void OnWRoleSync(BattleRoleStateUpdateMsg msg)
         {
             roleStateQueue.Enqueue(msg);
+            // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
         }
 
         void OnBattleRoleSpawn(FrameBattleRoleSpawnResMsg msg)

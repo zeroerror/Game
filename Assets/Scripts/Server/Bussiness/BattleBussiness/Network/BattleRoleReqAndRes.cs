@@ -76,7 +76,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             BattleRoleStateUpdateMsg msg = new BattleRoleStateUpdateMsg
             {
-                serverFrameIndex = serverFrame,
+                serverFrame = serverFrame,
                 entityId = (byte)role.IDComponent.EntityId,
                 roleState = (int)role.RoleState,
                 x = x,
@@ -98,18 +98,19 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BattleRoleSpawn(int connId, byte wRoleId, bool isOwner)
+        public void SendRes_BattleRoleSpawn(int connId, int entityID, bool isOwner)
         {
             FrameBattleRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameBattleRoleSpawnResMsg
             {
                 serverFrame = serverFrame,
-                wRoleId = wRoleId,
+                wRoleId = (byte)entityID,
                 isOwner = isOwner
             };
             battleServer.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
             Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");
             sendCount++;
         }
+        
         #endregion
 
         #region [Regist]

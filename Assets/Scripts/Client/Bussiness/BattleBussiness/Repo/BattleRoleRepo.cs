@@ -21,14 +21,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             list = new List<BattleRoleLogicEntity>();
         }
 
-        public BattleRoleLogicEntity GetByEntityId(byte wRid)
+        public BattleRoleLogicEntity GetByEntityId(int entityID)
         {
-            return list.Find((entity) => entity.IDComponent.EntityId == wRid);
+            return list.Find((entity) => entity.IDComponent.EntityId == entityID);
         }
 
-        public bool TryGetByEntityId(int wRid, out BattleRoleLogicEntity entity)
+        public bool TryGetByEntityId(int entityID, out BattleRoleLogicEntity entity)
         {
-            entity = list.Find((entity) => entity.IDComponent.EntityId == wRid);
+            entity = list.Find((entity) => entity.IDComponent.EntityId == entityID);
             return entity != null;
         }
 
