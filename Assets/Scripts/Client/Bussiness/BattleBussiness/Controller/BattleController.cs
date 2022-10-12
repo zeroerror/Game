@@ -272,7 +272,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 bulletEntity.MoveComponent.SetForward(shootDir);
                 bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                 bulletEntity.SetMasterId(masterWRid);
-                bulletEntity.SetEntityId(bulletId);
+                bulletEntity.IDComponent.SetEntityId(bulletId);
                 var bulletRepo = battleFacades.Repo.BulletRepo;
                 bulletEntity.gameObject.SetActive(true);
                 bulletRepo.Add(bulletEntity);
@@ -291,7 +291,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
 
                 // Client Logic
-                role.HealthComponent.HurtByDamage(5);
                 role.MoveComponent.HitByBullet(bullet);
                 if (role.HealthComponent.IsDead)
                 {

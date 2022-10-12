@@ -9,7 +9,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<BulletEntity> bulletList;
-        public ushort BulletCount => (ushort)bulletList.Count;
+        public int BulletCount => bulletList.Count;
 
         public BulletRepo()
         {
@@ -18,7 +18,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public BulletEntity GetByBulletId(ushort bulletId)
         {
-            return bulletList.Find((entity) => entity.EntityId == bulletId);
+            return bulletList.Find((entity) => entity.IDComponent.EntityId == bulletId);
         }
 
         public BulletEntity GetByWRid(ushort wRid)

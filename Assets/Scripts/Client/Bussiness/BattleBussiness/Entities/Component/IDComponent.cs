@@ -8,19 +8,18 @@ namespace Game.Client.Bussiness.BattleBussiness
 
     public class IDComponent
     {
-        public EntityType EntityType => EntityType.BattleRole;
 
-        short entityId;
+        EntityType entityType;
+        public EntityType EntityType => entityType;
+        public void SetEntityType(EntityType entityType) => this.entityType = entityType;
+
+        int entityId;
         public int EntityId => entityId;
-        public void SetEntityId(short entityId) => this.entityId = entityId;
+        public void SetEntityId(int entityId) => this.entityId = entityId;
 
         int leagueId;
         public int LeagueId => leagueId;
         public void SetLeagueId(int leagueId) => this.leagueId = leagueId;
-
-        int connId;
-        public int ConnId => connId;
-        public void SetConnId(int connId) => this.connId = connId;
 
         public IDComponent()
         {

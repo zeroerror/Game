@@ -16,15 +16,24 @@ namespace Game.Client.Bussiness.BattleBussiness
 
     public class BattleRoleLogicEntity : PhysicsEntity
     {
-        public BattleRoleRendererEntity roleRenderer { get; private set; }
-        public Vector3 SelfPos => transform.position;
 
+        // Connection Info
+        int connId;
+        public int ConnId => connId;
+        public void SetConnId(int connId) => this.connId = connId;
+
+        // ID
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
 
+        // Renderer
+        public BattleRoleRendererEntity roleRenderer { get; private set; }
+
+        // Pos
         Vector3 offset;
         Vector3 shootPointPos => MoveComponent.CurPos + transform.forward + offset;
         public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
+        public Vector3 SelfPos => transform.position;
 
         // == Component ==
         [SerializeField]
@@ -52,6 +61,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveComponent.SetMaximumSpeed(30f);
 
             idComponent = new IDComponent();
+            idComponent.SetEntityType(EntityType.BattleRole);
 
             HealthComponent = new HealthComponent(100f);
 

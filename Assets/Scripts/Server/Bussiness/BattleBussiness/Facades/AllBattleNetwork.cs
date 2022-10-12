@@ -12,7 +12,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
 
         // Network
         public BattleReqAndRes BattleReqAndRes { get; private set; }
-        public BattleRoleReqAndRes BattleRoleReqAndRes { get; private set; }
+        public BattleRoleReqAndRes RoleReqAndRes { get; private set; }
         public BulletReqAndRes BulletReqAndRes { get; private set; }
         public WeaponReqAndRes WeaponReqAndRes { get; private set; }
         public ItemReqAndRes ItemReqAndRes { get; private set; }
@@ -25,7 +25,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
         public AllBattleNetwork()
         {
             BattleReqAndRes = new BattleReqAndRes();
-            BattleRoleReqAndRes = new BattleRoleReqAndRes();
+            RoleReqAndRes = new BattleRoleReqAndRes();
             BulletReqAndRes = new BulletReqAndRes();
             WeaponReqAndRes = new WeaponReqAndRes();
             ItemReqAndRes = new ItemReqAndRes();
@@ -36,7 +36,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
         public void Inject(NetworkServer server)
         {
             BattleReqAndRes.Inject(server);
-            BattleRoleReqAndRes.Inject(server);
+            RoleReqAndRes.Inject(server);
             BulletReqAndRes.Inject(server);
             WeaponReqAndRes.Inject(server);
             ItemReqAndRes.Inject(server);
@@ -46,14 +46,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
         {
             int totalSendCount = 0;
             totalSendCount += BattleReqAndRes.SendCount;
-            totalSendCount += BattleRoleReqAndRes.SendCount;
+            totalSendCount += RoleReqAndRes.SendCount;
             totalSendCount += BulletReqAndRes.SendCount;
             totalSendCount += WeaponReqAndRes.SendCount;
             totalSendCount += ItemReqAndRes.SendCount;
             if (totalSendCount > 0)
             {
                 BattleReqAndRes.ClearSendCount();
-                BattleRoleReqAndRes.ClearSendCount();
+                RoleReqAndRes.ClearSendCount();
                 BulletReqAndRes.ClearSendCount();
                 WeaponReqAndRes.ClearSendCount();
                 ItemReqAndRes.ClearSendCount();
@@ -62,14 +62,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
                 Debug.Log($"状态帧更新--------------------------> {serverFrame}");
 
                 BattleReqAndRes.SetServerFrame(serverFrame);
-                BattleRoleReqAndRes.SetServerFrame(serverFrame);
+                RoleReqAndRes.SetServerFrame(serverFrame);
                 BulletReqAndRes.SetServerFrame(serverFrame);
                 WeaponReqAndRes.SetServerFrame(serverFrame);
                 ItemReqAndRes.SetServerFrame(serverFrame);
             }
 
             BattleReqAndRes.TickAllRegistAction();
-            BattleRoleReqAndRes.TickAllRegistAction();
+            RoleReqAndRes.TickAllRegistAction();
             BulletReqAndRes.TickAllRegistAction();
             WeaponReqAndRes.TickAllRegistAction();
             ItemReqAndRes.TickAllRegistAction();

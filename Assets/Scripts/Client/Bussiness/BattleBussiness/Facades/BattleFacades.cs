@@ -15,12 +15,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         // Controller Set
         public InputComponent InputComponent { get; private set; }
 
+        public BattleArbitrationService ArbitrationService { get; private set; }
+
+        public BattleLeagueService BattleLeagueService { get; private set; }
+
         public BattleFacades()
         {
             Network = new AllBattleNetwork();
             Repo = new AllBattleRepo();
             Domain = new AllDomains();
             Assets = new AllBattleAssets();
+            ArbitrationService=new BattleArbitrationService();
+            BattleLeagueService=new BattleLeagueService();
+
             Domain.Inject(this);
 
             // Asset Load

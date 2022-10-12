@@ -104,7 +104,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             bulletEntity.MoveComponent.SetForward(shootDir);
                             bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                             bulletEntity.SetMasterId(masterId);
-                            bulletEntity.SetEntityId(bulletId);
+                            bulletEntity.IDComponent.SetEntityId(bulletId);
                             bulletEntity.gameObject.SetActive(true);
                             bulletRepo.Add(bulletEntity);
 

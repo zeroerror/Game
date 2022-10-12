@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             // TODO: 改成子弹对应的伤害
             if (IsDead) return;
 
-            Debug.Log($"damage: {damage}  ->  health {health - damage}");
+            Debug.Log($"受到伤害: {damage}  ->  health {health - damage}");
             health -= damage;
         }
 

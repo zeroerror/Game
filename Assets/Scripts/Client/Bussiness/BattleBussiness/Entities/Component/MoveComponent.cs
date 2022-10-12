@@ -221,7 +221,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveVelocity -= reduceVelocity;
             if (cosValue != 0)
             {
-                DebugExtensions.LogWithColor($"cosValue：{cosValue} 贴墙移动消除速度量 {reduceVelocity} ----> 新速度:{moveVelocity}", "#48D1CC");
+                DebugExtensions.LogWithColor($"贴墙移动，消除垂直墙面速度 {reduceVelocity}", "#48D1CC");
             }
         }
 

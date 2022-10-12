@@ -48,6 +48,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         }
 
+        #region [PRIVATE]
+
         bool IsRightTarget(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)
         {
 
@@ -146,6 +148,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             return key;
         }
 
+        #endregion
+
     }
+
 
 }

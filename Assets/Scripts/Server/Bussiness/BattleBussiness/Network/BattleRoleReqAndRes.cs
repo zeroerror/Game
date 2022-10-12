@@ -92,7 +92,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 extraVelocityY = extraVelocityY,
                 extraVelocityZ = extraVelocityZ,
                 gravityVelocity = gravityVelocity,
-                isOwner = connId == role.IDComponent.ConnId
+                isOwner = (connId == role.ConnId)
             };
             battleServer.SendMsg<BattleRoleStateUpdateMsg>(connId, msg);
             sendCount++;

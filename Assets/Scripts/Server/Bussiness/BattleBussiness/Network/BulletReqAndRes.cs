@@ -47,14 +47,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Send]
 
-        public void SendRes_BulletSpawn(int connId, BulletType bulletType, ushort bulletId, byte wRid, Vector3 dir)
+        public void SendRes_BulletSpawn(int connId, BulletType bulletType, int bulletId, byte wRid, Vector3 dir)
         {
             FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
             {
                 serverFrame = serverFrame,
                 wRid = wRid,
                 bulletType = (byte)bulletType,
-                bulletId = bulletId,
+                bulletId = (ushort)bulletId,
                 shootDirX = (short)(dir.x * 100),
                 shootDirY = (short)(dir.y * 100),
                 shootDirZ = (short)(dir.z * 100),
@@ -65,12 +65,12 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BulletHitRole(int connId, ushort bulletId, int entityId)
+        public void SendRes_BulletHitRole(int connId, int bulletId, int entityId)
         {
             FrameBulletHitRoleResMsg msg = new FrameBulletHitRoleResMsg
             {
                 serverFrame = serverFrame,
-                bulletId = bulletId,
+                bulletId = (ushort)bulletId,
                 entityId = (byte)entityId
             };
 
@@ -86,7 +86,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
             {
                 serverFrame = serverFrame,
-                bulletId = bulletEntity.EntityId,
+                bulletId = (ushort)bulletEntity.IDComponent.EntityId,
                 posX = (int)bulletPos.x,
                 posY = (int)bulletPos.y,
                 posZ = (int)bulletPos.z,
@@ -97,15 +97,15 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"发送子弹击中墙壁消息 ");
         }
 
-        public void SendRes_BulletTearDown(int connId, BulletType bulletType, byte wRid, ushort bulletId, Vector3 pos)
+        public void SendRes_BulletTearDown(int connId, BulletType bulletType, int masterEntityID, int bulletEntityID, Vector3 pos)
         {
-            Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{wRid}");
+            Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");
             FrameBulletTearDownResMsg msg = new FrameBulletTearDownResMsg
             {
                 serverFrame = serverFrame,
                 bulletType = (byte)bulletType,
-                wRid = wRid,
-                bulletId = bulletId,
+                wRid = (byte)masterEntityID,
+                bulletId = (ushort)bulletEntityID,
                 posX = (int)(pos.x * 10000f),  // (16 16) 整数部16位 short -32768 --- +32767 小数部分16位 ushort(0 --- +65535) 0.0000到0.9999
                 posY = (int)(pos.y * 10000f),
                 posZ = (int)(pos.z * 10000f)

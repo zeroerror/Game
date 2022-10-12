@@ -74,7 +74,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var battleRqs = battleFacades.Network.BattleReqAndRes;
             battleRqs.RegistReq_HeartBeat(OnHeartbeat);
 
-            var roleRqs = battleFacades.Network.BattleRoleReqAndRes;
+            var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMove);
             roleRqs.RegistReq_RoleRotate(OnRoleRotate);
 
@@ -137,7 +137,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var clientFacades = battleFacades.ClientBattleFacades;
                     var repo = clientFacades.Repo;
                     var fieldEntity = repo.FiledRepo.Get(1);
-                    var roleRqs = battleFacades.Network.BattleRoleReqAndRes;
+                    var roleRqs = battleFacades.Network.RoleReqAndRes;
                     var roleRepo = repo.RoleRepo;
                     var itemRqs = battleFacades.Network.ItemReqAndRes;
                     var weaponRqs = battleFacades.Network.WeaponReqAndRes;
@@ -148,7 +148,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var roleEntity = clientFacades.Domain.BattleRoleDomain.SpawnBattleRoleLogic(fieldEntity.transform);
                     roleEntity.Ctor();
                     roleEntity.IDComponent.SetEntityId(wrid);
-                    roleEntity.IDComponent.SetConnId(connId);
+                    roleEntity.SetConnId(connId);
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.CurPos}");
 
                     // ===== TODO:同步所有信息给请求者
@@ -188,7 +188,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     roleEntity.SetRoleState(RoleState.Normal);
 
-                    var rqs = battleFacades.Network.BattleRoleReqAndRes;
+                    var rqs = battleFacades.Network.RoleReqAndRes;
                     ConnIdList.ForEach((connId) =>
                     {
                         rqs.SendUpdate_WRoleState(connId, roleEntity);
@@ -204,7 +204,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
                 var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                var rqs = battleFacades.Network.BattleRoleReqAndRes;
+                var rqs = battleFacades.Network.RoleReqAndRes;
 
                 if (roleMoveMsgDic.TryGetValue(key, out var msg))
                 {
@@ -271,7 +271,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var wRid = msg.entityId;
                     var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                     var roleEntity = roleRepo.GetByEntityId(wRid);
-                    var rqs = battleFacades.Network.BattleRoleReqAndRes;
+                    var rqs = battleFacades.Network.RoleReqAndRes;
 
                     //服务器逻辑Jump
                     if (roleEntity.MoveComponent.TryJump())
@@ -345,7 +345,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             break;
                     }
                     bulletEntity.SetMasterId(wRid);
-                    bulletEntity.SetEntityId(bulletId);
+                    bulletEntity.IDComponent.SetEntityId(bulletId);
                     bulletEntity.gameObject.SetActive(true);
                     bulletRepo.Add(bulletEntity);
                     Debug.Log($"服务器逻辑[生成子弹] serveFrame {ServeFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
@@ -402,11 +402,11 @@ namespace Game.Server.Bussiness.BattleBussiness
                 bulletRepo.TryRemove(bulletEntity);
 
                 var bulletRqs = battleFacades.Network.BulletReqAndRes;
-                var roleRqs = battleFacades.Network.BattleRoleReqAndRes;
+                var roleRqs = battleFacades.Network.RoleReqAndRes;
                 ConnIdList.ForEach((connId) =>
                 {
                     // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletTearDown(connId, bulletType, bulletEntity.MasterId, bulletEntity.EntityId, bulletEntity.MoveComponent.CurPos);
+                    bulletRqs.SendRes_BulletTearDown(connId, bulletType, bulletEntity.MasterId, bulletEntity.IDComponent.EntityId, bulletEntity.MoveComponent.CurPos);
                 });
                 while (effectRoleQueue.TryDequeue(out var role))
                 {
@@ -425,7 +425,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             var activeHookers = battleFacades.ClientBattleFacades.Domain.BulletDomain.GetActiveHookerList();
             List<BattleRoleLogicEntity> roleList = new List<BattleRoleLogicEntity>();
-            var rqs = battleFacades.Network.BattleRoleReqAndRes;
+            var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {
                 var master = battleFacades.ClientBattleFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterId);

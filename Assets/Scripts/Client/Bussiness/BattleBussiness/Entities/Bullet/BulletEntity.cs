@@ -7,6 +7,10 @@ namespace Game.Client.Bussiness.BattleBussiness
 
     public class BulletEntity : PhysicsEntity
     {
+        // ID Info
+        IDComponent idComponent;
+        public IDComponent IDComponent => idComponent;
+
         // Master Info
         byte masterId;
         public byte MasterId => masterId;
@@ -17,10 +21,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         BulletType bulletType = BulletType.DefaultBullet;
         public BulletType BulletType => bulletType;
         public void SetBulletType(BulletType bulletType) => this.bulletType = bulletType;
-
-        ushort entityId;
-        public ushort EntityId => entityId;
-        public void SetEntityId(ushort entityId) => this.entityId = entityId;
 
         [SerializeField]
         protected MoveComponent moveComponent;
@@ -40,6 +40,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Ctor()
         {
+            idComponent = new IDComponent();
+            idComponent.SetEntityType(EntityType.Bullet);
+
             moveComponent.Inject(transform.GetComponent<Rigidbody>());
             Init();
         }

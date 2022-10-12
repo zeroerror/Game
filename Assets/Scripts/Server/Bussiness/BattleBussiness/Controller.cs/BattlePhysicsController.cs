@@ -47,7 +47,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
             var roleList = physicsDomain.Tick_AllRoleHitEnter(fixedDeltaTime);
-            var rqs = battleFacades.Network.BattleRoleReqAndRes;
+            var rqs = battleFacades.Network.RoleReqAndRes;
             roleList.ForEach((role) =>
             {
                 connIdList.ForEach((connId) =>
@@ -68,27 +68,53 @@ namespace Game.Server.Bussiness.BattleBussiness
             bulletRepo.Foreach((bullet) =>
             {
                 var hitRoleList = physicsDomain.GetHitRole_ColliderList(bullet);
-                Transform roleTrans = null;
+                Transform hookedRoleTrans = null;
                 hitRoleList.ForEach((ce) =>
                 {
-                    roleTrans = ce.gameObject.transform;
-                    // Server Logic
+                    // TODO:如果子弹不能穿透，则是直接退出循环
+
+                    if (hookedRoleTrans == null)
+                    {
+                        hookedRoleTrans = ce.gameObject.transform;
+                    }
+
                     var role = ce.gameObject.GetComponentInParent<BattleRoleLogicEntity>();
                     if (bullet.MasterId != role.IDComponent.EntityId)
                     {
-                        Debug.Log($"打中敌人 bullet.MasterId ：{bullet.MasterId} role.EntityId ：{role.IDComponent.EntityId} ");
-                        role.HealthComponent.HurtByDamage(5);
-                        role.MoveComponent.HitByBullet(bullet);
-                        if (role.HealthComponent.IsDead)
+                        Debug.Log($"打中敌人");
+
+                        // TODO: 配置表配置 ----------------------------------------------
+                        HitPowerModel hitPowerModel = new HitPowerModel();
+                        hitPowerModel.damage = 5;
+                        hitPowerModel.canHitRepeatly = false;
+                        hitPowerModel.attackTag = AttackTag.Enemy;
+                        // ----------------------------------------------------------------
+
+                        var service = battleFacades.ClientBattleFacades.ArbitrationService;
+                        if (service.CanDamage(role.IDComponent, bullet.IDComponent, in hitPowerModel))
                         {
-                            role.TearDown();
-                            role.Reborn();
+                            role.HealthComponent.HurtByDamage(hitPowerModel.damage);
+                            var roleRqs = battleFacades.Network.RoleReqAndRes;
+                            // 广播 1
+                            connIdList.ForEach((connID) =>
+                            {
+                                roleRqs.SendUpdate_WRoleState(connID, role);
+                            });
+
+                            role.MoveComponent.HitByBullet(bullet);
+                            if (role.HealthComponent.IsDead)
+                            {
+                                role.TearDown();
+                                role.Reborn();
+                            }
                         }
+
                         // Notice Client
                         var rqs = battleFacades.Network.BulletReqAndRes;
                         connIdList.ForEach((connId) =>
                         {
-                            rqs.SendRes_BulletHitRole(connId, bullet.EntityId, role.IDComponent.EntityId);
+                            // 广播 2
+                            rqs.SendRes_BulletHitRole(connId, bullet.IDComponent.EntityId, role.IDComponent.EntityId);
                         });
                     }
 
@@ -109,22 +135,21 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (hitRoleList.Count != 0 || hitFieldList.Count != 0)
                 {
-                    // Server Logic
+                    // 普通子弹的逻辑，只是单纯的TearDown
                     if (bullet.BulletType == BulletType.DefaultBullet)
                     {
-                        // 普通子弹的逻辑，只是单纯的移除
                         removeList.Add(bullet);
                     }
 
+                    // 爪钩逻辑
                     if (bullet is HookerEntity hookerEntity)
                     {
-                        // 爪钩逻辑
                         hookerEntity.TryGrabSomthing(field);
-                        hookerEntity.TryGrabSomthing(roleTrans);
+                        hookerEntity.TryGrabSomthing(hookedRoleTrans);
                     }
+                    // 手雷逻辑: 速度清零
                     else if (bullet is GrenadeEntity grenadeEntity)
                     {
-                        // 手雷逻辑: 速度清零
                         grenadeEntity.MoveComponent.SetMoveVelocity(Vector3.zero);
                     }
 
@@ -139,8 +164,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_Physics_Movement_Role(float fixedDeltaTime)
         {
-            // var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
-            // physicsDomain.Tick_RoleMoveHitErase();   //Unity's Collision Will Auto Erase
+            var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
+            physicsDomain.Tick_RoleMoveHitErase();   //Unity's Collision Will Auto Erase
             var domain = battleFacades.ClientBattleFacades.Domain.BattleRoleDomain;
             domain.Tick_RoleRigidbody(fixedDeltaTime);
         }
