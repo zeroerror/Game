@@ -7,9 +7,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
     public class WeaponEntity : MonoBehaviour, IPickable
     {
-        ushort weaponId;
-        public ushort EntityId => weaponId;
-        public void SetEntityId(ushort id) => weaponId = id;
+        int weaponId;
+        public int EntityId => weaponId;
+        public void SetEntityId(int id) => weaponId = id;
 
         [SerializeField]
         WeaponType weaponType;
@@ -26,26 +26,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void ResetCurrentReloadingFrame() => curReloadingFrame = reloadFrame;
         public void ReduceCurReloadingFrame() => curReloadingFrame--;
 
-        byte masterWRid;
-        public byte MasterId => masterWRid;
+        int masterWRid;
+        public int MasterId => masterWRid;
+
         bool hasMaster;
         public bool HasMaster => hasMaster;
-        public void SetMasterId(byte masterWRid)
-        {
-            this.masterWRid = masterWRid;
-            hasMaster = true;
-        }
-        public void Clear()
-        {
-            var colliders = transform.GetComponentsInChildren<Collider>();
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                var c = colliders[i];
-                c.enabled = true;
-                c.isTrigger = true;
-            }
-            hasMaster = false;
-        }
 
         int bulletCapacity = 30;
         public int BulletCapacity => bulletCapacity;
@@ -59,6 +44,24 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             itemType = ItemType.Weapon;
+        }
+
+        public void SetMaster(int masterWRid)
+        {
+            this.masterWRid = masterWRid;
+            hasMaster = true;
+        }
+
+        public void Clear()
+        {
+            var colliders = transform.GetComponentsInChildren<Collider>();
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                var c = colliders[i];
+                c.enabled = true;
+                c.isTrigger = true;
+            }
+            hasMaster = false;
         }
 
         public int TryFireBullet(int num)

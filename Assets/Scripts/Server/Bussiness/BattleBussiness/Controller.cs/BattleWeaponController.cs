@@ -157,7 +157,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     }
                     else
                     {
-                        int reloadBulletNum = role.FetchCurWeaponBullets();
+                        int reloadBulletNum = role.FetchBulletsFromItemComponent();
                         role.WeaponComponent.FinishReloading(reloadBulletNum);
                         //TODO: 装弹时间过后才发送回客户端
                         ConnIdList.ForEach((connId) =>

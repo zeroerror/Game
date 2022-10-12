@@ -18,10 +18,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public WeaponComponent()
         {
-        }
-
-        public void Ctor()
-        {
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
         }
 

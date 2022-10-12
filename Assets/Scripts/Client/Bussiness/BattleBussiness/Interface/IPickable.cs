@@ -8,9 +8,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Interface
     {
         ItemType ItemType { get; }
 
-        ushort EntityId { get; }
+        int EntityId { get; }
 
-        byte MasterId { get; }
+        int MasterId { get; }
 
     }
 

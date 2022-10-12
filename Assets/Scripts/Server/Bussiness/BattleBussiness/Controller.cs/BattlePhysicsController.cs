@@ -77,7 +77,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     if (bullet.MasterId != role.EntityId)
                     {
                         Debug.Log($"打中敌人 bullet.MasterId ：{bullet.MasterId} role.EntityId ：{role.EntityId} ");
-                        role.HealthComponent.HurtByBullet(bullet);
+                        role.HealthComponent.HurtBy(bullet);
                         role.MoveComponent.HitByBullet(bullet);
                         if (role.HealthComponent.IsDead)
                         {

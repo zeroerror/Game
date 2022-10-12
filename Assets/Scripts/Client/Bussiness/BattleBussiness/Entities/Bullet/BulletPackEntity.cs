@@ -19,13 +19,13 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int bulletNum;
 
         // Master Info
-        byte masterId;
-        public byte MasterId => masterId;
-        public void SetMasterId(byte masterId) => this.masterId = masterId;
+        int masterId;
+        public int MasterId => masterId;
+        public void SetMasterId(int masterId) => this.masterId = masterId;
 
-        ushort entityId;
-        public ushort EntityId => entityId;
-        public void SetEntityId(ushort entityId) => this.entityId = entityId;
+        int entityId;
+        public int EntityId => entityId;
+        public void SetEntityId(int entityId) => this.entityId = entityId;
 
         public void Ctor()
         {

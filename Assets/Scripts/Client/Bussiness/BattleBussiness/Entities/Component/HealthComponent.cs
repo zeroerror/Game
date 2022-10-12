@@ -9,7 +9,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         float maxHealth;
         public float MaxHealth => maxHealth;
-        
+
         float health;
         public float Health => health;
 
@@ -29,13 +29,13 @@ namespace Game.Client.Bussiness.BattleBussiness
             health -= damage;
         }
 
-        public void HurtByBullet(BulletEntity bulletEntity)
+        public void HurtBy(int damage)
         {
             // TODO: 改成子弹对应的伤害
             if (IsDead) return;
 
-            Debug.Log($"health:{health} -> {health - 5}");
-            health -= 5;
+            Debug.Log($"damage: {damage}  ->  health {health - damage}");
+            health -= damage;
         }
 
         public void Reset()

@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var inputComponent = battleFacades.InputComponent;
 
                 var owner = battleFacades.Repo.RoleRepo.Owner;
-                bool isOwner = owner.EntityId == role.EntityId;
+                bool isOwner = owner.IDComponent.EntityId == role.IDComponent.EntityId;
 
                 if (isOwner && inputComponent.moveAxis != Vector3.zero)
                 {

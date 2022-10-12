@@ -17,10 +17,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public ItemComponent()
         {
-        }
-
-        public void Ctor()
-        {
             bulletPackItemQueue = new Queue<BulletPackEntity>();
         }
 

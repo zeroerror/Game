@@ -1,6 +1,7 @@
 using UnityEngine;
 using Game.Generic;
 using Game.Client.Bussiness.Interfaces;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -18,13 +19,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public BattleRoleRendererEntity roleRenderer { get; private set; }
         public Vector3 SelfPos => transform.position;
 
-        byte entityId;
-        public byte EntityId => entityId;
-        public void SetEntityId(byte entityId) => this.entityId = entityId;
-
-        int connId;
-        public int ConnId => connId;
-        public void SetConnId(int connId) => this.connId = connId;
+        IDComponent idComponent;
+        public IDComponent IDComponent => idComponent;
 
         Vector3 offset;
         Vector3 shootPointPos => MoveComponent.CurPos + transform.forward + offset;
@@ -55,19 +51,19 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveComponent.Inject(transform.GetComponentInParent<Rigidbody>());
             moveComponent.SetMaximumSpeed(30f);
 
+            idComponent = new IDComponent();
+
             HealthComponent = new HealthComponent(100f);
 
             WeaponComponent = new WeaponComponent();
-            WeaponComponent.Ctor();
 
             ItemComponent = new ItemComponent();
-            ItemComponent.Ctor();
 
             RoleState = RoleState.Normal;
             offset = new Vector3(0, 0.2f, 0);
         }
 
-        public int FetchCurWeaponBullets()
+        public int FetchBulletsFromItemComponent()
         {
             var curWeapon = WeaponComponent.CurrentWeapon;
             return ItemComponent.TryTakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
@@ -113,7 +109,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Reborn()
         {
-            Debug.Log($" wRid:{entityId} 重生----------------------------------");
+            Debug.Log($" wRid:{idComponent.EntityId} 重生----------------------------------");
             moveComponent.Reset();
             moveComponent.SetCurPos(SelfPos + new Vector3(0, 5f, 0));
             HealthComponent.Reset();

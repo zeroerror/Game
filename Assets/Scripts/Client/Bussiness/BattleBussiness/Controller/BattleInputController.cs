@@ -41,8 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var input = battleFacades.InputComponent;
             if (input.isPressJump)
             {
-                byte rid = owner.EntityId;
-                battleFacades.Network.RoleReqAndRes.SendReq_RoleJump(rid);
+                battleFacades.Network.RoleReqAndRes.SendReq_RoleJump(owner.IDComponent.EntityId);
             }
             if (input.isPressSwitchView)
             {
@@ -85,7 +84,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (closestGo != null)
                 {
                     var rqs = battleFacades.Network.ItemReqAndRes;
-                    rqs.SendReq_ItemPickUp(owner.EntityId, closestPickable.ItemType, closestPickable.EntityId);
+                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityId, closestPickable.ItemType, closestPickable.EntityId);
                 }
             }
             if (input.isPressFire)
@@ -102,7 +101,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     Vector3 targetPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
                     // 2.服务端流程
                     var rqs = battleFacades.Network.WeaponReqAndRes;
-                    rqs.SendReq_WeaponShoot(owner.EntityId, targetPos);
+                    rqs.SendReq_WeaponShoot(owner.IDComponent.EntityId, targetPos);
                 }
 
             }
@@ -145,8 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         rqs.SendReq_RoleRotate(owner);
                     }
 
-                    byte rid = owner.EntityId;
-                    rqs.SendReq_RoleMove(rid, moveDir);
+                    rqs.SendReq_RoleMove(owner.IDComponent.EntityId, moveDir);
                 }
             }
 
@@ -169,7 +167,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             for (int i = 0; i < array.Length; i++)
             {
                 var r = array[i];
-                if (r.EntityId == roleEntity.EntityId) continue;
+                if (r.IDComponent.EntityId == roleEntity.IDComponent.EntityId) continue;
 
                 var pos1 = r.MoveComponent.CurPos;
                 var pos2 = roleEntity.MoveComponent.CurPos;

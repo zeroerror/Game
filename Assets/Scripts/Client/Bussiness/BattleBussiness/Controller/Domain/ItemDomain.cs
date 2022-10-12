@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster && master.WeaponComponent.TryPickUpWeapon(weaponEntity, hangPoint))
                     {
                         isPickUpSucceed = true;
-                        weaponEntity.SetMasterId(master.EntityId);
+                        weaponEntity.SetMaster(master.IDComponent.EntityId);
 
                         weaponRepo.TryRemove(weaponEntity);
                     }

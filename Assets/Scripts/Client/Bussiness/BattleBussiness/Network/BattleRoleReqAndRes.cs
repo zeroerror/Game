@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // == Send ==
-        public void SendReq_RoleMove(byte rid, Vector3 dir)
+        public void SendReq_RoleMove(int rid, Vector3 dir)
         {
             var d = dir;
             dir.Normalize();
@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         public void SendReq_RoleRotate(BattleRoleLogicEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
-            var rid = roleEntity.EntityId;
+            var rid = roleEntity.IDComponent.EntityId;
             ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
             msg |= (ulong)(ushort)eulerAngel.x << 32;
             msg |= (ulong)(ushort)eulerAngel.y << 16;
@@ -56,11 +56,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             battleClient.SendMsg(frameRoleRotateReqMsg);
         }
 
-        public void SendReq_RoleJump(byte wRid)
+        public void SendReq_RoleJump(int entityId)
         {
             FrameJumpReqMsg frameJumpReqMsg = new FrameJumpReqMsg
             {
-                wRid = wRid
+                entityId = (byte)entityId
             };
 
             battleClient.SendMsg(frameJumpReqMsg);

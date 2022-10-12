@@ -22,13 +22,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendReq_ItemPickUp(byte wRid, ItemType itemType, ushort entityId)
+        public void SendReq_ItemPickUp(int wRid, ItemType itemType, int entityId)
         {
             FrameItemPickReqMsg msg = new FrameItemPickReqMsg
             {
-                wRid = wRid,
+                wRid = (byte)wRid,
                 itemType = (byte)itemType,
-                entityId = entityId
+                entityId = (ushort)entityId
             };
             _client.SendMsg(msg);
             Debug.Log($"[wRid:{wRid}]请求拾取 {itemType.ToString()}物件[entityId:{entityId}]");

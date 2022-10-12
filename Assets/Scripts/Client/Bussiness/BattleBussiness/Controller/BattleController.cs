@@ -146,7 +146,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     var fieldEntity = fieldRepo.Get(1);
                     var domain = battleFacades.Domain.BattleRoleDomain;
                     roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.transform);
-                    roleLogic.SetEntityId(wRoleId);
+                    roleLogic.IDComponent.SetEntityId(wRoleId);
                     roleLogic.Ctor();
 
                     var roleRenderer = domain.SpawnBattleRoleRenderer(fieldEntity.Role_Group_Renderer);
@@ -157,7 +157,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     roleRepo.Add(roleLogic);
                     if (stateMsg.isOwner && roleRepo.Owner == null)
                     {
-                        Debug.Log($"生成Owner  wRid:{roleLogic.EntityId})");
+                        Debug.Log($"生成Owner  wRid:{roleLogic.IDComponent.EntityId})");
                         roleRepo.SetOwner(roleLogic);
                         var fieldCameraComponent = fieldEntity.CameraComponent;
                         fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
@@ -195,7 +195,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         break;
                 }
                 moveComponent.SetCurPos(pos);
-                if (roleRepo.Owner == null || roleRepo.Owner.EntityId != roleLogic.EntityId) moveComponent.SetEulerAngle(eulerAngle);
+                if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId) moveComponent.SetEulerAngle(eulerAngle);
                 moveComponent.SetMoveVelocity(moveVelocity);
                 moveComponent.SetExtraVelocity(extraVelocity);
                 moveComponent.SetGravityVelocity(gravityVelocity);
@@ -216,7 +216,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var fieldEntity = repo.FiledRepo.Get(1);
                 var domain = battleFacades.Domain.BattleRoleDomain;
                 var roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.Role_Group_Logic);
-                roleLogic.SetEntityId(wRoleId);
+                roleLogic.IDComponent.SetEntityId(wRoleId);
                 roleLogic.Ctor();
 
                 var roleRenderer = domain.SpawnBattleRoleRenderer(fieldEntity.Role_Group_Renderer);
@@ -234,7 +234,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
                 }
 
-                Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{roleLogic.EntityId}" : $"生成其他角色 : WRid:{roleLogic.EntityId}");
+                Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{roleLogic.IDComponent.EntityId}" : $"生成其他角色 : WRid:{roleLogic.IDComponent.EntityId}");
             }
         }
         #endregion
@@ -291,7 +291,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var role = roleRepo.GetByEntityId(bulletHitRoleMsg.wRid);
 
                 // Client Logic
-                role.HealthComponent.HurtByBullet(bullet);
+                role.HealthComponent.HurtBy(5);
                 role.MoveComponent.HitByBullet(bullet);
                 if (role.HealthComponent.IsDead)
                 {

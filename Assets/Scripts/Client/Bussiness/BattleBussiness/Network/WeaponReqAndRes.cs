@@ -25,12 +25,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
 
         // ====== Send ======
-        public void SendReq_WeaponShoot(byte masterId, Vector3 targetPos)
+        public void SendReq_WeaponShoot(int masterId, Vector3 targetPos)
         {
             targetPos *= 10000f;
             FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
             {
-                masterId = masterId,
+                masterId = (byte)masterId,
                 targetPosX = (int)targetPos.x,
                 targetPosY = (int)targetPos.y,
                 targetPosZ = (int)targetPos.z,
@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         {
             FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
             {
-                masterId = role.EntityId,
+                masterId = role.IDComponent.EntityId,
             };
             _client.SendMsg(frameWeaponReloadReqMsg);
             Debug.Log("发送武器装弹请求");
@@ -54,8 +54,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
             FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
             {
-                entityId = role.WeaponComponent.CurrentWeapon.EntityId,
-                masterId = role.EntityId
+                entityId = (ushort)role.WeaponComponent.CurrentWeapon.EntityId,
+                masterId = role.IDComponent.EntityId
             };
             _client.SendMsg(frameWeaponDropReqMsg);
             Debug.Log("发送武器丢弃请求");

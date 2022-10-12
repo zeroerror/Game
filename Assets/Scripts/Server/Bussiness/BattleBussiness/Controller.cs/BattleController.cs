@@ -268,7 +268,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     jumpOptMsgDic[key] = null;
 
-                    var wRid = msg.wRid;
+                    var wRid = msg.entityId;
                     var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                     var roleEntity = roleRepo.GetByEntityId(wRid);
                     var rqs = battleFacades.Network.BattleRoleReqAndRes;

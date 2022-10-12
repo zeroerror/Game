@@ -5,11 +5,11 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 
     [ZeroMessage]
     public class FrameJumpReqMsg :IZeroMessage<FrameJumpReqMsg>{
-        public byte wRid;
+        public byte entityId;
 
         public void FromBytes(byte[] src, ref int offset)
         {
-            wRid = BufferReader.ReadByte(src, ref offset);
+            entityId = BufferReader.ReadByte(src, ref offset);
             offset += src.Length;
         }
 
@@ -17,7 +17,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
         {
             int offset = 0;
             byte[] result = new byte[1000];
-            BufferWriter.WriteByte(result, wRid, ref offset);
+            BufferWriter.WriteByte(result, entityId, ref offset);
             return result;
         }
 
