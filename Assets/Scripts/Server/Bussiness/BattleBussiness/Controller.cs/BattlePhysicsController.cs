@@ -164,13 +164,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 bullet.TearDown();
                 bulletRepo.TryRemove(bullet);
-
-                var bulletRqs = battleFacades.Network.BulletReqAndRes;
-                connIdList.ForEach((connID) =>
-                {
-                    bulletRqs.SendRes_BulletTearDown(connID, bullet);
-                });
-
             });
 
         }

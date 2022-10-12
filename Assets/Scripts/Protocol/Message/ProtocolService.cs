@@ -21,7 +21,7 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(FrameBulletHitWallResMsg), 6);
             messageInfoDic.Add(typeof(FrameBulletSpawnReqMsg), 7);
             messageInfoDic.Add(typeof(FrameBulletSpawnResMsg), 8);
-            messageInfoDic.Add(typeof(FrameBulletTearDownResMsg), 9);
+            messageInfoDic.Add(typeof(FrameBulletLifeOverResMsg), 9);
             messageInfoDic.Add(typeof(FrameItemPickReqMsg), 10);
             messageInfoDic.Add(typeof(FrameItemPickResMsg), 11);
             messageInfoDic.Add(typeof(FrameItemSpawnResMsg), 12);

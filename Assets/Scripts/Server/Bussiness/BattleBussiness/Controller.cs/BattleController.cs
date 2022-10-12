@@ -100,7 +100,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             if (!isSceneSpawn) return;
 
             // ====== Life
-            Tick_BulletLife();
+            Tick_BulletLifeFrame();
             Tick_ActiveHookersBehaviour();
 
             // Client Request
@@ -360,7 +360,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
 
-        void Tick_BulletLife()
+        void Tick_BulletLifeFrame()
         {
             var tearDownList = battleFacades.ClientBattleFacades.Domain.BulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
             if (tearDownList.Count == 0) return;
@@ -405,7 +405,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 ConnIdList.ForEach((connId) =>
                 {
                     // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletTearDown(connId, bulletEntity);
+                    bulletRqs.SendRes_BulletLifeFrameOver(connId, bulletEntity);
                 });
 
                 var roleRqs = battleFacades.Network.RoleReqAndRes;

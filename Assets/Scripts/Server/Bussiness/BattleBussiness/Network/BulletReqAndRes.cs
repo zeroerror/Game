@@ -97,14 +97,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"发送子弹击中墙壁消息 ");
         }
 
-        public void SendRes_BulletTearDown(int connId, BulletEntity bulletEntity)
+        public void SendRes_BulletLifeFrameOver(int connId, BulletEntity bulletEntity)
         {
             BulletType bulletType = bulletEntity.BulletType;
             int masterEntityID = bulletEntity.MasterId;
             int bulletEntityID = bulletEntity.IDComponent.EntityId;
             Vector3 pos = bulletEntity.MoveComponent.Position;
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");
-            FrameBulletTearDownResMsg msg = new FrameBulletTearDownResMsg
+            FrameBulletLifeOverResMsg msg = new FrameBulletLifeOverResMsg
             {
                 serverFrame = serverFrame,
                 bulletType = (byte)bulletType,

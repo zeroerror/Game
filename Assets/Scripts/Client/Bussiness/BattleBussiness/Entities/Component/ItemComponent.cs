@@ -27,17 +27,17 @@ namespace Game.Client.Bussiness.BattleBussiness
             // TODO: 只收集最大可收集数量
             if (CurrentCapacity >= 300)
             {
-                Debug.LogWarning("背包容量已满！");
+                Debug.LogWarning("背包容量已满！ 暂未作处理");
             }
 
             CurrentCapacity += bulletPackEntity.bulletNum * 1;
-            Debug.Log($"收集了子弹包[类型:{bulletPackEntity.bulletType.ToString()} 数量:{bulletPackEntity.bulletNum}]");
-            Debug.Log($"当前背包容量:{CurrentCapacity}");
+            Debug.LogWarning($"收集了子弹包[类型:{bulletPackEntity.bulletType.ToString()} 数量:{bulletPackEntity.bulletNum}]");
+            Debug.LogWarning($"当前背包容量 占用 {CurrentCapacity}  剩余 {ITEM_CAPACITY - CurrentCapacity}");
             bulletPackItemQueue.Enqueue(bulletPackEntity);
         }
 
         // 使用
-        public int TryTakeOutItem_Bullet(int num)
+        public int TakeOutItem_Bullet(int num)
         {
             if (bulletPackItemQueue.TryPeek(out var bulletPackEntity))
             {
@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 {
                     GameObject.Destroy(bulletPackEntity);
                     bulletPackItemQueue.Dequeue();
-                    return TryTakeOutItem_Bullet(num);
+                    return TakeOutItem_Bullet(num);
                 }
             }
 

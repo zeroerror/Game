@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public BattleRoleLogicEntity SpawnRoleLogic(Transform parent)
         {
-            string rolePrefabName = "player_logic";
+            string rolePrefabName = "role_logic";
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
@@ -40,12 +40,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public BattleRoleRendererEntity SpawnRoleRenderer(Transform parent)
         {
-            string rolePrefabName = "player_renderer";
+            string rolePrefabName = "role_renderer";
             Debug.Log("生成" + rolePrefabName);
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
-                var roleRenderer = prefabAsset.GetComponent<BattleRoleRendererEntity>();
+                var roleRenderer = prefabAsset.GetComponentInChildren<BattleRoleRendererEntity>();
                 return roleRenderer;
             }
 

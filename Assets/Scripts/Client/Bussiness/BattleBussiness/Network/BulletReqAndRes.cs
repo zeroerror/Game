@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             _client.RegistMsg(action);
         }
 
-        public void RegistRes_BulletTearDown(Action<FrameBulletTearDownResMsg> action)
+        public void RegistRes_BulletTearDown(Action<FrameBulletLifeOverResMsg> action)
         {
             _client.RegistMsg(action);
         }

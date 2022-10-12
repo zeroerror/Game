@@ -20,7 +20,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
         Queue<FrameBulletHitWallResMsg> bulletHitWallQueue;
-        Queue<FrameBulletTearDownResMsg> bulletTearDownQueue;
+        Queue<FrameBulletLifeOverResMsg> bulletTearDownQueue;
         // 服务器下发的人物状态同步队列
         Queue<BattleRoleStateUpdateMsg> roleStateQueue;
         // 服务器下发的资源拾取队列
@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
             bulletHitWallQueue = new Queue<FrameBulletHitWallResMsg>();
-            bulletTearDownQueue = new Queue<FrameBulletTearDownResMsg>();
+            bulletTearDownQueue = new Queue<FrameBulletLifeOverResMsg>();
 
             roleStateQueue = new Queue<BattleRoleStateUpdateMsg>();
 
@@ -498,7 +498,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletHitWallQueue.Enqueue(msg);
         }
 
-        void OnBulletTearDown(FrameBulletTearDownResMsg msg)
+        void OnBulletTearDown(FrameBulletLifeOverResMsg msg)
         {
             Debug.Log($"{msg.bulletType.ToString()} 加入子弹销毁队列");
             bulletTearDownQueue.Enqueue(msg);

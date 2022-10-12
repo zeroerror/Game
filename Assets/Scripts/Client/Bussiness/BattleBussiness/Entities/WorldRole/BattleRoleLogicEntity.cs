@@ -76,7 +76,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int FetchBulletsFromItemComponent()
         {
             var curWeapon = WeaponComponent.CurrentWeapon;
-            return ItemComponent.TryTakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
+            return ItemComponent.TakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
         }
 
         public bool CanWeaponReload()

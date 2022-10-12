@@ -17,23 +17,13 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: b7ca4e6ae41f2ed41af4532fd9b1ce99
   m_SerializeEntries:
-  - m_GUID: e5286f1985326b340a3a1117420f6d41
-    m_Address: PlayerRenderer
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Role
-  - m_GUID: cedadc64c011e514ebd3a60aacc2c17d
-    m_Address: PlayerLogic
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Role
-  - m_GUID: 37c99ac8d7e5b9c4484004635441a1a2
-    m_Address: player_renderer
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Role
   - m_GUID: 42136c702523b294cb7e7a2c3ff5826f
-    m_Address: player_logic
+    m_Address: role_logic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Role
+  - m_GUID: 73827c3a4bc0e02449b024132bc3742e
+    m_Address: role_renderer
     m_ReadOnly: 0
     m_SerializedLabels:
     - Role
