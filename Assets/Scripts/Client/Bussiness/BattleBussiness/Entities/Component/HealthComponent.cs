@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             health -= damage;
         }
 
-        public void HurtBy(int damage)
+        public void HurtByDamage(int damage)
         {
             // TODO: 改成子弹对应的伤害
             if (IsDead) return;

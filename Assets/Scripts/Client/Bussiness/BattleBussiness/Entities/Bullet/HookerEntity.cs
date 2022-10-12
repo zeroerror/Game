@@ -7,8 +7,8 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class HookerEntity : BulletEntity
     {
 
-        byte masterWRid;
-        public void SetMasterWRid(byte masterWRid) => this.masterWRid = masterWRid;
+        int masterWRid;
+        public void SetMasterWRid(int masterWRid) => this.masterWRid = masterWRid;
 
         GameObject masterGrabEnd;//钩爪持有者一端
         public void SetMasterGrabPoint(Transform grabPoint) => this.masterGrabEnd.transform.SetParent(grabPoint, false);

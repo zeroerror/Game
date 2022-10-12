@@ -56,11 +56,11 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log("回复武器射击请求");
         }
 
-        public void SendRes_WeaponReloaded(int connId, int serverFrame, byte masterId, int reloadBulletNum)
+        public void SendRes_WeaponReloaded(int connId, int serverFrame, int masterId, int reloadBulletNum)
         {
             FrameWeaponReloadResMsg msg = new FrameWeaponReloadResMsg
             {
-                masterId = masterId,
+                masterId = (byte)masterId,
                 reloadBulletNum = (byte)reloadBulletNum
             };
             battleServer.SendMsg(connId, msg);
@@ -68,12 +68,12 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log("回复武器装弹请求");
         }
 
-        public void SendRes_WeaponDrop(int connId, int serverFrame, byte masterId, ushort entityId)
+        public void SendRes_WeaponDrop(int connId, int serverFrame, int masterId, ushort entityId)
         {
             FrameWeaponDropResMsg msg = new FrameWeaponDropResMsg
             {
                 entityId = entityId,
-                masterId = masterId,
+                masterId = (byte)masterId,
             };
             battleServer.SendMsg(connId, msg);
             sendCount++;

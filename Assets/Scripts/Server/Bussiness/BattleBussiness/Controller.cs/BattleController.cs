@@ -147,8 +147,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     // 服务器逻辑
                     var roleEntity = clientFacades.Domain.BattleRoleDomain.SpawnBattleRoleLogic(fieldEntity.transform);
                     roleEntity.Ctor();
-                    roleEntity.SetEntityId(wrid);
-                    roleEntity.SetConnId(connId);
+                    roleEntity.IDComponent.SetEntityId(wrid);
+                    roleEntity.IDComponent.SetConnId(connId);
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.CurPos}");
 
                     // ===== TODO:同步所有信息给请求者
@@ -340,7 +340,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             break;
                         case BulletType.Hooker:
                             var hookerEntity = (HookerEntity)bulletEntity;
-                            hookerEntity.SetMasterWRid(roleEntity.EntityId);
+                            hookerEntity.SetMasterWRid(roleEntity.IDComponent.EntityId);
                             hookerEntity.SetMasterGrabPoint(roleEntity.transform);
                             break;
                     }

@@ -77,7 +77,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             BattleRoleStateUpdateMsg msg = new BattleRoleStateUpdateMsg
             {
                 serverFrameIndex = serverFrame,
-                wRid = role.EntityId,
+                entityId = (byte)role.IDComponent.EntityId,
                 roleState = (int)role.RoleState,
                 x = x,
                 y = y,
@@ -92,7 +92,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 extraVelocityY = extraVelocityY,
                 extraVelocityZ = extraVelocityZ,
                 gravityVelocity = gravityVelocity,
-                isOwner = connId == role.ConnId
+                isOwner = connId == role.IDComponent.ConnId
             };
             battleServer.SendMsg<BattleRoleStateUpdateMsg>(connId, msg);
             sendCount++;

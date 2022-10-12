@@ -139,10 +139,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleRepo;
                 var fieldRepo = repo.FiledRepo;
-                var roleLogic = battleFacades.Repo.RoleRepo.GetByEntityId(stateMsg.wRid);
+                var roleLogic = battleFacades.Repo.RoleRepo.GetByEntityId(stateMsg.entityId);
                 if (roleLogic == null)
                 {
-                    var wRoleId = stateMsg.wRid;
+                    var wRoleId = stateMsg.entityId;
                     var fieldEntity = fieldRepo.Get(1);
                     var domain = battleFacades.Domain.BattleRoleDomain;
                     roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.transform);
@@ -288,10 +288,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bulletRepo = battleFacades.Repo.BulletRepo;
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
-                var role = roleRepo.GetByEntityId(bulletHitRoleMsg.wRid);
+                var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
 
                 // Client Logic
-                role.HealthComponent.HurtBy(5);
+                role.HealthComponent.HurtByDamage(5);
                 role.MoveComponent.HitByBullet(bullet);
                 if (role.HealthComponent.IsDead)
                 {

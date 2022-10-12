@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return list.Find((entity) => entity.IDComponent.EntityId == wRid);
         }
 
-        public bool TryGetByEntityId(byte wRid, out BattleRoleLogicEntity entity)
+        public bool TryGetByEntityId(int wRid, out BattleRoleLogicEntity entity)
         {
             entity = list.Find((entity) => entity.IDComponent.EntityId == wRid);
             return entity != null;

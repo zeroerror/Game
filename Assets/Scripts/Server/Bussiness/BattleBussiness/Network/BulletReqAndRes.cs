@@ -65,18 +65,18 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BulletHitRole(int connId, ushort bulletId, byte wRid)
+        public void SendRes_BulletHitRole(int connId, ushort bulletId, int entityId)
         {
             FrameBulletHitRoleResMsg msg = new FrameBulletHitRoleResMsg
             {
                 serverFrame = serverFrame,
                 bulletId = bulletId,
-                wRid = wRid
+                entityId = (byte)entityId
             };
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
-            Debug.Log($"发送子弹击中角色消息 wRid {wRid}");
+            Debug.Log($"发送子弹击中角色消息 wRid {entityId}");
         }
 
         public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)

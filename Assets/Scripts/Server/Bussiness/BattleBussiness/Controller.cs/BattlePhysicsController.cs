@@ -74,10 +74,10 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleTrans = ce.gameObject.transform;
                     // Server Logic
                     var role = ce.gameObject.GetComponentInParent<BattleRoleLogicEntity>();
-                    if (bullet.MasterId != role.EntityId)
+                    if (bullet.MasterId != role.IDComponent.EntityId)
                     {
-                        Debug.Log($"打中敌人 bullet.MasterId ：{bullet.MasterId} role.EntityId ：{role.EntityId} ");
-                        role.HealthComponent.HurtBy(bullet);
+                        Debug.Log($"打中敌人 bullet.MasterId ：{bullet.MasterId} role.EntityId ：{role.IDComponent.EntityId} ");
+                        role.HealthComponent.HurtByDamage(5);
                         role.MoveComponent.HitByBullet(bullet);
                         if (role.HealthComponent.IsDead)
                         {
@@ -88,7 +88,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         var rqs = battleFacades.Network.BulletReqAndRes;
                         connIdList.ForEach((connId) =>
                         {
-                            rqs.SendRes_BulletHitRole(connId, bullet.EntityId, role.EntityId);
+                            rqs.SendRes_BulletHitRole(connId, bullet.EntityId, role.IDComponent.EntityId);
                         });
                     }
 

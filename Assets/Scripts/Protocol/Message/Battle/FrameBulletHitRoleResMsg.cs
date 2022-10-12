@@ -7,13 +7,13 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
     public class FrameBulletHitRoleResMsg :IZeroMessage<FrameBulletHitRoleResMsg>{
         public int serverFrame;
         public ushort bulletId;
-        public byte wRid;
+        public byte entityId;
 
         public void FromBytes(byte[] src, ref int offset)
         {
             serverFrame = BufferReader.ReadInt32(src, ref offset);
             bulletId = BufferReader.ReadUInt16(src, ref offset);
-            wRid = BufferReader.ReadByte(src, ref offset);
+            entityId = BufferReader.ReadByte(src, ref offset);
             offset += src.Length;
         }
 
@@ -23,7 +23,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             byte[] result = new byte[1000];
             BufferWriter.WriteInt32(result, serverFrame, ref offset);
             BufferWriter.WriteUInt16(result, bulletId, ref offset);
-            BufferWriter.WriteByte(result, wRid, ref offset);
+            BufferWriter.WriteByte(result, entityId, ref offset);
             return result;
         }
     }

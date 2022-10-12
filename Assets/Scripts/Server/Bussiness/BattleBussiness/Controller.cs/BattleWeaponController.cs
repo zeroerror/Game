@@ -162,7 +162,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         //TODO: 装弹时间过后才发送回客户端
                         ConnIdList.ForEach((connId) =>
                         {
-                            rqs.SendRes_WeaponReloaded(connId, ServeFrame, role.EntityId, reloadBulletNum);
+                            rqs.SendRes_WeaponReloaded(connId, ServeFrame, role.IDComponent.EntityId, reloadBulletNum);
                         });
                     }
                 }
