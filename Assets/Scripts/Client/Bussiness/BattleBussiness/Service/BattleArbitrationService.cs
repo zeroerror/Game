@@ -26,19 +26,24 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         Dictionary<long, Queue<HitPowerModel>> all;
 
-        public BattleArbitrationService() { }
+        public BattleArbitrationService()
+        {
+            all = new Dictionary<long, Queue<HitPowerModel>>();
+        }
 
         public bool CanDamage(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)
         {
             // 不可多次伤害
             if (HasHitRecord(attacker, victim, hitPowerModel) && !hitPowerModel.canHitRepeatly)
             {
+                Debug.LogWarning($"不可多次伤害 ");
                 return false;
             }
 
             // 不是正确的攻击对象
             if (!IsRightTarget(attacker, victim, hitPowerModel))
             {
+                Debug.LogWarning($"不是正确的攻击对象 ");
                 return false;
             }
 

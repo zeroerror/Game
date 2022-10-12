@@ -61,14 +61,15 @@ namespace Game.Server.Bussiness.BattleBussiness
         void Tick_Physics_Collision_Bullet()
         {
             var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
-
             var bulletDomain = battleFacades.ClientBattleFacades.Domain.BulletDomain;
             var bulletRepo = battleFacades.ClientBattleFacades.Repo.BulletRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
+
             bulletRepo.Foreach((bullet) =>
             {
                 var hitRoleList = physicsDomain.GetHitRole_ColliderList(bullet);
                 Transform hookedRoleTrans = null;
+
                 hitRoleList.ForEach((ce) =>
                 {
                     // TODO:如果子弹不能穿透，则是直接退出循环
@@ -95,18 +96,21 @@ namespace Game.Server.Bussiness.BattleBussiness
                         {
                             role.HealthComponent.HurtByDamage(hitPowerModel.damage);
                             var roleRqs = battleFacades.Network.RoleReqAndRes;
+
+                            role.MoveComponent.HitByBullet(bullet);
+                            if (role.HealthComponent.IsDead())
+                            {
+                                role.TearDown();
+                                var roleDomain = battleFacades.ClientBattleFacades.Domain.RoleDomain;
+                                roleDomain.RebornRole(role);
+                            }
+
                             // 广播 1
                             connIdList.ForEach((connID) =>
                             {
                                 roleRqs.SendUpdate_WRoleState(connID, role);
                             });
 
-                            role.MoveComponent.HitByBullet(bullet);
-                            if (role.HealthComponent.IsDead)
-                            {
-                                role.TearDown();
-                                role.Reborn();
-                            }
                         }
 
                         // Notice Client
@@ -155,18 +159,27 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 }
             });
+
             removeList.ForEach((bullet) =>
             {
                 bullet.TearDown();
                 bulletRepo.TryRemove(bullet);
+
+                var bulletRqs = battleFacades.Network.BulletReqAndRes;
+                connIdList.ForEach((connID) =>
+                {
+                    bulletRqs.SendRes_BulletTearDown(connID, bullet);
+                });
+
             });
+
         }
 
         void Tick_Physics_Movement_Role(float fixedDeltaTime)
         {
             var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
             physicsDomain.Tick_RoleMoveHitErase();   //Unity's Collision Will Auto Erase
-            var domain = battleFacades.ClientBattleFacades.Domain.BattleRoleDomain;
+            var domain = battleFacades.ClientBattleFacades.Domain.RoleDomain;
             domain.Tick_RoleRigidbody(fixedDeltaTime);
         }
 

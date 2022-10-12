@@ -13,7 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         float health;
         public float Health => health;
 
-        public bool IsDead => health <= 0;
+        public bool IsDead() => health <= 0;
 
         public HealthComponent(float health)
         {
@@ -23,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void HurtByDamage(float damage)
         {
-            if (IsDead) return;
+            if (IsDead()) return;
 
             Debug.Log($"health:{health} -> {health - damage}");
             health -= damage;
@@ -32,7 +32,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void HurtByDamage(int damage)
         {
             // TODO: 改成子弹对应的伤害
-            if (IsDead) return;
+            if (IsDead()) return;
 
             Debug.Log($"受到伤害: {damage}  ->  health {health - damage}");
             health -= damage;

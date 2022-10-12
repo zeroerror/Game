@@ -47,7 +47,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public void SendUpdate_WRoleState(int connId, BattleRoleLogicEntity role)
         {
             // Position
-            var pos = role.MoveComponent.CurPos;
+            var pos = role.MoveComponent.Position;
             int x = (int)(pos.x * 10000);
             int y = (int)(pos.y * 10000);
             int z = (int)(pos.z * 10000);

@@ -99,7 +99,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                             var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
                             var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                            var bulletId = bulletRepo.BulletCount;
+                            var bulletId = bulletRepo.AutoEntityID;
                             bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                             bulletEntity.MoveComponent.SetForward(shootDir);
                             bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
@@ -187,7 +187,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
                     {
                         // 服务器逻辑
-                        battleFacades.ClientBattleFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.CurPos);
+                        battleFacades.ClientBattleFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.Position);
 
                         ConnIdList.ForEach((connId) =>
                         {

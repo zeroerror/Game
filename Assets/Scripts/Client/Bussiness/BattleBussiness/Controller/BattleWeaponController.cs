@@ -89,7 +89,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 weaponDropQueue.Dequeue();
                 var master = battleFacades.Repo.RoleRepo.GetByEntityId(msg.masterId);
                 master.WeaponComponent.TryDropWeapon(msg.entityId, out var weaponEntity);
-                battleFacades.Domain.WeaponDomain.ReuseWeapon(weaponEntity, master.MoveComponent.CurPos);
+                battleFacades.Domain.WeaponDomain.ReuseWeapon(weaponEntity, master.MoveComponent.Position);
             }
         }
 

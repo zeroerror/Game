@@ -59,7 +59,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 float closestDis = float.MaxValue;
                 GameObject closestGo = null;
                 IPickable closestPickable = null;
-                Vector3 ownerPos = owner.MoveComponent.CurPos;
+                Vector3 ownerPos = owner.MoveComponent.Position;
                 Debug.Log($"想要拾取物品，周围可拾取数量为:{nearItemList.Count}");
 
                 nearItemList.ForEach((item) =>
@@ -169,8 +169,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var r = array[i];
                 if (r.IDComponent.EntityId == roleEntity.IDComponent.EntityId) continue;
 
-                var pos1 = r.MoveComponent.CurPos;
-                var pos2 = roleEntity.MoveComponent.CurPos;
+                var pos1 = r.MoveComponent.Position;
+                var pos2 = roleEntity.MoveComponent.Position;
                 if (Vector3.Distance(pos1, pos2) < 1f)
                 {
                     var betweenV = pos1 - pos2;

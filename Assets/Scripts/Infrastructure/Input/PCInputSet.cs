@@ -26,7 +26,7 @@ public class PCInputSet
         right = KeyCode.D;
         jump = KeyCode.Space;
         swithView = KeyCode.V;
-        shoot = KeyCode.Mouse0;
+        shoot = KeyCode.J;
         pickUpAssets = KeyCode.F;
         weaponReload = KeyCode.R;
         weaponDrop = KeyCode.G;

@@ -145,12 +145,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     var wRoleId = stateMsg.entityId;
                     var fieldEntity = fieldRepo.Get(1);
-                    var domain = battleFacades.Domain.BattleRoleDomain;
-                    roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.transform);
+                    var domain = battleFacades.Domain.RoleDomain;
+                    roleLogic = domain.SpawnRoleLogic(fieldEntity.transform);
                     roleLogic.Ctor();
                     roleLogic.IDComponent.SetEntityId(wRoleId);
 
-                    var roleRenderer = domain.SpawnBattleRoleRenderer(fieldEntity.Role_Group_Renderer);
+                    var roleRenderer = domain.SpawnRoleRenderer(fieldEntity.Role_Group_Renderer);
                     roleRenderer.SetWRid(wRoleId);
                     roleRenderer.Ctor();
                     roleLogic.Inject(roleRenderer);
@@ -167,6 +167,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     {
                         Debug.Log($"人物状态同步帧(roleLogic[{wRoleId}]丢失，重新生成)");
                     }
+                }
+
+                if (roleLogic.HealthComponent.IsDead())
+                {
+                    battleFacades.Domain.RoleDomain.RebornRole(roleLogic);
+                    return;
                 }
 
                 var animatorComponent = roleLogic.roleRenderer.AnimatorComponent;
@@ -214,12 +220,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var wRoleId = spawn.wRoleId;
                 var repo = battleFacades.Repo;
                 var fieldEntity = repo.FiledRepo.Get(1);
-                var domain = battleFacades.Domain.BattleRoleDomain;
-                var roleLogic = domain.SpawnBattleRoleLogic(fieldEntity.Role_Group_Logic);
+                var domain = battleFacades.Domain.RoleDomain;
+                var roleLogic = domain.SpawnRoleLogic(fieldEntity.Role_Group_Logic);
                 roleLogic.Ctor();
                 roleLogic.IDComponent.SetEntityId(wRoleId);
 
-                var roleRenderer = domain.SpawnBattleRoleRenderer(fieldEntity.Role_Group_Renderer);
+                var roleRenderer = domain.SpawnRoleRenderer(fieldEntity.Role_Group_Renderer);
                 roleRenderer.SetWRid(wRoleId);
                 roleRenderer.Ctor();
                 roleLogic.Inject(roleRenderer);
@@ -292,16 +298,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 // Client Logic
                 role.MoveComponent.HitByBullet(bullet);
-                if (role.HealthComponent.IsDead)
+                if (role.HealthComponent.IsDead())
                 {
-                    role.TearDown();
-                    role.Reborn();
+                    battleFacades.Domain.RoleDomain.RebornRole(role);
                 }
 
                 if (bullet.BulletType == BulletType.DefaultBullet)
                 {
-                    bullet.TearDown();
-                    bulletRepo.TryRemove(bullet);
                 }
                 else if (bullet is HookerEntity hookerEntity)
                 {
@@ -500,6 +503,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Debug.Log($"{msg.bulletType.ToString()} 加入子弹销毁队列");
             bulletTearDownQueue.Enqueue(msg);
         }
+        
         #endregion
 
         #region [ITEM]

@@ -31,7 +31,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         // Pos
         Vector3 offset;
-        Vector3 shootPointPos => MoveComponent.CurPos + transform.forward + offset;
+        Vector3 shootPointPos => MoveComponent.Position + transform.forward + offset;
         public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
         public Vector3 SelfPos => transform.position;
 
@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.BattleRole);
 
-            HealthComponent = new HealthComponent(100f);
+            HealthComponent = new HealthComponent(5f);
 
             WeaponComponent = new WeaponComponent();
 
@@ -117,12 +117,15 @@ namespace Game.Client.Bussiness.BattleBussiness
             IsDead = true;
         }
 
-        public void Reborn()
+        public void Reborn(in Vector3 pos)
         {
             Debug.Log($" wRid:{idComponent.EntityId} 重生----------------------------------");
+
+            moveComponent.SetCurPos(pos);
             moveComponent.Reset();
-            moveComponent.SetCurPos(SelfPos + new Vector3(0, 5f, 0));
+
             HealthComponent.Reset();
+
             IsDead = false;
         }
 

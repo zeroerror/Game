@@ -9,7 +9,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<BulletEntity> bulletList;
-        public int BulletCount => bulletList.Count;
+
+        int autoEntityID;
+        public int AutoEntityID => autoEntityID;
 
         public BulletRepo()
         {
@@ -34,6 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public void Add(BulletEntity entity)
         {
             bulletList.Add(entity);
+            autoEntityID++;
         }
 
         public bool TryRemove(BulletEntity entity)

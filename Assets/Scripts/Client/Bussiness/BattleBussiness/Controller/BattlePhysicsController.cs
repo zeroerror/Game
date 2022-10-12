@@ -52,7 +52,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_Physics_Movement_Role(float deltaTime)
         {
-            var domain = battleFacades.Domain.BattleRoleDomain;
+            var domain = battleFacades.Domain.RoleDomain;
             domain.Tick_RoleRigidbody(deltaTime);
 
             var cameraComponent = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent;

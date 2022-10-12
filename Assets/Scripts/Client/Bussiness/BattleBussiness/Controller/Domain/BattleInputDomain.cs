@@ -66,7 +66,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     if (Physics.Raycast(ray, out RaycastHit hit)) return hit.point;
                     break;
                 case CameraView.ThirdView:
-                    var roleTrans = roleLogicEntity.MoveComponent.CurPos;
+                    var roleTrans = roleLogicEntity.MoveComponent.Position;
                     var forward = roleLogicEntity.transform.forward;
                     if (Physics.Raycast(roleTrans, forward, out hit, 1000f)) return hit.point;
                     break;

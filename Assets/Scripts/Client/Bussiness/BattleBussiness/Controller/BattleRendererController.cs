@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Update_RoleRenderer(float deltaTime)
         {
-            var domain = battleFacades.Domain.BattleRoleDomain;
+            var domain = battleFacades.Domain.RoleDomain;
             domain.Update_RoleRenderer(deltaTime);
         }
 

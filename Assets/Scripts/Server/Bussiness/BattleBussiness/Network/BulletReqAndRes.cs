@@ -81,7 +81,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)
         {
-            var bulletPos = bulletEntity.MoveComponent.CurPos;
+            var bulletPos = bulletEntity.MoveComponent.Position;
             bulletPos *= 10000f;
             FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
             {
@@ -97,8 +97,12 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"发送子弹击中墙壁消息 ");
         }
 
-        public void SendRes_BulletTearDown(int connId, BulletType bulletType, int masterEntityID, int bulletEntityID, Vector3 pos)
+        public void SendRes_BulletTearDown(int connId, BulletEntity bulletEntity)
         {
+            BulletType bulletType = bulletEntity.BulletType;
+            int masterEntityID = bulletEntity.MasterId;
+            int bulletEntityID = bulletEntity.IDComponent.EntityId;
+            Vector3 pos = bulletEntity.MoveComponent.Position;
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");
             FrameBulletTearDownResMsg msg = new FrameBulletTearDownResMsg
             {

@@ -46,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             dir.Normalize();
             dir = dir.FixDecimal(2);
             this.moveVelocity = dir * speed;
-            Debug.Log($"移动:{moveVelocity}");
+            // Debug.Log($"移动:{moveVelocity}");
         }
 
         // == 跳跃速度 2
@@ -54,9 +54,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float JumpVelocity => jumpVelocity;
 
         // == 重力速度 3
-        float _gravityVelocity;
-        public float GravityVelocity => _gravityVelocity;
-        public void SetGravityVelocity(float gravityVelocity) => this._gravityVelocity = gravityVelocity;
+        float gravityVelocity;
+        public float GravityVelocity => gravityVelocity;
+        public void SetGravityVelocity(float gravityVelocity) => this.gravityVelocity = gravityVelocity;
 
         // == 额外速度 4
         Vector3 extraVelocity;
@@ -71,7 +71,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public bool IsGrouded { get; private set; }
         public bool IsHitWall { get; private set; }
 
-        public Vector3 CurPos => rb.position;
+        public Vector3 Position => rb.position;
         public void SetCurPos(Vector3 curPos) => rb.position = curPos;
 
         // == Rotation
@@ -120,7 +120,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             var v = rb.velocity;
             v.y = 0;
             rb.velocity = v;
-            _gravityVelocity = 0;
+            gravityVelocity = 0;
 
             jumpVelocity = jumpSpeed;
             return true;
@@ -139,7 +139,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             vel = moveVelocity;//XZ轴
-            vel.y = rb.velocity.y + jumpVelocity + _gravityVelocity * fixedDeltaTime;   //Y轴
+            vel.y = rb.velocity.y + jumpVelocity + gravityVelocity * fixedDeltaTime;   //Y轴
             vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
 
@@ -187,7 +187,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 }
                 else
                 {
-                    _gravityVelocity -= (fixedDeltaTime * gravity);
+                    gravityVelocity -= (fixedDeltaTime * gravity);
                 }
 
                 if (moveVelocity.y > 0)
@@ -201,13 +201,18 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Reset()
         {
             LeaveGround();
+            gravityVelocity = 0;
+            jumpVelocity = 0;
+            extraVelocity = Vector3.zero;
+            moveVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;
+
             rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
         }
 
         public string ToInfo()
         {
-            return $"位置: {CurPos} 移动速度: {MoveVelocity} 跳跃速度: {JumpVelocity} 重力速度: {GravityVelocity} 额外速度: {ExtraVelocity} ";
+            return $"位置: {Position} 移动速度: {MoveVelocity} 跳跃速度: {JumpVelocity} 重力速度: {GravityVelocity} 额外速度: {ExtraVelocity} ";
         }
 
         #region [ Physics Collision]
@@ -221,7 +226,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveVelocity -= reduceVelocity;
             if (cosValue != 0)
             {
-                DebugExtensions.LogWithColor($"贴墙移动，消除垂直墙面速度 {reduceVelocity}", "#48D1CC");
+                // DebugExtensions.LogWithColor($"贴墙移动，消除垂直墙面速度 {reduceVelocity}  moveVelocity{moveVelocity} cosValue:{cosValue}", "#48D1CC");
             }
         }
 
@@ -253,13 +258,13 @@ namespace Game.Client.Bussiness.BattleBussiness
             extraVelocity -= reduceVelocity;
             // DebugExtensions.LogWithColor($"碰撞消除'额外速度':{reduceVelocity}---->新'额外速度':{extraVelocity}", "#48D1CC");
 
-            var gravityVelocity = new Vector3(0, _gravityVelocity, 0);
+            var gravityVelocity = new Vector3(0, this.gravityVelocity, 0);
             a = gravityVelocity.normalized;
             b = dir.normalized;
             cosValue = Vector3.Dot(a, b);
             reduceVelocity = gravityVelocity * cosValue;
             gravityVelocity -= reduceVelocity;
-            _gravityVelocity = gravityVelocity.y;
+            this.gravityVelocity = gravityVelocity.y;
             // DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}---->新'重力速度':{_gravityVelocity}", "#48D1CC");
         }
 
@@ -308,6 +313,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void HitByBullet(BulletEntity bulletEntity)
         {
+            if (bulletEntity == null)
+            {
+                Debug.LogWarning("HitByBullet Null");
+                return;
+            }
+
+
             var velocity = bulletEntity.MoveComponent.Velocity / 10f;
             Debug.Log($"被子弹击中 extraVelocity 增加:  {velocity}");
             extraVelocity += velocity;

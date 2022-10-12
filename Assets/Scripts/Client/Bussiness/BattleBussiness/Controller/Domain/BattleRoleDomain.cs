@@ -24,7 +24,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleRoleLogicEntity SpawnBattleRoleLogic(Transform parent)
+        public BattleRoleLogicEntity SpawnRoleLogic(Transform parent)
         {
             string rolePrefabName = "player_logic";
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public BattleRoleRendererEntity SpawnBattleRoleRenderer(Transform parent)
+        public BattleRoleRendererEntity SpawnRoleRenderer(Transform parent)
         {
             string rolePrefabName = "player_renderer";
             Debug.Log("生成" + rolePrefabName);
@@ -50,6 +50,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             return null;
+        }
+
+        public void RebornRole(BattleRoleLogicEntity role)
+        {
+            role.TearDown();
+            role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
         }
 
         public void Tick_RoleRigidbody(float fixedTime)
@@ -69,7 +75,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 var roleRenderer = role.roleRenderer;
-                roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, role.MoveComponent.CurPos, deltaTime * roleRenderer.posAdjust);
+                roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, role.MoveComponent.Position, deltaTime * roleRenderer.posAdjust);
                 roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, role.MoveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
 
                 var animatorComponent = roleRenderer.AnimatorComponent;

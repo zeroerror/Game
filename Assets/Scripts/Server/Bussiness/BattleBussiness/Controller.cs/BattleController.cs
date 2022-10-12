@@ -145,11 +145,11 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var wrid = roleRepo.Size;
 
                     // 服务器逻辑
-                    var roleEntity = clientFacades.Domain.BattleRoleDomain.SpawnBattleRoleLogic(fieldEntity.transform);
+                    var roleEntity = clientFacades.Domain.RoleDomain.SpawnRoleLogic(fieldEntity.transform);
                     roleEntity.Ctor();
                     roleEntity.IDComponent.SetEntityId(wrid);
                     roleEntity.SetConnId(connId);
-                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.CurPos}");
+                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.Position}");
 
                     // ===== TODO:同步所有信息给请求者
                     var allRole = roleRepo.GetAll();
@@ -328,7 +328,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
                     var bulletRepo = clientFacades.Repo.BulletRepo;
-                    var bulletId = bulletRepo.BulletCount;
+                    var bulletId = bulletRepo.AutoEntityID;
                     bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                     bulletEntity.MoveComponent.SetForward(shootDir);
                     bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
@@ -381,10 +381,10 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
                     roleRepo.Foreach((role) =>
                     {
-                        var dis = Vector3.Distance(role.MoveComponent.CurPos, bulletEntity.MoveComponent.CurPos);
+                        var dis = Vector3.Distance(role.MoveComponent.Position, bulletEntity.MoveComponent.Position);
                         if (dis < 7f)
                         {
-                            var dir = role.MoveComponent.CurPos - bulletEntity.MoveComponent.CurPos;
+                            var dir = role.MoveComponent.Position - bulletEntity.MoveComponent.Position;
                             var extraV = dir.normalized * 10f;
                             role.MoveComponent.AddExtraVelocity(extraV);
                             role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
@@ -402,12 +402,13 @@ namespace Game.Server.Bussiness.BattleBussiness
                 bulletRepo.TryRemove(bulletEntity);
 
                 var bulletRqs = battleFacades.Network.BulletReqAndRes;
-                var roleRqs = battleFacades.Network.RoleReqAndRes;
                 ConnIdList.ForEach((connId) =>
                 {
                     // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletTearDown(connId, bulletType, bulletEntity.MasterId, bulletEntity.IDComponent.EntityId, bulletEntity.MoveComponent.CurPos);
+                    bulletRqs.SendRes_BulletTearDown(connId, bulletEntity);
                 });
+
+                var roleRqs = battleFacades.Network.RoleReqAndRes;
                 while (effectRoleQueue.TryDequeue(out var role))
                 {
                     Debug.Log($"角色击飞发送");
@@ -442,8 +443,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 var masterMC = master.MoveComponent;
                 var hookerEntityMC = hooker.MoveComponent;
-                var dir = hookerEntityMC.CurPos - masterMC.CurPos;
-                var dis = Vector3.Distance(hookerEntityMC.CurPos, masterMC.CurPos);
+                var dir = hookerEntityMC.Position - masterMC.Position;
+                var dis = Vector3.Distance(hookerEntityMC.Position, masterMC.Position);
                 dir.Normalize();
                 var v = dir * force * fixedDeltaTime;
                 masterMC.AddExtraVelocity(v);
