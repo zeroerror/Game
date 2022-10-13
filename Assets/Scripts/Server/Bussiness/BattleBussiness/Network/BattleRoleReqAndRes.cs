@@ -33,14 +33,11 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void TickAllRegistAction()
         {
-            lock (actionList)
+            actionList.ForEach((action) =>
             {
-                actionList.ForEach((action) =>
-                       {
-                           action.Invoke();
-                       });
-                actionList.Clear();
-            }
+                action.Invoke();
+            });
+            actionList.Clear();
         }
 
         #region [Send]
@@ -110,7 +107,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");
             sendCount++;
         }
-        
+
         #endregion
 
         #region [Regist]
@@ -142,13 +139,16 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         // Private Func
         void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
         {
-            battleServer.AddRegister<T>((connId, msg) =>
+            lock (actionList)
             {
-                actionList.Add(() =>
+                battleServer.AddRegister<T>((connId, msg) =>
                 {
-                    action.Invoke(connId, msg);
+                    actionList.Add(() =>
+                    {
+                        action.Invoke(connId, msg);
+                    });
                 });
-            });
+            }
         }
 
     }

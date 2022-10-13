@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         // == Component ==
         [SerializeField]
-        public MoveComponent moveComponent;
+        MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
         public HealthComponent HealthComponent { get; private set; }
         public WeaponComponent WeaponComponent { get; private set; }

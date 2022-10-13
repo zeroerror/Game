@@ -109,6 +109,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
+        public void RoleRollForward()
+        {
+
+        }
+
 
     }
 

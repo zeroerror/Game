@@ -122,14 +122,14 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.useGravity = false;  //关闭地球引力
         }
 
-        public bool TryRollForward()
+        public bool TryRollForward(Vector3 dir)
         {
             if (!IsGrouded) return false;
 
-            var forward = rb.transform.forward;
-            var addVelocity = forward * rollSpeed;
+            dir.Normalize();
+            var addVelocity = dir * rollSpeed;
             extraVelocity += addVelocity;
-            Debug.Log($"前滚翻 forward {forward} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
+            Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
             return true;
         }
 
@@ -146,7 +146,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             vel = moveVelocity;//XZ轴
-            vel.y = rb.velocity.y  + gravityVelocity * fixedDeltaTime;   //Y轴
+            vel.y = rb.velocity.y + gravityVelocity * fixedDeltaTime;   //Y轴
             vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
 

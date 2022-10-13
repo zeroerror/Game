@@ -198,8 +198,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                         break;
                     case RoleState.RollForward:
-                        moveComponent.TryRollForward();
-
                         if (roleLogic.RoleState != RoleState.RollForward)
                         {
                             animatorComponent.PlayRollForward();

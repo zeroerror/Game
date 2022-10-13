@@ -41,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var input = battleFacades.InputComponent;
             if (input.isPressJump)
             {
-                battleFacades.Network.RoleReqAndRes.SendReq_RoleJump(owner.IDComponent.EntityId);
+                battleFacades.Network.RoleReqAndRes.SendReq_RoleJump(owner);
             }
             if (input.isPressSwitchView)
             {
