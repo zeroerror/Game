@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             Debug.Assert(animator != null);
 
             AnimatorComponent = new AnimatorComponent(animator);
-            camTrackingObj = new GameObject($"CameraTrackingObject_RID_{wRid}");
+            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{wRid}");
 
             posAdjust = 15f;
             rotAdjust = 15f;
