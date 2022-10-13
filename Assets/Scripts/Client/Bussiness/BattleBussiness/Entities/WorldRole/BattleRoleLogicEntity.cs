@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
         Normal,
         Move,
-        Jump,
+        RollForward,
         Hooking       //-使用爪钩中
     }
 

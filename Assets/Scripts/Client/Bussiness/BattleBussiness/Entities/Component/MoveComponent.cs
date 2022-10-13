@@ -10,14 +10,27 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class MoveComponent
     {
 
-        [SerializeField]
-        float speed;
+        #region [静态变量]
 
         [SerializeField]
-        float jumpSpeed;
-        public void SetJumpVelocity(float jumpSpeed) => this.jumpSpeed = jumpSpeed;
+        [Header("移动速度")]
+        float moveSpeed;
 
-        public bool isPersistentMove;
+        [SerializeField]
+        [Header("持续移动")]
+        bool isPersistentMove;
+        public void SetPersistentMove(bool flag) => isPersistentMove = flag;
+
+        [SerializeField]
+        [Header("地球引力加速度")]
+        float gravity;
+
+        [SerializeField]
+        [Header("前滚翻速度")]
+        float rollSpeed;
+        public float RollVelocity => rollSpeed;
+
+        #endregion
 
         float maximumSpeed = float.MaxValue;
         public void SetMaximumSpeed(float speed) => this.maximumSpeed = speed;
@@ -37,7 +50,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 Velocity => rb.velocity;
         public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
 
-        // == 移动速度 1
+        #region [动态速度]
+
+        // == 移动速度 
         Vector3 moveVelocity;
         public Vector3 MoveVelocity => moveVelocity;
         public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
@@ -45,27 +60,22 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             dir.Normalize();
             dir = dir.FixDecimal(2);
-            this.moveVelocity = dir * speed;
+            this.moveVelocity = dir * moveSpeed;
             // Debug.Log($"移动:{moveVelocity}");
         }
 
-        // == 跳跃速度 2
-        float jumpVelocity;
-        public float JumpVelocity => jumpVelocity;
-
-        // == 重力速度 3
+        // == 重力速度 
         float gravityVelocity;
         public float GravityVelocity => gravityVelocity;
         public void SetGravityVelocity(float gravityVelocity) => this.gravityVelocity = gravityVelocity;
 
-        // == 额外速度 4
+        // == 额外速度 
         Vector3 extraVelocity;
         public Vector3 ExtraVelocity => extraVelocity;
         public void SetExtraVelocity(Vector3 extraVelocity) => this.extraVelocity = extraVelocity;
         public void AddExtraVelocity(Vector3 addVelocity) => this.extraVelocity += addVelocity.FixDecimal(4);
 
-        // == 地球引力
-        public float gravity;
+        #endregion
 
         // == 碰撞状态
         public bool IsGrouded { get; private set; }
@@ -112,17 +122,14 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.useGravity = false;  //关闭地球引力
         }
 
-        public bool TryJump()
+        public bool TryRollForward()
         {
             if (!IsGrouded) return false;
-            Debug.Log($"跳");
 
-            var v = rb.velocity;
-            v.y = 0;
-            rb.velocity = v;
-            gravityVelocity = 0;
-
-            jumpVelocity = jumpSpeed;
+            var forward = rb.transform.forward;
+            var addVelocity = forward * rollSpeed;
+            extraVelocity += addVelocity;
+            Debug.Log($"前滚翻 forward {forward} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
             return true;
         }
 
@@ -139,7 +146,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             vel = moveVelocity;//XZ轴
-            vel.y = rb.velocity.y + jumpVelocity + gravityVelocity * fixedDeltaTime;   //Y轴
+            vel.y = rb.velocity.y  + gravityVelocity * fixedDeltaTime;   //Y轴
             vel += extraVelocity;//XYZ轴
             rb.velocity = vel;
 
@@ -148,7 +155,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             // 重置 ‘一次性速度’
             moveVelocity = Vector3.zero;
-            jumpVelocity = 0;
         }
 
         public void Tick_Friction(float fixedDeltaTime)
@@ -202,7 +208,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             LeaveGround();
             gravityVelocity = 0;
-            jumpVelocity = 0;
+            rollSpeed = 0;
             extraVelocity = Vector3.zero;
             moveVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;
@@ -212,7 +218,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public string ToInfo()
         {
-            return $"位置: {Position} 移动速度: {MoveVelocity} 跳跃速度: {JumpVelocity} 重力速度: {GravityVelocity} 额外速度: {ExtraVelocity} ";
+            return $"位置: {Position} 移动速度: {MoveVelocity} 跳跃速度: {RollVelocity} 重力速度: {GravityVelocity} 额外速度: {ExtraVelocity} ";
         }
 
         #region [ Physics Collision]

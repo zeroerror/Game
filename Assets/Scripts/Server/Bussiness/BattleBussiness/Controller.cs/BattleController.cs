@@ -274,9 +274,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var rqs = battleFacades.Network.RoleReqAndRes;
 
                     //服务器逻辑Jump
-                    if (roleEntity.MoveComponent.TryJump())
+                    if (roleEntity.MoveComponent.TryRollForward())
                     {
-                        if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.Jump);
+                        if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.RollForward);
                         //发送状态同步帧
                         ConnIdList.ForEach((connId) =>
                         {

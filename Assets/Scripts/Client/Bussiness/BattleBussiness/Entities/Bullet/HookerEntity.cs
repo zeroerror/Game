@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (GrabPoint != null) return;
 
             Debug.Log("钩爪击中！");
-            moveComponent.isPersistentMove = false;
+            moveComponent.SetPersistentMove(false);
             moveComponent.SetVelocity(Vector3.zero);
 
             var shootEndTrans = ShootEnd.transform;
@@ -69,12 +69,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             SetLifeTime(5f);
         }
 
-        public void TryGrabSomthing(Vector3 pos)
+        public void TryGrabPosition(Vector3 pos)
         {
             Debug.Log("钩爪击中！");
             if (GrabPoint != null) return;
 
-            moveComponent.isPersistentMove = false;
+            moveComponent.SetPersistentMove(false);
             moveComponent.SetVelocity(Vector3.zero);
 
             var shootEndTrans = ShootEnd.transform;

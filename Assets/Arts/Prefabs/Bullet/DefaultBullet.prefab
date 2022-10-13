@@ -130,10 +130,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletType: 0
   moveComponent:
-    speed: 35
-    jumpSpeed: 0
+    moveSpeed: 30
     isPersistentMove: 1
     gravity: 0
+    rollSpeed: 0
   lifeTime: 10
 --- !u!1001 &8100238415778686914
 PrefabInstance:

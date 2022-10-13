@@ -129,7 +129,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletType: 0
   moveComponent:
-    speed: 5
-    jumpSpeed: 0
+    moveSpeed: 10
     isPersistentMove: 0
     gravity: 100
+    rollSpeed: 0
+  lifeTime: 5

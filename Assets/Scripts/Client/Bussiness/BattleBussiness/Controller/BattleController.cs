@@ -197,12 +197,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         }
 
                         break;
-                    case RoleState.Jump:
-                        moveComponent.TryJump();
+                    case RoleState.RollForward:
+                        moveComponent.TryRollForward();
 
-                        if (roleLogic.RoleState != RoleState.Jump)
+                        if (roleLogic.RoleState != RoleState.RollForward)
                         {
-                            animatorComponent.PlayJump();
+                            animatorComponent.PlayRollForward();
                         }
 
                         break;
@@ -360,7 +360,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 else if (bullet is HookerEntity hookerEntity)
                 {
                     // 爪钩:抓住某物而不是销毁
-                    hookerEntity.TryGrabSomthing(bulletHitPos);
+                    hookerEntity.TryGrabPosition(bulletHitPos);
                 }
                 else if (bullet is GrenadeEntity grenadeEntity)
                 {

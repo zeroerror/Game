@@ -13,8 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             base.Init();
             ExplosionRadius = 7f;
-            moveComponent.isPersistentMove = false;
-            moveComponent.isPersistentMove = true;
+            moveComponent.SetPersistentMove(false);
         }
 
         public override void TearDown()

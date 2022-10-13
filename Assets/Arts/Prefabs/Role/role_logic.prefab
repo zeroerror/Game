@@ -78,10 +78,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveComponent:
-    speed: 5
-    jumpSpeed: 5
+    moveSpeed: 5
     isPersistentMove: 0
     gravity: 100
+    rollSpeed: 10
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,7 +100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7154922147397083532
 Transform:
   m_ObjectHideFlags: 0
