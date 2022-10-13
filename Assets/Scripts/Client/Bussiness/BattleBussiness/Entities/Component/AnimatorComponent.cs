@@ -45,6 +45,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             animator.Play("Dead", 0, 0);
         }
 
+        public void PlayRollForward()
+        {
+            animator.CrossFade("RollForward", 0.1f);
+        }
+
+        ////////////////////////////////////////
         public void PlayIdleWithGun()
         {
             if (IsInState("Idle_With_Gun")) return;

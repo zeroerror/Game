@@ -141,21 +141,24 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRepo = repo.RoleRepo;
                 var fieldRepo = repo.FiledRepo;
                 var roleLogic = battleFacades.Repo.RoleRepo.GetByEntityId(stateMsg.entityId);
+
                 if (roleLogic == null)
                 {
                     var wRoleId = stateMsg.entityId;
                     var fieldEntity = fieldRepo.Get(1);
                     var domain = battleFacades.Domain.RoleDomain;
-                    roleLogic = domain.SpawnRoleLogic(fieldEntity.transform);
-                    roleLogic.Ctor();
-                    roleLogic.IDComponent.SetEntityId(wRoleId);
 
                     var roleRenderer = domain.SpawnRoleRenderer(fieldEntity.Role_Group_Renderer);
                     roleRenderer.SetWRid(wRoleId);
                     roleRenderer.Ctor();
+
+                    roleLogic = domain.SpawnRoleLogic(fieldEntity.transform);
+                    roleLogic.Ctor();
                     roleLogic.Inject(roleRenderer);
+                    roleLogic.IDComponent.SetEntityId(wRoleId);
 
                     roleRepo.Add(roleLogic);
+
                     if (stateMsg.isOwner && roleRepo.Owner == null)
                     {
                         Debug.Log($"生成Owner  wRid:{roleLogic.IDComponent.EntityId})");
@@ -178,33 +181,46 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var animatorComponent = roleLogic.roleRenderer.AnimatorComponent;
                 var moveComponent = roleLogic.MoveComponent;
                 var weaponComponent = roleLogic.WeaponComponent;
+
                 switch (roleState)
                 {
                     case RoleState.Normal:
                         break;
                     case RoleState.Move:
-                        if (moveComponent.IsGrouded)
+                        if (moveComponent.IsGrouded && weaponComponent.CurrentWeapon == null)
                         {
-                            if (weaponComponent.CurrentWeapon == null) animatorComponent.PlayRunning();
-                            else animatorComponent.PlayRunWithGun();
+                            animatorComponent.PlayRunning();
                         }
+                        if (moveComponent.IsGrouded && weaponComponent.CurrentWeapon != null)
+                        {
+                            animatorComponent.PlayRunWithGun();
+                        }
+
                         break;
                     case RoleState.Jump:
+                        moveComponent.TryJump();
+
                         if (roleLogic.RoleState != RoleState.Jump)
                         {
                             animatorComponent.PlayJump();
                         }
-                        moveComponent.TryJump();
+
                         break;
                     case RoleState.Hooking:
                         animatorComponent.PlayHooking();
+
                         break;
                 }
+
                 moveComponent.SetCurPos(pos);
-                if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId) moveComponent.SetEulerAngle(eulerAngle);
                 moveComponent.SetMoveVelocity(moveVelocity);
                 moveComponent.SetExtraVelocity(extraVelocity);
                 moveComponent.SetGravityVelocity(gravityVelocity);
+
+                if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId)
+                {
+                    moveComponent.SetEulerAngle(eulerAngle);
+                }
 
                 roleLogic.SetRoleState(roleState);
             }
@@ -215,20 +231,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             if (roleSpawnQueue.TryPeek(out var spawn))
             {
                 roleSpawnQueue.Dequeue();
-
                 Debug.Log($"生成人物帧 : {spawn.serverFrame}");
+
                 var wRoleId = spawn.wRoleId;
                 var repo = battleFacades.Repo;
                 var fieldEntity = repo.FiledRepo.Get(1);
                 var domain = battleFacades.Domain.RoleDomain;
-                var roleLogic = domain.SpawnRoleLogic(fieldEntity.Role_Group_Logic);
-                roleLogic.Ctor();
-                roleLogic.IDComponent.SetEntityId(wRoleId);
 
                 var roleRenderer = domain.SpawnRoleRenderer(fieldEntity.Role_Group_Renderer);
                 roleRenderer.SetWRid(wRoleId);
                 roleRenderer.Ctor();
+
+                var roleLogic = domain.SpawnRoleLogic(fieldEntity.Role_Group_Logic);
+                roleLogic.Ctor();
                 roleLogic.Inject(roleRenderer);
+                roleLogic.IDComponent.SetEntityId(wRoleId);
 
                 var roleRepo = repo.RoleRepo;
                 roleRepo.Add(roleLogic);
@@ -259,9 +276,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var masterWRole = battleFacades.Repo.RoleRepo.GetByEntityId(masterWRid);
                 var shootStartPoint = masterWRole.ShootPointPos;
                 Vector3 shootDir = new Vector3(bulletSpawn.shootDirX / 100f, bulletSpawn.shootDirY / 100f, bulletSpawn.shootDirZ / 100f);
-                Debug.Log($"生成子弹帧 {bulletSpawn.serverFrame}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
                 var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
                 var bulletEntity = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
+
+                Debug.Log($"生成子弹帧 {bulletSpawn.serverFrame}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
+
                 switch (bulletType)
                 {
                     case BulletType.DefaultBullet:
@@ -272,8 +291,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         var hookerEntity = (HookerEntity)bulletEntity;
                         hookerEntity.SetMasterWRid(masterWRid);
                         hookerEntity.SetMasterGrabPoint(masterWRole.transform);
+
                         break;
                 }
+
                 bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
                 bulletEntity.MoveComponent.SetForward(shootDir);
                 bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
@@ -296,8 +317,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
                 var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
 
-                // Client Logic
                 role.MoveComponent.HitByBullet(bullet);
+
                 if (role.HealthComponent.IsDead())
                 {
                     battleFacades.Domain.RoleDomain.RebornRole(role);
@@ -310,9 +331,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     // 如果是爪钩则是抓住某物而不是销毁
                     hookerEntity.TryGrabSomthing(role.transform);
-                    continue;
                 }
-
             }
         }
 
@@ -503,7 +522,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Debug.Log($"{msg.bulletType.ToString()} 加入子弹销毁队列");
             bulletTearDownQueue.Enqueue(msg);
         }
-        
+
         #endregion
 
         #region [ITEM]
