@@ -88,7 +88,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 if (isOwner && inputComponent.moveAxis != Vector3.zero)
                 {
-                    if (weaponComponent.CurrentWeapon == null) animatorComponent.PlayRun();
+                    if (weaponComponent.CurrentWeapon == null) animatorComponent.PlayRunning();
                     else animatorComponent.PlayRunWithGun();
                     return;
                 }

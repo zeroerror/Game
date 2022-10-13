@@ -64,7 +64,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     Debug.Log($"角色:{msg.masterId}射击zidan:{bulletType.ToString()}---");
 
                     // Trigger Renderer
-                    master.roleRenderer.AnimatorComponent.PlayShoot();
+                    master.roleRenderer.AnimatorComponent.PlayShooting();
                 }
             }
         }

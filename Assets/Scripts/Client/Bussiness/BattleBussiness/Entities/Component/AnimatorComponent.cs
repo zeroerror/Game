@@ -24,16 +24,31 @@ namespace Game.Client.Bussiness.BattleBussiness
             animator.Play("Idle");
         }
 
+        public void PlayRunning()
+        {
+            if (IsInState("Running")) return;
+            animator.Play("Running");
+        }
+
+        public void PlayReloading()
+        {
+            animator.Play("Reloading", 0, 0);
+        }
+
+        public void PlayShooting()
+        {
+            animator.Play("Shooting", 0, 0);
+        }
+
+        public void PlayDead()
+        {
+            animator.Play("Dead", 0, 0);
+        }
+
         public void PlayIdleWithGun()
         {
             if (IsInState("Idle_With_Gun")) return;
             animator.Play("Idle_With_Gun");
-        }
-
-        public void PlayRun()
-        {
-            if (IsInState("Run")) return;
-            animator.Play("Run");
         }
 
         public void PlayRunWithGun()
@@ -45,11 +60,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void PlayJump()
         {
             animator.CrossFade("Jump", 0.1f);
-        }
-
-        public void PlayShoot()
-        {
-            animator.Play("Shoot", 0, 0);
         }
 
         public void PlayHooking()
