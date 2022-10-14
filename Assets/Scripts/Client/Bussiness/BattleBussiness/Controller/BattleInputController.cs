@@ -109,11 +109,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 // 换弹前判断流程
                 var weaponComponent = owner.WeaponComponent;
+                var animatorComponent = owner.roleRenderer.AnimatorComponent;
                 Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空");
                 // Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
                 if (owner.CanWeaponReload())
                 {
                     weaponComponent.BeginReloading();
+                    animatorComponent.PlayReloading();
+
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     rqs.SendReq_WeaponReload(owner);
                 }

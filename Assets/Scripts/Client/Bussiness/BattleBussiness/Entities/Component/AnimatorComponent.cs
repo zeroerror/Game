@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void PlayRollForward()
         {
-            animator.CrossFade("RollForward", 0.1f);
+            animator.Play("RollForward", 0, 0);
         }
 
         ////////////////////////////////////////
