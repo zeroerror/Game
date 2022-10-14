@@ -171,7 +171,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         void Tick_Physics_Movement_Role(float fixedDeltaTime)
         {
             var physicsDomain = battleFacades.ClientBattleFacades.Domain.PhysicsDomain;
-            physicsDomain.Tick_RoleMoveHitErase();   //Unity's Collision Will Auto Erase
+            // physicsDomain.Tick_RoleMoveHitErase();   //Unity's Collision Will Auto Erase 有BUG!!!!!!!!
             var domain = battleFacades.ClientBattleFacades.Domain.RoleDomain;
             domain.Tick_RoleRigidbody(fixedDeltaTime);
         }

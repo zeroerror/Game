@@ -44,6 +44,21 @@ namespace Game.Generic
             return v;
         }
 
+        public static Vector2 FixDecimal(this Vector2 v, int num)
+        {
+            int multy = 1;
+            for (int i = 0; i < num; i++)
+            {
+                multy *= 10;
+            }
+            v *= multy;
+            int x = (int)v.x;
+            int y = (int)v.y;
+            v.x = 1f * x / multy;
+            v.y = 1f * y / multy;
+            return v;
+        }
+
         public static void Reset(this ref Vector3 v)
         {
             v.x = 0;

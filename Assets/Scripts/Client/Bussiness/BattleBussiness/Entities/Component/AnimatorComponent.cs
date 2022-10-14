@@ -21,7 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void PlayIdle()
         {
             if (IsInState("Idle")) return;
-            animator.Play("Idle");
+            animator.CrossFade("Idle", 0.1f);
         }
 
         public void PlayRunning()

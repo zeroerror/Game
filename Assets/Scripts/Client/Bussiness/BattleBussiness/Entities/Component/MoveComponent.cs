@@ -36,6 +36,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetMaximumSpeed(float speed) => this.maximumSpeed = speed;
 
         // TODO: 滑铲摩擦力
+        [SerializeField]
+        [Header("摩擦力")]
         float frictionReduce = 10f;
         public void SetFriction(float friction) => this.frictionReduce = friction;
 
@@ -52,7 +54,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region [动态速度]
 
-        // == 移动速度 
+        // == 移动速度
+        [SerializeField]
+        [Header("移动速度")]
         Vector3 moveVelocity;
         public Vector3 MoveVelocity => moveVelocity;
         public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
@@ -64,22 +68,39 @@ namespace Game.Client.Bussiness.BattleBussiness
             // Debug.Log($"移动:{moveVelocity}");
         }
 
-        // == 重力速度 
+        // == 重力速度
+        [SerializeField]
+        [Header("重力速度")]
         float gravityVelocity;
         public float GravityVelocity => gravityVelocity;
         public void SetGravityVelocity(float gravityVelocity) => this.gravityVelocity = gravityVelocity;
 
-        // == 额外速度 
+        // == 额外速度
+        [SerializeField]
+        [Header("额外速度")]
         Vector3 extraVelocity;
         public Vector3 ExtraVelocity => extraVelocity;
         public void SetExtraVelocity(Vector3 extraVelocity) => this.extraVelocity = extraVelocity;
-        public void AddExtraVelocity(Vector3 addVelocity) => this.extraVelocity += addVelocity.FixDecimal(4);
+        public void AddExtraVelocity(Vector3 addVelocity)
+        {
+            Debug.Log($"AddExtraVelocity :{addVelocity}");
+            this.extraVelocity += addVelocity.FixDecimal(4);
+        }
 
         #endregion
 
         // == 碰撞状态
-        public bool IsGrouded { get; private set; }
-        public bool IsHitWall { get; private set; }
+        [SerializeField]
+        [Header("是否接触地面")]
+        bool isGrounded;
+        public bool IsGrounded => isGrounded;
+        public void SetIsGrounded(bool flag) => this.isGrounded = flag;
+
+        [SerializeField]
+        [Header("是否接触墙面")]
+        bool isHitWall;
+        public bool IsHitWall => isHitWall;
+        public void SetIsHitWall(bool flag) => this.isHitWall = flag;
 
         public Vector3 Position => rb.position;
         public void SetCurPos(Vector3 curPos) => rb.position = curPos;
@@ -124,12 +145,12 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool TryRollForward(Vector3 dir)
         {
-            if (!IsGrouded) return false;
+            if (!IsGrounded) return false;
 
             dir.Normalize();
             var addVelocity = dir * rollSpeed;
-            // addVelocity.y = 2f;
-            extraVelocity += addVelocity;
+            addVelocity.y = 2f;
+            AddExtraVelocity(addVelocity);
             Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
             return true;
         }
@@ -146,9 +167,11 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return;
             }
 
-            vel = moveVelocity;//XZ轴
-            vel.y = rb.velocity.y + gravityVelocity * fixedDeltaTime;   //Y轴
-            vel += extraVelocity;//XYZ轴
+            // 移动速度可以抵消extraVelocity
+            EraseVelocity(ref extraVelocity, moveVelocity);
+
+            vel = moveVelocity + extraVelocity;
+            vel.y = rb.velocity.y + extraVelocity.y + gravityVelocity * fixedDeltaTime;   //Y轴
             rb.velocity = vel;
 
             //限制'最大速度'
@@ -160,48 +183,67 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Tick_Friction(float fixedDeltaTime)
         {
-            //模拟摩擦力
-            if (IsGrouded && (Mathf.Abs(extraVelocity.x) > 0.1f || Mathf.Abs(extraVelocity.z) > 0.1f))
+            if (!IsGrounded)
             {
-                var reduceVelocity = extraVelocity.normalized;
-                reduceVelocity.y = 0;
-                extraVelocity -= (frictionReduce * reduceVelocity * fixedDeltaTime);
-                var cosValue = Vector3.Dot(reduceVelocity.normalized, extraVelocity.normalized);
-                if (cosValue <= 0)
-                {
-                    extraVelocity.z = 0f;
-                    extraVelocity.x = 0f;
-                    Debug.Log($"摩擦力作用结束");
-                }
-                else
-                {
-                    if (Mathf.Abs(extraVelocity.x) <= 0.1f) extraVelocity.x = 0f;
-                    if (Mathf.Abs(extraVelocity.z) <= 0.1f) extraVelocity.z = 0f;
-                }
+                return;
             }
+
+            if (extraVelocity.x == 0 && extraVelocity.z == 0)
+            {
+                Debug.Log($"摩擦力不作用 extraVelocity.x == 0 && extraVelocity.z == 0");
+                return;
+            }
+
+            //模拟摩擦力
+            var extraVelocity2DDir = extraVelocity;
+            extraVelocity2DDir.y = 0;
+            extraVelocity2DDir.Normalize();
+            var reduceVelocity = extraVelocity2DDir;
+            reduceVelocity *= frictionReduce;
+
+            extraVelocity -= reduceVelocity * fixedDeltaTime;
+
+            var afterExtraVelocity2DDir = extraVelocity;
+            afterExtraVelocity2DDir.y = 0;
+            afterExtraVelocity2DDir.Normalize();
+
+            if (IsOppositeDir(extraVelocity2DDir, afterExtraVelocity2DDir))
+            {
+                extraVelocity.x = 0f;
+                extraVelocity.z = 0f;
+                Debug.Log($"摩擦力作用结束");
+                return;
+            }
+
+            Debug.Log($"摩擦力----------------------- reduceVelocity {reduceVelocity} extraVelocity {extraVelocity}");
 
         }
 
-        public void Tick_GravityVelocity(float fixedDeltaTime)
+        public void Tick_Gravity(float fixedDeltaTime)
         {
             //模拟重力
-            if (!IsGrouded)
+            if (!IsGrounded)
             {
                 if (extraVelocity.y > 0)
                 {
+                    gravityVelocity = 0;
+
                     extraVelocity.y -= (fixedDeltaTime * gravity);
-                    if (extraVelocity.y < 0) extraVelocity.y = 0;
-                }
-                else
-                {
-                    gravityVelocity -= (fixedDeltaTime * gravity);
+                    if (extraVelocity.y < 0)
+                    {
+                        extraVelocity.y = 0;
+                    }
                 }
 
-                if (moveVelocity.y > 0)
+                gravityVelocity -= (fixedDeltaTime * gravity);
+                if (gravityVelocity > 100)
                 {
-                    moveVelocity.y -= (fixedDeltaTime * gravity);
-                    if (moveVelocity.y < 0) moveVelocity.y = 0;
+                    gravityVelocity = 100;
                 }
+            }
+            else
+            {
+                gravityVelocity = 0;
             }
         }
 
@@ -233,7 +275,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveVelocity -= reduceVelocity;
             if (cosValue != 0)
             {
-                // DebugExtensions.LogWithColor($"贴墙移动，消除垂直墙面速度 {reduceVelocity}  moveVelocity{moveVelocity} cosValue:{cosValue}", "#48D1CC");
+                DebugExtensions.LogWithColor($"贴墙移动，消除垂直墙面速度 {reduceVelocity}  moveVelocity{moveVelocity} cosValue:{cosValue}", "#48D1CC");
             }
         }
 
@@ -241,7 +283,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             // DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
             //  消除反方向Velocity
-            EraseVelocity(hitDir);
+            // EraseVelocity(hitDir);   // 存在BUG!!!!!
         }
 
         public void LeaveSomthing(Vector3 leaveDir)
@@ -251,28 +293,35 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void EraseVelocity(Vector3 dir)
         {
-            var a = rb.velocity.normalized;
-            var b = dir.normalized;
-            var cosValue = Vector3.Dot(a, b);
-            var reduceVelocity = rb.velocity * cosValue;
-            rb.velocity -= Vector3.zero;
+            dir.Normalize();
+
+            Vector3 a;
+            float cosValue;
+            Vector3 reduceVelocity;
+
+            var grav = new Vector3(0, this.gravityVelocity, 0);
+            a = grav.normalized;
+            cosValue = Vector3.Dot(a, dir);
+            reduceVelocity = grav * cosValue;
+            grav -= reduceVelocity;
+            gravityVelocity = grav.y;
+            if (gravityVelocity > 0)
+            {
+                gravityVelocity = 0;
+            }
+            // DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}", "#48D1CC");
+
+            a = rb.velocity.normalized;
+            cosValue = Vector3.Dot(a, dir);
+            reduceVelocity = rb.velocity * cosValue;
+            rb.velocity -= reduceVelocity;
             // DebugExtensions.LogWithColor($"碰撞消除'Rigidbody速度':{reduceVelocity}---->新'Rigidbody速度':{rb.velocity}", "#48D1CC");
 
             a = extraVelocity.normalized;
-            b = dir.normalized;
-            cosValue = Vector3.Dot(a, b);
+            cosValue = Vector3.Dot(a, dir);
             reduceVelocity = extraVelocity * cosValue;
             extraVelocity -= reduceVelocity;
             // DebugExtensions.LogWithColor($"碰撞消除'额外速度':{reduceVelocity}---->新'额外速度':{extraVelocity}", "#48D1CC");
-
-            var gravityVelocity = new Vector3(0, this.gravityVelocity, 0);
-            a = gravityVelocity.normalized;
-            b = dir.normalized;
-            cosValue = Vector3.Dot(a, b);
-            reduceVelocity = gravityVelocity * cosValue;
-            gravityVelocity -= reduceVelocity;
-            this.gravityVelocity = gravityVelocity.y;
-            // DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}---->新'重力速度':{_gravityVelocity}", "#48D1CC");
         }
 
         public void JumpboardSpeedUp()
@@ -282,40 +331,40 @@ namespace Game.Client.Bussiness.BattleBussiness
             var addVelocity = rb.velocity;
             addVelocity.y = 0;
             addVelocity = addVelocity * 5f;
-            extraVelocity += addVelocity * 5f;
+            AddExtraVelocity(addVelocity);
             DebugExtensions.LogWithColor($"跳板起飞  addVelocity:{addVelocity} extraVelocity:{extraVelocity}", "#48D1CC");
         }
 
         public void EnterGound()
         {
-            if (IsGrouded) return;
+            if (isGrounded) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
-            IsGrouded = true;
+            isGrounded = true;
         }
 
         public void LeaveGround()
         {
-            if (!IsGrouded) return;
+            if (!isGrounded) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
-            IsGrouded = false;
+            isGrounded = false;
         }
 
         public void EnterWall()
         {
-            if (IsHitWall) return;
+            if (isHitWall) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}接触墙体---------------------------", "#48D1CC");
-            IsHitWall = true;
+            isHitWall = true;
         }
 
         public void LeaveWall()
         {
-            if (!IsHitWall) return;
+            if (!isHitWall) return;
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开墙体-----------------------------", "#48D1CC");
-            IsHitWall = false;
+            isHitWall = false;
         }
 
         public void HitByBullet(BulletEntity bulletEntity)
@@ -329,7 +378,40 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             var velocity = bulletEntity.MoveComponent.Velocity / 10f;
             Debug.Log($"被子弹击中 extraVelocity 增加:  {velocity}");
-            extraVelocity += velocity;
+            AddExtraVelocity(velocity);
+        }
+
+        #endregion
+
+        #region [Private Func]
+
+        bool IsOppositeDir(Vector3 dir1, Vector3 dir2)
+        {
+            dir1.Normalize();
+            dir2.Normalize();
+            var cosVal = Vector3.Dot(dir1, dir2);
+            return cosVal < 0;
+        }
+
+        void EraseVelocity(ref Vector3 velocity, Vector3 v)
+        {
+            var cosVal = Vector3.Dot(velocity.normalized, v.normalized);
+            if (cosVal >= 0)
+            {
+                return;
+            }
+
+            var reduce = v * cosVal;
+            var after = velocity + reduce;
+            if (!IsOppositeDir(reduce, after))
+            {
+                reduce = velocity * cosVal;
+                after = velocity + reduce;
+            }
+
+            velocity = after;
+
+            Debug.Log($"EraseVelocityByDir  cosVal:{cosVal} reduce:{reduce} ");
         }
 
         #endregion

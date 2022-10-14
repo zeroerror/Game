@@ -69,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 }
 
                 bullet.MoveComponent.Tick_Friction(fixedDeltaTime);
-                bullet.MoveComponent.Tick_GravityVelocity(fixedDeltaTime);
+                bullet.MoveComponent.Tick_Gravity(fixedDeltaTime);
                 bullet.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
             });
         }

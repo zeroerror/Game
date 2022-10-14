@@ -64,7 +64,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 role.MoveComponent.Tick_Friction(fixedTime);
-                role.MoveComponent.Tick_GravityVelocity(fixedTime);
+                role.MoveComponent.Tick_Gravity(fixedTime);
                 role.MoveComponent.Tick_Rigidbody(fixedTime);
             });
         }

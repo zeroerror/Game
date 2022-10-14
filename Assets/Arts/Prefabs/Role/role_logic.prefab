@@ -80,8 +80,14 @@ MonoBehaviour:
   moveComponent:
     moveSpeed: 5
     isPersistentMove: 0
-    gravity: 100
+    gravity: 300
     rollSpeed: 10
+    frictionReduce: 13
+    moveVelocity: {x: 0, y: 0, z: 0}
+    gravityVelocity: 0
+    extraVelocity: {x: 0, y: 0, z: 0}
+    isGrounded: 0
+    isHitWall: 0
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0

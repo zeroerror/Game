@@ -187,11 +187,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     case RoleState.Normal:
                         break;
                     case RoleState.Move:
-                        if (moveComponent.IsGrouded && weaponComponent.CurrentWeapon == null)
+                        if (moveComponent.IsGrounded && weaponComponent.CurrentWeapon == null)
                         {
                             animatorComponent.PlayRunning();
                         }
-                        if (moveComponent.IsGrouded && weaponComponent.CurrentWeapon != null)
+                        if (moveComponent.IsGrounded && weaponComponent.CurrentWeapon != null)
                         {
                             animatorComponent.PlayRunWithGun();
                         }

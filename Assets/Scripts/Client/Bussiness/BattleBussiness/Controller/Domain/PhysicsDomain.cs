@@ -79,8 +79,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     role.SetRoleState(RoleState.Normal);
                 }
 
-                if (hitWallCount <= 0) role.MoveComponent.LeaveWall();
-                else role.MoveComponent.EnterWall();
+                if (hitWallCount <= 0)
+                {
+                    role.MoveComponent.LeaveWall();
+                }
+                else
+                {
+                    role.MoveComponent.EnterWall();
+                }
 
             });
 
