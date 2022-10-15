@@ -34,10 +34,11 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void TickAllRegistAction()
         {
-            actionList.ForEach((action) =>
+            for (int i = 0; i < actionList.Count; i++)
             {
+                var action = actionList[i];
                 action.Invoke();
-            });
+            }
             actionList.Clear();
         }
 

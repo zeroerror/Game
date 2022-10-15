@@ -54,6 +54,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             ServerNetworkEventCenter.battleSerConnect += ((connId) =>
             {
+                ConnIDList.Add(connId); //添加至连接名单
             });
 
             heartbeatMsgDic = new Dictionary<long, BattleHeartbeatReqMsg>();
@@ -74,7 +75,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             this.fixedDeltaTime = fixedDeltaTime;
 
             var battleRqs = battleFacades.Network.BattleReqAndRes;
-            battleRqs.RegistReq_HeartBeat(OnHeartbeat);
 
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMove);
@@ -402,6 +402,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Item]
+
         void Tick_ItemPickUp()
         {
 
@@ -449,6 +450,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Network]
 
         #region [Role]
+
         void OnRoleMove(int connId, FrameRoleMoveReqMsg msg)
         {
             lock (roleMoveMsgDic)
@@ -502,8 +504,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleSpawnMsgDic[key] = msg;
                 }
 
-                ConnIDList.Add(connId); //角色生成后添加至连接名单
-
                 sceneSpawnTrigger = true;// 创建场景(First Time)
 
             }
@@ -512,6 +512,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Bullet]
+
         void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
         {
             Debug.Log("OnBulletSpawn");
@@ -528,6 +529,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Item]
+
         void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
         {
             lock (itemPickUpMsgDic)
@@ -543,6 +545,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Scene Spawn Method]
+
         async void SpawBattleChooseScene()
         {
             // Load Scene And Spawn Field
@@ -637,21 +640,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
         #endregion
-
-        void OnHeartbeat(int connId, BattleHeartbeatReqMsg msg)
-        {
-            lock (heartbeatMsgDic)
-            {
-
-                long key = GetCurFrameKey(connId);
-
-                if (!heartbeatMsgDic.TryGetValue(key, out var _))
-                {
-                    heartbeatMsgDic[key] = msg;
-                }
-
-            }
-        }
 
         #endregion
 

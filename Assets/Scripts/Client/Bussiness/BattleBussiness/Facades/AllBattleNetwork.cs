@@ -34,6 +34,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             BattleReqAndRes.Inject(client);
         }
 
+        public void Tick()
+        {
+            BattleReqAndRes.TickAllRegistAction();
+            RoleReqAndRes.TickAllRegistAction();
+            BulletReqAndRes.TickAllRegistAction();
+            WeaponReqAndRes.TickAllRegistAction();
+            ItemReqAndRes.TickAllRegistAction();
+        }
+
     }
 
 }

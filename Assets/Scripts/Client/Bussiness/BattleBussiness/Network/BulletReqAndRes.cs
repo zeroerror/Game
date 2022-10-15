@@ -3,22 +3,35 @@ using UnityEngine;
 using Game.Protocol.Battle;
 using Game.Infrastructure.Network.Client;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using System.Collections.Generic;
+using ZeroFrame.Protocol;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
 
     public class BulletReqAndRes
     {
-        NetworkClient _client;
+        NetworkClient battleClient;
+        List<Action> actionList;
 
         public BulletReqAndRes()
         {
-
+            actionList = new List<Action>();
         }
 
         public void Inject(NetworkClient client)
         {
-            _client = client;
+            battleClient = client;
+        }
+
+        public void TickAllRegistAction()
+        {
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                var action = actionList[i];
+                action.Invoke();
+            }
+            actionList.Clear();
         }
 
         public void SendReq_BulletSpawn(BulletType bulletType, byte wRid, Vector3 targetPos)
@@ -33,28 +46,48 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
                 targetPosY = (int)(targetPos.y),
                 targetPosZ = (int)(targetPos.z)
             };
-            _client.SendMsg(msg);
+            battleClient.SendMsg(msg);
             Debug.Log($"发送生成子弹网络请求:wRid:{wRid} 目标点：{targetPos}");
         }
 
+
+        #region [Regist]
+
         public void RegistRes_BulletSpawn(Action<FrameBulletSpawnResMsg> action)
         {
-            _client.RegistMsg(action);
+            AddRegister(action);
         }
 
         public void RegistRes_BulletTearDown(Action<FrameBulletLifeOverResMsg> action)
         {
-            _client.RegistMsg(action);
+            AddRegister(action);
         }
 
         public void RegistRes_BulletHitRole(Action<FrameBulletHitRoleResMsg> action)
         {
-            _client.RegistMsg(action);
+            AddRegister(action);
         }
 
         public void RegistRes_BulletHitWall(Action<FrameBulletHitWallResMsg> action)
         {
-            _client.RegistMsg(action);
+            AddRegister(action);
+        }
+
+        #endregion
+
+        // Private Func
+        void AddRegister<T>(Action<T> action) where T : IZeroMessage<T>, new()
+        {
+            lock (actionList)
+            {
+                battleClient.RegistMsg<T>((msg) =>
+                {
+                    actionList.Add(() =>
+                    {
+                        action.Invoke(msg);
+                    });
+                });
+            }
         }
 
     }

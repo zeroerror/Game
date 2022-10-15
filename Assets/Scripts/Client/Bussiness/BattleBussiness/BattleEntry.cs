@@ -17,6 +17,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         static BattleInputController battleInputController;
         static BattleWeaponController battleWeaponController;
         static BattleRendererController battleRendererController;
+        static BattleNetworkController battleNetworkController;
 
         #region [Life Cycle]
 
@@ -30,6 +31,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleInputController = new BattleInputController();
             battleWeaponController = new BattleWeaponController();
             battleRendererController = new BattleRendererController();
+            battleNetworkController = new BattleNetworkController();
         }
 
         public static void Inject(NetworkClient client, PlayerInputComponent inputComponent)
@@ -42,11 +44,14 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleInputController.Inject(battleFacades);
             battleWeaponController.Inject(battleFacades);
             battleRendererController.Inject(battleFacades);
+            battleNetworkController.Inject(battleFacades);
         }
 
         public static void Tick()
         {
             // == Controller ==
+            battleNetworkController.Tick();
+
             battleController.Tick();
             battlePhysicsController.Tick();
             battleInputController.Tick();

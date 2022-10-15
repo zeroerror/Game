@@ -4,6 +4,9 @@ using Game.Infrastructure.Network.Client;
 using Game.Protocol.Battle;
 using System.Runtime.InteropServices;
 using Game.Client.Bussiness.EventCenter;
+using ZeroFrame.Protocol;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
@@ -11,17 +14,29 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
     public class BattleRoleReqAndRes
     {
         NetworkClient battleClient;
+        List<Action> actionList;
 
         int clientFrame;
         public void SetClientFrame(int clienFrame) => this.clientFrame = clienFrame;
 
         public BattleRoleReqAndRes()
         {
+            actionList = new List<Action>();
         }
 
         public void Inject(NetworkClient client)
         {
             battleClient = client;
+        }
+
+        public void TickAllRegistAction()
+        {
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                var action = actionList[i];
+                action.Invoke();
+            }
+            actionList.Clear();
         }
 
         // == Send ==
@@ -86,14 +101,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void RegistRes_BattleRoleSpawn(Action<FrameBattleRoleSpawnResMsg> action)
         {
-            battleClient.RegistMsg(action);
+            AddRegister(action);
         }
 
         public void RegistUpdate_WRole(Action<BattleRoleStateUpdateMsg> action)
         {
-            battleClient.RegistMsg(action);
+            AddRegister(action);
         }
 
+        // Private Func
+        void AddRegister<T>(Action<T> action) where T : IZeroMessage<T>, new()
+        {
+            lock (actionList)
+            {
+                battleClient.RegistMsg<T>((msg) =>
+                {
+                    actionList.Add(() =>
+                    {
+                        action.Invoke(msg);
+                    });
+                });
+            }
+        }
 
     }
 

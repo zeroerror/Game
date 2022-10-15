@@ -280,10 +280,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_BulletHitRole()
         {
-            while (bulletHitRoleQueue.TryPeek(out var bulletHitRoleMsg))
+            while (bulletHitRoleQueue.TryDequeue(out var bulletHitRoleMsg))
             {
-                bulletHitRoleQueue.Dequeue();
-
+                // 只做表现层
+                return;
                 var bulletRepo = battleFacades.Repo.BulletRepo;
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
@@ -304,10 +304,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_BulletHitWall()
         {
-            while (bulletHitWallQueue.TryPeek(out var bulletHitWallResMsg))
+            while (bulletHitWallQueue.TryDequeue(out var bulletHitWallResMsg))
             {
-                bulletHitWallQueue.Dequeue();
-
+                // 只做表现层
+                return;
                 var bulletHitPos = new Vector3(bulletHitWallResMsg.posX / 10000f, bulletHitWallResMsg.posY / 10000f, bulletHitWallResMsg.posZ / 10000f);
                 var bulletRepo = battleFacades.Repo.BulletRepo;
                 var roleRepo = battleFacades.Repo.RoleRepo;
@@ -347,6 +347,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bulletRepo = battleFacades.Repo.BulletRepo;
                 var bulletEntity = bulletRepo.GetByBulletId(bulletId);
 
+                Debug.Assert(msg != null, "asdasdsadsada");
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
                 bulletEntity.MoveComponent.SetCurPos(pos);
 

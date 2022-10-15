@@ -3,22 +3,35 @@ using UnityEngine;
 using Game.Protocol.Battle;
 using Game.Infrastructure.Network.Client;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using System.Collections.Generic;
+using ZeroFrame.Protocol;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
 
     public class ItemReqAndRes
     {
-        NetworkClient _client;
+        NetworkClient battleClient;
+        List<Action> actionList;
 
         public ItemReqAndRes()
         {
-
+            actionList = new List<Action>();
         }
 
         public void Inject(NetworkClient client)
         {
-            _client = client;
+            battleClient = client;
+        }
+
+        public void TickAllRegistAction()
+        {
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                var action = actionList[i];
+                action.Invoke();
+            }
+            actionList.Clear();
         }
 
         // ====== Send ======
@@ -30,19 +43,34 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
                 itemType = (byte)itemType,
                 entityId = (ushort)entityId
             };
-            _client.SendMsg(msg);
+            battleClient.SendMsg(msg);
             Debug.Log($"[wRid:{wRid}]请求拾取 {itemType.ToString()}物件[entityId:{entityId}]");
         }
 
         // ====== Regist ======
         public void RegistRes_ItemPickUp(Action<FrameItemPickResMsg> action)
         {
-            _client.RegistMsg<FrameItemPickResMsg>(action);
+            AddRegister(action);
         }
 
         public void RegistRes_ItemSpawn(Action<FrameItemSpawnResMsg> action)
         {
-            _client.RegistMsg(action);
+            AddRegister(action);
+        }
+
+        // Private Func
+        void AddRegister<T>(Action<T> action) where T : IZeroMessage<T>, new()
+        {
+            lock (actionList)
+            {
+                battleClient.RegistMsg<T>((msg) =>
+                {
+                    actionList.Add(() =>
+                    {
+                        action.Invoke(msg);
+                    });
+                });
+            }
         }
 
     }
