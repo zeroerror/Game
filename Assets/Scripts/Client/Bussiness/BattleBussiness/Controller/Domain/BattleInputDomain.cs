@@ -94,7 +94,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return Vector3.zero;
         }
 
-
     }
 
 }

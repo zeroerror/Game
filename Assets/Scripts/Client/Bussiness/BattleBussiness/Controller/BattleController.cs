@@ -456,7 +456,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void OnWRoleSync(BattleRoleStateUpdateMsg msg)
         {
             roleStateQueue.Enqueue(msg);
-            DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
+            // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
         }
 
         void OnBattleRoleSpawn(FrameBattleRoleSpawnResMsg msg)

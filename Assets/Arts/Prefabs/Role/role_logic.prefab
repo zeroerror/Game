@@ -88,6 +88,14 @@ MonoBehaviour:
     extraVelocity: {x: 0, y: 0, z: 0}
     isGrounded: 0
     isHitWall: 0
+  healthComponent:
+    maxHealth: 30
+    health: 0
+  weaponComponent:
+    AllWeapon:
+    - {fileID: 0}
+  stateComponent:
+    roleState: 0
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0

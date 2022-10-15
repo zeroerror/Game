@@ -93,26 +93,30 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            // Tick的过滤条件
             if (sceneSpawnTrigger && !isSceneSpawn)
             {
                 SpawBattleChooseScene();
                 sceneSpawnTrigger = false;
             }
-            if (!isSceneSpawn) return;
+            if (!isSceneSpawn)
+            {
+                return;
+            }
 
-            // ====== Life
+            // ====== Bullet
+            Tick_BulletSpawn();
             Tick_BulletLifeCycle();
 
-            // Client Request
+            // ====== Role
             Tick_WRoleSpawn();
-            Tick_BulletSpawn();
+            Tick_RoleRollOpt();
+            Tick_RoleMoveRotateOpt();
+            ApplyAllRoleState();
 
+            // ====== Item
             Tick_ItemPickUp();
 
-            Tick_RollOpt();
-            Tick_MoveAndRotateOpt();
-
+            // ====== Broadcast
             BroadcastAllRoleState();
         }
 
@@ -171,7 +175,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
-        void Tick_MoveAndRotateOpt()
+        void Tick_RoleMoveRotateOpt()
         {
             ConnIDList.ForEach((connId) =>
             {
@@ -189,29 +193,26 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var rid = (byte)(realMsg >> 48);
                     var role = roleRepo.GetByEntityId(rid);
 
-                    // ------------移动
+                    // ------------移动 -> Input
                     Vector3 dir = new Vector3((short)(ushort)(realMsg >> 32) / 100f, (short)(ushort)(realMsg >> 16) / 100f, (short)(ushort)realMsg / 100f);
-
-                    //服务器逻辑
-                    var roleDomain = battleServerFacades.BattleFacades.Domain.RoleDomain;
-                    roleDomain.RoleMove(role, dir);
+                    role.InputComponent.SetMoveDir(dir);
                 }
 
                 if (roleRotateMsgDic.TryGetValue(key, out var rotateMsg))
                 {
-                    // ------------转向（基于客户端鉴权的同步）
+                    // ------------转向 -> Input（基于客户端鉴权的同步） 
                     var realMsg = rotateMsg.msg;
                     var rid = (byte)(realMsg >> 48);
                     var role = roleRepo.GetByEntityId(rid);
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
-                    role.MoveComponent.SetEulerAngle(eulerAngle);
+                    role.InputComponent.SetRotEuler(eulerAngle);
                 }
 
             });
 
         }
 
-        void Tick_RollOpt()
+        void Tick_RoleRollOpt()
         {
             ConnIDList.ForEach((connId) =>
             {
@@ -231,12 +232,16 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var role = roleRepo.GetByEntityId(wRid);
                     var rqs = battleServerFacades.Network.RoleReqAndRes;
                     Vector3 dir = new Vector3(msg.dirX / 10000f, msg.dirY / 10000f, msg.dirZ / 10000f);
-
-                    var roleDomain = battleServerFacades.BattleFacades.Domain.RoleDomain;
-                    roleDomain.RoleRoll(role, dir);
+                    role.InputComponent.SetRollDir(dir);
                 }
             });
 
+        }
+
+        void ApplyAllRoleState()
+        {
+            var roleStateDomain = battleServerFacades.BattleFacades.Domain.RoleStateDomain;
+            roleStateDomain.ApplyAllRoleState();
         }
 
         #endregion

@@ -1,9 +1,11 @@
 using UnityEngine;
 using Game.Generic;
+using System;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
+    [Serializable]
     public class WeaponComponent
     {
 
@@ -16,7 +18,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool IsFullReloaded => CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
 
-        public WeaponComponent()
+        public void Reset()
         {
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
         }

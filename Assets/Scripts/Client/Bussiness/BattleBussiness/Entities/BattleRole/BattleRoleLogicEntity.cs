@@ -45,14 +45,19 @@ namespace Game.Client.Bussiness.BattleBussiness
         MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
 
-        public HealthComponent HealthComponent { get; private set; }
+        [SerializeField]
+        HealthComponent healthComponent;
+        public HealthComponent HealthComponent => healthComponent;
 
-        public WeaponComponent WeaponComponent { get; private set; }
+        [SerializeField]
+        WeaponComponent weaponComponent;
+        public WeaponComponent WeaponComponent => weaponComponent;
 
-        public ItemComponent ItemComponent { get; private set; }
-
+        [SerializeField]
         RoleStateComponent stateComponent;
         public RoleStateComponent StateComponent => stateComponent;
+
+        public ItemComponent ItemComponent { get; private set; }
 
         RoleInputComponent roleInputComponent;
         public RoleInputComponent InputComponent => roleInputComponent;
@@ -71,48 +76,45 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             // == Component
-            // moveComponent = new MoveComponent();
+
             moveComponent.Inject(transform.GetComponentInParent<Rigidbody>());
             moveComponent.SetMaximumSpeed(30f);
 
-            idComponent = new IDComponent();
+            idComponent = new IDComponent();    // TODO: Serializable
             idComponent.SetEntityType(EntityType.BattleRole);
 
-            HealthComponent = new HealthComponent(5f);
-
-            WeaponComponent = new WeaponComponent();
-
-            ItemComponent = new ItemComponent();
-
-            stateComponent = new RoleStateComponent();
-
             roleInputComponent = new RoleInputComponent();
+            ItemComponent = new ItemComponent(); // TODO: Serializable
 
-            RoleState = RoleState.Normal;///////////
+            moveComponent.Reset();
+            healthComponent.Reset();
+            weaponComponent.Reset();
+            stateComponent.Reset();
+
             offset = new Vector3(0, 0.2f, 0);
         }
 
         public int FetchBulletsFromItemComponent()
         {
-            var curWeapon = WeaponComponent.CurrentWeapon;
+            var curWeapon = weaponComponent.CurrentWeapon;
             return ItemComponent.TakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
         }
 
         public bool CanWeaponReload()
         {
-            if (WeaponComponent.IsReloading)
+            if (weaponComponent.IsReloading)
             {
                 return false;
             }
 
-            var curWeapon = WeaponComponent.CurrentWeapon;
+            var curWeapon = weaponComponent.CurrentWeapon;
             if (curWeapon == null)
             {
                 Debug.LogWarning("当前尚未持有武器！");
                 return false;
             }
 
-            if (WeaponComponent.IsFullReloaded)
+            if (weaponComponent.IsFullReloaded)
             {
                 Debug.LogWarning("当前武器已经装满子弹");
                 return false;
@@ -143,7 +145,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveComponent.SetCurPos(pos);
             moveComponent.Reset();
 
-            HealthComponent.Reset();
+            healthComponent.Reset();
 
             IsDead = false;
         }

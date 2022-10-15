@@ -9,6 +9,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleSpawnDomain SpawnDomain { get; private set; }
         public BattleRoleDomain RoleDomain { get; private set; }
+        public BattleRoleStateDomain RoleStateDomain { get; private set; }
         public BattleInputDomain InputDomain { get; private set; }
         public BulletDomain BulletDomain { get; private set; }
         public ItemDomain ItemDomain { get; private set; }
@@ -21,6 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         {
             SpawnDomain = new BattleSpawnDomain();
             RoleDomain = new BattleRoleDomain();
+            RoleStateDomain = new BattleRoleStateDomain();
             InputDomain = new BattleInputDomain();
             BulletDomain = new BulletDomain();
             ItemDomain = new ItemDomain();
@@ -34,6 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         {
             SpawnDomain.Inject(facades);
             RoleDomain.Inject(facades);
+            RoleStateDomain.Inject(facades);
             InputDomain.Inject(facades);
             BulletDomain.Inject(facades);
             ItemDomain.Inject(facades);

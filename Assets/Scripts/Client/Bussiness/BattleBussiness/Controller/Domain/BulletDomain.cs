@@ -101,12 +101,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     hitPowerModel.attackTag = AttackTag.Enemy;
                     hitPowerModel.damage = 5;
                     hitPowerModel.hitVelocity = bullet.MoveComponent.Velocity / 10f;
+                    hitPowerModel.freezeMaintainFrame = 30;
                     // ----------------------------------------------------------------
 
                     var hitDomain = battleFacades.Domain.HitDomain;
                     var roleIDC = role.IDComponent;
                     var bulletIDC = bullet.IDComponent;
-                    if (!hitDomain.TryHitActor(roleIDC, bulletIDC, in hitPowerModel, fixedDeltaTime))
+                    if (!hitDomain.TryHitActor(bulletIDC, roleIDC, in hitPowerModel, fixedDeltaTime))
                     {
                         Debug.LogWarning($"无法真正打击目标");
                         return;
@@ -201,6 +202,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     hitPowerModel.canHitRepeatly = false;
                     hitPowerModel.damage = 50;
                     hitPowerModel.hitVelocity = hitVelocity;
+                    hitPowerModel.freezeMaintainFrame = 30;
 
                     var hitDomain = battleFacades.Domain.HitDomain;
                     hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime);

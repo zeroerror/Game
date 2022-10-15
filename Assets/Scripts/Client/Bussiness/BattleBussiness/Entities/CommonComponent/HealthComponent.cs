@@ -1,25 +1,23 @@
 using UnityEngine;
 using Game.Generic;
+using System;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
+    [Serializable]
     public class HealthComponent
     {
 
+        [SerializeField]
         float maxHealth;
         public float MaxHealth => maxHealth;
 
+        [SerializeField]
         float health;
         public float Health => health;
 
         public bool IsDead() => health <= 0;
-
-        public HealthComponent(float health)
-        {
-            this.maxHealth = health;
-            this.health = health;
-        }
 
         public void HurtByDamage(float damage)
         {

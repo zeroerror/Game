@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             animator.Play("Dead", 0, 0);
         }
 
-        public void PlayRollForward()
+        public void PlayRolling()
         {
             animator.Play("RollForward", 0, 0);
         }

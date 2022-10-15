@@ -23,11 +23,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var arbitService = battleFacades.ArbitrationService;
             if (!arbitService.CanDamage(attackerIDC, victimIDC, hitPowerModel))
             {
+                Debug.Log($"不能造成伤害");
                 return false;
             }
 
             ApplyHitRole(attackerIDC, victimIDC, hitPowerModel, fixedDeltaTime);
 
+            Debug.Log($"victimIDC : {victimIDC.EntityType.ToString()}");
             return true;
 
         }
@@ -39,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            var role = battleFacades.Repo.RoleRepo.GetByEntityId(attackerIDC.EntityId);
+            var role = battleFacades.Repo.RoleRepo.GetByEntityId(victimIDC.EntityId);
 
             // 作用伤害
             role.HealthComponent.HurtByDamage(hitPowerModel.damage);
@@ -47,6 +49,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             // 作用物理
             role.MoveComponent.AddExtraVelocity(hitPowerModel.hitVelocity);
             role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
+
+            // 状态
+            role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);
 
         }
 

@@ -10,6 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public AttackTag attackTag;
         public int damage;
         public Vector3 hitVelocity;
+        public int freezeMaintainFrame;
     }
 
     public struct HitModel
@@ -22,6 +23,48 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
         public IDComponent hitter;
         public CollisionExtra fieldCE;
+    }
+
+    public class RoleStateRollingMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
+    }
+
+    public class RoleStateClimbingMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
+    }
+
+    public class RoleStateReloadingMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
+    }
+
+    public class RoleStateSwitchingMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
+    }
+
+    public class RoleStateShootingMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
+    }
+
+    public class RoleStateBeHitMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
+    }
+
+    public class RoleStateAttackingMod
+    {
+        public bool isFirstEnter;
+        public int maintainFrame;
     }
 
 }
