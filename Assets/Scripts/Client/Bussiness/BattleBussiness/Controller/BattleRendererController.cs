@@ -44,16 +44,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Update_Camera()
         {
-            var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            if (curFieldEntity == null) return;
-
-            var cameraComponent = curFieldEntity.CameraComponent;
-            var currentCam = cameraComponent.CurrentCamera;
-            var cameraView = cameraComponent.CurrentCameraView;
-            var inputDomain = battleFacades.Domain.BattleInputDomain;
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
-            inputDomain.UpdateCameraByCameraView(battleFacades.Repo.RoleRepo.Owner, cameraView, currentCam, inputAxis);
+            var inputDomain = battleFacades.Domain.InputDomain;
+            inputDomain.UpdateCameraByCameraView(inputAxis);
         }
 
         #endregion

@@ -6,7 +6,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
     public class BattleEntry
     {
-        BattleFacades battleFacades;
+        BattleServerFacades battleFacades;
 
         BattleController battleController;
         BattlePhysicsController battlePhysicsController;
@@ -15,7 +15,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public BattleEntry()
         {
-            battleFacades = new BattleFacades();
+            battleFacades = new BattleServerFacades();
             battleController = new BattleController();
             battlePhysicsController = new BattlePhysicsController();
             battleNetworkController = new BattleNetworkController();
@@ -37,6 +37,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         public void Tick()
         {
             battleNetworkController.Tick();
+            
             battlePhysicsController.Tick();
             battleWeaponController.Tick();
             battleController.Tick();

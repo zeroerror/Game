@@ -32,7 +32,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleRendererController = new BattleRendererController();
         }
 
-        public static void Inject(NetworkClient client, InputComponent inputComponent)
+        public static void Inject(NetworkClient client, PlayerInputComponent inputComponent)
         {
             // == Facades ==
             battleFacades.Inject(client, inputComponent);

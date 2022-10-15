@@ -1,43 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Game.Generic;
 using UnityEngine;
-using ZeroFrame.Log;
+using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Generic;
 
 namespace Game.Client.Bussiness
 {
-
-    public enum CollisionStatus
-    {
-        None,
-        Enter,
-        Stay,
-        Exit
-    }
-
-    public enum FieldType
-    {
-        None,
-        Wall,
-        Ground
-    }
-
-    public class CollisionExtra
-    {
-
-        public CollisionStatus status;
-
-        public Collision collision;
-        public GameObject gameObject;
-        public Collider Collider => gameObject != null ? gameObject.GetComponent<Collider>() : null;
-
-        public string layerName;
-
-        public FieldType fieldType;
-
-        public Vector3 hitDir;
-
-    }
 
     public class PhysicsEntity : MonoBehaviour
     {

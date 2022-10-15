@@ -14,13 +14,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         AllyExcludeSelf, // -友军（除了自己）
     }
 
-    public struct HitPowerModel
-    {
-        public int damage;
-        public bool canHitRepeatly;
-        public AttackTag attackTag;
-    }
-
     public class BattleArbitrationService
     {
 

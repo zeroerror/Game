@@ -5,19 +5,19 @@ using Game.Server.Bussiness.EventCenter;
 namespace Game.Server.Bussiness.BattleBussiness.Facades
 {
 
-    public class BattleFacades
+    public class BattleServerFacades
     {
 
         public AllBattleNetwork Network { get; private set; }
         public LocalEventCenter LocalEventCenter { get; private set; }
 
-        public Game.Client.Bussiness.BattleBussiness.Facades.BattleFacades ClientBattleFacades { get; private set; }
+        public Game.Client.Bussiness.BattleBussiness.Facades.BattleFacades BattleFacades { get; private set; }
 
-        public BattleFacades()
+        public BattleServerFacades()
         {
             Network = new AllBattleNetwork();
             LocalEventCenter = new LocalEventCenter();
-            ClientBattleFacades = new Client.Bussiness.BattleBussiness.Facades.BattleFacades();
+            BattleFacades = new Client.Bussiness.BattleBussiness.Facades.BattleFacades();
         }
 
         public void Inject(NetworkServer server)

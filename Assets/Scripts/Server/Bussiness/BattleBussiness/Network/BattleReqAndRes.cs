@@ -38,9 +38,9 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             lock (actionList)
             {
                 actionList.ForEach((action) =>
-                       {
-                           action.Invoke();
-                       });
+                {
+                    action.Invoke();
+                });
                 actionList.Clear();
             }
         }

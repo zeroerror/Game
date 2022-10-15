@@ -13,7 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         // Asset
         public AllBattleAssets Assets { get; private set; }
         // Controller Set
-        public InputComponent InputComponent { get; private set; }
+        public PlayerInputComponent InputComponent { get; private set; }
 
         public BattleArbitrationService ArbitrationService { get; private set; }
 
@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             Assets.LoadAll();
         }
 
-        public void Inject(NetworkClient client, InputComponent inputComponent)
+        public void Inject(NetworkClient client, PlayerInputComponent inputComponent)
         {
             Network.Inject(client);
             InputComponent = inputComponent;

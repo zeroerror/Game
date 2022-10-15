@@ -6,10 +6,10 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleNetworkController
     {
 
-        BattleFacades battleFacades;
+        BattleServerFacades battleFacades;
         int serveFrame;
 
-        public void Inject(BattleFacades battleFacades, float fixedDeltaTime)
+        public void Inject(BattleServerFacades battleFacades, float fixedDeltaTime)
         {
             this.battleFacades = battleFacades;
         }

@@ -31,4 +31,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
         GrenadeLauncher //榴弹发射器
     }
 
+    public enum FieldType
+    {
+        None,
+        Wall,
+        Ground
+    }
+
+
+
 }

@@ -9,7 +9,7 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleWeaponController
     {
 
-        BattleFacades battleFacades;
+        BattleServerFacades battleFacades;
 
         // NetWorkd Info
         public int ServeFrame => battleFacades.Network.ServeFrame;
@@ -31,7 +31,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             weaponDropMsgDic = new Dictionary<long, FrameWeaponDropReqMsg>();
         }
 
-        public void Inject(BattleFacades battleFacades, float fixedDeltaTime)
+        public void Inject(BattleServerFacades battleFacades, float fixedDeltaTime)
         {
             this.battleFacades = battleFacades;
 
@@ -48,7 +48,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             Tick_ReloadingFrame();
             Tick_WeaponDrop();
 
-            var allRole = battleFacades.ClientBattleFacades.Repo.RoleRepo;
+            var allRole = battleFacades.BattleFacades.Repo.RoleRepo;
             allRole.Foreach((role) =>
             {
                 var WeaponComponent = role.WeaponComponent;
@@ -72,7 +72,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (weaponShootMsgDic.TryGetValue(key, out var msg))
                 {
-                    var clientFacades = battleFacades.ClientBattleFacades;
+                    var clientFacades = battleFacades.BattleFacades;
                     var weaponRepo = clientFacades.Repo.WeaponRepo;
                     var roleRepo = clientFacades.Repo.RoleRepo;
                     var bulletRepo = clientFacades.Repo.BulletRepo;
@@ -131,8 +131,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (weaponReloadMsgDic.TryGetValue(key, out var msg))
                 {
-                    var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
+                    var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
+                    var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
                     var masterId = msg.masterId;
                     if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
                     {
@@ -144,7 +144,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_ReloadingFrame()
         {
-            var allRole = battleFacades.ClientBattleFacades.Repo.RoleRepo;
+            var allRole = battleFacades.BattleFacades.Repo.RoleRepo;
             var rqs = battleFacades.Network.WeaponReqAndRes;
             allRole.Foreach((role) =>
             {
@@ -178,8 +178,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (weaponDropMsgDic.TryGetValue(key, out var msg))
                 {
-                    var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
+                    var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
+                    var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     var entityId = msg.entityId;
                     var masterId = msg.masterId;
@@ -187,7 +187,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
                     {
                         // 服务器逻辑
-                        battleFacades.ClientBattleFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.Position);
+                        battleFacades.BattleFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.Position);
 
                         ConnIdList.ForEach((connId) =>
                         {

@@ -24,7 +24,7 @@ public static class InputGameSet
         MobileInputSet = null;
     }
 
-    public static void Receive_Input(ref InputComponent inputComponent)
+    public static void Receive_Input(ref PlayerInputComponent inputComponent)
     {
 #if UNITY_STANDALONE
         ReceivePCInput(ref inputComponent);
@@ -35,7 +35,7 @@ public static class InputGameSet
 #endif
     }
 
-    public static void ReceivePCInput(ref InputComponent inputComponent)
+    public static void ReceivePCInput(ref PlayerInputComponent inputComponent)
     {
         if (Input.GetKey(PCInputSet.forward))
         {
@@ -79,7 +79,7 @@ public static class InputGameSet
         }
     }
 
-    public static void ReceiveMobileInput(ref InputComponent inputComponent)
+    public static void ReceiveMobileInput(ref PlayerInputComponent inputComponent)
     {
         inputComponent.moveAxis = MobileInputSet.moveAixs;
         if (MobileInputSet.isPressJump)

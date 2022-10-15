@@ -9,9 +9,14 @@ namespace Game.Client.Bussiness.BattleBussiness
     public enum RoleState
     {
         Normal,
-        Move,
-        RollForward,
-        Hooking       //-使用爪钩中
+        Rolling,
+        Climbing,
+        Attacking,
+        Reloading,
+        Healing,
+        Switching,
+        BeHit,
+        Dead
     }
 
     public class BattleRoleLogicEntity : PhysicsEntity
@@ -39,10 +44,20 @@ namespace Game.Client.Bussiness.BattleBussiness
         [SerializeField]
         MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
+
         public HealthComponent HealthComponent { get; private set; }
+
         public WeaponComponent WeaponComponent { get; private set; }
+
         public ItemComponent ItemComponent { get; private set; }
 
+        RoleStateComponent stateComponent;
+        public RoleStateComponent StateComponent => stateComponent;
+
+        RoleInputComponent roleInputComponent;
+        public RoleInputComponent InputComponent => roleInputComponent;
+
+        /// </summary>///////////////////
         public RoleState RoleState { get; private set; }
         public void SetRoleState(RoleState roleStatus) => this.RoleState = roleStatus;
 
@@ -69,7 +84,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             ItemComponent = new ItemComponent();
 
-            RoleState = RoleState.Normal;
+            stateComponent = new RoleStateComponent();
+
+            roleInputComponent = new RoleInputComponent();
+
+            RoleState = RoleState.Normal;///////////
             offset = new Vector3(0, 0.2f, 0);
         }
 

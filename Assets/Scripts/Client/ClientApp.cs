@@ -23,7 +23,7 @@ namespace Game.Client
         Thread _worldServClientThread;
         Thread _battleServClientThread;
         public string CurrentSceneName { get; private set; }
-        InputComponent _inputComponent;
+        PlayerInputComponent playerInputComponent;
         float time;
         bool isStarted;
 
@@ -60,8 +60,8 @@ namespace Game.Client
             WorldEntry.Inject(AllClientNetwork.worldSerClient);
             // Battle
             BattleEntry.Ctor();
-            _inputComponent = new InputComponent();
-            BattleEntry.Inject(AllClientNetwork.battleSerClient, _inputComponent);
+            playerInputComponent = new PlayerInputComponent();
+            BattleEntry.Inject(AllClientNetwork.battleSerClient, playerInputComponent);
 
             // ====== Manager ======
             UIManager.Ctor();
@@ -97,7 +97,7 @@ namespace Game.Client
         {
             if (!isStarted) return;
 
-            InputGameSet.Receive_Input(ref _inputComponent);
+            InputGameSet.Receive_Input(ref playerInputComponent);
             BattleEntry.Update();
         }
 

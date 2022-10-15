@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void Tick_Physics_Collision_Role(float fixedDeltaTime)
         {
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
-            var roleList = physicsDomain.Tick_AllRoleHitEnter(fixedDeltaTime);
+            var roleList = physicsDomain.Tick_AllRoleHitField(fixedDeltaTime);
         }
 
         void Tick_Physics_Collision_Bullet()
@@ -55,19 +55,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var domain = battleFacades.Domain.RoleDomain;
             domain.Tick_RoleRigidbody(deltaTime);
 
-            var cameraComponent = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent;
-            var currentCamera = cameraComponent.CurrentCamera;
-            var cameraView = cameraComponent.CurrentCameraView;
-            var inputDomain = battleFacades.Domain.BattleInputDomain;
-
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            inputDomain.UpdateCameraByCameraView(battleFacades.Repo.RoleRepo.Owner, cameraView, currentCamera, inputAxis);
+            var inputDomain = battleFacades.Domain.InputDomain;
+            inputDomain.UpdateCameraByCameraView(inputAxis);
         }
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
         {
             var domain = battleFacades.Domain.BulletDomain;
-            domain.Tick_Bullet(fixedDeltaTime);
+            domain.Tick_BulletMovement(fixedDeltaTime);
         }
 
     }

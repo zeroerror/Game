@@ -1,3 +1,4 @@
+using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Infrastructure.Input;
 using UnityEngine;
 using ZeroFrame.ZeroMath;
@@ -8,24 +9,42 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
     public class BattleInputDomain
     {
 
-        public void UpdateCameraByCameraView(BattleRoleLogicEntity owner, CameraView cameraView, CinemachineExtra curCam, Vector2 inputAxis)
+        BattleFacades battleFacades;
+
+        public BattleInputDomain()
         {
+
+        }
+
+        public void Inject(BattleFacades battleFacades)
+        {
+            this.battleFacades = battleFacades;
+        }
+
+
+        public void UpdateCameraByCameraView(Vector2 inputAxis)
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
             if (owner == null) return;
+
+            var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            if (curFieldEntity == null) return;
+
+            var cameraComponent = curFieldEntity.CameraComponent;
+            var currentCam = cameraComponent.CurrentCamera;
+            var cameraView = cameraComponent.CurrentCameraView;
 
             var roleRenderer = owner.roleRenderer;
             Vector3 trackPos = roleRenderer.transform.position;
-            switch (cameraView)
-            {
-                case CameraView.FirstView:
-                    trackPos += roleRenderer.transform.forward * 0.5f;
-                    trackPos.y -= 1.2f;
 
-                    curCam.AddEulerAngleX(-inputAxis.y);
-                    curCam.AddEulerAngleY(inputAxis.x);
-                    owner.MoveComponent.SetEulerAngleY(curCam.EulerAngles);
-                    break;
-                case CameraView.ThirdView:
-                    break;
+            if (cameraView == CameraView.FirstView)
+            {
+                trackPos += roleRenderer.transform.forward * 0.5f;
+                trackPos.y -= 1.2f;
+
+                currentCam.AddEulerAngleX(-inputAxis.y);
+                currentCam.AddEulerAngleY(inputAxis.x);
+                owner.MoveComponent.SetEulerAngleY(currentCam.EulerAngles);
             }
 
             roleRenderer.SetCamTrackingPos(trackPos);

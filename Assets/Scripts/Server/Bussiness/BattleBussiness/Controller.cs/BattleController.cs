@@ -7,13 +7,15 @@ using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Client.Bussiness.EventCenter;
 using Game.Server.Bussiness.EventCenter;
+using Game.Server.Bussiness.BattleBussiness.Network;
+using Game.Client.Bussiness.BattleBussiness.Controller.Domain;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
 
     public class BattleController
     {
-        BattleFacades battleFacades;
+        BattleServerFacades battleServerFacades;
         float fixedDeltaTime;  //0.03f
 
         // Scene Spawn Trigger
@@ -21,8 +23,8 @@ namespace Game.Server.Bussiness.BattleBussiness
         bool isSceneSpawn;
 
         // NetWork Info
-        public int ServeFrame => battleFacades.Network.ServeFrame;
-        List<int> ConnIdList => battleFacades.Network.connIdList;
+        public int ServeFrame => battleServerFacades.Network.ServeFrame;
+        List<int> ConnIDList => battleServerFacades.Network.connIdList;
 
         // ====== 心跳 ======
         // - 所有客户端心跳帧
@@ -35,7 +37,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         Dictionary<long, FrameRoleMoveReqMsg> roleMoveMsgDic;
         Dictionary<long, FrameRoleRotateReqMsg> roleRotateMsgDic;
         // - 所有跳跃帧
-        Dictionary<long, FrameJumpReqMsg> jumpOptMsgDic;
+        Dictionary<long, FrameJumpReqMsg> rollOptMsgDic;
 
         // ====== 子弹 ======
         // - 所有子弹生成帧
@@ -59,16 +61,16 @@ namespace Game.Server.Bussiness.BattleBussiness
             roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
-            jumpOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
+            rollOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
 
             bulletSpawnMsgDic = new Dictionary<long, FrameBulletSpawnReqMsg>();
 
             itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
         }
 
-        public void Inject(BattleFacades battleFacades, float fixedDeltaTime)
+        public void Inject(BattleServerFacades battleFacades, float fixedDeltaTime)
         {
-            this.battleFacades = battleFacades;
+            this.battleServerFacades = battleFacades;
             this.fixedDeltaTime = fixedDeltaTime;
 
             var battleRqs = battleFacades.Network.BattleReqAndRes;
@@ -100,8 +102,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             if (!isSceneSpawn) return;
 
             // ====== Life
-            Tick_BulletLifeFrame();
-            Tick_ActiveHookersBehaviour();
+            Tick_BulletLifeCycle();
 
             // Client Request
             Tick_WRoleSpawn();
@@ -109,21 +110,34 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             Tick_ItemPickUp();
 
-            Tick_JumpOpt();
+            Tick_RollOpt();
             Tick_MoveAndRotateOpt();
 
-            Tick_Heartbeat();
+            BroadcastAllRoleState();
         }
 
         #region [Tick Request]
 
         #region [Role]
+
+        void BroadcastAllRoleState()
+        {
+            var roleRqs = battleServerFacades.Network.RoleReqAndRes;
+            var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
+            ConnIDList.ForEach((connID) =>
+            {
+                roleRepo.Foreach((role) =>
+                {
+                    roleRqs.SendUpdate_WRoleState(connID, role);
+                });
+            });
+        }
+
         void Tick_WRoleSpawn()
         {
-            ConnIdList.ForEach((connId) =>
+            ConnIDList.ForEach((connId) =>
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 if (roleSpawnMsgDic.TryGetValue(key, out var msg))
                 {
@@ -134,13 +148,13 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     roleSpawnMsgDic[key] = null;
 
-                    var clientFacades = battleFacades.ClientBattleFacades;
+                    var clientFacades = battleServerFacades.BattleFacades;
                     var repo = clientFacades.Repo;
                     var fieldEntity = repo.FiledRepo.Get(1);
-                    var roleRqs = battleFacades.Network.RoleReqAndRes;
+                    var roleRqs = battleServerFacades.Network.RoleReqAndRes;
                     var roleRepo = repo.RoleRepo;
-                    var itemRqs = battleFacades.Network.ItemReqAndRes;
-                    var weaponRqs = battleFacades.Network.WeaponReqAndRes;
+                    var itemRqs = battleServerFacades.Network.ItemReqAndRes;
+                    var weaponRqs = battleServerFacades.Network.WeaponReqAndRes;
                     var weaponRepo = repo.WeaponRepo;
                     var wrid = roleRepo.Size;
 
@@ -149,70 +163,25 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleEntity.Ctor();
                     roleEntity.IDComponent.SetEntityId(wrid);
                     roleEntity.SetConnId(connId);
+                    roleRepo.Add(roleEntity);
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.Position}");
 
-                    // ===== TODO:同步所有信息给请求者
-                    var allRole = roleRepo.GetAll();
-                    for (int i = 0; i < allRole.Length; i++)
-                    {
-                        var otherRole = allRole[i];
-                        roleRqs.SendUpdate_WRoleState(connId, otherRole);
-                    }
-
                     itemRqs.SendRes_ItemSpawn(connId, ServeFrame, itemTypeByteArray, subTypeList.ToArray(), entityIdArray);
-
-                    // ====== 广播请求者创建的角色给其他人
-                    ConnIdList.ForEach((otherConnId) =>
-                    {
-                        if (otherConnId != connId)
-                        {
-                            roleRqs.SendUpdate_WRoleState(otherConnId, roleEntity);
-                        }
-                    });
-
-                    // ====== 回复请求者创建的角色
-                    roleRqs.SendUpdate_WRoleState(connId, roleEntity);
-
-                    roleRepo.Add(roleEntity);
-                }
-            });
-        }
-
-        void Tick_RoleStateIdle(int nextFrame)
-        {
-            //人物静止和运动 2个状态
-            var BattleRoleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-            BattleRoleRepo.Foreach((roleEntity) =>
-            {
-                if (roleEntity.IsIdle() && roleEntity.RoleState != RoleState.Normal)
-                {
-                    roleEntity.SetRoleState(RoleState.Normal);
-
-                    var rqs = battleFacades.Network.RoleReqAndRes;
-                    ConnIdList.ForEach((connId) =>
-                    {
-                        rqs.SendUpdate_WRoleState(connId, roleEntity);
-                    });
                 }
             });
         }
 
         void Tick_MoveAndRotateOpt()
         {
-            ConnIdList.ForEach((connId) =>
+            ConnIDList.ForEach((connId) =>
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
-                var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                var rqs = battleFacades.Network.RoleReqAndRes;
+                long key = GetCurFrameKey(connId);
+
+                var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
+                var rqs = battleServerFacades.Network.RoleReqAndRes;
 
                 if (roleMoveMsgDic.TryGetValue(key, out var msg))
                 {
-                    if (msg == null)
-                    {
-                        return;
-                    }
-
                     roleMoveMsgDic[key] = null;
 
                     var realMsg = msg.msg;
@@ -224,14 +193,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     Vector3 dir = new Vector3((short)(ushort)(realMsg >> 32) / 100f, (short)(ushort)(realMsg >> 16) / 100f, (short)(ushort)realMsg / 100f);
 
                     //服务器逻辑
-                    role.MoveComponent.ActivateMoveVelocity(dir);
-
-                    //发送状态同步帧
-                    if (role.RoleState != RoleState.Hooking) role.SetRoleState(RoleState.Move);
-                    ConnIdList.ForEach((otherConnId) =>
-                    {
-                        rqs.SendUpdate_WRoleState(otherConnId, role);
-                    });
+                    var roleDomain = battleServerFacades.BattleFacades.Domain.RoleDomain;
+                    roleDomain.RoleMove(role, dir);
                 }
 
                 if (roleRotateMsgDic.TryGetValue(key, out var rotateMsg))
@@ -242,50 +205,36 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var role = roleRepo.GetByEntityId(rid);
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
                     role.MoveComponent.SetEulerAngle(eulerAngle);
-                    //发送状态同步帧
-                    ConnIdList.ForEach((otherConnId) =>
-                    {
-                        rqs.SendUpdate_WRoleState(otherConnId, role);
-                    });
                 }
 
             });
 
         }
 
-        void Tick_JumpOpt()
+        void Tick_RollOpt()
         {
-            ConnIdList.ForEach((connId) =>
+            ConnIDList.ForEach((connId) =>
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
-                if (jumpOptMsgDic.TryGetValue(key, out var msg))
+                long key = GetCurFrameKey(connId);
+
+                if (rollOptMsgDic.TryGetValue(key, out var msg))
                 {
                     if (msg == null)
                     {
                         return;
                     }
 
-                    jumpOptMsgDic[key] = null;
+                    rollOptMsgDic[key] = null;
 
                     var wRid = msg.entityId;
-                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                    var roleEntity = roleRepo.GetByEntityId(wRid);
-                    var rqs = battleFacades.Network.RoleReqAndRes;
-
-                    //服务器逻辑Jump
+                    var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
+                    var role = roleRepo.GetByEntityId(wRid);
+                    var rqs = battleServerFacades.Network.RoleReqAndRes;
                     Vector3 dir = new Vector3(msg.dirX / 10000f, msg.dirY / 10000f, msg.dirZ / 10000f);
-                    if (roleEntity.MoveComponent.TryRollForward(dir))
-                    {
-                        if (roleEntity.RoleState != RoleState.Hooking) roleEntity.SetRoleState(RoleState.RollForward);
-                        //发送状态同步帧
-                        ConnIdList.ForEach((connId) =>
-                        {
-                            rqs.SendUpdate_WRoleState(connId, roleEntity);
-                        });
-                    }
-                }
 
+                    var roleDomain = battleServerFacades.BattleFacades.Domain.RoleDomain;
+                    roleDomain.RoleRoll(role, dir);
+                }
             });
 
         }
@@ -295,11 +244,9 @@ namespace Game.Server.Bussiness.BattleBussiness
         #region [Bullet]
         void Tick_BulletSpawn()
         {
-
-            ConnIdList.ForEach((connId) =>
+            ConnIDList.ForEach((connId) =>
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 if (bulletSpawnMsgDic.TryGetValue(key, out var msg))
                 {
@@ -316,7 +263,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     float targetPosY = msg.targetPosY / 10000f;
                     float targetPosZ = msg.targetPosZ / 10000f;
                     Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                    var roleEntity = battleFacades.ClientBattleFacades.Repo.RoleRepo.GetByEntityId(msg.wRid);
+                    var roleEntity = battleServerFacades.BattleFacades.Repo.RoleRepo.GetByEntityId(msg.wRid);
                     var moveComponent = roleEntity.MoveComponent;
                     var shootStartPoint = roleEntity.ShootPointPos;
                     Vector3 shootDir = targetPos - shootStartPoint;
@@ -324,7 +271,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     // 服务器逻辑
                     var bulletType = (BulletType)bulletTypeByte;
-                    var clientFacades = battleFacades.ClientBattleFacades;
+                    var clientFacades = battleServerFacades.BattleFacades;
                     var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
 
                     var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
@@ -351,8 +298,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     bulletRepo.Add(bulletEntity);
                     Debug.Log($"服务器逻辑[生成子弹] serveFrame {ServeFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
 
-                    var rqs = battleFacades.Network.BulletReqAndRes;
-                    ConnIdList.ForEach((otherConnId) =>
+                    var rqs = battleServerFacades.Network.BulletReqAndRes;
+                    ConnIDList.ForEach((otherConnId) =>
                     {
                         rqs.SendRes_BulletSpawn(otherConnId, bulletType, bulletId, wRid, shootDir);
                     });
@@ -361,119 +308,106 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
 
-        void Tick_BulletLifeFrame()
+        void Tick_BulletLifeCycle()
         {
-            var tearDownList = battleFacades.ClientBattleFacades.Domain.BulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
+            Tick_DeadLifeBulletTearDown();
+            Tick_BulletHitRole();
+            Tick_BulletHitField();
+            Tick_ActiveHookerDraging();
+        }
+
+        void Tick_DeadLifeBulletTearDown()
+        {
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+            var tearDownList = bulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
             if (tearDownList.Count == 0) return;
 
             tearDownList.ForEach((bulletEntity) =>
             {
 
-                Queue<BattleRoleLogicEntity> effectRoleQueue = new Queue<BattleRoleLogicEntity>();
                 var bulletType = bulletEntity.BulletType;
+
                 if (bulletType == BulletType.DefaultBullet)
                 {
                     bulletEntity.TearDown();
                 }
-                else if (bulletEntity is GrenadeEntity grenadeEntity)
+
+                if (bulletEntity is GrenadeEntity grenadeEntity)
                 {
                     Debug.Log("爆炸");
-                    grenadeEntity.TearDown();
-                    var roleRepo = battleFacades.ClientBattleFacades.Repo.RoleRepo;
-                    roleRepo.Foreach((role) =>
-                    {
-                        var dis = Vector3.Distance(role.MoveComponent.Position, bulletEntity.MoveComponent.Position);
-                        if (dis < 7f)
-                        {
-                            var dir = role.MoveComponent.Position - bulletEntity.MoveComponent.Position;
-                            var extraV = dir.normalized * 10f;
-                            role.MoveComponent.AddExtraVelocity(extraV);
-                            role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
-                            role.SetRoleState(RoleState.Move);
-                            effectRoleQueue.Enqueue(role);
-                        }
-                    });
+                    var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+                    bulletDomain.GrenadeExplode(grenadeEntity, fixedDeltaTime);
                 }
-                else if (bulletEntity is HookerEntity hookerEntity)
+
+                if (bulletEntity is HookerEntity hookerEntity)
                 {
                     hookerEntity.TearDown();
                 }
 
-                var bulletRepo = battleFacades.ClientBattleFacades.Repo.BulletRepo;
+                var bulletRepo = battleServerFacades.BattleFacades.Repo.BulletRepo;
                 bulletRepo.TryRemove(bulletEntity);
 
-                var bulletRqs = battleFacades.Network.BulletReqAndRes;
-                ConnIdList.ForEach((connId) =>
+                var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
+                ConnIDList.ForEach((connId) =>
                 {
                     // 广播子弹销毁消息
                     bulletRqs.SendRes_BulletLifeFrameOver(connId, bulletEntity);
                 });
 
-                var roleRqs = battleFacades.Network.RoleReqAndRes;
-                while (effectRoleQueue.TryDequeue(out var role))
-                {
-                    Debug.Log($"角色击飞发送");
-                    ConnIdList.ForEach((connId) =>
-                    {
-                        // 广播被影响角色的最新状态消息
-                        roleRqs.SendUpdate_WRoleState(connId, role);
-                    });
-                }
-
             });
         }
 
-        void Tick_ActiveHookersBehaviour()
+        void Tick_BulletHitField()
         {
-            var activeHookers = battleFacades.ClientBattleFacades.Domain.BulletDomain.GetActiveHookerList();
-            List<BattleRoleLogicEntity> roleList = new List<BattleRoleLogicEntity>();
-            var rqs = battleFacades.Network.RoleReqAndRes;
-            activeHookers.ForEach((hooker) =>
+            Transform field = null;
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+            var bulletRepo = battleServerFacades.BattleFacades.Repo.BulletRepo;
+            var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
+            var hitFieldList = bulletDomain.Tick_BulletHitField(fixedDeltaTime);
+
+            hitFieldList.ForEach((hitFieldModel) =>
             {
-                var master = battleFacades.ClientBattleFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterId);
-                if (!hooker.TickHooker(out float force))
+                var bulletIDC = hitFieldModel.hitter;
+                var bullet = bulletRepo.GetByBulletId(bulletIDC.EntityId);
+
+                ConnIDList.ForEach((connId) =>
                 {
-                    master.SetRoleState(RoleState.Normal);
-                    //发送爪钩断开后的角色状态帧
-                    ConnIdList.ForEach((connId) =>
-                    {
-                        rqs.SendUpdate_WRoleState(connId, master);
-                    });
-                    return;
-                }
-
-                var masterMC = master.MoveComponent;
-                var hookerEntityMC = hooker.MoveComponent;
-                var dir = hookerEntityMC.Position - masterMC.Position;
-                var dis = Vector3.Distance(hookerEntityMC.Position, masterMC.Position);
-                dir.Normalize();
-                var v = dir * force * fixedDeltaTime;
-                masterMC.AddExtraVelocity(v);
-                master.SetRoleState(RoleState.Hooking);
-
-                if (!roleList.Contains(master)) roleList.Add(master);
+                    bulletRqs.SendRes_BulletHitField(connId, bullet);
+                });
+                field = hitFieldModel.fieldCE.Collider.transform;
             });
+        }
 
-            roleList.ForEach((master) =>
+        void Tick_BulletHitRole()
+        {
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+            var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
+            var hitRoleList = bulletDomain.Tick_BulletHitRole(fixedDeltaTime);
+
+            ConnIDList.ForEach((connId) =>
             {
-                //发送爪钩作用力后的角色状态帧
-                ConnIdList.ForEach((connId) =>
+                hitRoleList.ForEach((attackModel) =>
                 {
-                    rqs.SendUpdate_WRoleState(connId, master);
+                    bulletRqs.SendRes_BulletHitRole(connId, attackModel.attackerIDC.EntityId, attackModel.victimIDC.EntityId);
                 });
             });
-
         }
+
+        void Tick_ActiveHookerDraging()
+        {
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+            bulletDomain.Tick_ActiveHookerDraging(fixedDeltaTime);
+        }
+
         #endregion
 
         #region [Item]
         void Tick_ItemPickUp()
         {
 
-            ConnIdList.ForEach((connId) =>
+            ConnIDList.ForEach((connId) =>
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 if (itemPickUpMsgDic.TryGetValue(key, out var msg))
                 {
@@ -485,16 +419,16 @@ namespace Game.Server.Bussiness.BattleBussiness
                     itemPickUpMsgDic[key] = null;
 
                     // TODO:Add judgement like 'Can He Pick It Up?'
-                    var repo = battleFacades.ClientBattleFacades.Repo;
+                    var repo = battleServerFacades.BattleFacades.Repo;
                     var roleRepo = repo.RoleRepo;
                     var role = roleRepo.GetByEntityId(msg.wRid);
                     ItemType itemType = (ItemType)msg.itemType;
-                    var itemDomain = battleFacades.ClientBattleFacades.Domain.ItemDomain;
-                    bool isPickUpSucceed = itemDomain.TryPickUpItem(itemType, msg.entityId, repo, role);
-                    if (isPickUpSucceed)
+
+                    var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
+                    if (itemDomain.TryPickUpItem(itemType, msg.entityId, repo, role))
                     {
-                        var rqs = battleFacades.Network.ItemReqAndRes;
-                        ConnIdList.ForEach((connId) =>
+                        var rqs = battleServerFacades.Network.ItemReqAndRes;
+                        ConnIDList.ForEach((connId) =>
                         {
                             rqs.SendRes_ItemPickUp(connId, ServeFrame, msg.wRid, itemType, msg.entityId);
                         });
@@ -510,28 +444,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #endregion
 
-        void Tick_Heartbeat()
-        {
-            ConnIdList.ForEach((connId) =>
-            {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
-
-                if (heartbeatMsgDic.TryGetValue(key, out var msg))
-                {
-                    if (msg == null)
-                    {
-                        return;
-                    }
-
-                    heartbeatMsgDic[key] = null;
-
-                    var rqs = battleFacades.Network.BattleReqAndRes;
-                    rqs.SendRes_HeartBeat(connId);
-                }
-            });
-        }
-
         #endregion
 
         #region [Network]
@@ -541,9 +453,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             lock (roleMoveMsgDic)
             {
-
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 if (!roleMoveMsgDic.TryGetValue(key, out var opt))
                 {
@@ -555,14 +465,13 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnRoleJump(int connId, FrameJumpReqMsg msg)
         {
-            lock (jumpOptMsgDic)
+            lock (rollOptMsgDic)
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
-                if (!jumpOptMsgDic.TryGetValue(key, out var opt))
+                if (!rollOptMsgDic.TryGetValue(key, out var opt))
                 {
-                    jumpOptMsgDic[key] = msg;
+                    rollOptMsgDic[key] = msg;
                 }
 
             }
@@ -570,10 +479,10 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnRoleRotate(int connId, FrameRoleRotateReqMsg msg)
         {
-            lock (roleMoveMsgDic)
+            lock (roleRotateMsgDic)
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
+
                 if (!roleRotateMsgDic.TryGetValue(key, out var opt))
                 {
                     roleRotateMsgDic[key] = msg;
@@ -585,8 +494,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             lock (roleSpawnMsgDic)
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 Debug.Log($"[战斗Controller] 战斗角色生成请求 key:{key}");
                 if (!roleSpawnMsgDic.TryGetValue(key, out var _))
@@ -594,7 +502,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleSpawnMsgDic[key] = msg;
                 }
 
-                ConnIdList.Add(connId); //角色生成后添加至连接名单
+                ConnIDList.Add(connId); //角色生成后添加至连接名单
 
                 sceneSpawnTrigger = true;// 创建场景(First Time)
 
@@ -609,8 +517,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             Debug.Log("OnBulletSpawn");
             lock (bulletSpawnMsgDic)
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 if (!bulletSpawnMsgDic.TryGetValue(key, out var _))
                 {
@@ -625,8 +532,8 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             lock (itemPickUpMsgDic)
             {
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
+
                 if (!itemPickUpMsgDic.TryGetValue(key, out var _))
                 {
                     itemPickUpMsgDic[key] = msg;
@@ -639,10 +546,10 @@ namespace Game.Server.Bussiness.BattleBussiness
         async void SpawBattleChooseScene()
         {
             // Load Scene And Spawn Field
-            var domain = battleFacades.ClientBattleFacades.Domain;
-            var fieldEntity = await domain.BattleSpawnDomain.SpawnGameFightScene();
+            var domain = battleServerFacades.BattleFacades.Domain;
+            var fieldEntity = await domain.SpawnDomain.SpawnGameFightScene();
             fieldEntity.SetFieldId(1);
-            var fieldEntityRepo = battleFacades.ClientBattleFacades.Repo.FiledRepo;
+            var fieldEntityRepo = battleServerFacades.BattleFacades.Repo.FiledRepo;
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
             isSceneSpawn = true;
@@ -685,7 +592,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 var subtype = subTypeList[index];
                 itemTypeByteArray[index] = (byte)itemType;
                 // 生成武器资源
-                var itemDomain = battleFacades.ClientBattleFacades.Domain.ItemDomain;
+                var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
                 var item = itemDomain.SpawnItem(itemType, subtype);
 
                 ushort entityId = 0;
@@ -695,7 +602,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         break;
                     case ItemType.Weapon:
                         var weaponEntity = item.GetComponent<WeaponEntity>();
-                        var weaponRepo = battleFacades.ClientBattleFacades.Repo.WeaponRepo;
+                        var weaponRepo = battleServerFacades.BattleFacades.Repo.WeaponRepo;
                         entityId = weaponRepo.WeaponIdAutoIncreaseId;
                         weaponEntity.Ctor();
                         weaponEntity.SetEntityId(entityId);
@@ -705,7 +612,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         break;
                     case ItemType.BulletPack:
                         var bulletPackEntity = item.GetComponent<BulletPackEntity>();
-                        var bulletPackRepo = battleFacades.ClientBattleFacades.Repo.BulletPackRepo;
+                        var bulletPackRepo = battleServerFacades.BattleFacades.Repo.BulletPackRepo;
                         entityId = bulletPackRepo.bulletPackAutoIncreaseId;
                         bulletPackEntity.Ctor();
                         bulletPackEntity.SetEntityId(entityId);
@@ -733,11 +640,10 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnHeartbeat(int connId, BattleHeartbeatReqMsg msg)
         {
-            lock (roleMoveMsgDic)
+            lock (heartbeatMsgDic)
             {
 
-                long key = (long)ServeFrame << 32;
-                key |= (long)connId;
+                long key = GetCurFrameKey(connId);
 
                 if (!heartbeatMsgDic.TryGetValue(key, out var _))
                 {
@@ -745,6 +651,17 @@ namespace Game.Server.Bussiness.BattleBussiness
                 }
 
             }
+        }
+
+        #endregion
+
+        #region [Private Func]
+
+        long GetCurFrameKey(int connId)
+        {
+            long key = (long)ServeFrame << 32;
+            key |= (long)connId;
+            return key;
         }
 
         #endregion

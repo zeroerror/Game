@@ -11,8 +11,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         BattleFacades battleFacades;
 
-        BattleRoleReqAndRes battleRoleReqAndRes;
-
         byte tempRidIndex;
 
         public BattleRoleDomain()
@@ -23,6 +21,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             this.battleFacades = facades;
         }
+
+        #region [Spawn]
 
         public BattleRoleLogicEntity SpawnRoleLogic(Transform parent)
         {
@@ -52,11 +52,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void RebornRole(BattleRoleLogicEntity role)
-        {
-            role.TearDown();
-            role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
-        }
+        #endregion
 
         public void Tick_RoleRigidbody(float fixedTime)
         {
@@ -109,11 +105,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public void RoleRollForward()
+        public void RoleMove(BattleRoleLogicEntity role, Vector3 dir)
         {
-
+            role.MoveComponent.ActivateMoveVelocity(dir);
         }
 
+        public void RoleRoll(BattleRoleLogicEntity role, Vector3 dir)
+        {
+            role.MoveComponent.TryRoll(dir);
+        }
+
+        public void RoleReborn(BattleRoleLogicEntity role)
+        {
+            role.TearDown();
+            role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
+        }
 
     }
 

@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ZeroFrame.Protocol;
 using Game.Infrastructure.Network.Server;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.BattleBussiness;
-using ZeroFrame.Protocol;
+using Game.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness.Network
 {
@@ -69,7 +70,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             int gravityVelocity = (int)(role.MoveComponent.GravityVelocity * 10000);
 
-            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.EntityId} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
+            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.IDComponent.EntityId} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
 
             BattleRoleStateUpdateMsg msg = new BattleRoleStateUpdateMsg
             {

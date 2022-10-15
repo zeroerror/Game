@@ -174,7 +174,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 if (roleLogic.HealthComponent.IsDead())
                 {
-                    battleFacades.Domain.RoleDomain.RebornRole(roleLogic);
+                    battleFacades.Domain.RoleDomain.RoleReborn(roleLogic);
                     return;
                 }
 
@@ -182,33 +182,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var moveComponent = roleLogic.MoveComponent;
                 var weaponComponent = roleLogic.WeaponComponent;
 
-                switch (roleState)
-                {
-                    case RoleState.Normal:
-                        break;
-                    case RoleState.Move:
-                        if (moveComponent.IsGrounded && weaponComponent.CurrentWeapon == null)
-                        {
-                            animatorComponent.PlayRunning();
-                        }
-                        if (moveComponent.IsGrounded && weaponComponent.CurrentWeapon != null)
-                        {
-                            animatorComponent.PlayRunWithGun();
-                        }
 
-                        break;
-                    case RoleState.RollForward:
-                        if (roleLogic.RoleState != RoleState.RollForward)
-                        {
-                            animatorComponent.PlayRollForward();
-                        }
-
-                        break;
-                    case RoleState.Hooking:
-                        animatorComponent.PlayHooking();
-
-                        break;
-                }
 
                 moveComponent.SetCurPos(pos);
                 moveComponent.SetMoveVelocity(moveVelocity);
@@ -315,17 +289,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
                 var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
 
-                role.MoveComponent.HitByBullet(bullet);
-
                 if (role.HealthComponent.IsDead())
                 {
-                    battleFacades.Domain.RoleDomain.RebornRole(role);
+                    battleFacades.Domain.RoleDomain.RoleReborn(role);
                 }
 
-                if (bullet.BulletType == BulletType.DefaultBullet)
-                {
-                }
-                else if (bullet is HookerEntity hookerEntity)
+                if (bullet is HookerEntity hookerEntity)
                 {
                     // 如果是爪钩则是抓住某物而不是销毁
                     hookerEntity.TryGrabSomthing(role.transform);
@@ -486,7 +455,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void OnWRoleSync(BattleRoleStateUpdateMsg msg)
         {
             roleStateQueue.Enqueue(msg);
-            // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
+            DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
         }
 
         void OnBattleRoleSpawn(FrameBattleRoleSpawnResMsg msg)
@@ -555,7 +524,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             // Load Scene And Spawn Field
             var domain = battleFacades.Domain;
-            var fieldEntity = await domain.BattleSpawnDomain.SpawnGameFightScene();
+            var fieldEntity = await domain.SpawnDomain.SpawnGameFightScene();
             // Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = true;
             fieldEntity.SetFieldId(1);

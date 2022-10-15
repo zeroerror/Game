@@ -2,7 +2,7 @@
 using UnityEngine;
 using Game.Generic;
 
-public class InputComponent
+public class PlayerInputComponent
 {
 
     public Vector3 moveAxis;
@@ -15,7 +15,7 @@ public class InputComponent
     public Vector3 grenadeThrowPoint;   //obsolete
     public Vector3 hookPoint; //obsolete
 
-    public InputComponent()
+    public PlayerInputComponent()
     {
         moveAxis = new Vector3();
         grenadeThrowPoint = new Vector3();

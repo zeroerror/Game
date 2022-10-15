@@ -143,7 +143,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.useGravity = false;  //关闭地球引力
         }
 
-        public bool TryRollForward(Vector3 dir)
+        public bool TryRoll(Vector3 dir)
         {
             if (!IsGrounded) return false;
 
@@ -190,7 +190,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             if (extraVelocity.x == 0 && extraVelocity.z == 0)
             {
-                Debug.Log($"摩擦力不作用 extraVelocity.x == 0 && extraVelocity.z == 0");
+                // Debug.Log($"摩擦力不作用 extraVelocity.x == 0 && extraVelocity.z == 0");
                 return;
             }
 
@@ -365,20 +365,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             DebugExtensions.LogWithColor($"{rb.gameObject.name}离开墙体-----------------------------", "#48D1CC");
             isHitWall = false;
-        }
-
-        public void HitByBullet(BulletEntity bulletEntity)
-        {
-            if (bulletEntity == null)
-            {
-                Debug.LogWarning("HitByBullet Null");
-                return;
-            }
-
-
-            var velocity = bulletEntity.MoveComponent.Velocity / 10f;
-            Debug.Log($"被子弹击中 extraVelocity 增加:  {velocity}");
-            AddExtraVelocity(velocity);
         }
 
         #endregion

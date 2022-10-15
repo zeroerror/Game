@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -22,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Item");
         public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Role");
 
-        public List<BattleRoleLogicEntity> Tick_AllRoleHitEnter(float fixedDeltaTime)
+        public List<BattleRoleLogicEntity> Tick_AllRoleHitField(float fixedDeltaTime)
         {
             List<BattleRoleLogicEntity> hitRoleList = new List<BattleRoleLogicEntity>();
             var roleRepo = battleFacades.Repo.RoleRepo;
@@ -108,6 +109,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
+
+        #region [Private Func]
+
         List<CollisionExtra> GetCollisionExtraList(PhysicsEntity physicsEntity, string layerName)
         {
             List<CollisionExtra> collisionList = new List<CollisionExtra>();
@@ -134,6 +138,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             return collisionList;
         }
+
+        #endregion
 
     }
 

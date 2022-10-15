@@ -2,6 +2,7 @@ using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Interface;
 using Game.Client.Bussiness.EventCenter;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -97,7 +98,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsReloading)
                 {
                     var curCamView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
-                    var inputDomain = battleFacades.Domain.BattleInputDomain;
+                    var inputDomain = battleFacades.Domain.InputDomain;
                     Vector3 targetPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
                     // 2.服务端流程
                     var rqs = battleFacades.Network.WeaponReqAndRes;
@@ -133,7 +134,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var moveAxis = input.moveAxis;
 
                 var cameraView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
-                Vector3 moveDir = battleFacades.Domain.BattleInputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
+                Vector3 moveDir = battleFacades.Domain.InputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
                 owner.MoveComponent.FaceTo(moveDir);
 
 
