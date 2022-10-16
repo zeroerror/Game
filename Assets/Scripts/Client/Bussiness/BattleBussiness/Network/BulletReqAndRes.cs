@@ -34,23 +34,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             actionList.Clear();
         }
 
-        public void SendReq_BulletSpawn(BulletType bulletType, byte wRid, Vector3 targetPos)
-        {
-            targetPos *= 10000f;
-
-            FrameBulletSpawnReqMsg msg = new FrameBulletSpawnReqMsg
-            {
-                bulletType = (byte)bulletType,
-                masterEntityId = wRid,
-                targetPosX = (int)(targetPos.x),
-                targetPosY = (int)(targetPos.y),
-                targetPosZ = (int)(targetPos.z)
-            };
-            battleClient.SendMsg(msg);
-            Debug.Log($"发送生成子弹网络请求:wRid:{wRid} 目标点：{targetPos}");
-        }
-
-
         #region [Regist]
 
         public void RegistRes_BulletSpawn(Action<FrameBulletSpawnResMsg> action)

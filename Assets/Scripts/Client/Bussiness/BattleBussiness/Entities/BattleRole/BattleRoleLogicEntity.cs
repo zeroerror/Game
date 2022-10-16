@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         // Pos
         Vector3 offset;
         Vector3 shootPointPos => MoveComponent.Position + transform.forward + offset;
-        public Vector3 ShootPointPos => shootPointPos.FixDecimal(4);
+        public Vector3 ShootStartPos => shootPointPos.FixDecimal(4);
         public Vector3 SelfPos => transform.position;
 
         // == Component ==
@@ -87,7 +87,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             weaponComponent.Reset();
             stateComponent.Reset();
 
-            offset = new Vector3(0, 0.2f, 0);
+            offset = new Vector3(0, 0.8f, 0);
         }
 
         public int FetchBulletsFromItemComponent()

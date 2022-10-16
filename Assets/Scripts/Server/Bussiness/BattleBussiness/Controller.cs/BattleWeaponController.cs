@@ -90,18 +90,26 @@ namespace Game.Server.Bussiness.BattleBussiness
                         {
                             master.StateComponent.EnterShooting(10);
                             //子弹生成
-                            float targetPosX = msg.targetPosX / 10000f;
-                            float targetPosY = msg.targetPosY / 10000f;
-                            float targetPosZ = msg.targetPosZ / 10000f;
-                            Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                            var shootStartPoint = master.ShootPointPos;
-                            Vector3 shootDir = targetPos - shootStartPoint;
-                            shootDir.Normalize();
+                            float startPosX = msg.startPosX / 10000f;
+                            float startPosY = msg.startPosY / 10000f;
+                            float startPosZ = msg.startPosZ / 10000f;
+                            Vector3 startPos = new Vector3(startPosX, startPosY, startPosZ);
+
+                            float endPosX = msg.endPosX / 10000f;
+                            float endPosY = msg.endPosY / 10000f;
+                            float endPosZ = msg.endPosZ / 10000f;
+                            Vector3 endPos = new Vector3(endPosX, endPosY, endPosZ);
+
+                            var sp = startPos;
+                            var ep = endPos;
+                            sp.y = 0;
+                            ep.y = 0;
+                            Vector3 shootDir = (ep - sp).normalized;
 
                             var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
                             var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
                             var bulletId = bulletRepo.AutoEntityID;
-                            bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
+                            bulletEntity.MoveComponent.SetCurPos(startPos);
                             bulletEntity.MoveComponent.SetForward(shootDir);
                             bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                             bulletEntity.SetMasterId(masterId);
@@ -112,9 +120,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                             ConnIdList.ForEach((connId) =>
                             {
                                 weaponRqs.SendRes_WeaponShoot(connId, masterId);
-                                bulletRqs.SendRes_BulletSpawn(connId, bulletType, bulletId, masterId, shootDir);
+                                bulletRqs.SendRes_BulletSpawn(connId, bulletType, bulletId, masterId, startPos, endPos);
                             });
-                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{masterId}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
+                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{masterId}  起点：{startPos} 终点：{endPos} 飞行方向:{shootDir}");
                         }
                     }
                 }

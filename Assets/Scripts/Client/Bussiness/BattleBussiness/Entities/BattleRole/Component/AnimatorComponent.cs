@@ -54,7 +54,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             currentStateName = "Shooting";
             animator.Play(currentStateName);
-            Debug.Log("PlayShooting");
         }
 
         public void PlayDead()

@@ -40,8 +40,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         Dictionary<long, FrameJumpReqMsg> rollOptMsgDic;
 
         // ====== 子弹 ======
-        // - 所有子弹生成帧
-        Dictionary<long, FrameBulletSpawnReqMsg> bulletSpawnMsgDic;
         // - 所有拾取物件帧
         Dictionary<long, FrameItemPickReqMsg> itemPickUpMsgDic;
 
@@ -64,8 +62,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
             rollOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
 
-            bulletSpawnMsgDic = new Dictionary<long, FrameBulletSpawnReqMsg>();
-
             itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
         }
 
@@ -82,9 +78,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             roleRqs.RegistReq_Jump(OnRoleJump);
             roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawn);
-
-            var bulletRqs = battleFacades.Network.BulletReqAndRes;
-            bulletRqs.RegistReq_BulletSpawn(OnBulletSpawn);
 
             var itemRqs = battleFacades.Network.ItemReqAndRes;
             itemRqs.RegistReq_ItemPickUp(OnItemPickUp);
@@ -104,7 +97,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
 
             // ====== Bullet
-            Tick_BulletSpawn();
             Tick_BulletLifeCycle();
 
             // ====== Role
@@ -247,72 +239,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Bullet]
-        void Tick_BulletSpawn()
-        {
-            ConnIDList.ForEach((connId) =>
-            {
-                long key = GetCurFrameKey(connId);
-
-                if (bulletSpawnMsgDic.TryGetValue(key, out var msg))
-                {
-                    if (msg == null)
-                    {
-                        return;
-                    }
-
-                    bulletSpawnMsgDic[key] = null;
-
-                    var bulletTypeByte = msg.bulletType;
-                    float targetPosX = msg.targetPosX / 10000f;
-                    float targetPosY = msg.targetPosY / 10000f;
-                    float targetPosZ = msg.targetPosZ / 10000f;
-                    Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                    var roleEntity = battleServerFacades.BattleFacades.Repo.RoleRepo.GetByEntityId(msg.masterEntityId);
-                    var moveComponent = roleEntity.MoveComponent;
-                    var shootStartPoint = roleEntity.ShootPointPos;
-                    Vector3 shootDir = targetPos - shootStartPoint;
-                    shootDir.Normalize();
-
-                    // 服务器逻辑
-                    var bulletType = (BulletType)bulletTypeByte;
-                    var clientFacades = battleServerFacades.BattleFacades;
-                    var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
-
-                    var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                    var bulletRepo = clientFacades.Repo.BulletRepo;
-                    var bulletId = bulletRepo.AutoEntityID;
-                    bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
-                    bulletEntity.MoveComponent.SetForward(shootDir);
-                    bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
-                    switch (bulletType)
-                    {
-                        case BulletType.DefaultBullet:
-                            break;
-                        case BulletType.Grenade:
-                            break;
-                        case BulletType.Hooker:
-                            var hookerEntity = (HookerEntity)bulletEntity;
-                            hookerEntity.SetMasterWRid(roleEntity.IDComponent.EntityId);
-                            hookerEntity.SetMasterGrabPoint(roleEntity.transform);
-                            break;
-                    }
-
-                    var masterEntityId = msg.masterEntityId;
-                    bulletEntity.SetMasterId(masterEntityId);
-                    bulletEntity.IDComponent.SetEntityId(bulletId);
-                    bulletEntity.gameObject.SetActive(true);
-                    bulletRepo.Add(bulletEntity);
-                    Debug.Log($"服务器逻辑[生成子弹] serveFrame {ServeFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{masterEntityId}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
-
-                    var rqs = battleServerFacades.Network.BulletReqAndRes;
-                    ConnIDList.ForEach((otherConnId) =>
-                    {
-                        rqs.SendRes_BulletSpawn(otherConnId, bulletType, bulletId, masterEntityId, shootDir);
-                    });
-                }
-            });
-
-        }
 
         void Tick_BulletLifeCycle()
         {
@@ -514,23 +440,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             }
 
-        }
-        #endregion
-
-        #region [Bullet]
-
-        void OnBulletSpawn(int connId, FrameBulletSpawnReqMsg msg)
-        {
-            Debug.Log("OnBulletSpawn");
-            lock (bulletSpawnMsgDic)
-            {
-                long key = GetCurFrameKey(connId);
-
-                if (!bulletSpawnMsgDic.TryGetValue(key, out var _))
-                {
-                    bulletSpawnMsgDic[key] = msg;
-                }
-            }
         }
         #endregion
 

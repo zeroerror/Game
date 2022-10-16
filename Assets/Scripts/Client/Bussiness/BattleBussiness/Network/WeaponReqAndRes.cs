@@ -37,15 +37,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendReq_WeaponShoot(int masterId, Vector3 targetPos)
+        public void SendReq_WeaponShoot(int masterId, Vector3 startPos, Vector3 endPos)
         {
-            targetPos *= 10000f;
+            startPos *= 10000f;
+            endPos *= 10000f;
+
             FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
             {
                 masterId = (byte)masterId,
-                targetPosX = (int)targetPos.x,
-                targetPosY = (int)targetPos.y,
-                targetPosZ = (int)targetPos.z,
+                startPosX = (int)(startPos.x),
+                startPosY = (int)(startPos.y),
+                startPosZ = (int)(startPos.z),
+                endPosX = (int)(endPos.x),
+                endPosY = (int)(endPos.z),
+                endPosZ = (int)(endPos.z),
             };
             battleClient.SendMsg(frameWeaponShootReqMsg);
         }

@@ -99,10 +99,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     var curCamView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
                     var inputDomain = battleFacades.Domain.InputDomain;
-                    Vector3 targetPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
+                    Vector3 startPos = owner.ShootStartPos;
+                    Vector3 endPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
                     // 2.服务端流程
                     var rqs = battleFacades.Network.WeaponReqAndRes;
-                    rqs.SendReq_WeaponShoot(owner.IDComponent.EntityId, targetPos);
+                    rqs.SendReq_WeaponShoot(owner.IDComponent.EntityId, startPos, endPos);
                 }
 
             }

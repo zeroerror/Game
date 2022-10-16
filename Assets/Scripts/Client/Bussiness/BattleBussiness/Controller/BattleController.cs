@@ -169,7 +169,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         Debug.Log($"人物状态同步帧(roleLogic[{wRoleId}]丢失，重新生成)");
                     }
                 }
-                
+
                 var moveComponent = roleLogic.MoveComponent;
                 moveComponent.SetCurPos(pos);
                 moveComponent.SetMoveVelocity(moveVelocity);
@@ -228,17 +228,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 bulletSpawnQueue.Dequeue();
 
-                var bulletId = bulletSpawn.bulletId;
+                var bulletId = bulletSpawn.bulletEntityId;
                 var bulletTypeByte = bulletSpawn.bulletType;
                 var bulletType = (BulletType)bulletTypeByte;
-                var masterWRid = bulletSpawn.wRid;
+
+                var masterWRid = bulletSpawn.masterEntityId;
                 var masterWRole = battleFacades.Repo.RoleRepo.GetByEntityId(masterWRid);
-                var shootStartPoint = masterWRole.ShootPointPos;
-                Vector3 shootDir = new Vector3(bulletSpawn.shootDirX / 100f, bulletSpawn.shootDirY / 100f, bulletSpawn.shootDirZ / 100f);
+
+                Vector3 startPos = new Vector3(bulletSpawn.startPosX / 10000f, bulletSpawn.startPosY / 10000f, bulletSpawn.startPosZ / 10000f);
+                Vector3 endPos = new Vector3(bulletSpawn.endPosX / 10000f, bulletSpawn.endPosY / 10000f, bulletSpawn.endPosZ / 10000f);
+                var sp = startPos;
+                var ep = endPos;
+                sp.y = 0;
+                ep.y = 0;
+                Vector3 shootDir = (ep - sp).normalized;
+
                 var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
                 var bulletEntity = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
 
-                Debug.Log($"生成子弹帧 {bulletSpawn.serverFrame}: masterWRid:{masterWRid}   起点位置：{shootStartPoint} 飞行方向{shootDir}");
+                Debug.Log($"生成子弹帧 {bulletSpawn.serverFrame}: masterWRid:{masterWRid} 起点位置：{startPos} 终点位置：{endPos} 飞行方向{shootDir}");
 
                 switch (bulletType)
                 {
@@ -254,7 +262,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         break;
                 }
 
-                bulletEntity.MoveComponent.SetCurPos(shootStartPoint);
+                bulletEntity.MoveComponent.SetCurPos(startPos);
                 bulletEntity.MoveComponent.SetForward(shootDir);
                 bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
                 bulletEntity.SetMasterId(masterWRid);
