@@ -280,21 +280,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 // 只做表现层
                 return;
-                var bulletRepo = battleFacades.Repo.BulletRepo;
-                var roleRepo = battleFacades.Repo.RoleRepo;
-                var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
-                var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
+                // var bulletRepo = battleFacades.Repo.BulletRepo;
+                // var roleRepo = battleFacades.Repo.RoleRepo;
+                // var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
+                // var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
 
-                if (role.HealthComponent.IsDead())
-                {
-                    battleFacades.Domain.RoleDomain.RoleReborn(role);
-                }
+                // if (role.HealthComponent.IsDead())
+                // {
+                //     battleFacades.Domain.RoleDomain.RoleReborn(role);
+                // }
 
-                if (bullet is HookerEntity hookerEntity)
-                {
-                    // 如果是爪钩则是抓住某物而不是销毁
-                    hookerEntity.TryGrabSomthing(role.transform);
-                }
+                // if (bullet is HookerEntity hookerEntity)
+                // {
+                //     // 如果是爪钩则是抓住某物而不是销毁
+                //     hookerEntity.TryGrabSomthing(role.transform);
+                // }
             }
         }
 
@@ -303,34 +303,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (bulletHitWallQueue.TryDequeue(out var bulletHitWallResMsg))
             {
                 // 只做表现层
-                return;
-                var bulletHitPos = new Vector3(bulletHitWallResMsg.posX / 10000f, bulletHitWallResMsg.posY / 10000f, bulletHitWallResMsg.posZ / 10000f);
-                var bulletRepo = battleFacades.Repo.BulletRepo;
-                var roleRepo = battleFacades.Repo.RoleRepo;
-                var bullet = bulletRepo.GetByBulletId(bulletHitWallResMsg.bulletId);
-
-                if (bullet == null)
-                {
-                    bulletRepo.TryRemove(bullet);
-                    continue;
-                }
-
-                if (bullet.BulletType == BulletType.DefaultBullet)
-                {
-                    bullet.TearDown();
-                    bulletRepo.TryRemove(bullet);
-                }
-                else if (bullet is HookerEntity hookerEntity)
-                {
-                    // 爪钩:抓住某物而不是销毁
-                    hookerEntity.TryGrabPosition(bulletHitPos);
-                }
-                else if (bullet is GrenadeEntity grenadeEntity)
-                {
-                    // 手雷:速度清零
-                    bullet.MoveComponent.SetMoveVelocity(Vector3.zero);
-                }
-
             }
         }
 
@@ -526,9 +498,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(physicsScene);
-            // Load UI  
+
             UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
-            // Send Spawn Role Message
+
             var rqs = battleFacades.Network.RoleReqAndRes;
             rqs.SendReq_BattleRoleSpawn();
 

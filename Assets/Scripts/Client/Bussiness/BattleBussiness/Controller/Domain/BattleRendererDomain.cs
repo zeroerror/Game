@@ -31,7 +31,8 @@ namespace Game.Client.Bussiness.BattleBussiness
                 ApplyRoleState_Rolling(role);
                 ApplyRoleState_Reloading(role);
                 ApplyRoleState_Shooting(role);
-
+                ApplyRoleState_Dead(role);
+                ApplyRoleState_Reborn(role);
             });
         }
 
@@ -148,6 +149,38 @@ namespace Game.Client.Bussiness.BattleBussiness
             var roleRenderer = role.roleRenderer;
             var animatorComponent = roleRenderer.AnimatorComponent;
             animatorComponent.PlayShooting();
+        }
+
+        void ApplyRoleState_Dead(BattleRoleLogicEntity role)
+        {
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState != RoleState.Dead)
+            {
+                return;
+            }
+
+            var roleRenderer = role.roleRenderer;
+            var animatorComponent = roleRenderer.AnimatorComponent;
+            if (!animatorComponent.IsInState("Dead"))
+            {
+                animatorComponent.PlayDead();
+            }
+        }
+
+        void ApplyRoleState_Reborn(BattleRoleLogicEntity role)
+        {
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState != RoleState.Reborn)
+            {
+                return;
+            }
+
+            var roleRenderer = role.roleRenderer;
+            var animatorComponent = roleRenderer.AnimatorComponent;
+            if (!animatorComponent.IsInState("Rolling"))
+            {
+                animatorComponent.PlayRolling();    // TODO Reborn动画
+            }
         }
 
     }

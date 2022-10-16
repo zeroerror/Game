@@ -16,7 +16,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         Healing,
         Switching,
         BeHit,
-        Dead
+        Dead,
+        Reborn
     }
 
     public class BattleRoleLogicEntity : PhysicsEntity
@@ -136,7 +137,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Reborn(in Vector3 pos)
         {
-            Debug.Log($" wRid:{idComponent.EntityId} 重生----------------------------------");
+            Debug.Log($" ENTITYID:{idComponent.EntityId} 重生----------------------------------");
 
             moveComponent.SetCurPos(pos);
             moveComponent.Reset();

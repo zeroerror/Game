@@ -26,6 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool CanDamage(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)
         {
+
             // 不可多次伤害
             if (HasHitRecord(attacker, victim, hitPowerModel) && !hitPowerModel.canHitRepeatly)
             {

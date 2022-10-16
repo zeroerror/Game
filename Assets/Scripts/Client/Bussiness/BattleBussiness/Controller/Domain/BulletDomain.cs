@@ -88,12 +88,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 hitRoleList.ForEach((ce) =>
                 {
                     Debug.Log($"打中敌人");
+
                     if (hookedTrans == null)
                     {
                         hookedTrans = ce.gameObject.transform;
                     }
 
                     var role = ce.gameObject.GetComponentInParent<BattleRoleLogicEntity>();
+                    if (role.HealthComponent.CheckIsDead())
+                    {
+                        Debug.LogWarning($"TryHitActor 角色已死亡! return");
+                        return;
+                    }
 
                     // TODO: 配置表配置 ----------------------------------------------
                     HitPowerModel hitPowerModel = new HitPowerModel();
@@ -109,7 +115,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var bulletIDC = bullet.IDComponent;
                     if (!hitDomain.TryHitActor(bulletIDC, roleIDC, in hitPowerModel, fixedDeltaTime))
                     {
-                        Debug.LogWarning($"无法真正打击目标");
+                        Debug.LogWarning($"TryHitActor 失败! return");
                         return;
                     }
 

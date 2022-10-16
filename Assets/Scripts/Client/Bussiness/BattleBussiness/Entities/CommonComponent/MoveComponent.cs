@@ -201,6 +201,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             var reduceVelocity = extraVelocity2DDir;
             reduceVelocity *= frictionReduce;
 
+            if (reduceVelocity == Vector3.zero)
+            {
+                return;
+            }
+            
             extraVelocity -= reduceVelocity * fixedDeltaTime;
 
             var afterExtraVelocity2DDir = extraVelocity;

@@ -33,6 +33,14 @@ namespace Game.Client.Bussiness.BattleBussiness
         public RoleStateBeHitMod BeHitMod => beHitMod;
 
         [SerializeField]
+        RoleStateDeadMod deadMod;
+        public RoleStateDeadMod DeadMod => deadMod;
+
+        [SerializeField]
+        RoleStateRebornMod rebornMod;
+        public RoleStateRebornMod RebornMod => rebornMod;
+
+        [SerializeField]
         RoleStateClimbingMod climbingMod;
         public RoleStateClimbingMod ClimbingMod => climbingMod;
 
@@ -50,6 +58,8 @@ namespace Game.Client.Bussiness.BattleBussiness
             roleStateSwitchingMod = new RoleStateSwitchingMod();
             beHitMod = new RoleStateBeHitMod();
             shootingMod = new RoleStateShootingMod();
+            deadMod = new RoleStateDeadMod();
+            rebornMod = new RoleStateRebornMod();
         }
 
 
@@ -90,6 +100,22 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             beHitMod.isFirstEnter = true;
             beHitMod.maintainFrame = maintainFrame;
+        }
+
+        public void EnterDead(int maintainFrame)
+        {
+            roleState = RoleState.Dead;
+
+            deadMod.isFirstEnter = true;
+            deadMod.maintainFrame = maintainFrame;
+        }
+
+        public void EnterReborn(int maintainFrame)
+        {
+            roleState = RoleState.Reborn;
+
+            rebornMod.isFirstEnter = true;
+            rebornMod.maintainFrame = maintainFrame;
         }
 
         #endregion

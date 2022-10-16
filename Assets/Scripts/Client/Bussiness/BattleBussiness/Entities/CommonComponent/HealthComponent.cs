@@ -17,21 +17,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         float health;
         public float Health => health;
 
-        public bool IsDead() => health <= 0;
-
-        public void HurtByDamage(float damage)
-        {
-            if (IsDead()) return;
-
-            Debug.Log($"health:{health} -> {health - damage}");
-            health -= damage;
-        }
+        public bool CheckIsDead() => health <= 0;
 
         public void HurtByDamage(int damage)
         {
-            // TODO: 改成子弹对应的伤害
-            if (IsDead()) return;
-
             Debug.Log($"受到伤害: {damage}  ->  health {health - damage}");
             health -= damage;
         }

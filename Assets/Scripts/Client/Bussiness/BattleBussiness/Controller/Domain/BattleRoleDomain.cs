@@ -81,6 +81,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
         }
 
+        public void RoleStateEnterDead(BattleRoleLogicEntity role)
+        {
+            role.StateComponent.EnterDead(60);
+        }
+
     }
 
 }

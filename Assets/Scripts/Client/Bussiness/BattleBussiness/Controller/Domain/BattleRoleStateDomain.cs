@@ -42,6 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             ApplySwitching(roleLogicEntity);
             ApplyBeHit(roleLogicEntity);
             ApplyDead(roleLogicEntity);
+            ApplyReborn(roleLogicEntity);
         }
 
         void ApplyAnyState(BattleRoleLogicEntity role)
@@ -180,19 +181,51 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
         }
 
-        void ApplyHealing(BattleRoleLogicEntity role)
-        {
-
-        }
-
-        void ApplySwitching(BattleRoleLogicEntity role)
-        {
-
-        }
-
         void ApplyDead(BattleRoleLogicEntity role)
         {
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState != RoleState.Dead)
+            {
+                return;
+            }
 
+            var stateMod = stateComponent.DeadMod;
+            if (stateMod.maintainFrame <= 0)
+            {
+                stateComponent.EnterReborn(30);
+                var roleDomain = battleFacades.Domain.RoleDomain;
+                roleDomain.RoleReborn(role);
+                return;
+            }
+
+            stateMod.maintainFrame--;
+            if (stateMod.isFirstEnter)
+            {
+                stateMod.isFirstEnter = false;
+
+            }
+        }
+
+        void ApplyReborn(BattleRoleLogicEntity role)
+        {
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState != RoleState.Reborn)
+            {
+                return;
+            }
+
+            var stateMod = stateComponent.RebornMod;
+            if (stateMod.maintainFrame <= 0)
+            {
+                stateComponent.EnterNormal();
+                return;
+            }
+
+            stateMod.maintainFrame--;
+            if (stateMod.isFirstEnter)
+            {
+                stateMod.isFirstEnter = false;
+            }
         }
 
         void ApplyShooting(BattleRoleLogicEntity role)
@@ -216,6 +249,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.isFirstEnter = false;
 
             }
+        }
+
+        void ApplyHealing(BattleRoleLogicEntity role)
+        {
+
+        }
+
+        void ApplySwitching(BattleRoleLogicEntity role)
+        {
+
         }
 
     }
