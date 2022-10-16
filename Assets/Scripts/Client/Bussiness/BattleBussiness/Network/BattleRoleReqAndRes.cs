@@ -71,22 +71,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             battleClient.SendMsg(frameRoleRotateReqMsg);
         }
 
-        public void SendReq_RoleJump(BattleRoleLogicEntity roleLogicEntity)
+        public void SendReq_RoleRoll(BattleRoleLogicEntity role)
         {
-            Vector3 dir = roleLogicEntity.transform.forward;
+            Vector3 dir = role.transform.forward;
             int dirX = (int)(dir.x * 10000f);
             int dirY = (int)(dir.y * 10000f);
             int dirZ = (int)(dir.z * 10000f);
 
-            FrameJumpReqMsg frameJumpReqMsg = new FrameJumpReqMsg
+            FrameRollReqMsg frameJumpReqMsg = new FrameRollReqMsg
             {
-                entityId = (byte)roleLogicEntity.IDComponent.EntityId,
+                entityId = (byte)role.IDComponent.EntityId,
                 dirX = dirX,
                 dirY = dirY,
                 dirZ = dirZ
             };
 
             battleClient.SendMsg(frameJumpReqMsg);
+            Debug.Log($"SendReq_RoleRoll dir:{dir} ");
         }
 
         public void SendReq_BattleRoleSpawn()

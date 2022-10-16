@@ -37,7 +37,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         Dictionary<long, FrameRoleMoveReqMsg> roleMoveMsgDic;
         Dictionary<long, FrameRoleRotateReqMsg> roleRotateMsgDic;
         // - 所有跳跃帧
-        Dictionary<long, FrameJumpReqMsg> rollOptMsgDic;
+        Dictionary<long, FrameRollReqMsg> rollOptMsgDic;
 
         // ====== 子弹 ======
         // - 所有拾取物件帧
@@ -60,7 +60,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
-            rollOptMsgDic = new Dictionary<long, FrameJumpReqMsg>();
+            rollOptMsgDic = new Dictionary<long, FrameRollReqMsg>();
 
             itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
         }
@@ -397,7 +397,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleJump(int connId, FrameJumpReqMsg msg)
+        void OnRoleJump(int connId, FrameRollReqMsg msg)
         {
             lock (rollOptMsgDic)
             {

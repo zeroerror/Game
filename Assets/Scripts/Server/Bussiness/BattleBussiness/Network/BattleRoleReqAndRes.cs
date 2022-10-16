@@ -125,7 +125,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
-        public void RegistReq_Jump(Action<int, FrameJumpReqMsg> action)
+        public void RegistReq_Jump(Action<int, FrameRollReqMsg> action)
         {
             AddRegister(action);
         }

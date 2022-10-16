@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             UIEventCenter.PickAction += (() => battleFacades.InputComponent.isPressPick = true);
             UIEventCenter.FireAction += (() => battleFacades.InputComponent.isPressFire = true);
             UIEventCenter.ReloadAction += (() => battleFacades.InputComponent.isPressWeaponReload = true);
-            UIEventCenter.JumpAction += (() => battleFacades.InputComponent.isPressJump = true);
+            UIEventCenter.JumpAction += (() => battleFacades.InputComponent.isPressRoll = true);
             UIEventCenter.DropWeaponAction += (() => battleFacades.InputComponent.isPressDropWeapon = true);
         }
 
@@ -35,15 +35,62 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_Input()
         {
-            //没有角色就没有移动
+            TickInput_Move();
+            TickInput_Rotate();
+            TickInput_Roll();
+            TickInput_SwitchingView();
+            TickInput_Pick();
+            TickInput_Shoot();
+            TickInput_Reload();
+            TickInput_DropWeapon();
+
+            battleFacades.InputComponent.Reset();
+        }
+
+        void TickInput_Move()
+        {
             var owner = battleFacades.Repo.RoleRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
-            if (input.isPressJump)
+            if (input.moveAxis != Vector3.zero)
             {
-                battleFacades.Network.RoleReqAndRes.SendReq_RoleJump(owner);
+                var moveAxis = input.moveAxis;
+
+                var cameraView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
+                Vector3 moveDir = battleFacades.Domain.InputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
+                if (owner.StateComponent.RoleState == RoleState.Normal)
+                {
+                    owner.MoveComponent.FaceTo(moveDir);
+                    Debug.Log($"dir moveDir:{moveDir}");
+                }
+
+                if (!WillHitOtherRole(owner, moveDir))
+                {
+                    var rqs = battleFacades.Network.RoleReqAndRes;
+                    rqs.SendReq_RoleMove(owner.IDComponent.EntityId, moveDir);
+                }
             }
+        }
+
+        void TickInput_Roll()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = battleFacades.InputComponent;
+            if (input.isPressRoll)
+            {
+                battleFacades.Network.RoleReqAndRes.SendReq_RoleRoll(owner);
+            }
+        }
+
+        void TickInput_SwitchingView()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = battleFacades.InputComponent;
             if (input.isPressSwitchView)
             {
                 //打开第一人称视角
@@ -52,6 +99,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner.roleRenderer);
                 else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner.roleRenderer);
             }
+        }
+
+        void TickInput_Pick()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = battleFacades.InputComponent;
             if (input.isPressPick)
             {
                 // 拾取物品
@@ -88,6 +143,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     rqs.SendReq_ItemPickUp(owner.IDComponent.EntityId, closestPickable.ItemType, closestPickable.EntityId);
                 }
             }
+        }
+
+        void TickInput_Shoot()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = battleFacades.InputComponent;
             if (input.isPressFire)
             {
                 // 射击前 
@@ -107,6 +170,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
 
             }
+        }
+
+        void TickInput_Reload()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = battleFacades.InputComponent;
             if (input.isPressWeaponReload)
             {
                 // 换弹前判断流程
@@ -123,37 +194,26 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     rqs.SendReq_WeaponReload(owner);
                 }
             }
+        }
+
+        void TickInput_DropWeapon()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
+
+            var input = battleFacades.InputComponent;
             if (input.isPressDropWeapon)
             {
                 // 丢弃武器前判断流程 TODO:由服务端鉴定
                 var rqs = battleFacades.Network.WeaponReqAndRes;
                 rqs.SendReq_WeaponDrop(owner);
             }
+        }
 
-            if (input.moveAxis != Vector3.zero)
-            {
-                var moveAxis = input.moveAxis;
-
-                var cameraView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
-                Vector3 moveDir = battleFacades.Domain.InputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
-                owner.MoveComponent.FaceTo(moveDir);
-
-
-                if (!WillHitOtherRole(owner, moveDir))
-                {
-                    var rqs = battleFacades.Network.RoleReqAndRes;
-                    if (owner.MoveComponent.IsEulerAngleNeedFlush())
-                    {
-                        owner.MoveComponent.FlushEulerAngle();
-                        //客户端鉴权旋转角度同步
-                        rqs.SendReq_RoleRotate(owner);
-                    }
-
-                    rqs.SendReq_RoleMove(owner.IDComponent.EntityId, moveDir);
-                }
-            }
-
-            input.Reset();
+        void TickInput_Rotate()
+        {
+            var owner = battleFacades.Repo.RoleRepo.Owner;
+            if (owner == null || owner.IsDead) return;
 
             if (owner.MoveComponent.IsEulerAngleNeedFlush())
             {
@@ -162,7 +222,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var rqs = battleFacades.Network.RoleReqAndRes;
                 rqs.SendReq_RoleRotate(owner);
             }
-
         }
 
         bool WillHitOtherRole(BattleRoleLogicEntity roleEntity, Vector3 moveDir)

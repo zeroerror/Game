@@ -7,7 +7,7 @@ public class PlayerInputComponent
 
     public Vector3 moveAxis;
     public bool isPressFire;
-    public bool isPressJump;
+    public bool isPressRoll;
     public bool isPressSwitchView;
     public bool isPressPick;
     public bool isPressWeaponReload;
@@ -30,7 +30,7 @@ public class PlayerInputComponent
 
         isPressFire = false;
         isPressSwitchView = false;
-        isPressJump = false;
+        isPressRoll = false;
         isPressPick = false;
         isPressWeaponReload = false;
         isPressDropWeapon = false;

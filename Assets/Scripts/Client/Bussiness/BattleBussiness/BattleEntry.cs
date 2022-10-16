@@ -56,6 +56,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             battlePhysicsController.Tick();
             battleInputController.Tick();
             battleWeaponController.Tick();
+            
             battleRendererController.Tick();    // Last But No Least
         }
 

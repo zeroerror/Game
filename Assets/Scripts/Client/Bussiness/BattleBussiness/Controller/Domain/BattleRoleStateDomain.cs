@@ -46,10 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         void ApplyAnyState(BattleRoleLogicEntity role)
         {
-            var inputComponent = role.InputComponent;
-            var moveComponent = role.MoveComponent;
 
-            moveComponent.SetEulerAngle(inputComponent.RotEuler);
         }
 
         void ApplyNormal(BattleRoleLogicEntity role)
@@ -62,19 +59,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var moveComponent = role.MoveComponent;
             var weaponComponent = role.WeaponComponent;
-            var roleInputComponent = role.InputComponent;
+            var inputComponent = role.InputComponent;
 
-            bool hasMoveDir = roleInputComponent.MoveDir != Vector3.zero;
-            bool hasRollDir = roleInputComponent.RollDir != Vector3.zero;
+            bool hasMoveDir = inputComponent.MoveDir != Vector3.zero;
+            bool hasRollDir = inputComponent.RollDir != Vector3.zero;
+
+            Debug.Log($"inputComponent.RotEuler {inputComponent.RotEuler}");
+            moveComponent.SetEulerAngle(inputComponent.RotEuler);
 
             var roleDomain = battleFacades.Domain.RoleDomain;
-            if (hasRollDir && roleDomain.TryRoleRoll(role, roleInputComponent.RollDir))
+            if (hasRollDir && roleDomain.TryRoleRoll(role, inputComponent.RollDir))
             {
                 stateComponent.EnterRolling(20);
                 return;
             }
 
-            if (roleInputComponent.pressReload)
+            if (inputComponent.pressReload)
             {
                 stateComponent.EnterReloading(30);
                 return;
@@ -82,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             if (hasMoveDir)
             {
-                roleDomain.RoleMove(role, roleInputComponent.MoveDir);
+                roleDomain.RoleMove(role, inputComponent.MoveDir);
             }
 
         }

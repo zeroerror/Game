@@ -178,6 +178,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId)
                 {
+                    //不是Owner
                     moveComponent.SetEulerAngle(eulerAngle);
                 }
 

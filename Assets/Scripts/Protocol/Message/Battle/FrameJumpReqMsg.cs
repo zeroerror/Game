@@ -4,7 +4,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 {
 
     [ZeroMessage]
-    public class FrameJumpReqMsg :IZeroMessage<FrameJumpReqMsg>{
+    public class FrameRollReqMsg :IZeroMessage<FrameRollReqMsg>{
         public byte entityId;
         public int dirX;
         public int dirY;

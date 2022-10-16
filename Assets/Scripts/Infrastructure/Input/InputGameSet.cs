@@ -59,7 +59,7 @@ public static class InputGameSet
         }
         if (Input.GetKeyDown(PCInputSet.jump))
         {
-            inputComponent.isPressJump = true;
+            inputComponent.isPressRoll = true;
         }
         if (Input.GetKeyDown(PCInputSet.shoot))
         {
@@ -84,7 +84,7 @@ public static class InputGameSet
         inputComponent.moveAxis = MobileInputSet.moveAixs;
         if (MobileInputSet.isPressJump)
         {
-            inputComponent.isPressJump = true;
+            inputComponent.isPressRoll = true;
             MobileInputSet.isPressJump = false;
         }
         if (MobileInputSet.isPressShoot)
