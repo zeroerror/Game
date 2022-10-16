@@ -14,6 +14,7 @@ namespace Game.Infrastructure.Network.Server
         public NetworkServer(int maxMessageSize) : base(maxMessageSize)
         {
             protocolService = new ProtocolService();
+            
         }
 
         public void SendMsg<T>(int connID, T msg) where T : IZeroMessage<T>
