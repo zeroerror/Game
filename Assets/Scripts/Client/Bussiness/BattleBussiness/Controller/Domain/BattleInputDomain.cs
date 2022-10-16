@@ -21,7 +21,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = battleFacades;
         }
 
-
         public void UpdateCameraByCameraView(Vector2 inputAxis)
         {
             var owner = battleFacades.Repo.RoleRepo.Owner;

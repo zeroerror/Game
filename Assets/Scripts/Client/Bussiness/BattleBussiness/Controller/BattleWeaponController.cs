@@ -62,9 +62,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
                     var domain = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
                     Debug.Log($"角色:{msg.masterId}射击zidan:{bulletType.ToString()}---");
-
-                    // Trigger Renderer
-                    master.roleRenderer.AnimatorComponent.PlayShooting();
                 }
             }
         }

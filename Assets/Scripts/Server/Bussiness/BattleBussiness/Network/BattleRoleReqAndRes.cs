@@ -77,7 +77,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             {
                 serverFrame = serverFrame,
                 entityId = (byte)role.IDComponent.EntityId,
-                roleState = (int)role.RoleState,
+                roleState = (int)role.StateComponent.RoleState,
                 x = x,
                 y = y,
                 z = z,

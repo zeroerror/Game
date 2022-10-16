@@ -65,54 +65,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public void Update_RoleRenderer(float deltaTime)
-        {
-            var roleRepo = battleFacades.Repo.RoleRepo;
-            roleRepo.Foreach((role) =>
-            {
-                var roleRenderer = role.roleRenderer;
-                roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, role.MoveComponent.Position, deltaTime * roleRenderer.posAdjust);
-                roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, role.MoveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
-
-                var animatorComponent = roleRenderer.AnimatorComponent;
-                var weaponComponent = role.WeaponComponent;
-
-                var inputComponent = battleFacades.InputComponent;
-
-                var owner = battleFacades.Repo.RoleRepo.Owner;
-                bool isOwner = owner.IDComponent.EntityId == role.IDComponent.EntityId;
-
-                if (isOwner && inputComponent.moveAxis != Vector3.zero)
-                {
-                    if (weaponComponent.CurrentWeapon == null) animatorComponent.PlayRunning();
-                    else animatorComponent.PlayRunWithGun();
-                    return;
-                }
-
-                if (role.MoveComponent.Velocity.magnitude < 0.1f)
-                {
-                    roleRenderer.noMoveTime += deltaTime;
-                    if (roleRenderer.noMoveTime > 0.2f && !roleRenderer.AnimatorComponent.IsInState("Shoot"))
-                    {
-                        bool hasGun = role.WeaponComponent.CurrentWeapon != null;
-                        if (hasGun) roleRenderer.AnimatorComponent.PlayIdleWithGun();
-                        else roleRenderer.AnimatorComponent.PlayIdle();
-                    }
-                    return;
-                }
-
-                role.roleRenderer.noMoveTime = 0;
-            });
-        }
-
         public void RoleMove(BattleRoleLogicEntity role, Vector3 dir)
         {
             role.MoveComponent.ActivateMoveVelocity(dir);
         }
 
-        public void RoleRoll(BattleRoleLogicEntity role, Vector3 dir)
+        public bool TryRoleRoll(BattleRoleLogicEntity role, Vector3 dir)
         {
-            role.MoveComponent.TryRoll(dir);
+            return role.MoveComponent.TryRoll(dir);
         }
 
         public void RoleReborn(BattleRoleLogicEntity role)

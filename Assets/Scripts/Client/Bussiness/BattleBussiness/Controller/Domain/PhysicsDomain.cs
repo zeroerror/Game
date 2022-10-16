@@ -77,7 +77,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 else
                 {
                     role.MoveComponent.EnterGound();
-                    role.SetRoleState(RoleState.Normal);
                 }
 
                 if (hitWallCount <= 0)

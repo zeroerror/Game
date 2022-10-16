@@ -8,76 +8,70 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         Animator animator;
 
+        string currentStateName;
+
         public AnimatorComponent(Animator animator)
         {
             this.animator = animator;
         }
 
-        public void PlayAnimClip(string animClipName)
+        public void PlayAnimClip(string stateName)
         {
-            animator.Play(animClipName);
+            animator.Play(stateName);
         }
 
         public void PlayIdle()
         {
-            if (IsInState("Idle")) return;
-            animator.CrossFade("Idle", 0.1f);
+            currentStateName = "Idle";
+            animator.CrossFade(currentStateName, 0.1f);
+        }
+
+        public void PlayIdleWithGun()
+        {
+            currentStateName = "Idle_With_Gun";
+            animator.CrossFade(currentStateName, 0.1f);
         }
 
         public void PlayRunning()
         {
-            if (IsInState("Running")) return;
-            animator.Play("Running");
+            currentStateName = "Running";
+            animator.CrossFade(currentStateName, 0.1f);
+        }
+
+        public void PlayRunnigWithGun()
+        {
+            currentStateName = "Running_With_Gun";
+            animator.CrossFade(currentStateName, 0.1f);
         }
 
         public void PlayReloading()
         {
-            animator.Play("Reloading", 0, 0);
+            currentStateName = "Reloading";
+            animator.CrossFade(currentStateName, 0.1f);
         }
 
         public void PlayShooting()
         {
-            animator.Play("Shooting", 0, 0);
+            currentStateName = "Shooting";
+            animator.Play(currentStateName);
+            Debug.Log("PlayShooting");
         }
 
         public void PlayDead()
         {
-            animator.Play("Dead", 0, 0);
+            currentStateName = "Dead";
+            animator.Play(currentStateName);
         }
 
         public void PlayRolling()
         {
-            animator.Play("RollForward", 0, 0);
-        }
-
-        ////////////////////////////////////////
-        public void PlayIdleWithGun()
-        {
-            if (IsInState("Idle_With_Gun")) return;
-            animator.Play("Idle_With_Gun");
-        }
-
-        public void PlayRunWithGun()
-        {
-            if (IsInState("Run_WithGun")) return;
-            animator.Play("Run_WithGun");
-        }
-
-        public void PlayJump()
-        {
-            animator.CrossFade("Jump", 0.1f);
-        }
-
-        public void PlayHooking()
-        {
-            if (IsInState("Hooking")) return;
-            animator.Play("Hooking");
+            currentStateName = "Rolling";
+            animator.Play(currentStateName);
         }
 
         public bool IsInState(string stateName)
         {
-            var curStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            return curStateInfo.IsName(stateName);
+            return currentStateName == stateName;
         }
 
         public int GetCurrentClipCurrentFrameIndex()

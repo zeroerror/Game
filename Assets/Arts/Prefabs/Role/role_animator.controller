@@ -68,7 +68,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 7af7757338f52f349b8cc56239151638, type: 2}
+  m_Motion: {fileID: 7400000, guid: feb81e9bb604d474cb8e19ae8cd1746b, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -159,7 +159,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Run_WithGun
+  m_Name: Running_With_Gun
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -172,7 +172,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 10e65761e8bc76d40a17b152479f665a, type: 3}
+  m_Motion: {fileID: 7400000, guid: d9d04debdd0e2d34fa4b0e9c630a1c9c, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -233,7 +233,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RollForward
+  m_Name: Rolling
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -328,7 +328,7 @@ AnimatorStateMachine:
     m_Position: {x: 130, y: 30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 9152925790626642061}
-    m_Position: {x: 350, y: 300, z: 0}
+    m_Position: {x: 390, y: 300, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -4470438548171115398}
     m_Position: {x: 360, y: 30, z: 0}

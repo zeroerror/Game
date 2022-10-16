@@ -263,12 +263,11 @@ namespace Game.Server.Bussiness.BattleBussiness
                     bulletSpawnMsgDic[key] = null;
 
                     var bulletTypeByte = msg.bulletType;
-                    byte wRid = msg.wRid;
                     float targetPosX = msg.targetPosX / 10000f;
                     float targetPosY = msg.targetPosY / 10000f;
                     float targetPosZ = msg.targetPosZ / 10000f;
                     Vector3 targetPos = new Vector3(targetPosX, targetPosY, targetPosZ);
-                    var roleEntity = battleServerFacades.BattleFacades.Repo.RoleRepo.GetByEntityId(msg.wRid);
+                    var roleEntity = battleServerFacades.BattleFacades.Repo.RoleRepo.GetByEntityId(msg.masterEntityId);
                     var moveComponent = roleEntity.MoveComponent;
                     var shootStartPoint = roleEntity.ShootPointPos;
                     Vector3 shootDir = targetPos - shootStartPoint;
@@ -297,16 +296,18 @@ namespace Game.Server.Bussiness.BattleBussiness
                             hookerEntity.SetMasterGrabPoint(roleEntity.transform);
                             break;
                     }
-                    bulletEntity.SetMasterId(wRid);
+
+                    var masterEntityId = msg.masterEntityId;
+                    bulletEntity.SetMasterId(masterEntityId);
                     bulletEntity.IDComponent.SetEntityId(bulletId);
                     bulletEntity.gameObject.SetActive(true);
                     bulletRepo.Add(bulletEntity);
-                    Debug.Log($"服务器逻辑[生成子弹] serveFrame {ServeFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{wRid}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
+                    Debug.Log($"服务器逻辑[生成子弹] serveFrame {ServeFrame} connId {connId}:  bulletType:{bulletTypeByte.ToString()} bulletId:{bulletId}  MasterWRid:{masterEntityId}  起点：{shootStartPoint} 终点：{targetPos} 飞行方向:{shootDir}");
 
                     var rqs = battleServerFacades.Network.BulletReqAndRes;
                     ConnIDList.ForEach((otherConnId) =>
                     {
-                        rqs.SendRes_BulletSpawn(otherConnId, bulletType, bulletId, wRid, shootDir);
+                        rqs.SendRes_BulletSpawn(otherConnId, bulletType, bulletId, masterEntityId, shootDir);
                     });
                 }
             });

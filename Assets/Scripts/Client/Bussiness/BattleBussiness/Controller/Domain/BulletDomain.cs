@@ -239,7 +239,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var master = battleFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterId);
                 if (!hooker.TickHooker(out float force))
                 {
-                    master.SetRoleState(RoleState.Normal);
+                    master.StateComponent.SetRoleState(RoleState.Normal);
                     return;
                 }
 

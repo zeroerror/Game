@@ -251,7 +251,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             LeaveGround();
             gravityVelocity = 0;
-            rollSpeed = 0;
             extraVelocity = Vector3.zero;
             moveVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;

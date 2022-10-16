@@ -41,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             FrameBulletSpawnReqMsg msg = new FrameBulletSpawnReqMsg
             {
                 bulletType = (byte)bulletType,
-                wRid = wRid,
+                masterEntityId = wRid,
                 targetPosX = (int)(targetPos.x),
                 targetPosY = (int)(targetPos.y),
                 targetPosZ = (int)(targetPos.z)

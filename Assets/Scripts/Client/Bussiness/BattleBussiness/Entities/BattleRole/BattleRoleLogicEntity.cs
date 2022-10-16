@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         Normal,
         Rolling,
         Climbing,
-        Attacking,
+        Shooting,
         Reloading,
         Healing,
         Switching,
@@ -61,10 +61,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         RoleInputComponent roleInputComponent;
         public RoleInputComponent InputComponent => roleInputComponent;
-
-        /// </summary>///////////////////
-        public RoleState RoleState { get; private set; }
-        public void SetRoleState(RoleState roleStatus) => this.RoleState = roleStatus;
 
         public bool IsDead { get; private set; }
 

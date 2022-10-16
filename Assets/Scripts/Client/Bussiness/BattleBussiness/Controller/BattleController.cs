@@ -92,16 +92,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Tick_BulletTearDown();
 
             // == Server Response
+            Tick_RoleSpawn();
             Tick_RoleStateSync();
 
-            Tick_RoleSpawn();
             Tick_BulletSpawn();
-            Tick_ItemAssetsSpawn();
 
+            Tick_ItemAssetsSpawn();
             Tick_ItemPick();
 
-            // == Heartbeat
-            // if (hasSpawnScene) battleFacades.Network.BattleReqAndRes.SendReq_HeartBeat();
         }
 
         #region [Input]
@@ -171,19 +169,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         Debug.Log($"人物状态同步帧(roleLogic[{wRoleId}]丢失，重新生成)");
                     }
                 }
-
-                if (roleLogic.HealthComponent.IsDead())
-                {
-                    battleFacades.Domain.RoleDomain.RoleReborn(roleLogic);
-                    return;
-                }
-
-                var animatorComponent = roleLogic.roleRenderer.AnimatorComponent;
+                
                 var moveComponent = roleLogic.MoveComponent;
-                var weaponComponent = roleLogic.WeaponComponent;
-
-
-
                 moveComponent.SetCurPos(pos);
                 moveComponent.SetMoveVelocity(moveVelocity);
                 moveComponent.SetExtraVelocity(extraVelocity);
@@ -194,7 +181,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     moveComponent.SetEulerAngle(eulerAngle);
                 }
 
-                roleLogic.SetRoleState(roleState);
+                roleLogic.StateComponent.SetRoleState(roleState);
             }
         }
 
@@ -347,7 +334,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bulletRepo = battleFacades.Repo.BulletRepo;
                 var bulletEntity = bulletRepo.GetByBulletId(bulletId);
 
-                Debug.Assert(msg != null, "asdasdsadsada");
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
                 bulletEntity.MoveComponent.SetCurPos(pos);
 

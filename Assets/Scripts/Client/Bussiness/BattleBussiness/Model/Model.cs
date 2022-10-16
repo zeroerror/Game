@@ -61,10 +61,4 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int maintainFrame;
     }
 
-    public class RoleStateAttackingMod
-    {
-        public bool isFirstEnter;
-        public int maintainFrame;
-    }
-
 }

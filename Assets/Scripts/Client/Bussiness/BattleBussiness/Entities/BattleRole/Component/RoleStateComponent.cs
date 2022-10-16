@@ -13,6 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         [SerializeField]
         RoleState roleState;
         public RoleState RoleState => roleState;
+        public void SetRoleState(RoleState roleState) => this.roleState = roleState;
 
         // Model
         [SerializeField]
@@ -20,12 +21,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         public RoleStateRollingMod RollingMod => rollingMod;
 
         [SerializeField]
-        RoleStateReloadingMod reloadingMod;
-        public RoleStateReloadingMod ReloadingMod => reloadingMod;
+        RoleStateShootingMod shootingMod;
+        public RoleStateShootingMod ShootingMod => shootingMod;
 
         [SerializeField]
-        RoleStateAttackingMod attackingMod;
-        public RoleStateAttackingMod AttackingMod => attackingMod;
+        RoleStateReloadingMod reloadingMod;
+        public RoleStateReloadingMod ReloadingMod => reloadingMod;
 
         [SerializeField]
         RoleStateBeHitMod beHitMod;
@@ -48,7 +49,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             reloadingMod = new RoleStateReloadingMod();
             roleStateSwitchingMod = new RoleStateSwitchingMod();
             beHitMod = new RoleStateBeHitMod();
-            attackingMod = new RoleStateAttackingMod();
+            shootingMod = new RoleStateShootingMod();
         }
 
 
@@ -65,6 +66,14 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             rollingMod.isFirstEnter = true;
             rollingMod.maintainFrame = maintainFrame;
+        }
+
+        public void EnterShooting(int maintainFrame)
+        {
+            roleState = RoleState.Shooting;
+
+            shootingMod.isFirstEnter = true;
+            shootingMod.maintainFrame = maintainFrame;
         }
 
         public void EnterReloading(int maintainFrame)

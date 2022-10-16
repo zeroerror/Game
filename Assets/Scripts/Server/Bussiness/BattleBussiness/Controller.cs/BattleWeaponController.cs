@@ -86,8 +86,9 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     if (roleRepo.TryGetByEntityId(masterId, out var master))
                     {
-                        if (master.WeaponComponent.TryWeaponShoot())
+                        if (master.WeaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
+                            master.StateComponent.EnterShooting(10);
                             //子弹生成
                             float targetPosX = msg.targetPosX / 10000f;
                             float targetPosY = msg.targetPosY / 10000f;

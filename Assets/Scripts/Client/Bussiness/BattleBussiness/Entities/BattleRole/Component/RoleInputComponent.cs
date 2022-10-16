@@ -18,6 +18,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 RollDir => rollDir;
         public void SetRollDir(Vector3 rollDir) => this.rollDir = rollDir;
 
+        Vector3 shootDir;
+        public Vector3 ShootDir => shootDir;
+        public void SetShootDir(Vector3 dir) => this.shootDir = dir;
+
         public bool pressReload;
         public bool PressReload => pressReload;
         public void SetPressReload() => pressReload = true;

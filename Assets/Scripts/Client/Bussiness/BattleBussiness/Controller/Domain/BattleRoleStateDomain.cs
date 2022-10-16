@@ -36,7 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             ApplyNormal(roleLogicEntity);
             ApplyRolling(roleLogicEntity);
             ApplyClimbing(roleLogicEntity);
-            ApplyAttacking(roleLogicEntity);
+            ApplyShooting(roleLogicEntity);
             ApplyReloading(roleLogicEntity);
             ApplyHealing(roleLogicEntity);
             ApplySwitching(roleLogicEntity);
@@ -67,11 +67,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             bool hasMoveDir = roleInputComponent.MoveDir != Vector3.zero;
             bool hasRollDir = roleInputComponent.RollDir != Vector3.zero;
 
-            if (hasRollDir)
+            var roleDomain = battleFacades.Domain.RoleDomain;
+            if (hasRollDir && roleDomain.TryRoleRoll(role, roleInputComponent.RollDir))
             {
-                var roleDomain = battleFacades.Domain.RoleDomain;
-                roleDomain.RoleRoll(role, roleInputComponent.RollDir);
-                stateComponent.EnterRolling(30);
+                stateComponent.EnterRolling(20);
                 return;
             }
 
@@ -83,7 +82,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             if (hasMoveDir)
             {
-                var roleDomain = battleFacades.Domain.RoleDomain;
                 roleDomain.RoleMove(role, roleInputComponent.MoveDir);
             }
 
@@ -111,6 +109,29 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
 
+        }
+
+        void ApplyReloading(BattleRoleLogicEntity role)
+        {
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState != RoleState.Reloading)
+            {
+                return;
+            }
+
+            var stateMod = stateComponent.ReloadingMod;
+            if (stateMod.maintainFrame <= 0)
+            {
+                stateComponent.EnterNormal();
+                return;
+            }
+
+            stateMod.maintainFrame--;
+            if (stateMod.isFirstEnter)
+            {
+                stateMod.isFirstEnter = false;
+
+            }
         }
 
         void ApplyBeHit(BattleRoleLogicEntity role)
@@ -160,29 +181,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
         }
 
-        void ApplyReloading(BattleRoleLogicEntity role)
-        {
-            var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Reloading)
-            {
-                return;
-            }
-
-            var stateMod = stateComponent.ReloadingMod;
-            if (stateMod.maintainFrame <= 0)
-            {
-                stateComponent.EnterNormal();
-                return;
-            }
-
-            stateMod.maintainFrame--;
-            if (stateMod.isFirstEnter)
-            {
-                stateMod.isFirstEnter = false;
-
-            }
-        }
-
         void ApplyHealing(BattleRoleLogicEntity role)
         {
 
@@ -198,15 +196,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         }
 
-        void ApplyAttacking(BattleRoleLogicEntity role)
+        void ApplyShooting(BattleRoleLogicEntity role)
         {
             var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Attacking)
+            if (stateComponent.RoleState != RoleState.Shooting)
             {
                 return;
             }
 
-            var stateMod = stateComponent.AttackingMod;
+            var stateMod = stateComponent.ShootingMod;
             if (stateMod.maintainFrame <= 0)
             {
                 stateComponent.EnterNormal();
