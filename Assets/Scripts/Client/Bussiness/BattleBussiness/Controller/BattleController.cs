@@ -26,8 +26,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         // 服务器下发的资源拾取队列
         Queue<FrameItemPickResMsg> itemPickQueue;
 
-        bool battleBegin;
-        bool hasSpawnScene;
+        bool hasBattleBegin;
+        bool hasSpawnBegin;
 
         public BattleController()
         {
@@ -50,7 +50,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             });
             NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
             {
-                battleBegin = true;
+                hasBattleBegin = true;
             });
         }
 
@@ -78,10 +78,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick()
         {
-            if (battleBegin && !hasSpawnScene)
+            if (hasBattleBegin && !hasSpawnBegin)
             {
-                GameFightStart();
-                hasSpawnScene = true;
+                hasSpawnBegin = true;
+                GameFightSpawn();
             }
 
             float deltaTime = UnityEngine.Time.deltaTime;
@@ -512,11 +512,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Network Event Center]
 
-        async void GameFightStart()
+        async void GameFightSpawn()
         {
-            // // 当前有加载好的场景，则不加载
-            // var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            // if (curFieldEntity != null) return;
+            Debug.Log($"开始加载战斗场景---------------------------------------------------");
 
             // Load Scene And Spawn Field
             var domain = battleFacades.Domain;
@@ -533,6 +531,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             // Send Spawn Role Message
             var rqs = battleFacades.Network.RoleReqAndRes;
             rqs.SendReq_BattleRoleSpawn();
+
+            Debug.Log($"加载战斗场景结束---------------------------------------------------");
 
         }
 

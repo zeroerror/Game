@@ -64,7 +64,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             bool hasMoveDir = inputComponent.MoveDir != Vector3.zero;
             bool hasRollDir = inputComponent.RollDir != Vector3.zero;
 
-            Debug.Log($"inputComponent.RotEuler {inputComponent.RotEuler}");
             moveComponent.SetEulerAngle(inputComponent.RotEuler);
 
             var roleDomain = battleFacades.Domain.RoleDomain;

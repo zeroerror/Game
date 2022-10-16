@@ -9,6 +9,8 @@ using Game.Client.Bussiness.EventCenter;
 using Game.Server.Bussiness.EventCenter;
 using Game.Server.Bussiness.BattleBussiness.Network;
 using Game.Client.Bussiness.BattleBussiness.Controller.Domain;
+using System.Threading.Tasks;
+using Game.Client.Bussiness;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -19,8 +21,8 @@ namespace Game.Server.Bussiness.BattleBussiness
         float fixedDeltaTime;  //0.03f
 
         // Scene Spawn Trigger
-        bool sceneSpawnTrigger;
-        bool isSceneSpawn;
+        bool hasBattleBegin;
+        bool hasSpawnBegin;
 
         // NetWork Info
         public int ServeFrame => battleServerFacades.Network.ServeFrame;
@@ -53,6 +55,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             ServerNetworkEventCenter.battleSerConnect += ((connId) =>
             {
                 ConnIDList.Add(connId); //添加至连接名单
+                hasBattleBegin = true;
             });
 
             heartbeatMsgDic = new Dictionary<long, BattleHeartbeatReqMsg>();
@@ -86,16 +89,16 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            if (sceneSpawnTrigger && !isSceneSpawn)
+            if (hasBattleBegin)
             {
-                SpawBattleChooseScene();
-                sceneSpawnTrigger = false;
+                SpawBattleScene();
             }
-            if (!isSceneSpawn)
+
+            var CurFieldEntity = battleServerFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
+            if (CurFieldEntity == null)
             {
                 return;
             }
-
             // ====== Bullet
             Tick_BulletLifeCycle();
 
@@ -435,11 +438,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     roleSpawnMsgDic[key] = msg;
                 }
-
-                sceneSpawnTrigger = true;// 创建场景(First Time)
-
             }
-
         }
         #endregion
 
@@ -461,8 +460,14 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Scene Spawn Method]
 
-        async void SpawBattleChooseScene()
+        async void SpawBattleScene()
         {
+            if (hasSpawnBegin)
+            {
+                return;
+            }
+            hasSpawnBegin = true;
+
             // Load Scene And Spawn Field
             var domain = battleServerFacades.BattleFacades.Domain;
             var fieldEntity = await domain.SpawnDomain.SpawnGameFightScene();
@@ -470,39 +475,18 @@ namespace Game.Server.Bussiness.BattleBussiness
             var fieldEntityRepo = battleServerFacades.BattleFacades.Repo.FiledRepo;
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
-            isSceneSpawn = true;
 
-            // 生成场景资源，并回复客户端
-            List<ItemType> itemTypeList = new List<ItemType>();
-            AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
-            for (int i = 0; i < assetPointEntities.Length; i++)
-            {
-                var assetPoint = assetPointEntities[i];
-                ItemGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
-                float totalWeight = 0;
-                for (int j = 0; j < itemGenProbabilities.Length; j++) totalWeight += itemGenProbabilities[j].weight;
-                float lRange = 0;
-                float rRange = 0;
-                float randomNumber = Random.Range(0f, 1f);
-                for (int j = 0; j < itemGenProbabilities.Length; j++)
-                {
-                    ItemGenProbability igp = itemGenProbabilities[j];
-                    if (igp.weight <= 0) continue;
-                    rRange = lRange + igp.weight / totalWeight;
-                    if (randomNumber >= lRange && randomNumber < rRange)
-                    {
-                        itemTypeList.Add(igp.itemType);
-                        subTypeList.Add(igp.subType);
-                        break;
-                    }
-                    lRange = rRange;
-                }
-            }
+            // 生成资源
+            GenerateRandomAssetData(fieldEntity, out List<ItemType> itemTypeList, out AssetPointEntity[] assetPointEntities);
+            InitAllAssetRepo(itemTypeList, assetPointEntities);
+        }
 
+        void InitAllAssetRepo(List<ItemType> itemTypeList, AssetPointEntity[] assetPointEntities)
+        {
             int count = itemTypeList.Count;
             entityIdArray = new ushort[count];
             itemTypeByteArray = new byte[count];
-            Debug.Log($"服务器地图物件资源开始生成[数量:{count}]----------------------------------------------------");
+            Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
             int index = 0;
             itemTypeList.ForEach((itemType) =>
             {
@@ -526,7 +510,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                         weaponEntity.SetEntityId(entityId);
                         weaponRepo.Add(weaponEntity);
                         Debug.Log($"生成武器资源:{entityId}");
-                        entityIdArray[index] = entityId;
+
+                        entityIdArray[index] = entityId;    //记录
+
                         break;
                     case ItemType.BulletPack:
                         var bulletPackEntity = item.GetComponent<BulletPackEntity>();
@@ -535,9 +521,11 @@ namespace Game.Server.Bussiness.BattleBussiness
                         bulletPackEntity.Ctor();
                         bulletPackEntity.SetEntityId(entityId);
                         bulletPackRepo.Add(bulletPackEntity);
-                        Debug.Log($"生成子弹包资源:{entityId}");
-                        entityIdArray[index] = entityId;
                         bulletPackRepo.bulletPackAutoIncreaseId++;
+                        Debug.Log($"生成子弹包资源:{entityId}");
+
+                        entityIdArray[index] = entityId;    //记录
+
                         break;
                     case ItemType.Pill:
                         break;
@@ -551,8 +539,36 @@ namespace Game.Server.Bussiness.BattleBussiness
                 index++;
             });
 
-            Debug.Log($"地图物件资源生成完毕******************************************************");
+            Debug.Log($"物件资源生成完毕******************************************************");
+        }
 
+        void GenerateRandomAssetData(FieldEntity fieldEntity, out List<ItemType> itemTypeList, out AssetPointEntity[] assetPointEntities)
+        {
+            itemTypeList = new List<ItemType>();
+            assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
+            for (int i = 0; i < assetPointEntities.Length; i++)
+            {
+                var assetPoint = assetPointEntities[i];
+                ItemGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
+                float totalWeight = 0;
+                for (int j = 0; j < itemGenProbabilities.Length; j++) totalWeight += itemGenProbabilities[j].weight;
+                float lRange = 0;
+                float rRange = 0;
+                float randomNumber = Random.Range(0f, 1f);
+                for (int j = 0; j < itemGenProbabilities.Length; j++)
+                {
+                    ItemGenProbability igp = itemGenProbabilities[j];
+                    if (igp.weight <= 0) continue;
+                    rRange = lRange + igp.weight / totalWeight;
+                    if (randomNumber >= lRange && randomNumber < rRange)
+                    {
+                        itemTypeList.Add(igp.itemType);
+                        subTypeList.Add(igp.subType);
+                        break;
+                    }
+                    lRange = rRange;
+                }
+            }
         }
         #endregion
 

@@ -215,13 +215,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var owner = battleFacades.Repo.RoleRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
-            if (owner.MoveComponent.IsEulerAngleNeedFlush())
-            {
-                owner.MoveComponent.FlushEulerAngle();
-                //客户端鉴权旋转角度同步
-                var rqs = battleFacades.Network.RoleReqAndRes;
-                rqs.SendReq_RoleRotate(owner);
-            }
+            //客户端鉴权旋转角度同步
+            var rqs = battleFacades.Network.RoleReqAndRes;
+            rqs.SendReq_RoleRotate(owner);
+            // if (owner.MoveComponent.IsEulerAngleNeedFlush())
+            // {
+            //     owner.MoveComponent.FlushEulerAngle();
+            //     //客户端鉴权旋转角度同步
+            //     var rqs = battleFacades.Network.RoleReqAndRes;
+            //     rqs.SendReq_RoleRotate(owner);
+            // }
         }
 
         bool WillHitOtherRole(BattleRoleLogicEntity roleEntity, Vector3 moveDir)
