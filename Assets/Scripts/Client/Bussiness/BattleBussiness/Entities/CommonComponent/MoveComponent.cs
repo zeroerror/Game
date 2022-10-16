@@ -149,7 +149,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             dir.Normalize();
             var addVelocity = dir * rollSpeed;
-            addVelocity.y = 2f;
+            addVelocity.y = 2.5f;
             AddExtraVelocity(addVelocity);
             Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
             return true;
@@ -220,7 +220,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return;
             }
 
-            Debug.Log($"摩擦力----------------------- reduceVelocity {reduceVelocity} extraVelocity {extraVelocity}");
+            // Debug.Log($"摩擦力----------------------- reduceVelocity {reduceVelocity} extraVelocity {extraVelocity}");
 
         }
 
@@ -331,10 +331,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void JumpboardSpeedUp()
         {
             DebugExtensions.LogWithColor($"跳板起飞！！！！！", "#48D1CC");
-            extraVelocity.y += 2f;
+            extraVelocity.y += 4f;
             var addVelocity = rb.velocity;
             addVelocity.y = 0;
-            addVelocity = addVelocity * 5f;
+            addVelocity = addVelocity * 4f;
             AddExtraVelocity(addVelocity);
             DebugExtensions.LogWithColor($"跳板起飞  addVelocity:{addVelocity} extraVelocity:{extraVelocity}", "#48D1CC");
         }

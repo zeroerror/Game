@@ -69,7 +69,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             {
                 actionList.Add(() =>
                 {
-                    action.Invoke(connId, msg);
+                    action?.Invoke(connId, msg);
                 });
             });
         }

@@ -181,7 +181,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (roleMoveMsgDic.TryGetValue(key, out var msg))
                 {
-                    roleMoveMsgDic[key] = null;
 
                     var realMsg = msg.msg;
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using ZeroFrame.Protocol.Editor;
@@ -7,6 +5,7 @@ using ZeroFrame.Protocol.Editor;
 public class ProtocolGenTool
 {
 
+#if UNITY_EDITOR
     [MenuItem("Generate/生成协议")]
     public static void Generate()
     {
@@ -15,5 +14,7 @@ public class ProtocolGenTool
         ProtocolEditorHelper.ProtocolGenAll(msgDir, servicePath);
         Debug.Log("协议生成完毕！");
     }
+#else
+#endif
 
 }

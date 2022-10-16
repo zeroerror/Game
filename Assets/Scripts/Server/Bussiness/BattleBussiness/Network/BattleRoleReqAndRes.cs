@@ -37,7 +37,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             for (int i = 0; i < actionList.Count; i++)
             {
                 var action = actionList[i];
-                action.Invoke();
+                action?.Invoke();
             }
             actionList.Clear();
         }

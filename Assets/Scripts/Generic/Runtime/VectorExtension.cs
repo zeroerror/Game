@@ -59,6 +59,11 @@ namespace Game.Generic
             return v;
         }
 
+        public static bool MostEqualsY(this Vector3 v1, Vector3 v2)
+        {
+            return (v1.y - v2.y) < 0.1f;
+        }
+
         public static void Reset(this ref Vector3 v)
         {
             v.x = 0;

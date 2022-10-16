@@ -75,20 +75,48 @@ namespace Game.Client.Bussiness
                 CollisionExtra collisionExtra = new CollisionExtra();
                 FieldType fieldType = FieldType.None;
                 string layerName = LayerMask.LayerToName(collision.gameObject.layer);
-
                 Vector3 selfPos = transform.position;
+
                 var closestPoint = collision.collider.bounds.ClosestPoint(selfPos);
-                if (closestPoint == selfPos)
+                if (closestPoint.MostEqualsY(selfPos))
                 {
                     if (collision.contactCount != 0)
                     {
                         closestPoint = collision.GetContact(0).point;
+                        Debug.LogWarning("collision.contactCount != 0");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("collision.contactCount == 0");
                     }
                 }
-                var hitDir = (closestPoint - selfPos).normalized;
+
+                Vector3 hitDir = Vector3.zero;
+                bool isGround = false;
+                if (!closestPoint.MostEqualsY(selfPos))
+                {
+                    hitDir = (closestPoint - selfPos).normalized;
+                    isGround = hitDir.y <= 0;
+                }
+                else
+                {
+                    isGround = true;
+                }
+
+                Debug.LogWarning($"collision hitDir {hitDir}  selfPos {selfPos} closestPoint {closestPoint}");
+                if (isGround)
+                {
+                    Debug.LogWarning($"collision isGround");
+                }
+                else
+                {
+                    Debug.LogWarning($"collision Not isGround");
+
+                }
+
                 if (layerName == "Field")
                 {
-                    if (hitDir.y < 0) fieldType = FieldType.Ground;
+                    if (isGround) fieldType = FieldType.Ground;
                     else fieldType = FieldType.Wall;
                 }
 
@@ -100,7 +128,6 @@ namespace Game.Client.Bussiness
                 collisionExtra.hitDir = hitDir;
                 hitCollisionList.Add(collisionExtra);
                 // DebugExtensions.LogWithColor($"接触:fieldType:{fieldType.ToString()} {collision.gameObject.name} ", "#48D1CC");
-                return;
             }
         }
 
