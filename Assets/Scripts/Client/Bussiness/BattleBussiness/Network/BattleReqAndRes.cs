@@ -15,6 +15,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
     {
         NetworkClient battleClient;
         List<Action> actionList;
+        object lockObj;
 
         public BattleReqAndRes()
         {
@@ -28,12 +29,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void TickAllRegistAction()
         {
-            for (int i = 0; i < actionList.Count; i++)
+            lock (lockObj)
             {
-                var action = actionList[i];
-                action.Invoke();
+                for (int i = 0; i < actionList.Count; i++)
+                {
+                    var action = actionList[i];
+                    action.Invoke();
+                }
+                actionList.Clear();
             }
-            actionList.Clear();
         }
 
         public void ConnBattleServer(string host, ushort port)
@@ -63,7 +67,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         // Private Func
         void AddRegister<T>(Action<T> action) where T : IZeroMessage<T>, new()
         {
-            lock (actionList)
+            lock (lockObj)
             {
                 battleClient.RegistMsg<T>((msg) =>
                 {

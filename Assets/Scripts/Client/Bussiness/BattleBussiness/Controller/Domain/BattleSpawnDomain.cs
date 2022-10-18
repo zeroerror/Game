@@ -24,7 +24,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public async Task<FieldEntity> SpawnBattleChooseScene() => await SpawnScene("BattleChooseScene");
 
-        public async Task<FieldEntity> SpawnGameFightScene() => await SpawnScene("scene_city");
+        public async Task<FieldEntity> SpawnGameFightScene() => await SpawnScene("scene_arena");
 
         public async Task<FieldEntity> SpawnWorldServerChooseScene() => await SpawnScene("world_server_choose_scene");
 
