@@ -1,6 +1,7 @@
 
 
 using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Generic;
 using UnityEngine;
 
 namespace Game.Client.Bussiness.BattleBussiness
@@ -43,10 +44,14 @@ namespace Game.Client.Bussiness.BattleBussiness
             roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, moveComponent.Position, deltaTime * roleRenderer.posAdjust);
             roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, moveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
 
-            bool isPosChange = roleRenderer.transform.position != moveComponent.Position;
+            bool isPosChange = !roleRenderer.transform.position.MostEqualsY(moveComponent.Position);
             if (isPosChange)
             {
                 role.roleRenderer.noMoveTime = 0;
+            }
+            else
+            {
+                role.roleRenderer.noMoveTime++;
             }
         }
 
@@ -66,12 +71,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             // 1. Idle 2. Running 3. IdleWithGun 4. RunningWithGun
             bool isHoldingGun = weaponComponent.CurrentWeapon != null;
-            bool isPosChange = Vector3.Distance(roleRenderer.transform.position, moveComponent.Position) > 0.03f;
+            bool isPosChange = Vector3.Distance(roleRenderer.transform.position, moveComponent.Position) > 0.05f;
 
             if (!isPosChange && !isHoldingGun)
             {
-                if (!animatorComponent.IsInState("Idle"))
+                if (!animatorComponent.IsInState("Idle") && roleRenderer.noMoveTime > 0.1f)
                 {
+                    Debug.Log("PlayIdle Idle ");
                     animatorComponent.PlayIdle();
                 }
                 return;
@@ -79,27 +85,28 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             if (isPosChange && !isHoldingGun)
             {
-                if (!animatorComponent.IsInState("Running"))
+                if (!animatorComponent.IsInState("Run"))
                 {
-                    animatorComponent.PlayRunning();
+                    Debug.Log("PlayRun Run ");
+                    animatorComponent.PlayRun();
                 }
                 return;
             }
 
             if (!isPosChange && isHoldingGun)
             {
-                if (!animatorComponent.IsInState("Idle_With_Gun"))
+                if (!animatorComponent.IsInState("Idle_Rifle") && roleRenderer.noMoveTime > 0.1f)
                 {
-                    animatorComponent.PlayIdleWithGun();
+                    animatorComponent.PlayIdle_Rifle();
                 }
                 return;
             }
 
             if (isPosChange && isHoldingGun)
             {
-                if (!animatorComponent.IsInState("Running_With_Gun"))
+                if (!animatorComponent.IsInState("Run_Rifle"))
                 {
-                    animatorComponent.PlayRunnigWithGun();
+                    animatorComponent.PlayRun_Rifle();
                 }
                 return;
             }
@@ -116,9 +123,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             var roleRenderer = role.roleRenderer;
             var animatorComponent = roleRenderer.AnimatorComponent;
-            if (!animatorComponent.IsInState("Rolling"))
+            if (!animatorComponent.IsInState("Roll"))
             {
-                animatorComponent.PlayRolling();
+                animatorComponent.PlayRoll();
             }
         }
 
@@ -132,9 +139,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             var roleRenderer = role.roleRenderer;
             var animatorComponent = roleRenderer.AnimatorComponent;
-            if (!animatorComponent.IsInState("Reloading"))
+            if (!animatorComponent.IsInState("Reload"))
             {
-                animatorComponent.PlayReloading();
+                animatorComponent.PlayReload_Run();
             }
         }
 
@@ -148,7 +155,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             var roleRenderer = role.roleRenderer;
             var animatorComponent = roleRenderer.AnimatorComponent;
-            animatorComponent.PlayShooting();
+            animatorComponent.PlayShoot_Rifle();
         }
 
         void ApplyRoleState_Dead(BattleRoleLogicEntity role)
@@ -177,9 +184,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             var roleRenderer = role.roleRenderer;
             var animatorComponent = roleRenderer.AnimatorComponent;
-            if (!animatorComponent.IsInState("Rolling"))
+            if (!animatorComponent.IsInState("Roll"))
             {
-                animatorComponent.PlayRolling();    // TODO Reborn动画
+                animatorComponent.PlayRoll();    // TODO Reborn动画
             }
         }
 

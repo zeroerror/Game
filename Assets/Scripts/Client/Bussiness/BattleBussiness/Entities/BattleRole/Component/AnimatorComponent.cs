@@ -26,45 +26,69 @@ namespace Game.Client.Bussiness.BattleBussiness
             animator.CrossFade(currentStateName, 0.1f);
         }
 
-        public void PlayIdleWithGun()
+        public void PlayIdle_Rifle()
         {
-            currentStateName = "Idle_With_Gun";
+            currentStateName = "Idle_Rifle";
             animator.CrossFade(currentStateName, 0.1f);
         }
 
-        public void PlayRunning()
+        public void PlayRun()
         {
-            currentStateName = "Running";
+            currentStateName = "Run";
             animator.CrossFade(currentStateName, 0.1f);
         }
 
-        public void PlayRunnigWithGun()
+        public void PlayRun_Rifle()
         {
-            currentStateName = "Running_With_Gun";
+            currentStateName = "Run_Rifle";
             animator.CrossFade(currentStateName, 0.1f);
         }
 
-        public void PlayReloading()
+        public void PlayReload()
         {
-            currentStateName = "Reloading";
+            currentStateName = "Reload";
             animator.CrossFade(currentStateName, 0.1f);
         }
 
-        public void PlayShooting()
+        public void PlayReload_Run()
         {
-            currentStateName = "Shooting";
+            currentStateName = "Reload_Run";
+            animator.CrossFade(currentStateName, 0.1f);
+        }
+
+        public void PlayRoll()
+        {
+            currentStateName = "Roll";
+            animator.Play(currentStateName);
+        }
+
+        public void PlayBeHit()
+        {
+            currentStateName = "BeHit";
+            animator.Play(currentStateName);
+        }
+
+        public void PlayBeHit_Rifle()
+        {
+            currentStateName = "BeHit_Rifle";
+            animator.Play(currentStateName);
+        }
+
+        public void PlayShoot_Rifle_Run()
+        {
+            currentStateName = "Shoot_Rifle_Run";
+            animator.Play(currentStateName);
+        }
+
+        public void PlayShoot_Rifle()
+        {
+            currentStateName = "Shoot_Rifle";
             animator.Play(currentStateName);
         }
 
         public void PlayDead()
         {
             currentStateName = "Dead";
-            animator.Play(currentStateName);
-        }
-
-        public void PlayRolling()
-        {
-            currentStateName = "Rolling";
             animator.Play(currentStateName);
         }
 

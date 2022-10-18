@@ -70,7 +70,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleDomain = battleFacades.Domain.RoleDomain;
             if (hasRollDir && roleDomain.TryRoleRoll(role, inputComponent.RollDir))
             {
-                stateComponent.EnterRolling(20);
+                stateComponent.EnterRolling(40);
                 return;
             }
 

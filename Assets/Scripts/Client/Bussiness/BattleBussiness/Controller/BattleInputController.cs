@@ -62,7 +62,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (owner.StateComponent.RoleState == RoleState.Normal)
                 {
                     owner.MoveComponent.FaceTo(moveDir);
-                    Debug.Log($"dir moveDir:{moveDir}");
                 }
 
                 if (!WillHitOtherRole(owner, moveDir))
@@ -188,7 +187,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (owner.CanWeaponReload())
                 {
                     weaponComponent.BeginReloading();
-                    animatorComponent.PlayReloading();
+                    animatorComponent.PlayReload_Run();
 
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     rqs.SendReq_WeaponReload(owner);

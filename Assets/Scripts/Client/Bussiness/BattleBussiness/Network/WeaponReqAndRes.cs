@@ -25,6 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         public void Inject(NetworkClient client)
         {
             battleClient = client;
+            lockObj = this;
         }
 
         public void TickAllRegistAction()
