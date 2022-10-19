@@ -11,7 +11,6 @@ using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Client.Bussiness.UIBussiness;
 using Game.Client.Bussiness.WorldBussiness;
-using Game.Protocol.Client2World;
 
 namespace Game.Client
 {

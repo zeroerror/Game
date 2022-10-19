@@ -81,13 +81,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 case CameraView.FirstView:
                     var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-                    if (Physics.Raycast(ray, out RaycastHit hit)) return hit.point;
+                    if (Physics.Raycast(ray, out RaycastHit hit))
+                    {
+                        return hit.point;
+                    }
+
                     break;
                 case CameraView.ThirdView:
                     var roleTrans = roleLogicEntity.MoveComponent.Position;
                     var forward = roleLogicEntity.transform.forward;
-                    if (Physics.Raycast(roleTrans, forward, out hit, 1000f)) return hit.point;
-                    break;
+                    var pos = roleLogicEntity.transform.position + forward * 10f;
+                    return pos;
             }
 
             return Vector3.zero;
