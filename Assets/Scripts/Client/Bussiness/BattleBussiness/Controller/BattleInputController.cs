@@ -59,10 +59,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var cameraView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
                 Vector3 moveDir = battleFacades.Domain.InputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
-                if (owner.StateComponent.RoleState == RoleState.Normal)
-                {
-                    owner.MoveComponent.FaceTo(moveDir);
-                }
+                owner.MoveComponent.FaceTo(moveDir);
 
                 if (!WillHitOtherRole(owner, moveDir))
                 {

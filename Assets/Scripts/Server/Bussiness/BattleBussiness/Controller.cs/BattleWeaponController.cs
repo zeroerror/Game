@@ -145,7 +145,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var masterId = msg.masterId;
                     if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
                     {
-                        master.WeaponComponent.BeginReloading();
+                        master.InputComponent.pressReload = true;
                     }
                 }
             });

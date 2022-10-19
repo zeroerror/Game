@@ -63,6 +63,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         RoleInputComponent roleInputComponent;
         public RoleInputComponent InputComponent => roleInputComponent;
 
+        public Rigidbody RB { get; private set; }
+
+
         public bool IsDead { get; private set; }
 
         public void Inject(BattleRoleRendererEntity roleRendererEntity)
@@ -73,8 +76,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             // == Component
-
-            moveComponent.Inject(transform.GetComponentInParent<Rigidbody>());
+            RB = transform.GetComponentInParent<Rigidbody>();
+            moveComponent.Inject(RB);
             moveComponent.SetMaximumSpeed(30f);
 
             idComponent = new IDComponent();    // TODO: Serializable

@@ -47,6 +47,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         void ApplyAnyState(BattleRoleLogicEntity role)
         {
+            var inputComponent = role.InputComponent;
+            var roleDomain = battleFacades.Domain.RoleDomain;
+
+            // Locomotion
+            bool hasMoveDir = inputComponent.MoveDir != Vector3.zero;
+            if (hasMoveDir)
+            {
+                roleDomain.RoleMoveActivate(role, inputComponent.MoveDir);
+            }
 
         }
 
@@ -58,16 +67,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            var moveComponent = role.MoveComponent;
-            var weaponComponent = role.WeaponComponent;
             var inputComponent = role.InputComponent;
 
-            bool hasMoveDir = inputComponent.MoveDir != Vector3.zero;
-            bool hasRollDir = inputComponent.RollDir != Vector3.zero;
-
-            moveComponent.SetEulerAngle(inputComponent.RotEuler);
-
             var roleDomain = battleFacades.Domain.RoleDomain;
+            bool hasRollDir = inputComponent.RollDir != Vector3.zero;
             if (hasRollDir && roleDomain.TryRoleRoll(role, inputComponent.RollDir))
             {
                 stateComponent.EnterRolling(40);
@@ -76,14 +79,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             if (inputComponent.pressReload)
             {
-                stateComponent.EnterReloading(30);
+                var weaponComponent = role.WeaponComponent;
+                role.WeaponComponent.BeginReloading();
+                stateComponent.EnterReloading(weaponComponent.CurrentWeapon.ReloadFrame);
                 return;
             }
 
-            if (hasMoveDir)
-            {
-                roleDomain.RoleMove(role, inputComponent.MoveDir);
-            }
+            var moveComponent = role.MoveComponent;
+            moveComponent.SetEulerAngle(inputComponent.RotEuler);
 
         }
 
@@ -108,6 +111,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.isFirstEnter = false;
             }
 
+            role.MoveComponent.SetMoveVelocity(Vector3.zero);
 
         }
 
@@ -132,6 +136,42 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.isFirstEnter = false;
 
             }
+
+            // Locomotion
+            var moveComponent = role.MoveComponent;
+            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 4f);
+            var inputComponent = role.InputComponent;
+            moveComponent.SetEulerAngle(inputComponent.RotEuler);
+        }
+
+        void ApplyShooting(BattleRoleLogicEntity role)
+        {
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState != RoleState.Shooting)
+            {
+                return;
+            }
+
+            var stateMod = stateComponent.ShootingMod;
+            if (stateMod.maintainFrame <= 0)
+            {
+                stateComponent.EnterNormal();
+                return;
+            }
+
+            stateMod.maintainFrame--;
+            if (stateMod.isFirstEnter)
+            {
+                stateMod.isFirstEnter = false;
+            }
+
+            // Locomotion
+            var roleDomain = battleFacades.Domain.RoleDomain;
+            var moveComponent = role.MoveComponent;
+            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 4f);
+
+            var inputComponent = role.InputComponent;
+            moveComponent.SetEulerAngle(inputComponent.RotEuler);
         }
 
         void ApplyBeHit(BattleRoleLogicEntity role)
@@ -155,6 +195,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.isFirstEnter = false;
 
             }
+
+            var roleDomain = battleFacades.Domain.RoleDomain;
+            var moveComponent = role.MoveComponent;
+            roleDomain.RoleMoveActivate(role, moveComponent.MoveVelocity / 3f);
 
         }
 
@@ -189,11 +233,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
+            var roleDomain = battleFacades.Domain.RoleDomain;
             var stateMod = stateComponent.DeadMod;
             if (stateMod.maintainFrame <= 0)
             {
                 stateComponent.EnterReborn(30);
-                var roleDomain = battleFacades.Domain.RoleDomain;
                 roleDomain.RoleReborn(role);
                 return;
             }
@@ -204,6 +248,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.isFirstEnter = false;
 
             }
+
+            var moveComponent = role.MoveComponent;
+            moveComponent.SetMoveVelocity(Vector3.zero);
         }
 
         void ApplyReborn(BattleRoleLogicEntity role)
@@ -225,29 +272,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (stateMod.isFirstEnter)
             {
                 stateMod.isFirstEnter = false;
-            }
-        }
-
-        void ApplyShooting(BattleRoleLogicEntity role)
-        {
-            var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Shooting)
-            {
-                return;
-            }
-
-            var stateMod = stateComponent.ShootingMod;
-            if (stateMod.maintainFrame <= 0)
-            {
-                stateComponent.EnterNormal();
-                return;
-            }
-
-            stateMod.maintainFrame--;
-            if (stateMod.isFirstEnter)
-            {
-                stateMod.isFirstEnter = false;
-
             }
         }
 

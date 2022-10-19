@@ -65,13 +65,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public void RoleMove(BattleRoleLogicEntity role, Vector3 dir)
+        public void RoleMoveActivate(BattleRoleLogicEntity role, Vector3 dir)
         {
             role.MoveComponent.ActivateMoveVelocity(dir);
         }
 
         public bool TryRoleRoll(BattleRoleLogicEntity role, Vector3 dir)
         {
+            role.StateComponent.EnterRolling(40);
             return role.MoveComponent.TryRoll(dir);
         }
 
@@ -81,7 +82,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
         }
 
-        public void RoleStateEnterDead(BattleRoleLogicEntity role)
+        public void RoleStateEnterReloading(BattleRoleLogicEntity role)
+        {
+            role.StateComponent.EnterReloading(40);
+        }
+
+         public void RoleStateEnterDead(BattleRoleLogicEntity role)
         {
             role.StateComponent.EnterDead(60);
         }
