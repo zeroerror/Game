@@ -1,7 +1,5 @@
 using UnityEngine;
-using Game.Client.Bussiness.BattleBussiness.Network;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
