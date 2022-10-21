@@ -131,19 +131,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             if (curWeapon == null)
             {
-                Debug.Log("当前武器为空，无法射击");
+                Debug.LogWarning("当前武器为空，无法射击");
                 return false;
             }
 
             if (weaponComponent.IsReloading)
             {
-                Debug.Log("换弹中，无法射击");
+                Debug.LogWarning("换弹中，无法射击");
                 return false;
             }
 
             var stateComponent = role.StateComponent;
+            Debug.LogWarning($"stateComponent.RoleState  {stateComponent.RoleState.ToString()}");
+            Debug.LogWarning($"stateComponent.ShootingMod.maintainFrame  {stateComponent.ShootingMod.maintainFrame}");
             if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 5)
             {
+                Debug.LogWarning("射击CD未结束");
                 return false;
             }
 

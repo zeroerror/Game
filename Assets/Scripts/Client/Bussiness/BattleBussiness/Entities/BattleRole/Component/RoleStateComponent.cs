@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             rollingMod.maintainFrame = maintainFrame;
         }
 
-        public void EnterShooting(int maintainFrame)
+        public void EnterFiring(int maintainFrame)
         {
             roleState = RoleState.Shooting;
 

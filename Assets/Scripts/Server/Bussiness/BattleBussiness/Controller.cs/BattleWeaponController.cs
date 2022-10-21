@@ -43,7 +43,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            Tick_WeaponShoot();
+            Tick_WeaponFire();
             Tick_WeaponReloadBegin();
             Tick_ReloadingFrame();
             Tick_WeaponDrop();
@@ -62,9 +62,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Tick]
 
-        void Tick_WeaponShoot()
+        void Tick_WeaponFire()
         {
-
             ConnIdList.ForEach((connId) =>
             {
                 long key = (long)ServeFrame << 32;
@@ -84,11 +83,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     var masterId = msg.masterId;
 
-                    if (roleRepo.TryGetByEntityId(masterId, out var master))
+                    if (roleRepo.TryGetByEntityId(masterId, out var master) && clientFacades.Domain.RoleDomain.CanRoleFire(master))
                     {
                         if (master.WeaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
-                            master.StateComponent.EnterShooting(10);
+                            master.StateComponent.EnterFiring(10);
                             var startPos = new Vector3(msg.firePointPosX / 10000f, msg.firePointPosY / 10000f, msg.firePointPosZ / 10000f);
                             Vector3 fireDir = new Vector3(msg.dirX / 100f, 0, msg.dirZ / 100f);
 
@@ -131,7 +130,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
                     var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
                     var masterId = msg.masterId;
-                    if (roleRepo.TryGetByEntityId(masterId, out var master) && battleFacades.BattleFacades.Domain.RoleDomain.CanRoleFire(master))
+
+                    if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
                     {
                         master.InputComponent.pressReload = true;
                     }

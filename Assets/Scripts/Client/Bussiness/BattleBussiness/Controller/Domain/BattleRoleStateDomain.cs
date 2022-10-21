@@ -36,7 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             ApplyNormal(roleLogicEntity);
             ApplyRolling(roleLogicEntity);
             ApplyClimbing(roleLogicEntity);
-            ApplyShooting(roleLogicEntity);
+            ApplyFiring(roleLogicEntity);
             ApplyReloading(roleLogicEntity);
             ApplyHealing(roleLogicEntity);
             ApplySwitching(roleLogicEntity);
@@ -147,7 +147,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             moveComponent.SetEulerAngle(inputComponent.FaceDir);
         }
 
-        void ApplyShooting(BattleRoleLogicEntity role)
+        void ApplyFiring(BattleRoleLogicEntity role)
         {
             var stateComponent = role.StateComponent;
             if (stateComponent.RoleState != RoleState.Shooting)

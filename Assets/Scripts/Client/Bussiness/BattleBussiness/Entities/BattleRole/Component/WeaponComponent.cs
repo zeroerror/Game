@@ -39,12 +39,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool TryWeaponShoot()
         {
-            if (CurrentWeapon == null)
-            {
-                Debug.LogWarning("当前尚未持有武器！");
-                //TODO: 徒手攻击
-                return false;
-            }
             return CurrentWeapon.TryFireBullet(1) == 1;
         }
 
