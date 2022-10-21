@@ -17,7 +17,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             UIEventCenter.MoveAction += ((moveAxis) => battleFacades.InputComponent.moveAxis = new Vector3(moveAxis.x, 0, moveAxis.y));
             UIEventCenter.PickAction += (() => battleFacades.InputComponent.isPressPick = true);
-            UIEventCenter.FireAction += (() => battleFacades.InputComponent.isPressFire = true);
+            UIEventCenter.FireAction += ((fireDir) =>
+            {
+                battleFacades.InputComponent.isPressFire = true;
+                battleFacades.InputComponent.fireDir = fireDir;
+            });
+            UIEventCenter.StopFireAction += (() =>
+            {
+                battleFacades.InputComponent.isPressFire = false;
+            });
             UIEventCenter.ReloadAction += (() => battleFacades.InputComponent.isPressWeaponReload = true);
             UIEventCenter.JumpAction += (() => battleFacades.InputComponent.isPressRoll = true);
             UIEventCenter.DropWeaponAction += (() => battleFacades.InputComponent.isPressDropWeapon = true);
@@ -152,17 +160,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 // 射击前 
                 // 1.客户端判断流程
                 var weaponComponent = owner.WeaponComponent;
-                Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空，无法射击");
+                var curWeapon = weaponComponent.CurrentWeapon;
+                Debug.Assert(curWeapon != null, "当前武器为空，无法射击");
                 Debug.Assert(!weaponComponent.IsReloading, "换弹中，无法射击");
-                if (weaponComponent.CurrentWeapon != null && !weaponComponent.IsReloading)
+                if (curWeapon != null && !weaponComponent.IsReloading)
                 {
-                    var curCamView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
-                    var inputDomain = battleFacades.Domain.InputDomain;
-                    Vector3 startPos = owner.ShootStartPos;
-                    Vector3 endPos = inputDomain.GetShotPointByCameraView(curCamView, owner);
                     // 2.服务端流程
                     var rqs = battleFacades.Network.WeaponReqAndRes;
-                    rqs.SendReq_WeaponShoot(owner.IDComponent.EntityId, startPos, endPos);
+                    rqs.SendReq_WeaponFire(owner.IDComponent.EntityId, curWeapon.FirePointPos, input.fireDir);
                 }
 
             }

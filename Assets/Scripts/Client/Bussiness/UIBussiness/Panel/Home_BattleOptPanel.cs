@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZeroUIFrame;
 using Game.Client.Bussiness.EventCenter;
+using UnityEngine.EventSystems;
 
 namespace Game.Client.Bussiness.UIBussiness.Panel
 {
@@ -25,11 +26,15 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
             dropWeapon_b = transform.Find("OptGroup/Jump").GetComponent<Button>();
 
             VariableJoystick.moveHandler += OnMoveAxis;
-            SetOnClick("OptGroup/Pick", OnClickPick_Button);
-            SetOnClick("OptGroup/Fire", OnClickFire_Button);
-            SetOnClick("OptGroup/Reload", OnClickReload_Button);
-            SetOnClick("OptGroup/Jump", OnClickJump_Button);
-            SetOnClick("OptGroup/DropWeapon", OnClickDropWeapon_Button);
+            OnPointerDown("OptGroup/Pick", OnClickPick_Button);
+
+            OnPointerDown("OptGroup/Fire", PointerDownFireBtn);
+            OnPointerDrag("OptGroup/Fire", PointerDragFireBtn);
+            OnPointerUp("OptGroup/Fire", PointerUpFireBtn);
+
+            OnPointerDown("OptGroup/Reload", OnClickReload_Button);
+            OnPointerDown("OptGroup/Jump", OnClickJump_Button);
+            OnPointerDown("OptGroup/DropWeapon", OnClickDropWeapon_Button);
         }
 
         void OnMoveAxis(Vector2 moveAxis)
@@ -41,18 +46,37 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
         {
             UIEventCenter.PickAction.Invoke();
         }
-        void OnClickFire_Button(params object[] args)
+
+        void PointerDownFireBtn(params object[] args)
         {
-            UIEventCenter.FireAction.Invoke();
+            var evData = args[1] as PointerEventData;
+            var fireDir = evData.delta;
+            UIEventCenter.FireAction.Invoke(fireDir);
         }
+
+        void PointerDragFireBtn(params object[] args)
+        {
+            var evData = args[1] as PointerEventData;
+            var fireDir = evData.delta;
+            UIEventCenter.FireAction.Invoke(fireDir);
+        }
+
+        void PointerUpFireBtn(params object[] args)
+        {
+            UIEventCenter.StopFireAction.Invoke();
+        }
+
+
         void OnClickReload_Button(params object[] args)
         {
             UIEventCenter.ReloadAction.Invoke();
         }
+
         void OnClickJump_Button(params object[] args)
         {
             UIEventCenter.JumpAction.Invoke();
         }
+
         void OnClickDropWeapon_Button(params object[] args)
         {
             UIEventCenter.DropWeaponAction.Invoke();

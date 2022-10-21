@@ -16,7 +16,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         List<int> ConnIdList => battleFacades.Network.connIdList;
 
         // 记录所有武器射击帧
-        Dictionary<long, FrameWeaponShootReqMsg> weaponShootMsgDic;
+        Dictionary<long, FrameWeaponFireReqMsg> weaponFireMsgDic;
 
         // 记录所有武器装弹帧
         Dictionary<long, FrameWeaponReloadReqMsg> weaponReloadMsgDic;
@@ -26,7 +26,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public BattleWeaponController()
         {
-            weaponShootMsgDic = new Dictionary<long, FrameWeaponShootReqMsg>();
+            weaponFireMsgDic = new Dictionary<long, FrameWeaponFireReqMsg>();
             weaponReloadMsgDic = new Dictionary<long, FrameWeaponReloadReqMsg>();
             weaponDropMsgDic = new Dictionary<long, FrameWeaponDropReqMsg>();
         }
@@ -70,7 +70,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (weaponShootMsgDic.TryGetValue(key, out var msg))
+                if (weaponFireMsgDic.TryGetValue(key, out var msg))
                 {
                     var clientFacades = battleFacades.BattleFacades;
                     var weaponRepo = clientFacades.Repo.WeaponRepo;
@@ -90,28 +90,15 @@ namespace Game.Server.Bussiness.BattleBussiness
                         {
                             master.StateComponent.EnterShooting(10);
                             //子弹生成
-                            float startPosX = msg.startPosX / 10000f;
-                            float startPosY = msg.startPosY / 10000f;
-                            float startPosZ = msg.startPosZ / 10000f;
-                            Vector3 startPos = new Vector3(startPosX, startPosY, startPosZ);
-
-                            float endPosX = msg.endPosX / 10000f;
-                            float endPosY = msg.endPosY / 10000f;
-                            float endPosZ = msg.endPosZ / 10000f;
-                            Vector3 endPos = new Vector3(endPosX, endPosY, endPosZ);
-
-                            var sp = startPos;
-                            var ep = endPos;
-                            sp.y = 0;
-                            ep.y = 0;
-                            Vector3 shootDir = (ep - sp).normalized;
+                            var startPos = new Vector3(msg.firePointPosX / 10000f, msg.firePointPosY / 10000f, msg.firePointPosZ / 10000f);
+                            Vector3 fireDir = new Vector3(msg.dirX / 100f, 0, msg.dirZ / 100f);
 
                             var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
                             var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
                             var bulletId = bulletRepo.AutoEntityID;
                             bulletEntity.MoveComponent.SetCurPos(startPos);
-                            bulletEntity.MoveComponent.SetForward(shootDir);
-                            bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
+                            bulletEntity.MoveComponent.SetForward(fireDir);
+                            bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
                             bulletEntity.SetMasterId(masterId);
                             bulletEntity.IDComponent.SetEntityId(bulletId);
                             bulletEntity.gameObject.SetActive(true);
@@ -120,9 +107,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                             ConnIdList.ForEach((connId) =>
                             {
                                 weaponRqs.SendRes_WeaponShoot(connId, masterId);
-                                bulletRqs.SendRes_BulletSpawn(connId, bulletType, bulletId, masterId, startPos, endPos);
+                                bulletRqs.SendRes_BulletSpawn(connId, bulletType, bulletId, masterId, startPos, fireDir);
                             });
-                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{masterId}  起点：{startPos} 终点：{endPos} 飞行方向:{shootDir}");
+                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{masterId}  起点：{startPos} 飞行方向:{fireDir}");
                         }
                     }
                 }
@@ -210,16 +197,16 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Req]
-        void OnWeaponShoot(int connId, FrameWeaponShootReqMsg msg)
+        void OnWeaponShoot(int connId, FrameWeaponFireReqMsg msg)
         {
-            lock (weaponShootMsgDic)
+            lock (weaponFireMsgDic)
             {
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (!weaponShootMsgDic.TryGetValue(key, out var _))
+                if (!weaponFireMsgDic.TryGetValue(key, out var _))
                 {
-                    weaponShootMsgDic[key] = msg;
+                    weaponFireMsgDic[key] = msg;
                 }
                 Debug.Log("收到武器射击请求");
             }

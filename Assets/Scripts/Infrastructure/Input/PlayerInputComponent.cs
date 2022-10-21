@@ -6,7 +6,10 @@ public class PlayerInputComponent
 {
 
     public Vector3 moveAxis;
+
     public bool isPressFire;
+    public Vector2 fireDir;
+
     public bool isPressRoll;
     public bool isPressSwitchView;
     public bool isPressPick;
@@ -28,7 +31,6 @@ public class PlayerInputComponent
         grenadeThrowPoint.Reset();
         hookPoint.Reset();
 
-        isPressFire = false;
         isPressSwitchView = false;
         isPressRoll = false;
         isPressPick = false;

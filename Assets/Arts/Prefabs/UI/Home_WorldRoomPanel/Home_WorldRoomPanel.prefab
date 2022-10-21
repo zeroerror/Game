@@ -568,7 +568,7 @@ GameObject:
   - component: {fileID: 8353733886366060170}
   - component: {fileID: 8634656778566049054}
   - component: {fileID: 8922296155057198778}
-  - component: {fileID: 8336211304883879558}
+  - component: {fileID: 516598616168869068}
   m_Layer: 5
   m_Name: CreateRoom
   m_TagString: Untagged
@@ -585,7 +585,7 @@ RectTransform:
   m_GameObject: {fileID: 5805540270810455063}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.0844913, y: 2.0844913, z: 2.0844913}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6372913175328731522}
@@ -595,7 +595,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 84.83, y: -35.94452}
+  m_AnchoredPosition: {x: 84.83, y: -140}
   m_SizeDelta: {x: 160, y: 45.889008}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8634656778566049054
@@ -636,7 +636,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8336211304883879558
+--- !u!114 &516598616168869068
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -645,7 +645,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5805540270810455063}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: -428763740, guid: b2a343b693db9644497d964c14b02c19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:

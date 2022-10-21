@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1384179887398956707}
   - component: {fileID: 9112927540826419244}
   - component: {fileID: 6457443989672893502}
-  - component: {fileID: 4260547483727008324}
+  - component: {fileID: 5955002629499808521}
   m_Layer: 5
   m_Name: RegistBtn
   m_TagString: Untagged
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4260547483727008324
+--- !u!114 &5955002629499808521
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -87,7 +87,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1026171757409327656}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: -428763740, guid: b2a343b693db9644497d964c14b02c19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -880,7 +880,7 @@ GameObject:
   - component: {fileID: 634053441267403570}
   - component: {fileID: 6676897191336243154}
   - component: {fileID: 5163161383888366129}
-  - component: {fileID: 6397280604375177445}
+  - component: {fileID: 6315976833557224254}
   m_Layer: 5
   m_Name: LoginBtn
   m_TagString: Untagged
@@ -947,7 +947,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6397280604375177445
+--- !u!114 &6315976833557224254
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -956,7 +956,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7614560805875138207}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: -428763740, guid: b2a343b693db9644497d964c14b02c19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:

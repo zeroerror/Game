@@ -14,7 +14,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
 
         // 服务器下发的武器射击队列
-        Queue<FrameWeaponShootResMsg> weaponShootQueue;
+        Queue<FrameWeaponFireResMsg> weaponFireQueue;
         // 服务器下发的武器换弹队列
         Queue<FrameWeaponReloadResMsg> weaponReloadQueue;
         // 服务器下发的武器丢弃队列
@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public BattleWeaponController()
         {
-            weaponShootQueue = new Queue<FrameWeaponShootResMsg>();
+            weaponFireQueue = new Queue<FrameWeaponFireResMsg>();
             weaponReloadQueue = new Queue<FrameWeaponReloadResMsg>();
             weaponDropQueue = new Queue<FrameWeaponDropResMsg>();
         }
@@ -51,9 +51,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
 
             var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
-            while (weaponShootQueue.TryPeek(out var msg))
+            while (weaponFireQueue.TryPeek(out var msg))
             {
-                weaponShootQueue.Dequeue();
+                weaponFireQueue.Dequeue();
 
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 var master = roleRepo.GetByEntityId(msg.masterId);
@@ -94,10 +94,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Server]
 
-        void OnWeaponShoot(FrameWeaponShootResMsg msg)
+        void OnWeaponShoot(FrameWeaponFireResMsg msg)
         {
             Debug.Log($"加入武器射击队列");
-            weaponShootQueue.Enqueue(msg);
+            weaponFireQueue.Enqueue(msg);
         }
 
         void OnWeaponReload(FrameWeaponReloadResMsg msg)

@@ -23,6 +23,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         int reloadFrame;
         public int ReloadFrame => reloadFrame;
 
+        [SerializeField]
+        Transform firePoint;
+        public Vector3 FirePointPos => firePoint.position;
+
         int curReloadingFrame;
         public int CurReloadingFrame => curReloadingFrame;
         public void ResetCurrentReloadingFrame() => curReloadingFrame = reloadFrame;

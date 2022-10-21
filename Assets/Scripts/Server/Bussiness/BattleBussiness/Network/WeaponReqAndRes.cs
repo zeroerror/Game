@@ -45,7 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_WeaponShoot(int connId, byte masterId)
         {
-            FrameWeaponShootResMsg msg = new FrameWeaponShootResMsg
+            FrameWeaponFireResMsg msg = new FrameWeaponFireResMsg
             {
                 masterId = masterId,
             };
@@ -82,7 +82,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Regist]
 
-        public void RegistReq_WeaponShoot(Action<int, FrameWeaponShootReqMsg> action)
+        public void RegistReq_WeaponShoot(Action<int, FrameWeaponFireReqMsg> action)
         {
             AddRegister(action);
         }

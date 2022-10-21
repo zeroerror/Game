@@ -15,7 +15,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
         // 服务器下发的生成队列
         Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
-        Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
+        Queue<FrameBulletSpawnResMsg> bulletShootQueue;
         Queue<FrameItemSpawnResMsg> itemSpawnQueue;
         // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
@@ -33,7 +33,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
 
             roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
-            bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
+            bulletShootQueue = new Queue<FrameBulletSpawnResMsg>();
             itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
 
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
@@ -225,29 +225,24 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Bullet]
         void Tick_BulletSpawn()
         {
-            if (bulletSpawnQueue.TryPeek(out var bulletSpawn))
+            if (bulletShootQueue.TryPeek(out var msg))
             {
-                bulletSpawnQueue.Dequeue();
+                bulletShootQueue.Dequeue();
 
-                var bulletId = bulletSpawn.bulletEntityId;
-                var bulletTypeByte = bulletSpawn.bulletType;
+                var bulletId = msg.bulletEntityId;
+                var bulletTypeByte = msg.bulletType;
                 var bulletType = (BulletType)bulletTypeByte;
 
-                var masterWRid = bulletSpawn.masterEntityId;
+                var masterWRid = msg.masterEntityId;
                 var masterWRole = battleFacades.Repo.RoleRepo.GetByEntityId(masterWRid);
 
-                Vector3 startPos = new Vector3(bulletSpawn.startPosX / 10000f, bulletSpawn.startPosY / 10000f, bulletSpawn.startPosZ / 10000f);
-                Vector3 endPos = new Vector3(bulletSpawn.endPosX / 10000f, bulletSpawn.endPosY / 10000f, bulletSpawn.endPosZ / 10000f);
-                var sp = startPos;
-                var ep = endPos;
-                sp.y = 0;
-                ep.y = 0;
-                Vector3 shootDir = (ep - sp).normalized;
+                Vector3 startPos = new Vector3(msg.startPosX / 10000f, msg.startPosY / 10000f, msg.startPosZ / 10000f);
+                Vector3 fireDir = new Vector3(msg.fireDirX / 100f, 0, msg.fireDirZ / 100f);
 
                 var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
                 var bulletEntity = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
 
-                Debug.Log($"生成子弹帧 {bulletSpawn.serverFrame}: masterWRid:{masterWRid} 起点位置：{startPos} 终点位置：{endPos} 飞行方向{shootDir}");
+                Debug.Log($"生成子弹帧 {msg.serverFrame}: masterWRid:{masterWRid} 起点位置：{startPos}  飞行方向{fireDir}");
 
                 switch (bulletType)
                 {
@@ -259,13 +254,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         var hookerEntity = (HookerEntity)bulletEntity;
                         hookerEntity.SetMasterWRid(masterWRid);
                         hookerEntity.SetMasterGrabPoint(masterWRole.transform);
-
                         break;
                 }
 
                 bulletEntity.MoveComponent.SetCurPos(startPos);
-                bulletEntity.MoveComponent.SetForward(shootDir);
-                bulletEntity.MoveComponent.ActivateMoveVelocity(shootDir);
+                bulletEntity.MoveComponent.SetForward(fireDir);
+                bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
                 bulletEntity.SetMasterId(masterWRid);
                 bulletEntity.IDComponent.SetEntityId(bulletId);
                 var bulletRepo = battleFacades.Repo.BulletRepo;
@@ -437,7 +431,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void OnBulletSpawn(FrameBulletSpawnResMsg msg)
         {
             Debug.Log($"加入子弹生成队列");
-            bulletSpawnQueue.Enqueue(msg);
+            bulletShootQueue.Enqueue(msg);
         }
 
         void OnBulletHitRole(FrameBulletHitRoleResMsg msg)

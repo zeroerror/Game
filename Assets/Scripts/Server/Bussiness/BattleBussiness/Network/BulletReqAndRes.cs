@@ -46,7 +46,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         #region [Send]
 
         public void SendRes_BulletSpawn(int connId, BulletType bulletType, int bulletEntityId, byte masterEntityId
-        , Vector3 startPos, Vector3 endPos)
+        , Vector3 startPos, Vector3 fireDir)
         {
             FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
             {
@@ -57,9 +57,8 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 startPosX = (int)(startPos.x * 10000),
                 startPosY = (int)(startPos.y * 10000),
                 startPosZ = (int)(startPos.z * 10000),
-                endPosX = (int)(endPos.x * 10000),
-                endPosY = (int)(endPos.y * 10000),
-                endPosZ = (int)(endPos.z * 10000),
+                fireDirX = (short)(fireDir.x * 10000),
+                fireDirZ = (short)(fireDir.z * 10000),
             };
 
             battleServer.SendMsg(connId, msg);

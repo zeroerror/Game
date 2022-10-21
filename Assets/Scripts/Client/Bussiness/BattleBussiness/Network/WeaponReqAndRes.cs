@@ -42,22 +42,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendReq_WeaponShoot(int masterId, Vector3 startPos, Vector3 endPos)
+        public void SendReq_WeaponFire(int masterId, Vector3 firePointPos, Vector2 fireDir)
         {
-            startPos *= 10000f;
-            endPos *= 10000f;
-
-            FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
+            fireDir.Normalize();
+            FrameWeaponFireReqMsg frameWeaponShootReqMsg = new FrameWeaponFireReqMsg
             {
                 masterId = (byte)masterId,
-                startPosX = (int)(startPos.x),
-                startPosY = (int)(startPos.y),
-                startPosZ = (int)(startPos.z),
-                endPosX = (int)(endPos.x),
-                endPosY = (int)(endPos.z),
-                endPosZ = (int)(endPos.z),
+                firePointPosX = (int)(firePointPos.x * 100f),
+                firePointPosY = (int)(firePointPos.y * 100f),
+                firePointPosZ = (int)(firePointPos.z * 100f),
+                dirX = (short)(fireDir.x * 100f),
+                dirZ = (short)(fireDir.y * 100f)
             };
             battleClient.SendMsg(frameWeaponShootReqMsg);
+            Debug.Log($"firePointPos {firePointPos}  fireDir {fireDir}");
         }
 
         public void SendReq_WeaponReload(BattleRoleLogicEntity role)
@@ -84,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Regist ======
-        public void RegistRes_WeaponShoot(Action<FrameWeaponShootResMsg> action)
+        public void RegistRes_WeaponShoot(Action<FrameWeaponFireResMsg> action)
         {
             AddRegister(action);
         }

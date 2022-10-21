@@ -16,8 +16,8 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
         {
             _name = GetComponentFromChild<InputField>("AccountInputField");
             _Pwd = GetComponentFromChild<InputField>("PasswardInputField");
-            SetOnClick("LoginBtn", ClickLoginBtn);
-            SetOnClick("RegistBtn", ClickRegistBtn);
+            OnPointerDown("LoginBtn", ClickLoginBtn);
+            OnPointerDown("RegistBtn", ClickRegistBtn);
         }
 
         // == UI Click ==

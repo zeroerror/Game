@@ -22,7 +22,7 @@ namespace Game.Bussiness.UIBussiness.Panel
 
         void OnEnable()
         {
-            SetOnClick("CreateRoom", ClickCreateRoomBtn);
+            OnPointerDown("CreateRoom", ClickCreateRoomBtn);
         }
 
         // == Network ==
@@ -38,7 +38,7 @@ namespace Game.Bussiness.UIBussiness.Panel
             string path = $"{content}/{go.transform.name}";
             string info = $"房间名:{roomName} \n 房主:{masterAccount} ";
             Text_SetText(path + "/Info", info);
-            SetOnClick(path, ClickRoom, host, port); //一个人限制创建一个房间
+            OnPointerDown(path, ClickRoom, host, port); //一个人限制创建一个房间
 
             SetActive("CreateRoom", false); //一个人限制创建一个房间
         }
@@ -51,9 +51,10 @@ namespace Game.Bussiness.UIBussiness.Panel
 
         void ClickRoom(params object[] args)
         {
+            var argsArray = args[0] as object[];
             //点击进入
-            string host = (string)args[0];
-            ushort port = (ushort)args[1];
+            string host = (string)argsArray[0];
+            ushort port = (ushort)argsArray[1];
 
             UIEventCenter.WorldRoomEnter.Invoke(host, port);
             UIEventCenter.AddToTearDown("Home_WorldRoomPanel");

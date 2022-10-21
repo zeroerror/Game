@@ -32,14 +32,15 @@ namespace Game.Bussiness.UIBussiness.Panel
                 go.transform.name = name;
                 string path = $"SerGroup/Viewport/Content/" + name;
                 Text_SetText(path + "/host", $"{host}:{port}");
-                SetOnClick(path, ClickConWorldSer, i);
+                OnPointerDown(path, ClickConWorldSer, i);
             }
         }
 
         // == UI Click ==
         void ClickConWorldSer(params object[] args)
         {
-            int index = (int)args[0];
+            var argsArray = args[0] as object[];
+            int index = (int)argsArray[0];
             var host = worldSerHosts[index];
             var port = ports[index];
             UIEventCenter.ConnWorSerAction.Invoke(host, port);
