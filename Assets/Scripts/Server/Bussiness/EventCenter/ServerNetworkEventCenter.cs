@@ -18,6 +18,7 @@ namespace Game.Server.Bussiness.EventCenter
         public static void Regist_WorldDisconnection(Action<int> action) => worldDisconnHandler += action;
         public static void Invoke_WorldDisconnection(int connId) => worldDisconnHandler.Invoke(connId);
 
+        // == BattleServer
         static Action battleServerCreateHandler;
         public static void Regist_BattleServerNeedCreate(Action action) => battleServerCreateHandler += action;
         public static void Invoke_BattleServerNeedCreate() => battleServerCreateHandler.Invoke();

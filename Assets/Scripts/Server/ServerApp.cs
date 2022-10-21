@@ -24,10 +24,11 @@ namespace Game.Server
 
         Thread _loginThread;
         Thread _worldServerThread;
-        Thread _battleServerThread;
 
         void Awake()
         {
+            DontDestroyOnLoad(this.gameObject);
+            
             // == Network ==
             allServerNetwork = new AllServerNetwork();
             StartLoginServer();
@@ -36,7 +37,6 @@ namespace Game.Server
 
             // == Event Center ==
             ServerNetworkEventCenter.Ctor();
-            ServerNetworkEventCenter.Regist_BattleServerNeedCreate(StartBatllteServer);
 
             // == Entry ==
             // LoginEntry
@@ -49,11 +49,9 @@ namespace Game.Server
             battleEntry = new BattleEntry();
             battleEntry.Inject(allServerNetwork.BattleServer, UnityEngine.Time.fixedDeltaTime);
 
-
-            DontDestroyOnLoad(this.gameObject);
-
             // == Physics ==
             Physics.autoSimulation = false;
+
         }
 
         void FixedUpdate()
@@ -114,34 +112,6 @@ namespace Game.Server
             worldServer.OnDisconnectedHandle += (connID) =>
             {
                 ServerNetworkEventCenter.Invoke_WorldDisconnection(connID);
-            };
-        }
-
-        void StartBatllteServer()
-        {
-            if (_battleServerThread != null)
-            {
-                Debug.Log($"战斗服已经启动了！！！");
-                return;
-            }
-
-            var port = NetworkConfig.BATTLESERVER_PORT[0];
-            Debug.Log($"战斗服启动！端口:{port}");
-            var battleServer = allServerNetwork.BattleServer;
-            battleServer.StartListen(port);
-            _battleServerThread = new Thread(() =>
-                        {
-                            while (true)
-                            {
-                                battleServer.Tick();
-                            }
-                        });
-            _battleServerThread.Start();
-
-            battleServer.OnConnectedHandle += (connID) =>
-            {
-                Debug.Log($"[战斗服]: connID:{connID} 客户端连接成功-------------------------");
-                ServerNetworkEventCenter.battleSerConnect.Invoke(connID);
             };
         }
 

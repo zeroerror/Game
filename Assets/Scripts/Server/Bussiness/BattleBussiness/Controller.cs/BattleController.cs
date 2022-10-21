@@ -41,8 +41,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         // - 所有拾取物件帧
         Dictionary<long, FrameItemPickReqMsg> itemPickUpMsgDic;
 
-
-
         public BattleController()
         {
             ServerNetworkEventCenter.battleSerConnect += ((connId) =>

@@ -19,6 +19,8 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
 
         public List<int> connIdList { get; private set; }
 
+        public NetworkServer BattleServer { get; private set; }
+
         int serverFrame;
         public int ServeFrame => serverFrame;
 
@@ -35,6 +37,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
 
         public void Inject(NetworkServer server)
         {
+            BattleServer = server;
             BattleReqAndRes.Inject(server);
             RoleReqAndRes.Inject(server);
             BulletReqAndRes.Inject(server);
