@@ -15,7 +15,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public BattleRoleLogicEntity Owner => owner;
         public void SetOwner(BattleRoleLogicEntity battleRoleEntity) => this.owner = battleRoleEntity;
 
-
         public BattleRoleRepo()
         {
             list = new List<BattleRoleLogicEntity>();

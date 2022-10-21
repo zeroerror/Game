@@ -131,7 +131,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
                     var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
                     var masterId = msg.masterId;
-                    if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
+                    if (roleRepo.TryGetByEntityId(masterId, out var master) && battleFacades.BattleFacades.Domain.RoleDomain.CanRoleFire(master))
                     {
                         master.InputComponent.pressReload = true;
                     }

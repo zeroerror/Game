@@ -80,6 +80,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
+            if (!hasBattleBegin)
+            {
+                return;
+            }
+
             if (hasBattleBegin)
             {
                 SpawBattleScene();
@@ -94,7 +99,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             Tick_BulletLifeCycle();
 
             // ====== Role
-            Tick_WRoleSpawn();
+            Tick_RoleSpawn();
             Tick_RoleRollOpt();
             Tick_RoleMoveRotateOpt();
             ApplyAllRoleState();
@@ -118,12 +123,12 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 roleRepo.Foreach((role) =>
                 {
-                    roleRqs.SendUpdate_WRoleState(connID, role);
+                    roleRqs.SendUpdate_RoleState(connID, role);
                 });
             });
         }
 
-        void Tick_WRoleSpawn()
+        void Tick_RoleSpawn()
         {
             ConnIDList.ForEach((connId) =>
             {
@@ -138,24 +143,17 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     roleSpawnMsgDic[key] = null;
 
-                    var clientFacades = battleServerFacades.BattleFacades;
-                    var repo = clientFacades.Repo;
-                    var fieldEntity = repo.FiledRepo.Get(1);
-                    var roleRqs = battleServerFacades.Network.RoleReqAndRes;
-                    var roleRepo = repo.RoleRepo;
-                    var itemRqs = battleServerFacades.Network.ItemReqAndRes;
-                    var weaponRqs = battleServerFacades.Network.WeaponReqAndRes;
-                    var weaponRepo = repo.WeaponRepo;
-                    var wrid = roleRepo.Size;
+                    var battleFacades = battleServerFacades.BattleFacades;
+                    var weaponRepo = battleFacades.Repo.WeaponRepo;
+                    var roleRepo = battleFacades.Repo.RoleRepo;
+                    var entityId = roleRepo.Size;
 
                     // 服务器逻辑
-                    var roleEntity = clientFacades.Domain.RoleDomain.SpawnRoleLogic(fieldEntity.transform);
-                    roleEntity.Ctor();
-                    roleEntity.IDComponent.SetEntityId(wrid);
+                    var roleEntity = battleFacades.Domain.RoleDomain.SpawnRoleLogic(entityId);
                     roleEntity.SetConnId(connId);
-                    roleRepo.Add(roleEntity);
-                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.Position}");
+                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{entityId} 位置:{roleEntity.MoveComponent.Position}");
 
+                    var itemRqs = battleServerFacades.Network.ItemReqAndRes;
                     itemRqs.SendRes_ItemSpawn(connId, ServeFrame, battleServerFacades.ItemTypeByteList, battleServerFacades.SubTypeList, battleServerFacades.EntityIdList);
                 }
             });
@@ -471,22 +469,23 @@ namespace Game.Server.Bussiness.BattleBussiness
             InitAllAssetRepo(assetPointEntities);
         }
 
-        void InitAllAssetRepo( AssetPointEntity[] assetPointEntities)
+        void InitAllAssetRepo(AssetPointEntity[] assetPointEntities)
         {
             var itemTypeList = battleServerFacades.ItemTypeList;
             var entityIdList = battleServerFacades.EntityIdList;
             var itemTypeByteList = battleServerFacades.ItemTypeByteList;
             var subTypeList = battleServerFacades.SubTypeList;
-            
+
             int count = itemTypeList.Count;
             Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
             int index = 0;
-            itemTypeList.ForEach((itemType) =>
+            for (int i = 0; i < itemTypeList.Count; i++)
             {
+                var itemType = itemTypeList[i];
                 var subtype = subTypeList[index];
                 var parent = assetPointEntities[index];
 
-                itemTypeByteList[index] = (byte)itemType;   //记录
+                itemTypeByteList.Add((byte)itemType);   //记录
 
                 // 生成资源
                 var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
@@ -502,13 +501,13 @@ namespace Game.Server.Bussiness.BattleBussiness
                         var weaponEntity = item.GetComponent<WeaponEntity>();
                         var weaponRepo = battleServerFacades.BattleFacades.Repo.WeaponRepo;
                         entityId = weaponRepo.WeaponIdAutoIncreaseId;
-                        
+
                         weaponEntity.Ctor();
                         weaponEntity.SetEntityId(entityId);
                         weaponRepo.Add(weaponEntity);
                         Debug.Log($"生成武器资源:{entityId}");
 
-                        entityIdList[index] = entityId;    //记录
+                        entityIdList.Add(entityId);    //记录
 
                         break;
                     case ItemType.BulletPack:
@@ -521,7 +520,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         bulletPackRepo.bulletPackAutoIncreaseId++;
                         Debug.Log($"生成子弹包资源:{entityId}");
 
-                        entityIdList[index] = entityId;    //记录
+                        entityIdList.Add(entityId);    //记录
 
                         break;
                     case ItemType.Pill:
@@ -534,7 +533,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 item.name += entityId;
 
                 index++;
-            });
+            }
 
             Debug.Log($"物件资源生成完毕******************************************************");
         }

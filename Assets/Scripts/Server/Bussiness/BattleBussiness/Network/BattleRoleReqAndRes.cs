@@ -43,7 +43,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         #region [Send]
-        public void SendUpdate_WRoleState(int connId, BattleRoleLogicEntity role)
+        public void SendUpdate_RoleState(int connId, BattleRoleLogicEntity role)
         {
             // Position
             var pos = role.MoveComponent.Position;
@@ -71,7 +71,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             int gravityVelocity = (int)(role.MoveComponent.GravityVelocity * 10000);
 
-            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.IDComponent.EntityId} 角色状态:{role.RoleState.ToString()} 位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
+            // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.IDComponent.EntityId}  位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
 
             BattleRoleStateUpdateMsg msg = new BattleRoleStateUpdateMsg
             {
@@ -102,7 +102,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             FrameBattleRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameBattleRoleSpawnResMsg
             {
                 serverFrame = serverFrame,
-                wRoleId = (byte)entityID,
+                entityId = (byte)entityID,
                 isOwner = isOwner
             };
             battleServer.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);

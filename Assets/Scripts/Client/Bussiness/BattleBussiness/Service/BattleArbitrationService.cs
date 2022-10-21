@@ -9,9 +9,7 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
         None,
         Enemy,          // - 敌军
-        Self,           // -自己
-        AllyInculeSelf, // -友军（包括自己）
-        AllyExcludeSelf, // -友军（除了自己）
+        Ally, // - 友军
     }
 
     public class BattleArbitrationService
@@ -64,64 +62,23 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return IsOpposite(attacker, victim);
             }
 
-            if (attackTag == AttackTag.Self)
+            if (attackTag == AttackTag.Ally)
             {
-                return IsSelf(attacker, victim);
-            }
-
-            if (attackTag == AttackTag.AllyInculeSelf)
-            {
-                return IsAlly(attacker, victim);
-            }
-
-            if (attackTag == AttackTag.AllyExcludeSelf)
-            {
-                return IsAllyExcludeSelf(attacker, victim);
+                return !IsOpposite(attacker, victim);
             }
 
             Debug.LogWarning("未处理的情况");
             return false;
         }
 
-        private bool IsAllyExcludeSelf(IDComponent self, IDComponent compare)
-        {
-            if (self == compare)
-            {
-                return false;
-            }
-
-            return IsAlly(self, compare);
-        }
-
-        private static bool IsSelf(IDComponent attacker, IDComponent victim)
-        {
-            return attacker == victim;
-        }
-
         bool IsOpposite(IDComponent attacker, IDComponent victim)
         {
-            if (attacker.LeagueId == 0 && victim.LeagueId == 0)
-            {
-                return true;
-            }
-
             if (attacker.LeagueId != victim.LeagueId)
             {
                 return true;
             }
 
             return false;
-        }
-
-        bool IsAlly(IDComponent id1, IDComponent id2)
-        {
-            // 自己也属于友军
-            if (id1 != id2 && id1.LeagueId == 0 && id2.LeagueId == 0)
-            {
-                return false;
-            }
-
-            return id1.LeagueId == id2.LeagueId;
         }
 
         bool HasHitRecord(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)

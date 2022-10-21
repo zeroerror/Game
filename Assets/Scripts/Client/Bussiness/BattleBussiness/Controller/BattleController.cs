@@ -5,6 +5,8 @@ using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Generic;
+using Game.Client.Bussiness.BattleBussiness.Repo;
+using Game.Client.Bussiness.Repo;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -111,24 +113,24 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Role]
         void Tick_RoleStateSync()
         {
-            while (roleStateQueue.TryPeek(out var stateMsg))
+            while (roleStateQueue.TryPeek(out var msg))
             {
                 roleStateQueue.Dequeue();
 
-                RoleState roleState = (RoleState)stateMsg.roleState;
-                float x = stateMsg.x / 10000f;
-                float y = stateMsg.y / 10000f;
-                float z = stateMsg.z / 10000f;
-                float eulerX = stateMsg.eulerX / 10000f;
-                float eulerY = stateMsg.eulerY / 10000f;
-                float eulerZ = stateMsg.eulerZ / 10000f;
-                float moveVelocityX = stateMsg.moveVelocityX / 10000f;
-                float moveVelocityY = stateMsg.moveVelocityY / 10000f;
-                float moveVelocityZ = stateMsg.moveVelocityZ / 10000f;
-                float extraVelocityX = stateMsg.extraVelocityX / 10000f;
-                float extraVelocityY = stateMsg.extraVelocityY / 10000f;
-                float extraVelocityZ = stateMsg.extraVelocityZ / 10000f;
-                float gravityVelocity = stateMsg.gravityVelocity / 10000f;
+                RoleState roleState = (RoleState)msg.roleState;
+                float x = msg.x / 10000f;
+                float y = msg.y / 10000f;
+                float z = msg.z / 10000f;
+                float eulerX = msg.eulerX / 10000f;
+                float eulerY = msg.eulerY / 10000f;
+                float eulerZ = msg.eulerZ / 10000f;
+                float moveVelocityX = msg.moveVelocityX / 10000f;
+                float moveVelocityY = msg.moveVelocityY / 10000f;
+                float moveVelocityZ = msg.moveVelocityZ / 10000f;
+                float extraVelocityX = msg.extraVelocityX / 10000f;
+                float extraVelocityY = msg.extraVelocityY / 10000f;
+                float extraVelocityZ = msg.extraVelocityZ / 10000f;
+                float gravityVelocity = msg.gravityVelocity / 10000f;
 
                 Vector3 pos = new Vector3(x, y, z);
                 Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
@@ -138,36 +140,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleRepo;
                 var fieldRepo = repo.FiledRepo;
-                var roleLogic = battleFacades.Repo.RoleRepo.GetByEntityId(stateMsg.entityId);
+                var entityId = msg.entityId;
+                var roleLogic = battleFacades.Repo.RoleRepo.GetByEntityId(entityId);
 
                 if (roleLogic == null)
                 {
-                    var wRoleId = stateMsg.entityId;
-                    var fieldEntity = fieldRepo.Get(1);
-                    var domain = battleFacades.Domain.RoleDomain;
-
-                    var roleRenderer = domain.SpawnRoleRenderer(fieldEntity.Role_Group_Renderer);
-                    roleRenderer.SetWRid(wRoleId);
-                    roleRenderer.Ctor();
-
-                    roleLogic = domain.SpawnRoleLogic(fieldEntity.transform);
-                    roleLogic.Ctor();
-                    roleLogic.Inject(roleRenderer);
-                    roleLogic.IDComponent.SetEntityId(wRoleId);
-
-                    roleRepo.Add(roleLogic);
-
-                    if (stateMsg.isOwner && roleRepo.Owner == null)
-                    {
-                        Debug.Log($"生成Owner  wRid:{roleLogic.IDComponent.EntityId})");
-                        roleRepo.SetOwner(roleLogic);
-                        var fieldCameraComponent = fieldEntity.CameraComponent;
-                        fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
-                    }
-                    else
-                    {
-                        Debug.Log($"人物状态同步帧(roleLogic[{wRoleId}]丢失，重新生成)");
-                    }
+                    roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId,msg.isOwner);
                 }
 
                 var moveComponent = roleLogic.MoveComponent;
@@ -186,38 +164,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
+
+
         void Tick_RoleSpawn()
         {
-            if (roleSpawnQueue.TryPeek(out var spawn))
+            if (roleSpawnQueue.TryPeek(out var msg))
             {
                 roleSpawnQueue.Dequeue();
-                Debug.Log($"生成人物帧 : {spawn.serverFrame}");
+                Debug.Log($"生成人物帧 : {msg.serverFrame}");
 
-                var wRoleId = spawn.wRoleId;
+                var entityId = msg.entityId;
                 var repo = battleFacades.Repo;
-                var fieldEntity = repo.FiledRepo.Get(1);
-                var domain = battleFacades.Domain.RoleDomain;
-
-                var roleRenderer = domain.SpawnRoleRenderer(fieldEntity.Role_Group_Renderer);
-                roleRenderer.SetWRid(wRoleId);
-                roleRenderer.Ctor();
-
-                var roleLogic = domain.SpawnRoleLogic(fieldEntity.Role_Group_Logic);
-                roleLogic.Ctor();
-                roleLogic.Inject(roleRenderer);
-                roleLogic.IDComponent.SetEntityId(wRoleId);
-
                 var roleRepo = repo.RoleRepo;
-                roleRepo.Add(roleLogic);
-
-                var fieldCameraComponent = fieldEntity.CameraComponent;
-                if (spawn.isOwner)
-                {
-                    roleRepo.SetOwner(roleLogic);
-                    fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
-                }
-
-                Debug.Log(spawn.isOwner ? $"生成自身角色 : WRid:{roleLogic.IDComponent.EntityId}" : $"生成其他角色 : WRid:{roleLogic.IDComponent.EntityId}");
+                var fieldEntity = repo.FiledRepo.CurFieldEntity;
+                var domain = battleFacades.Domain.RoleDomain;
+                domain.SpawnRoleWithRenderer(entityId,msg.isOwner);
+                Debug.Log(msg.isOwner ? $"生成自身角色   entityId: {entityId}" : $"生成其他角色 : entityId: {entityId}");
             }
         }
         #endregion

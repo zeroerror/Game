@@ -23,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         public BattleRoleReqAndRes()
         {
             actionList = new List<Action>();
-            lockObj = this;
+            lockObj = new object();
         }
 
         public void Inject(NetworkClient client)

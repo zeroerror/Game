@@ -16,7 +16,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         List<League> leagueList;
 
-        int autoId;
+        int autoId=10000;
 
         public BattleLeagueService()
         {

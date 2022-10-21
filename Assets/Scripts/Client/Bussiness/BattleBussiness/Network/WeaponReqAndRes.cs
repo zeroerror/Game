@@ -48,14 +48,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             FrameWeaponFireReqMsg frameWeaponShootReqMsg = new FrameWeaponFireReqMsg
             {
                 masterId = (byte)masterId,
-                firePointPosX = (int)(firePointPos.x * 100f),
-                firePointPosY = (int)(firePointPos.y * 100f),
-                firePointPosZ = (int)(firePointPos.z * 100f),
+                firePointPosX = (int)(firePointPos.x * 10000f),
+                firePointPosY = (int)(firePointPos.y * 10000f),
+                firePointPosZ = (int)(firePointPos.z * 10000f),
                 dirX = (short)(fireDir.x * 100f),
                 dirZ = (short)(fireDir.y * 100f)
             };
             battleClient.SendMsg(frameWeaponShootReqMsg);
-            Debug.Log($"firePointPos {firePointPos}  fireDir {fireDir}");
         }
 
         public void SendReq_WeaponReload(BattleRoleLogicEntity role)

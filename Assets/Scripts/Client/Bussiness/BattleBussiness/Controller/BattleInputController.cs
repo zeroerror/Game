@@ -158,45 +158,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             if (input.isPressFire)
             {
                 // 射击请求发送前判定
-                if (CanRoleFire(owner))
+                if (input.fireDir == Vector2.zero)
                 {
-                    if (input.fireDir == Vector2.zero)
-                    {
-                        var forward = owner.transform.forward;
-                        input.fireDir = new Vector2(forward.x, forward.z);
-                    }
-
-                    var curWeapon = owner.WeaponComponent.CurrentWeapon;
-                    var rqs = battleFacades.Network.WeaponReqAndRes;
-                    rqs.SendReq_WeaponFire(owner.IDComponent.EntityId, curWeapon.FirePointPos, input.fireDir);
+                    var forward = owner.transform.forward;
+                    input.fireDir = new Vector2(forward.x, forward.z);
                 }
+
+                var curWeapon = owner.WeaponComponent.CurrentWeapon;
+                var rqs = battleFacades.Network.WeaponReqAndRes;
+                rqs.SendReq_WeaponFire(owner.IDComponent.EntityId, curWeapon.FirePointPos, input.fireDir);
             }
-        }
-
-        bool CanRoleFire(BattleRoleLogicEntity owner)
-        {
-            var weaponComponent = owner.WeaponComponent;
-            var curWeapon = weaponComponent.CurrentWeapon;
-
-            if (curWeapon == null)
-            {
-                Debug.Log("当前武器为空，无法射击");
-                return false;
-            }
-
-            if (!weaponComponent.IsReloading)
-            {
-                Debug.Log("换弹中，无法射击");
-                return false;
-            }
-
-            var stateComponent = owner.StateComponent;
-            if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 5)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         void TickInput_Reload()
@@ -214,9 +185,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 // Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
                 if (owner.CanWeaponReload())
                 {
-                    weaponComponent.BeginReloading();
-                    animatorComponent.PlayReload_Run();
-
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     rqs.SendReq_WeaponReload(owner);
                 }

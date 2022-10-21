@@ -8,9 +8,9 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BattleRoleRendererEntity : MonoBehaviour, ICameraTrackObj
     {
 
-        byte wRid;
-        public byte WRid => wRid;
-        public void SetWRid(byte wrid) => this.wRid = wrid;
+        int entityId;
+        public int EntityId => entityId;
+        public void SetEntityId(int entityId) => this.entityId = entityId;
 
         Animator animator;
         public AnimatorComponent AnimatorComponent { get; private set; }
@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             Debug.Assert(animator != null);
 
             AnimatorComponent = new AnimatorComponent(animator);
-            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{wRid}");
+            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");
 
             posAdjust = 15f;
             rotAdjust = 15f;

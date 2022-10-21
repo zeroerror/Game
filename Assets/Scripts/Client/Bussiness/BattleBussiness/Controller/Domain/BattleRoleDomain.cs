@@ -22,21 +22,51 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         #region [Spawn]
 
-        public BattleRoleLogicEntity SpawnRoleLogic(Transform parent)
+        public BattleRoleLogicEntity SpawnRoleWithRenderer(byte entityId, bool isOwner)
         {
+            var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            var domain = battleFacades.Domain.RoleDomain;
+
+            var roleRenderer = domain.SpawnRoleRenderer(entityId, fieldEntity.Role_Group_Renderer);
+
+            var roleLogic = SpawnRoleLogic(entityId);
+            roleLogic.Inject(roleRenderer);
+
+            var fieldCameraComponent = fieldEntity.CameraComponent;
+            if (isOwner)
+            {
+                var roleRepo = battleFacades.Repo.RoleRepo;
+                roleRepo.SetOwner(roleLogic);
+                fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
+            }
+
+            return roleLogic;
+        }
+
+        public BattleRoleLogicEntity SpawnRoleLogic(int entityId)
+        {
+            var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
             string rolePrefabName = "role_logic";
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
             {
-                prefabAsset = GameObject.Instantiate(prefabAsset, parent);
+                prefabAsset = GameObject.Instantiate(prefabAsset, fieldEntity.transform);
+
                 var roleLogic = prefabAsset.GetComponent<BattleRoleLogicEntity>();
+                roleLogic.Ctor();
+                roleLogic.IDComponent.SetEntityId(entityId);
+                roleLogic.IDComponent.SetLeagueId(entityId);
+
+                var roleRepo = battleFacades.Repo.RoleRepo;
+                roleRepo.Add(roleLogic);
+
                 return roleLogic;
             }
 
-            Debug.Log("生成角色失败");
+            Debug.Log("生成Logic角色失败");
             return null;
         }
 
-        public BattleRoleRendererEntity SpawnRoleRenderer(Transform parent)
+        public BattleRoleRendererEntity SpawnRoleRenderer(int entityId, Transform parent)
         {
             string rolePrefabName = "role_renderer";
             Debug.Log("生成" + rolePrefabName);
@@ -44,9 +74,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var roleRenderer = prefabAsset.GetComponentInChildren<BattleRoleRendererEntity>();
+                roleRenderer.SetEntityId(entityId);
+                roleRenderer.Ctor();
+
                 return roleRenderer;
             }
 
+            Debug.Log("生成Renderer角色失败");
             return null;
         }
 
@@ -85,9 +119,35 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.StateComponent.EnterReloading(40);
         }
 
-         public void RoleStateEnterDead(BattleRoleLogicEntity role)
+        public void RoleStateEnterDead(BattleRoleLogicEntity role)
         {
             role.StateComponent.EnterDead(60);
+        }
+
+        public bool CanRoleFire(BattleRoleLogicEntity role)
+        {
+            var weaponComponent = role.WeaponComponent;
+            var curWeapon = weaponComponent.CurrentWeapon;
+
+            if (curWeapon == null)
+            {
+                Debug.Log("当前武器为空，无法射击");
+                return false;
+            }
+
+            if (weaponComponent.IsReloading)
+            {
+                Debug.Log("换弹中，无法射击");
+                return false;
+            }
+
+            var stateComponent = role.StateComponent;
+            if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 5)
+            {
+                return false;
+            }
+
+            return true;
         }
 
     }

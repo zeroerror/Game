@@ -27,7 +27,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool HasLeague()
         {
-            return leagueId != 0;
+            return leagueId >= 10000;
         }
 
     }
