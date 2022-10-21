@@ -89,9 +89,10 @@ namespace Game.Server.Bussiness.BattleBussiness
                         if (master.WeaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
                             master.StateComponent.EnterShooting(10);
-                            //子弹生成
                             var startPos = new Vector3(msg.firePointPosX / 10000f, msg.firePointPosY / 10000f, msg.firePointPosZ / 10000f);
                             Vector3 fireDir = new Vector3(msg.dirX / 100f, 0, msg.dirZ / 100f);
+
+                            master.InputComponent.SetFireDir(fireDir);
 
                             var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
                             var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);

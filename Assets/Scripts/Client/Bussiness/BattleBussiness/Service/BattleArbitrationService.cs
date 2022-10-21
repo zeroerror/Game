@@ -61,22 +61,12 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             if (attackTag == AttackTag.Enemy)
             {
-                if (attacker.LeagueId == 0 && victim.LeagueId == 0)
-                {
-                    return true;
-                }
-
-                if (attacker.LeagueId != victim.LeagueId)
-                {
-                    return true;
-                }
-
-                return false;
+                return IsOpposite(attacker, victim);
             }
 
             if (attackTag == AttackTag.Self)
             {
-                return attacker == victim;
+                return IsSelf(attacker, victim);
             }
 
             if (attackTag == AttackTag.AllyInculeSelf)
@@ -86,15 +76,40 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             if (attackTag == AttackTag.AllyExcludeSelf)
             {
-                if (attacker == victim)
-                {
-                    return false;
-                }
-
-                return IsAlly(attacker, victim);
+                return IsAllyExcludeSelf(attacker, victim);
             }
 
             Debug.LogWarning("未处理的情况");
+            return false;
+        }
+
+        private bool IsAllyExcludeSelf(IDComponent self, IDComponent compare)
+        {
+            if (self == compare)
+            {
+                return false;
+            }
+
+            return IsAlly(self, compare);
+        }
+
+        private static bool IsSelf(IDComponent attacker, IDComponent victim)
+        {
+            return attacker == victim;
+        }
+
+        bool IsOpposite(IDComponent attacker, IDComponent victim)
+        {
+            if (attacker.LeagueId == 0 && victim.LeagueId == 0)
+            {
+                return true;
+            }
+
+            if (attacker.LeagueId != victim.LeagueId)
+            {
+                return true;
+            }
+
             return false;
         }
 

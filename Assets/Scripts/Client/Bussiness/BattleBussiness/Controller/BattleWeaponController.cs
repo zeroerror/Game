@@ -49,7 +49,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_WeaponShoot()
         {
-
             var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
             while (weaponFireQueue.TryPeek(out var msg))
             {

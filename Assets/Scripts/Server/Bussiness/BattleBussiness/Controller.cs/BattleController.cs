@@ -5,11 +5,7 @@ using Game.Infrastructure.Generic;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Client.Bussiness.EventCenter;
 using Game.Server.Bussiness.EventCenter;
-using Game.Server.Bussiness.BattleBussiness.Network;
-using Game.Client.Bussiness.BattleBussiness.Controller.Domain;
-using System.Threading.Tasks;
 using Game.Client.Bussiness;
 
 namespace Game.Server.Bussiness.BattleBussiness
@@ -45,10 +41,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         // - 所有拾取物件帧
         Dictionary<long, FrameItemPickReqMsg> itemPickUpMsgDic;
 
-        // ====== 地图生成资源数据 ======
-        ushort[] entityIdArray;
-        byte[] itemTypeByteArray;
-        List<byte> subTypeList = new List<byte>();
+
 
         public BattleController()
         {
@@ -165,7 +158,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleRepo.Add(roleEntity);
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{wrid} 位置:{roleEntity.MoveComponent.Position}");
 
-                    itemRqs.SendRes_ItemSpawn(connId, ServeFrame, itemTypeByteArray, subTypeList.ToArray(), entityIdArray);
+                    itemRqs.SendRes_ItemSpawn(connId, ServeFrame, battleServerFacades.ItemTypeByteList, battleServerFacades.SubTypeList, battleServerFacades.EntityIdList);
                 }
             });
         }
@@ -199,7 +192,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var rid = (byte)(realMsg >> 48);
                     var role = roleRepo.GetByEntityId(rid);
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
-                    role.InputComponent.SetRotEuler(eulerAngle);
+                    role.InputComponent.SetFaceDir(eulerAngle);
                 }
 
             });
@@ -476,26 +469,32 @@ namespace Game.Server.Bussiness.BattleBussiness
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
 
             // 生成资源
-            GenerateRandomAssetData(fieldEntity, out List<ItemType> itemTypeList, out AssetPointEntity[] assetPointEntities);
-            InitAllAssetRepo(itemTypeList, assetPointEntities);
+            GenerateRandomAssetData(fieldEntity, out var assetPointEntities);
+            InitAllAssetRepo(assetPointEntities);
         }
 
-        void InitAllAssetRepo(List<ItemType> itemTypeList, AssetPointEntity[] assetPointEntities)
+        void InitAllAssetRepo( AssetPointEntity[] assetPointEntities)
         {
+            var itemTypeList = battleServerFacades.ItemTypeList;
+            var entityIdList = battleServerFacades.EntityIdList;
+            var itemTypeByteList = battleServerFacades.ItemTypeByteList;
+            var subTypeList = battleServerFacades.SubTypeList;
+            
             int count = itemTypeList.Count;
-            entityIdArray = new ushort[count];
-            itemTypeByteArray = new byte[count];
             Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
             int index = 0;
             itemTypeList.ForEach((itemType) =>
             {
-                var parent = assetPointEntities[index];
                 var subtype = subTypeList[index];
-                itemTypeByteArray[index] = (byte)itemType;
-                // 生成武器资源
+                var parent = assetPointEntities[index];
+
+                itemTypeByteList[index] = (byte)itemType;   //记录
+
+                // 生成资源
                 var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
                 var item = itemDomain.SpawnItem(itemType, subtype);
 
+                // 根据Entity类型初始化
                 ushort entityId = 0;
                 switch (itemType)
                 {
@@ -505,12 +504,13 @@ namespace Game.Server.Bussiness.BattleBussiness
                         var weaponEntity = item.GetComponent<WeaponEntity>();
                         var weaponRepo = battleServerFacades.BattleFacades.Repo.WeaponRepo;
                         entityId = weaponRepo.WeaponIdAutoIncreaseId;
+                        
                         weaponEntity.Ctor();
                         weaponEntity.SetEntityId(entityId);
                         weaponRepo.Add(weaponEntity);
                         Debug.Log($"生成武器资源:{entityId}");
 
-                        entityIdArray[index] = entityId;    //记录
+                        entityIdList[index] = entityId;    //记录
 
                         break;
                     case ItemType.BulletPack:
@@ -523,7 +523,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         bulletPackRepo.bulletPackAutoIncreaseId++;
                         Debug.Log($"生成子弹包资源:{entityId}");
 
-                        entityIdArray[index] = entityId;    //记录
+                        entityIdList[index] = entityId;    //记录
 
                         break;
                     case ItemType.Pill:
@@ -541,9 +541,8 @@ namespace Game.Server.Bussiness.BattleBussiness
             Debug.Log($"物件资源生成完毕******************************************************");
         }
 
-        void GenerateRandomAssetData(FieldEntity fieldEntity, out List<ItemType> itemTypeList, out AssetPointEntity[] assetPointEntities)
+        void GenerateRandomAssetData(FieldEntity fieldEntity, out AssetPointEntity[] assetPointEntities)
         {
-            itemTypeList = new List<ItemType>();
             assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
             for (int i = 0; i < assetPointEntities.Length; i++)
             {
@@ -561,8 +560,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     rRange = lRange + igp.weight / totalWeight;
                     if (randomNumber >= lRange && randomNumber < rRange)
                     {
-                        itemTypeList.Add(igp.itemType);
-                        subTypeList.Add(igp.subType);
+                        battleServerFacades.ItemTypeList.Add(igp.itemType);
+                        battleServerFacades.SubTypeList.Add(igp.subType);
                         break;
                     }
                     lRange = rRange;

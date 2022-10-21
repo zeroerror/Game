@@ -14,13 +14,17 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 RollDir => rollDir;
         public void SetRollDir(Vector3 rollDir) => this.rollDir = rollDir;
 
+        Vector3 faceDir;
+        public Vector3 FaceDir => faceDir;
+        public void SetFaceDir(Vector3 faceDir) => this.faceDir = faceDir;
+
+        Vector3 fireDir;
+        public Vector3 FireDir => fireDir;
+        public void SetFireDir(Vector3 fireDir) => this.fireDir = fireDir;
+
         public bool pressReload;
         public bool PressReload => pressReload;
         public void SetPressReload() => pressReload = true;
-
-        Vector3 rotEuler;
-        public Vector3 RotEuler => rotEuler;
-        public void SetRotEuler(Vector3 rotDir) => this.rotEuler = rotDir;
 
         public RoleInputComponent()
         {

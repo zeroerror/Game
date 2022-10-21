@@ -48,7 +48,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             TickInput_Roll();
             TickInput_SwitchingView();
             TickInput_Pick();
-            TickInput_Shoot();
+            TickInput_Fire();
             TickInput_Reload();
             TickInput_DropWeapon();
 
@@ -149,7 +149,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void TickInput_Shoot()
+        void TickInput_Fire()
         {
             var owner = battleFacades.Repo.RoleRepo.Owner;
             if (owner == null || owner.IsDead) return;
@@ -157,20 +157,46 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var input = battleFacades.InputComponent;
             if (input.isPressFire)
             {
-                // 射击前 
-                // 1.客户端判断流程
-                var weaponComponent = owner.WeaponComponent;
-                var curWeapon = weaponComponent.CurrentWeapon;
-                Debug.Assert(curWeapon != null, "当前武器为空，无法射击");
-                Debug.Assert(!weaponComponent.IsReloading, "换弹中，无法射击");
-                if (curWeapon != null && !weaponComponent.IsReloading)
+                // 射击请求发送前判定
+                if (CanRoleFire(owner))
                 {
-                    // 2.服务端流程
+                    if (input.fireDir == Vector2.zero)
+                    {
+                        var forward = owner.transform.forward;
+                        input.fireDir = new Vector2(forward.x, forward.z);
+                    }
+
+                    var curWeapon = owner.WeaponComponent.CurrentWeapon;
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     rqs.SendReq_WeaponFire(owner.IDComponent.EntityId, curWeapon.FirePointPos, input.fireDir);
                 }
-
             }
+        }
+
+        bool CanRoleFire(BattleRoleLogicEntity owner)
+        {
+            var weaponComponent = owner.WeaponComponent;
+            var curWeapon = weaponComponent.CurrentWeapon;
+
+            if (curWeapon == null)
+            {
+                Debug.Log("当前武器为空，无法射击");
+                return false;
+            }
+
+            if (!weaponComponent.IsReloading)
+            {
+                Debug.Log("换弹中，无法射击");
+                return false;
+            }
+
+            var stateComponent = owner.StateComponent;
+            if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 5)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         void TickInput_Reload()

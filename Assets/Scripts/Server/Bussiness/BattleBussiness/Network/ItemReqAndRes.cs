@@ -58,14 +58,14 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"SendRes_ItemPickUp connId:{connId}");
         }
 
-        public void SendRes_ItemSpawn(int connId, int frameIndex, byte[] itemTypeArray, byte[] subtypeArray, ushort[] entityIdArray)
+        public void SendRes_ItemSpawn(int connId, int frameIndex, List<byte> itemTypeList, List<byte> subtypeList, List<ushort> entityIdList)
         {
             FrameItemSpawnResMsg msg = new FrameItemSpawnResMsg
             {
                 serverFrame = frameIndex,
-                itemTypeArray = itemTypeArray,
-                subtypeArray = subtypeArray,
-                entityIdArray = entityIdArray
+                itemTypeArray = itemTypeList.ToArray(),
+                subtypeArray = subtypeList.ToArray(),
+                entityIdArray = entityIdList.ToArray()
             };
 
             battleServer.SendMsg(connId, msg);
