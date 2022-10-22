@@ -16,7 +16,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public PhysicsDomain PhysicsDomain { get; private set; }
         public WeaponDomain WeaponDomain { get; private set; }
         public BattleHitDomain HitDomain { get; private set; }
-        public BattleRendererDomain RendererDomain { get; private set; }
+        public BattleRoleStateRendererDomain RoleStateRendererDomain { get; private set; }
 
 
         public AllDomains()
@@ -30,7 +30,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             PhysicsDomain = new PhysicsDomain();
             WeaponDomain = new WeaponDomain();
             HitDomain = new BattleHitDomain();
-            RendererDomain = new BattleRendererDomain();
+            RoleStateRendererDomain = new BattleRoleStateRendererDomain();
         }
 
         // todo: obsolete
@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             PhysicsDomain.Inject(facades);
             WeaponDomain.Inject(facades);
             HitDomain.Inject(facades);
-            RendererDomain.Inject(facades);
+            RoleStateRendererDomain.Inject(facades);
         }
     }
 

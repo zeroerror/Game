@@ -80,7 +80,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void EnterFiring(int maintainFrame)
         {
-            roleState = RoleState.Shooting;
+            roleState = RoleState.Shoot;
 
             shootingMod.isFirstEnter = true;
             shootingMod.maintainFrame = maintainFrame;

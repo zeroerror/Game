@@ -158,14 +158,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     //不是Owner
                     moveComponent.SetRotation(eulerAngle);
-                    Debug.Log($"eulerAngleeulerAngleeulerAngleeulerAngle");
                 }
 
                 roleLogic.StateComponent.SetRoleState(roleState);
             }
         }
-
-
 
         void Tick_RoleSpawn()
         {

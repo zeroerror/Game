@@ -42,10 +42,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendReq_WeaponFire(int masterId, Vector3 firePointPos, Vector2 fireDir)
+        public void SendReq_WeaponShoot(int masterId, Vector3 firePointPos, Vector2 fireDir)
         {
             fireDir.Normalize();
-            FrameWeaponFireReqMsg frameWeaponShootReqMsg = new FrameWeaponFireReqMsg
+            FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
             {
                 masterId = (byte)masterId,
                 firePointPosX = (int)(firePointPos.x * 10000f),
@@ -82,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Regist ======
-        public void RegistRes_WeaponShoot(Action<FrameWeaponFireResMsg> action)
+        public void RegistRes_WeaponShoot(Action<FrameWeaponShootResMsg> action)
         {
             AddRegister(action);
         }

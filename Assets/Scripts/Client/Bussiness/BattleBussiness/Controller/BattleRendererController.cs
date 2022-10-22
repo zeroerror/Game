@@ -38,8 +38,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Update_RoleRenderer(float deltaTime)
         {
-            var domain = battleFacades.Domain.RendererDomain;
-            domain.ApplyRoleStateRenderer(deltaTime);
+            var domain = battleFacades.Domain.RoleStateRendererDomain;
+            domain.ApplyRoleState(deltaTime);
         }
 
         void Update_Camera()

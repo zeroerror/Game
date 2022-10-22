@@ -4,7 +4,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 {
 
     [ZeroMessage]
-    public class FrameWeaponFireResMsg :IZeroMessage<FrameWeaponFireResMsg>{
+    public class FrameWeaponShootResMsg :IZeroMessage<FrameWeaponShootResMsg>{
         public byte masterId;
 
         public void FromBytes(byte[] src, ref int offset)

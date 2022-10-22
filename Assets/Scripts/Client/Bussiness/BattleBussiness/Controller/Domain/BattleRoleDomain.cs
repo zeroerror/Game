@@ -124,7 +124,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.StateComponent.EnterDead(60);
         }
 
-        public bool CanRoleFire(BattleRoleLogicEntity role)
+        public bool CanRoleShoot(BattleRoleLogicEntity role)
         {
             var weaponComponent = role.WeaponComponent;
             var curWeapon = weaponComponent.CurrentWeapon;
@@ -144,7 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var stateComponent = role.StateComponent;
             Debug.LogWarning($"stateComponent.RoleState  {stateComponent.RoleState.ToString()}");
             Debug.LogWarning($"stateComponent.ShootingMod.maintainFrame  {stateComponent.ShootingMod.maintainFrame}");
-            if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 3)
+            if (stateComponent.RoleState == RoleState.Shoot && stateComponent.ShootingMod.maintainFrame > 3)
             {
                 Debug.LogWarning("射击CD未结束");
                 return false;

@@ -11,26 +11,17 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
     {
 
         VariableJoystick VariableJoystick;
-        Button pick_b;
-        Button fire_b;
-        Button reload_b;
-        Button jump_b;
-        Button dropWeapon_b;
 
         void Awake()
         {
             VariableJoystick = transform.Find("Joystick").GetComponent<VariableJoystick>();
-            fire_b = transform.Find("OptGroup/Fire").GetComponent<Button>();
-            reload_b = transform.Find("OptGroup/Reload").GetComponent<Button>();
-            jump_b = transform.Find("OptGroup/Jump").GetComponent<Button>();
-            dropWeapon_b = transform.Find("OptGroup/Jump").GetComponent<Button>();
-
             VariableJoystick.moveHandler += OnMoveAxis;
+            
             OnPointerDown("OptGroup/Pick", OnClickPick_Button);
 
-            OnPointerDown("OptGroup/Fire", PointerDownFireBtn);
-            OnPointerDrag("OptGroup/Fire", PointerDragFireBtn);
-            OnPointerUp("OptGroup/Fire", PointerUpFireBtn);
+            OnPointerDown("OptGroup/Shoot", PointerDownShootBtn);
+            OnPointerDrag("OptGroup/Shoot", PointerDragShootBtn);
+            OnPointerUp("OptGroup/Shoot", PointerUpShootBtn);
 
             OnPointerDown("OptGroup/Reload", OnClickReload_Button);
             OnPointerDown("OptGroup/Jump", OnClickJump_Button);
@@ -47,23 +38,23 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
             UIEventCenter.PickAction.Invoke();
         }
 
-        void PointerDownFireBtn(params object[] args)
+        void PointerDownShootBtn(params object[] args)
         {
             var evData = args[1] as PointerEventData;
             var fireDir = (evData.position - evData.pressPosition).normalized;
-            UIEventCenter.FireAction.Invoke(fireDir);
+            UIEventCenter.ShootAction.Invoke(fireDir);
         }
 
-        void PointerDragFireBtn(params object[] args)
+        void PointerDragShootBtn(params object[] args)
         {
             var evData = args[1] as PointerEventData;
             var fireDir = (evData.position - evData.pressPosition).normalized;
-            UIEventCenter.FireAction.Invoke(fireDir);
+            UIEventCenter.ShootAction.Invoke(fireDir);
         }
 
-        void PointerUpFireBtn(params object[] args)
+        void PointerUpShootBtn(params object[] args)
         {
-            UIEventCenter.StopFireAction.Invoke();
+            UIEventCenter.StopShootAction.Invoke();
         }
 
 

@@ -39,7 +39,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool TryWeaponShoot()
         {
-            return CurrentWeapon.TryFireBullet(1) == 1;
+            return CurrentWeapon.TryShootBullet(1) == 1;
         }
 
 

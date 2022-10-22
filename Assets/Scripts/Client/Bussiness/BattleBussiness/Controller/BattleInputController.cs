@@ -17,14 +17,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             UIEventCenter.MoveAction += ((moveAxis) => battleFacades.InputComponent.moveAxis = new Vector3(moveAxis.x, 0, moveAxis.y));
             UIEventCenter.PickAction += (() => battleFacades.InputComponent.isPressPick = true);
-            UIEventCenter.FireAction += ((fireDir) =>
+            UIEventCenter.ShootAction += ((fireDir) =>
             {
-                battleFacades.InputComponent.isPressFire = true;
+                battleFacades.InputComponent.isPressShoot = true;
                 battleFacades.InputComponent.fireDir = fireDir;
             });
-            UIEventCenter.StopFireAction += (() =>
+            UIEventCenter.StopShootAction += (() =>
             {
-                battleFacades.InputComponent.isPressFire = false;
+                battleFacades.InputComponent.isPressShoot = false;
             });
             UIEventCenter.ReloadAction += (() => battleFacades.InputComponent.isPressWeaponReload = true);
             UIEventCenter.JumpAction += (() => battleFacades.InputComponent.isPressRoll = true);
@@ -48,7 +48,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             TickInput_Roll();
             TickInput_SwitchingView();
             TickInput_Pick();
-            TickInput_Fire();
+            TickInput_Shoot();
             TickInput_Reload();
             TickInput_DropWeapon();
 
@@ -149,14 +149,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void TickInput_Fire()
+        void TickInput_Shoot()
         {
             var owner = battleFacades.Repo.RoleRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
-            if (input.isPressFire)
+            if (input.isPressShoot)
             {
+                var curWeapon = owner.WeaponComponent.CurrentWeapon;
+                if (curWeapon == null)
+                {
+                    return;
+                }
+
                 // 射击请求发送前判定
                 if (input.fireDir == Vector2.zero)
                 {
@@ -170,9 +176,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     owner.MoveComponent.FaceTo(faceDir);
                 }
 
-                var curWeapon = owner.WeaponComponent.CurrentWeapon;
                 var rqs = battleFacades.Network.WeaponReqAndRes;
-                rqs.SendReq_WeaponFire(owner.IDComponent.EntityId, curWeapon.FirePointPos, input.fireDir);
+                rqs.SendReq_WeaponShoot(owner.IDComponent.EntityId, curWeapon.ShootPointPos, input.fireDir);
             }
         }
 

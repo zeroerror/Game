@@ -141,7 +141,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             // Locomotion
             var moveComponent = role.MoveComponent;
-            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 2f);
+            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity * 0.7f);
             var inputComponent = role.InputComponent;
             moveComponent.SetRotation(inputComponent.FaceDir);
         }
@@ -149,7 +149,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         void ApplyFiring(BattleRoleLogicEntity role)
         {
             var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Shooting)
+            if (stateComponent.RoleState != RoleState.Shoot)
             {
                 return;
             }
@@ -170,10 +170,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             // Locomotion
             var roleDomain = battleFacades.Domain.RoleDomain;
             var moveComponent = role.MoveComponent;
-            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 2f);
+            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity * 0.7f);
 
             var inputComponent = role.InputComponent;
-            moveComponent.SetRotation(inputComponent.FireDir);
+            moveComponent.SetRotation(inputComponent.ShootDir);
         }
 
         void ApplyBeHit(BattleRoleLogicEntity role)
@@ -200,7 +200,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var roleDomain = battleFacades.Domain.RoleDomain;
             var moveComponent = role.MoveComponent;
-            roleDomain.RoleMoveActivate(role, moveComponent.MoveVelocity / 3f);
+            roleDomain.RoleMoveActivate(role, moveComponent.MoveVelocity * 0.7f);
 
         }
 

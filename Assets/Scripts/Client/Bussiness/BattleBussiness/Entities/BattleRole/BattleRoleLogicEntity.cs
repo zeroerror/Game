@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         Normal,
         Rolling,
         Climbing,
-        Shooting,
+        Shoot,
         Reloading,
         Healing,
         Switching,

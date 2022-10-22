@@ -19,8 +19,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetFaceDir(Vector3 faceDir) => this.faceDir = faceDir;
 
         Vector3 fireDir;
-        public Vector3 FireDir => fireDir;
-        public void SetFireDir(Vector3 fireDir) => this.fireDir = fireDir;
+        public Vector3 ShootDir => fireDir;
+        public void SetShootDir(Vector3 fireDir) => this.fireDir = fireDir;
 
         public bool pressReload;
         public bool PressReload => pressReload;

@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         [SerializeField]
         Transform firePoint;
-        public Vector3 FirePointPos => firePoint.position;
+        public Vector3 ShootPointPos => firePoint.position;
 
         int curReloadingFrame;
         public int CurReloadingFrame => curReloadingFrame;
@@ -70,7 +70,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             hasMaster = false;
         }
 
-        public int TryFireBullet(int num)
+        public int TryShootBullet(int num)
         {
             // Debug.Log($"武器射击，所需子弹：{num} 当前拥有子弹：{bulletNum}");
             if (bulletNum >= num)

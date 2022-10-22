@@ -18,7 +18,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         List<int> ConnIdList => battleFacades.Network.connIdList;
 
         // 记录所有武器射击帧
-        Dictionary<long, FrameWeaponFireReqMsg> weaponFireMsgDic;
+        Dictionary<long, FrameWeaponShootReqMsg> weaponShootMsgDic;
 
         // 记录所有武器装弹帧
         Dictionary<long, FrameWeaponReloadReqMsg> weaponReloadMsgDic;
@@ -28,7 +28,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public BattleWeaponController()
         {
-            weaponFireMsgDic = new Dictionary<long, FrameWeaponFireReqMsg>();
+            weaponShootMsgDic = new Dictionary<long, FrameWeaponShootReqMsg>();
             weaponReloadMsgDic = new Dictionary<long, FrameWeaponReloadReqMsg>();
             weaponDropMsgDic = new Dictionary<long, FrameWeaponDropReqMsg>();
         }
@@ -45,7 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick()
         {
-            Tick_WeaponFire();
+            Tick_WeaponShoot();
             Tick_WeaponReloadBegin();
             Tick_ReloadingFrame();
             Tick_WeaponDrop();
@@ -64,14 +64,14 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Tick]
 
-        void Tick_WeaponFire()
+        void Tick_WeaponShoot()
         {
             ConnIdList.ForEach((connId) =>
             {
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (weaponFireMsgDic.TryGetValue(key, out var msg))
+                if (weaponShootMsgDic.TryGetValue(key, out var msg))
                 {
                     var clientFacades = battleFacades.BattleFacades;
                     var weaponRepo = clientFacades.Repo.WeaponRepo;
@@ -87,12 +87,12 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var fireDirX = msg.fireDirX;
                     var fireDirZ = msg.fireDirZ;
 
-                    if (roleRepo.TryGetByEntityId(masterId, out var master) && clientFacades.Domain.RoleDomain.CanRoleFire(master))
+                    if (roleRepo.TryGetByEntityId(masterId, out var master) && clientFacades.Domain.RoleDomain.CanRoleShoot(master))
                     {
                         if (master.WeaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
                             Vector3 fireDir = new Vector3(fireDirX / 100f, 0, fireDirZ / 100f);
-                            master.InputComponent.SetFireDir(fireDir);
+                            master.InputComponent.SetShootDir(fireDir);
                             master.StateComponent.EnterFiring(5);
 
                             var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
@@ -195,16 +195,16 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Req]
-        void OnWeaponShoot(int connId, FrameWeaponFireReqMsg msg)
+        void OnWeaponShoot(int connId, FrameWeaponShootReqMsg msg)
         {
-            lock (weaponFireMsgDic)
+            lock (weaponShootMsgDic)
             {
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                if (!weaponFireMsgDic.TryGetValue(key, out var _))
+                if (!weaponShootMsgDic.TryGetValue(key, out var _))
                 {
-                    weaponFireMsgDic[key] = msg;
+                    weaponShootMsgDic[key] = msg;
                 }
                 Debug.Log("收到武器射击请求");
             }

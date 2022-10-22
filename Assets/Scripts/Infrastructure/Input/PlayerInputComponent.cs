@@ -7,7 +7,7 @@ public class PlayerInputComponent
 
     public Vector3 moveAxis;
 
-    public bool isPressFire;
+    public bool isPressShoot;
     public Vector2 fireDir;
 
     public bool isPressRoll;

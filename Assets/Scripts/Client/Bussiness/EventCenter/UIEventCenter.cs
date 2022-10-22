@@ -31,8 +31,8 @@ namespace Game.Client.Bussiness.EventCenter
         public static Action<string, ushort> WorldRoomEnter;   // 进入战斗服房间
         public static Action<Vector2> MoveAction;   // 战斗移动操作
         public static Action PickAction;   // 战斗拾取操作
-        public static Action<Vector2> FireAction;   // 战斗射击操作
-        public static Action StopFireAction;   // 战斗射击操作
+        public static Action<Vector2> ShootAction;   // 战斗射击操作
+        public static Action StopShootAction;   // 战斗射击操作
         public static Action ReloadAction;   // 战斗换弹操作
         public static Action JumpAction;   // 战斗跳跃操作
         public static Action DropWeaponAction;   // 战斗丢弃操作

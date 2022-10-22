@@ -652,7 +652,7 @@ GameObject:
   - component: {fileID: 8140534611230871247}
   - component: {fileID: 2993357118638181991}
   m_Layer: 5
-  m_Name: Fire
+  m_Name: Shoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
