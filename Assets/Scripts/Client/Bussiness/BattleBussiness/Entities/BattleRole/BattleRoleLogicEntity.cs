@@ -113,7 +113,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             dir.Normalize();
             var addVelocity = dir * rollSpeed;
-            addVelocity.y = 2.5f;
+            addVelocity.y = 3f;
             moveComponent.AddExtraVelocity(addVelocity);
             Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
             return true;

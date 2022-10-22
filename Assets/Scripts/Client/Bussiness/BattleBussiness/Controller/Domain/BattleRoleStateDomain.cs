@@ -73,7 +73,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             bool hasRollDir = inputComponent.RollDir != Vector3.zero;
             if (hasRollDir && roleDomain.TryRoleRoll(role, inputComponent.RollDir))
             {
-                stateComponent.EnterRolling(40);
                 return;
             }
 

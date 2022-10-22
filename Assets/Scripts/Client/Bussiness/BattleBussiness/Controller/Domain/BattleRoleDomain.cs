@@ -104,7 +104,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public bool TryRoleRoll(BattleRoleLogicEntity role, Vector3 dir)
         {
-            role.StateComponent.EnterRolling(40);
+            role.StateComponent.EnterRolling(30);
             return role.TryRoll(dir);
         }
 
