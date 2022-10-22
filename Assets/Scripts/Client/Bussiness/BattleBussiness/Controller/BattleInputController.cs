@@ -165,7 +165,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
                 else
                 {
-                    owner.transform.forward = new Vector3(input.fireDir.x, 0, input.fireDir.y);
+                    var faceDir = new Vector3(input.fireDir.x, 0, input.fireDir.y);
+                    owner.transform.forward = faceDir;
+                    owner.MoveComponent.FaceTo(faceDir);
                 }
 
                 var curWeapon = owner.WeaponComponent.CurrentWeapon;

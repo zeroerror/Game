@@ -77,7 +77,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a869ae89333f2143a582a9bf6d88085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rollSpeed: 5
+  rollSpeed: 8
   moveComponent:
     basicMoveSpeed: 4
     moveVelocity: {x: 0, y: 0, z: 0}

@@ -142,7 +142,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             // Locomotion
             var moveComponent = role.MoveComponent;
-            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 4f);
+            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 2f);
             var inputComponent = role.InputComponent;
             moveComponent.SetRotation(inputComponent.FaceDir);
         }
@@ -171,7 +171,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             // Locomotion
             var roleDomain = battleFacades.Domain.RoleDomain;
             var moveComponent = role.MoveComponent;
-            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 4f);
+            moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 2f);
 
             var inputComponent = role.InputComponent;
             moveComponent.SetRotation(inputComponent.FireDir);

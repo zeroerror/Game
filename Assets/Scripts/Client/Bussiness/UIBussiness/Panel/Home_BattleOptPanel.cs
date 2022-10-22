@@ -50,14 +50,14 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
         void PointerDownFireBtn(params object[] args)
         {
             var evData = args[1] as PointerEventData;
-            var fireDir = evData.delta;
+            var fireDir = (evData.position - evData.pressPosition).normalized;
             UIEventCenter.FireAction.Invoke(fireDir);
         }
 
         void PointerDragFireBtn(params object[] args)
         {
             var evData = args[1] as PointerEventData;
-            var fireDir = evData.delta;
+            var fireDir = (evData.position - evData.pressPosition).normalized;
             UIEventCenter.FireAction.Invoke(fireDir);
         }
 
