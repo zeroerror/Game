@@ -163,6 +163,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     var forward = owner.transform.forward;
                     input.fireDir = new Vector2(forward.x, forward.z);
                 }
+                else
+                {
+                    owner.transform.forward = new Vector3(input.fireDir.x, 0, input.fireDir.y);
+                }
 
                 var curWeapon = owner.WeaponComponent.CurrentWeapon;
                 var rqs = battleFacades.Network.WeaponReqAndRes;

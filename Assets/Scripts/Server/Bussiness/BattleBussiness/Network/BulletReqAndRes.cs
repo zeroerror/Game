@@ -45,25 +45,27 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Send]
 
-        public void SendRes_BulletSpawn(int connId, BulletType bulletType, int bulletEntityId, byte masterEntityId
-        , Vector3 startPos, Vector3 fireDir)
+        public void SendRes_BulletSpawn(int connId, BulletEntity bulletEntity)
         {
+            var bulletPos = bulletEntity.MoveComponent.Position;
+            var fireDir = bulletEntity.MoveComponent.GetFaceDir();
+
             FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
             {
                 serverFrame = serverFrame,
-                bulletType = (byte)bulletType,
-                masterEntityId = masterEntityId,
-                bulletEntityId = (ushort)bulletEntityId,
-                startPosX = (int)(startPos.x * 10000),
-                startPosY = (int)(startPos.y * 10000),
-                startPosZ = (int)(startPos.z * 10000),
+                bulletType = (byte)bulletEntity.BulletType,
+                masterEntityId = (byte)bulletEntity.MasterEntityId,
+                bulletEntityId = (ushort)bulletEntity.IDComponent.EntityId,
+                startPosX = (int)(bulletPos.x * 10000),
+                startPosY = (int)(bulletPos.y * 10000),
+                startPosZ = (int)(bulletPos.z * 10000),
                 fireDirX = (short)(fireDir.x * 10000),
                 fireDirZ = (short)(fireDir.z * 10000),
             };
 
             battleServer.SendMsg(connId, msg);
-            // Debug.Log($"dir.z:{dir.z} shootDirZ :{msg.shootDirZ}");
             sendCount++;
+            
         }
 
         public void SendRes_BulletHitRole(int connId, int bulletId, int entityId)
@@ -101,7 +103,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public void SendRes_BulletLifeFrameOver(int connId, BulletEntity bulletEntity)
         {
             BulletType bulletType = bulletEntity.BulletType;
-            int masterEntityID = bulletEntity.MasterId;
+            int masterEntityID = bulletEntity.MasterEntityId;
             int bulletEntityID = bulletEntity.IDComponent.EntityId;
             Vector3 pos = bulletEntity.MoveComponent.Position;
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");

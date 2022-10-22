@@ -20,16 +20,38 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletEntity SpawnBullet(Transform parent, BulletType bulletType)
+        public BulletEntity SpawnBullet(BulletType bulletType, int bulletEntityId, int masterEntityId, Vector3 startPos, Vector3 fireDir)
         {
             string bulletPrefabName = bulletType.ToString();
 
             if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
+                var parent = battleFacades.Repo.FiledRepo.CurFieldEntity.transform;
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
+
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
+
                 bulletEntity.SetBulletType(bulletType);
+                bulletEntity.SetMasterEntityId(masterEntityId);
                 bulletEntity.Ctor();
+                bulletEntity.gameObject.SetActive(true);
+
+                bulletEntity.IDComponent.SetEntityId(bulletEntityId);
+
+                var master = battleFacades.Repo.RoleRepo.GetByEntityId(masterEntityId);
+                bulletEntity.IDComponent.SetLeagueId(master.IDComponent.LeagueId);
+
+                bulletEntity.MoveComponent.SetPosition(startPos);
+                bulletEntity.MoveComponent.FaceTo(fireDir);
+                bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
+
+                battleFacades.Repo.BulletRepo.Add(bulletEntity);
+
+                if (bulletEntity is HookerEntity hookerEntity)
+                {
+                    hookerEntity.SetMasterGrabPoint(master.transform);
+                }
+
                 return bulletEntity;
             }
 
@@ -242,7 +264,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {
-                var master = battleFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterId);
+                var master = battleFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterEntityId);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.StateComponent.SetRoleState(RoleState.Normal);

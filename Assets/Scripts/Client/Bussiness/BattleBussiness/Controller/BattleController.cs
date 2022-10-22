@@ -17,7 +17,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
         // 服务器下发的生成队列
         Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
-        Queue<FrameBulletSpawnResMsg> bulletShootQueue;
+        Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
         Queue<FrameItemSpawnResMsg> itemSpawnQueue;
         // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
@@ -35,7 +35,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
 
             roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
-            bulletShootQueue = new Queue<FrameBulletSpawnResMsg>();
+            bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
             itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
 
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
@@ -145,11 +145,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 if (roleLogic == null)
                 {
-                    roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId,msg.isOwner);
+                    roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId, msg.isOwner);
                 }
 
                 var moveComponent = roleLogic.MoveComponent;
-                moveComponent.SetCurPos(pos);
+                moveComponent.SetPosition(pos);
                 moveComponent.SetMoveVelocity(moveVelocity);
                 moveComponent.SetExtraVelocity(extraVelocity);
                 moveComponent.SetGravityVelocity(gravityVelocity);
@@ -157,7 +157,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId)
                 {
                     //不是Owner
-                    moveComponent.SetEulerAngle(eulerAngle);
+                    moveComponent.SetRotation(eulerAngle);
                 }
 
                 roleLogic.StateComponent.SetRoleState(roleState);
@@ -178,7 +178,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRepo = repo.RoleRepo;
                 var fieldEntity = repo.FiledRepo.CurFieldEntity;
                 var domain = battleFacades.Domain.RoleDomain;
-                domain.SpawnRoleWithRenderer(entityId,msg.isOwner);
+                domain.SpawnRoleWithRenderer(entityId, msg.isOwner);
                 Debug.Log(msg.isOwner ? $"生成自身角色   entityId: {entityId}" : $"生成其他角色 : entityId: {entityId}");
             }
         }
@@ -187,46 +187,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Bullet]
         void Tick_BulletSpawn()
         {
-            if (bulletShootQueue.TryPeek(out var msg))
+            if (bulletSpawnQueue.TryPeek(out var msg))
             {
-                bulletShootQueue.Dequeue();
+                bulletSpawnQueue.Dequeue();
 
                 var bulletId = msg.bulletEntityId;
                 var bulletTypeByte = msg.bulletType;
                 var bulletType = (BulletType)bulletTypeByte;
 
-                var masterWRid = msg.masterEntityId;
-                var masterWRole = battleFacades.Repo.RoleRepo.GetByEntityId(masterWRid);
-
                 Vector3 startPos = new Vector3(msg.startPosX / 10000f, msg.startPosY / 10000f, msg.startPosZ / 10000f);
                 Vector3 fireDir = new Vector3(msg.fireDirX / 100f, 0, msg.fireDirZ / 100f);
 
-                var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
-                var bulletEntity = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-
-                Debug.Log($"生成子弹帧 {msg.serverFrame}: masterWRid:{masterWRid} 起点位置：{startPos}  飞行方向{fireDir}");
-
-                switch (bulletType)
-                {
-                    case BulletType.DefaultBullet:
-                        break;
-                    case BulletType.Grenade:
-                        break;
-                    case BulletType.Hooker:
-                        var hookerEntity = (HookerEntity)bulletEntity;
-                        hookerEntity.SetMasterWRid(masterWRid);
-                        hookerEntity.SetMasterGrabPoint(masterWRole.transform);
-                        break;
-                }
-
-                bulletEntity.MoveComponent.SetCurPos(startPos);
-                bulletEntity.MoveComponent.SetForward(fireDir);
-                bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
-                bulletEntity.SetMasterId(masterWRid);
-                bulletEntity.IDComponent.SetEntityId(bulletId);
                 var bulletRepo = battleFacades.Repo.BulletRepo;
-                bulletEntity.gameObject.SetActive(true);
-                bulletRepo.Add(bulletEntity);
+
+                var bulletEntity = battleFacades.Domain.BulletDomain.SpawnBullet(bulletType, msg.bulletEntityId, msg.masterEntityId, startPos, fireDir);
+
+                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletEntity.MasterEntityId} 起点位置：{startPos}  飞行方向{fireDir}");
+
             }
         }
 
@@ -272,7 +249,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bulletEntity = bulletRepo.GetByBulletId(bulletId);
 
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                bulletEntity.MoveComponent.SetCurPos(pos);
+                bulletEntity.MoveComponent.SetPosition(pos);
 
                 if (bulletEntity.BulletType == BulletType.DefaultBullet)
                 {
@@ -393,7 +370,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void OnBulletSpawn(FrameBulletSpawnResMsg msg)
         {
             Debug.Log($"加入子弹生成队列");
-            bulletShootQueue.Enqueue(msg);
+            bulletSpawnQueue.Enqueue(msg);
         }
 
         void OnBulletHitRole(FrameBulletHitRoleResMsg msg)

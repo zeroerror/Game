@@ -49,7 +49,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_WeaponShoot()
         {
-            var fieldEntity = battleFacades.Repo.FiledRepo.Get(1);
             while (weaponFireQueue.TryPeek(out var msg))
             {
                 weaponFireQueue.Dequeue();
@@ -58,9 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var master = roleRepo.GetByEntityId(msg.masterId);
                 if (master.WeaponComponent.TryWeaponShoot())
                 {
-                    var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
-                    var domain = battleFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                    Debug.Log($"角色:{msg.masterId}射击zidan:{bulletType.ToString()}---");
+                    Debug.Log($"角色:{msg.masterId}射击");
                 }
             }
         }

@@ -130,14 +130,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletType: 0
   moveComponent:
-    moveSpeed: 30
+    basicMoveSpeed: 30
+    moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 1
     gravity: 0
-    rollSpeed: 0
-    frictionReduce: 10
-    moveVelocity: {x: 0, y: 0, z: 0}
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
+    frictionReduce: 10
     isGrounded: 0
     isHitWall: 0
   lifeTime: 10

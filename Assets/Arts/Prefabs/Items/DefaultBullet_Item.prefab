@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletType: 0
-  bulletNum: 300
+  bulletNum: 1000
 --- !u!1 &6348179348261528665
 GameObject:
   m_ObjectHideFlags: 0

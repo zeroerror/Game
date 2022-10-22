@@ -86,7 +86,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             var moveComponent = role.MoveComponent;
-            moveComponent.SetEulerAngle(inputComponent.FaceDir);
+            moveComponent.SetRotation(inputComponent.FaceDir);
 
         }
 
@@ -115,7 +115,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             moveComponent.SetMoveVelocity(Vector3.zero);
 
             var inputComponent = role.InputComponent;
-            moveComponent.SetEulerAngle(inputComponent.RollDir);
+            moveComponent.SetRotation(inputComponent.RollDir);
         }
 
         void ApplyReloading(BattleRoleLogicEntity role)
@@ -144,7 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var moveComponent = role.MoveComponent;
             moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 4f);
             var inputComponent = role.InputComponent;
-            moveComponent.SetEulerAngle(inputComponent.FaceDir);
+            moveComponent.SetRotation(inputComponent.FaceDir);
         }
 
         void ApplyFiring(BattleRoleLogicEntity role)
@@ -174,7 +174,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             moveComponent.SetMoveVelocity(moveComponent.MoveVelocity / 4f);
 
             var inputComponent = role.InputComponent;
-            moveComponent.SetEulerAngle(inputComponent.FireDir);
+            moveComponent.SetRotation(inputComponent.FireDir);
         }
 
         void ApplyBeHit(BattleRoleLogicEntity role)

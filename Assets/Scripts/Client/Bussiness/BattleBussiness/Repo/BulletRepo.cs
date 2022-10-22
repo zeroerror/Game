@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public BulletEntity GetByWRid(ushort wRid)
         {
-            return bulletList.Find((entity) => entity.MasterId == wRid);
+            return bulletList.Find((entity) => entity.MasterEntityId == wRid);
         }
 
         public BulletEntity[] GetAll()

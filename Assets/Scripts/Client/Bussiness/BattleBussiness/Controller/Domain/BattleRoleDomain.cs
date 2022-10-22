@@ -105,7 +105,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public bool TryRoleRoll(BattleRoleLogicEntity role, Vector3 dir)
         {
             role.StateComponent.EnterRolling(40);
-            return role.MoveComponent.TryRoll(dir);
+            return role.TryRoll(dir);
         }
 
         public void RoleReborn(BattleRoleLogicEntity role)
@@ -144,7 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var stateComponent = role.StateComponent;
             Debug.LogWarning($"stateComponent.RoleState  {stateComponent.RoleState.ToString()}");
             Debug.LogWarning($"stateComponent.ShootingMod.maintainFrame  {stateComponent.ShootingMod.maintainFrame}");
-            if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 5)
+            if (stateComponent.RoleState == RoleState.Shooting && stateComponent.ShootingMod.maintainFrame > 3)
             {
                 Debug.LogWarning("射击CD未结束");
                 return false;

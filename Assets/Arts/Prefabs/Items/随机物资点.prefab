@@ -52,7 +52,7 @@ MonoBehaviour:
     subType: 0
     weight: 1
   - itemType: 1
-    subType: 0
+    subType: 1
     weight: 1
   - itemType: 1
     subType: 1

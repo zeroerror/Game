@@ -24,6 +24,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int ReloadFrame => reloadFrame;
 
         [SerializeField]
+        int bulletCapacity;
+        public int BulletCapacity => bulletCapacity;
+
+        [SerializeField]
         Transform firePoint;
         public Vector3 FirePointPos => firePoint.position;
 
@@ -37,10 +41,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         bool hasMaster;
         public bool HasMaster => hasMaster;
-
-        int bulletCapacity = 30;
-        public int BulletCapacity => bulletCapacity;
-        public void SetBulletCapacity(int capacity) => this.bulletCapacity = capacity;
 
         public int bulletNum { get; private set; }
         public void LoadBullet(int bulletNum) => this.bulletNum += bulletNum;

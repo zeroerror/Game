@@ -77,15 +77,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a869ae89333f2143a582a9bf6d88085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rollSpeed: 5
   moveComponent:
-    moveSpeed: 5
-    isPersistentMove: 0
-    gravity: 300
-    rollSpeed: 10
-    frictionReduce: 13
+    basicMoveSpeed: 4
     moveVelocity: {x: 0, y: 0, z: 0}
+    isPersistentMove: 0
+    gravity: 150
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
+    frictionReduce: 15
     isGrounded: 0
     isHitWall: 0
   healthComponent:
@@ -96,6 +96,30 @@ MonoBehaviour:
     - {fileID: 0}
   stateComponent:
     roleState: 0
+    rollingMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    shootingMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    reloadingMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    beHitMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    deadMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    rebornMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    climbingMod:
+      isFirstEnter: 0
+      maintainFrame: 0
+    roleStateSwitchingMod:
+      isFirstEnter: 0
+      maintainFrame: 0
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0

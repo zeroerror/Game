@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Protocol.Battle;
 using Game.Server.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Repo;
+using Game.Client.Bussiness.BattleBussiness;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -74,42 +76,37 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var clientFacades = battleFacades.BattleFacades;
                     var weaponRepo = clientFacades.Repo.WeaponRepo;
                     var roleRepo = clientFacades.Repo.RoleRepo;
-                    var bulletRepo = clientFacades.Repo.BulletRepo;
 
                     var weaponRqs = battleFacades.Network.WeaponReqAndRes;
                     var bulletRqs = battleFacades.Network.BulletReqAndRes;
 
-                    var fieldEntity = clientFacades.Repo.FiledRepo.Get(1);
-
                     var masterId = msg.masterId;
+                    var firePointPosX = msg.firePointPosX;
+                    var firePointPosY = msg.firePointPosY;
+                    var firePointPosZ = msg.firePointPosZ;
+                    var fireDirX = msg.fireDirX;
+                    var fireDirZ = msg.fireDirZ;
 
                     if (roleRepo.TryGetByEntityId(masterId, out var master) && clientFacades.Domain.RoleDomain.CanRoleFire(master))
                     {
                         if (master.WeaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
-                            master.StateComponent.EnterFiring(10);
-                            var startPos = new Vector3(msg.firePointPosX / 10000f, msg.firePointPosY / 10000f, msg.firePointPosZ / 10000f);
-                            Vector3 fireDir = new Vector3(msg.dirX / 100f, 0, msg.dirZ / 100f);
-
+                            Vector3 fireDir = new Vector3(fireDirX / 100f, 0, fireDirZ / 100f);
                             master.InputComponent.SetFireDir(fireDir);
+                            master.StateComponent.EnterFiring(5);
 
                             var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
-                            var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(fieldEntity.transform, bulletType);
-                            var bulletId = bulletRepo.AutoEntityID;
-                            bulletEntity.MoveComponent.SetCurPos(startPos);
-                            bulletEntity.MoveComponent.SetForward(fireDir);
-                            bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
-                            bulletEntity.SetMasterId(masterId);
-                            bulletEntity.IDComponent.SetEntityId(bulletId);
-                            bulletEntity.gameObject.SetActive(true);
-                            bulletRepo.Add(bulletEntity);
+                            var bulletEntityId = clientFacades.Repo.BulletRepo.AutoEntityID;
+                            var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
+
+                            var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(bulletType, bulletEntityId, masterId, startPos, fireDir);
 
                             ConnIdList.ForEach((connId) =>
                             {
                                 weaponRqs.SendRes_WeaponShoot(connId, masterId);
-                                bulletRqs.SendRes_BulletSpawn(connId, bulletType, bulletId, masterId, startPos, fireDir);
+                                bulletRqs.SendRes_BulletSpawn(connId,bulletEntity);
                             });
-                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletId}  MasterWRid:{masterId}  起点：{startPos} 飞行方向:{fireDir}");
+                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletEntityId}  MasterWRid:{masterId}  起点：{startPos} 飞行方向:{fireDir}");
                         }
                     }
                 }
@@ -154,7 +151,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     }
                     else
                     {
-                        int reloadBulletNum = role.FetchBulletsFromItemComponent();
+                        int reloadBulletNum = role.FetchBullets();
                         role.WeaponComponent.FinishReloading(reloadBulletNum);
                         //TODO: 装弹时间过后才发送回客户端
                         ConnIdList.ForEach((connId) =>

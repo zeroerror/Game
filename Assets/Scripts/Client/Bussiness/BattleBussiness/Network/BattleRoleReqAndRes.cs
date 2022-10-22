@@ -122,10 +122,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             {
                 battleClient.RegistMsg<T>((msg) =>
                 {
-                    actionList.Add(() =>
+                    Action action1 = () =>
                     {
                         action.Invoke(msg);
-                    });
+                    };
+                    actionList.Add(action1);
                 });
             }
         }

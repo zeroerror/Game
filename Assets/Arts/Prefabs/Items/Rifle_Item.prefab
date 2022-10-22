@@ -163,6 +163,7 @@ MonoBehaviour:
   weaponType: 1
   itemType: 1
   reloadFrame: 60
+  bulletCapacity: 100
   firePoint: {fileID: 3517488532659085502}
   bulletType: 0
 --- !u!1 &2739236041744508303

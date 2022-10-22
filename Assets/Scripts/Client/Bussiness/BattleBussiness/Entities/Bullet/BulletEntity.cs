@@ -12,9 +12,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public IDComponent IDComponent => idComponent;
 
         // Master Info
-        int masterId;
-        public int MasterId => masterId;
-        public void SetMasterId(int masterId) => this.masterId = masterId;
+        int masterEntityId;
+        public int MasterEntityId => masterEntityId;
+        public void SetMasterEntityId(int masterEntityId) => this.masterEntityId = masterEntityId;
 
         // Bullet Info
         [SerializeField]

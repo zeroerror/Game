@@ -9,8 +9,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
         public int firePointPosX;
         public int firePointPosY;
         public int firePointPosZ;
-        public short dirX;
-        public short dirZ;
+        public short fireDirX;
+        public short fireDirZ;
 
         public void FromBytes(byte[] src, ref int offset)
         {
@@ -18,8 +18,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             firePointPosX = BufferReader.ReadInt32(src, ref offset);
             firePointPosY = BufferReader.ReadInt32(src, ref offset);
             firePointPosZ = BufferReader.ReadInt32(src, ref offset);
-            dirX = BufferReader.ReadInt16(src, ref offset);
-            dirZ = BufferReader.ReadInt16(src, ref offset);
+            fireDirX = BufferReader.ReadInt16(src, ref offset);
+            fireDirZ = BufferReader.ReadInt16(src, ref offset);
             offset += src.Length;
         }
 
@@ -31,8 +31,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             BufferWriter.WriteInt32(result, firePointPosX, ref offset);
             BufferWriter.WriteInt32(result, firePointPosY, ref offset);
             BufferWriter.WriteInt32(result, firePointPosZ, ref offset);
-            BufferWriter.WriteInt16(result, dirX, ref offset);
-            BufferWriter.WriteInt16(result, dirZ, ref offset);
+            BufferWriter.WriteInt16(result, fireDirX, ref offset);
+            BufferWriter.WriteInt16(result, fireDirZ, ref offset);
             return result;
         }
 

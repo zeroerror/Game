@@ -51,7 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                         collisionExtra.status = CollisionStatus.Stay;
                         if (collision.gameObject.tag == "Jumpboard")
                         {
-                            role.MoveComponent.JumpboardSpeedUp();
+                            role.JumpboardSpeedUp();
                         }
                         hitRoleList.Add(role);
                     }

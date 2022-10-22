@@ -23,25 +23,34 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BattleRoleLogicEntity : PhysicsEntity
     {
 
-        // Connection Info
+        // - Connection Info
         int connId;
         public int ConnId => connId;
         public void SetConnId(int connId) => this.connId = connId;
 
-        // ID
+        // - Renderer
+        public BattleRoleRendererEntity roleRenderer { get; private set; }
+
+        // - Pos
+        public Vector3 SelfPos => transform.position;
+        Vector3 shootPointPos => MoveComponent.Position + transform.forward + new Vector3(0, 0.8f, 0);
+
+        Rigidbody rb;
+
+        [SerializeField]
+        [Header("前滚翻速度")]
+        float rollSpeed;
+        public float RollSpeed => rollSpeed;
+        
+        bool isDead;
+        public bool IsDead => isDead;
+
+        #region [Component]
+
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
 
-        // Renderer
-        public BattleRoleRendererEntity roleRenderer { get; private set; }
 
-        // Pos
-        Vector3 offset;
-        Vector3 shootPointPos => MoveComponent.Position + transform.forward + offset;
-        public Vector3 ShootStartPos => shootPointPos.FixDecimal(4);
-        public Vector3 SelfPos => transform.position;
-
-        // == Component ==
         [SerializeField]
         MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
@@ -63,10 +72,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         RoleInputComponent roleInputComponent;
         public RoleInputComponent InputComponent => roleInputComponent;
 
-        public Rigidbody RB { get; private set; }
+        #endregion
 
-
-        public bool IsDead { get; private set; }
 
         public void Inject(BattleRoleRendererEntity roleRendererEntity)
         {
@@ -76,9 +83,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             // == Component
-            RB = transform.GetComponentInParent<Rigidbody>();
-            moveComponent.Inject(RB);
-            moveComponent.SetMaximumSpeed(30f);
+            rb = transform.GetComponentInParent<Rigidbody>();
+            moveComponent.Inject(rb);
+            moveComponent.SetMaximumVelocity(30f);
 
             idComponent = new IDComponent();    // TODO: Serializable
             idComponent.SetEntityType(EntityType.BattleRole);
@@ -91,14 +98,54 @@ namespace Game.Client.Bussiness.BattleBussiness
             weaponComponent.Reset();
             stateComponent.Reset();
 
-            offset = new Vector3(0, 0.8f, 0);
         }
 
-        public int FetchBulletsFromItemComponent()
+        public void TearDown()
+        {
+            isDead = true;
+        }
+
+        #region [Action]
+
+        public bool TryRoll(Vector3 dir)
+        {
+            if (!moveComponent.IsGrounded) return false;
+
+            dir.Normalize();
+            var addVelocity = dir * rollSpeed;
+            addVelocity.y = 2.5f;
+            moveComponent.AddExtraVelocity(addVelocity);
+            Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
+            return true;
+        }
+
+        public void JumpboardSpeedUp()
+        {
+            var addVelocity = rb.velocity * 4f;
+            addVelocity = new Vector3(addVelocity.x, 4f, addVelocity.z);
+            moveComponent.AddExtraVelocity(addVelocity);
+            DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} ExtraVelocity当前值: {moveComponent.ExtraVelocity}", "#48D1CC");
+        }
+
+        public int FetchBullets()
         {
             var curWeapon = weaponComponent.CurrentWeapon;
             return ItemComponent.TakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
         }
+
+        public void Reborn(in Vector3 pos)
+        {
+            Debug.Log($" ENTITYID:{idComponent.EntityId} 重生----------------------------------");
+
+            moveComponent.SetPosition(pos);
+            moveComponent.Reset();
+
+            healthComponent.Reset();
+
+            isDead = false;
+        }
+
+        #endregion
 
         public bool CanWeaponReload()
         {
@@ -125,33 +172,6 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return false;
             }
 
-            return true;
-        }
-
-        public bool IsIdle()
-        {
-            return MoveComponent.Velocity == Vector3.zero;
-        }
-
-        public void TearDown()
-        {
-            IsDead = true;
-        }
-
-        public void Reborn(in Vector3 pos)
-        {
-            Debug.Log($" ENTITYID:{idComponent.EntityId} 重生----------------------------------");
-
-            moveComponent.SetCurPos(pos);
-            moveComponent.Reset();
-
-            healthComponent.Reset();
-
-            IsDead = false;
-        }
-
-        public bool IsAllowEnterNormal()
-        {
             return true;
         }
 

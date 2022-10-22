@@ -10,11 +10,58 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class MoveComponent
     {
 
-        #region [静态变量]
+        #region [基础]
+
+        Rigidbody rb;
+
+        // == Position
+        public Vector3 Position => rb.position;
+        public void SetPosition(Vector3 curPos) => rb.position = curPos;
+
+        // == Rotation
+        public Quaternion Rotation => rb.rotation;
+        public void SetRotation(Vector3 eulerAngle) => rb.rotation = Quaternion.Euler(eulerAngle);
+
+        public Vector3 OldEulerAngles { get; private set; }
+
+        // == Velocity
+        public Vector3 Velocity => rb.velocity;
+        public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
+
+        float maximumVelocity = float.MaxValue;
+        public void SetMaximumVelocity(float velocity) => this.maximumVelocity = velocity;
+
+        public void Inject(Rigidbody rb)
+        {
+            if (rb == null) return;
+            this.rb = rb;
+            rb.useGravity = false;  //关闭地球引力
+        }
+
+        public void Reset()
+        {
+            LeaveGround();
+            gravityVelocity = 0;
+            extraVelocity = Vector3.zero;
+            moveVelocity = Vector3.zero;
+            rb.velocity = Vector3.zero;
+
+            rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
+        }
+
+        #endregion
+
+        #region [序列化变量]
 
         [SerializeField]
-        [Header("移动速度")]
-        float moveSpeed;
+        [Header("基础移动速度")]
+        float basicMoveSpeed;
+
+        [SerializeField]
+        [Header("当前移动速度")]
+        Vector3 moveVelocity;
+        public Vector3 MoveVelocity => moveVelocity;
+        public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
 
         [SerializeField]
         [Header("持续移动")]
@@ -22,72 +69,25 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetPersistentMove(bool flag) => isPersistentMove = flag;
 
         [SerializeField]
-        [Header("地球引力加速度")]
+        [Header("所受重力")]
         float gravity;
-
-        [SerializeField]
-        [Header("前滚翻速度")]
-        float rollSpeed;
-        public float RollVelocity => rollSpeed;
-
-        #endregion
-
-        float maximumSpeed = float.MaxValue;
-        public void SetMaximumSpeed(float speed) => this.maximumSpeed = speed;
-
-        // TODO: 滑铲摩擦力
-        [SerializeField]
-        [Header("摩擦力")]
-        float frictionReduce = 10f;
-        public void SetFriction(float friction) => this.frictionReduce = friction;
-
-        // Rigidbody
-        Rigidbody rb;
-
-        public void SetForward(Vector3 forward)
-        {
-            this.rb.rotation = Quaternion.LookRotation(forward);
-        }
-
-        public Vector3 Velocity => rb.velocity;
-        public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
-
-        #region [动态速度]
-
-        // == 移动速度
-        [SerializeField]
-        [Header("移动速度")]
-        Vector3 moveVelocity;
-        public Vector3 MoveVelocity => moveVelocity;
-        public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
-        public void ActivateMoveVelocity(Vector3 dir)
-        {
-            dir.Normalize();
-            dir = dir.FixDecimal(2);
-            this.moveVelocity = dir * moveSpeed;
-            // Debug.Log($"移动:{moveVelocity}");
-        }
 
         // == 重力速度
         [SerializeField]
-        [Header("重力速度")]
+        [Header("当前重力速度")]
         float gravityVelocity;
         public float GravityVelocity => gravityVelocity;
         public void SetGravityVelocity(float gravityVelocity) => this.gravityVelocity = gravityVelocity;
 
-        // == 额外速度
         [SerializeField]
         [Header("额外速度")]
         Vector3 extraVelocity;
         public Vector3 ExtraVelocity => extraVelocity;
         public void SetExtraVelocity(Vector3 extraVelocity) => this.extraVelocity = extraVelocity;
-        public void AddExtraVelocity(Vector3 addVelocity)
-        {
-            Debug.Log($"AddExtraVelocity :{addVelocity}");
-            this.extraVelocity += addVelocity.FixDecimal(4);
-        }
 
-        #endregion
+        [SerializeField]
+        [Header("摩擦力")]
+        float frictionReduce = 10f;
 
         // == 碰撞状态
         [SerializeField]
@@ -102,22 +102,37 @@ namespace Game.Client.Bussiness.BattleBussiness
         public bool IsHitWall => isHitWall;
         public void SetIsHitWall(bool flag) => this.isHitWall = flag;
 
-        public Vector3 Position => rb.position;
-        public void SetCurPos(Vector3 curPos) => rb.position = curPos;
+        #endregion
 
-        // == Rotation
-        public Quaternion Rotation => rb.rotation;
-        public Vector3 EulerAngle => rb.rotation.eulerAngles;
-        public Vector3 OldEulerAngle { get; private set; }
+        #region [速度]
+
+        public void ActivateMoveVelocity(Vector3 dir)
+        {
+            dir.Normalize();
+            dir = dir.FixDecimal(2);
+            this.moveVelocity = dir * basicMoveSpeed;
+            // Debug.Log($"移动:{moveVelocity}");
+        }
+
+        public void AddExtraVelocity(Vector3 addVelocity)
+        {
+            Debug.Log($"AddExtraVelocity :{addVelocity}");
+            this.extraVelocity += addVelocity.FixDecimal(4);
+        }
+
+        #endregion
+
+        #region [旋转]
+
         public void FaceTo(Vector3 forward)
         {
             var newRotation = Quaternion.LookRotation(forward);
             rb.rotation = newRotation;
         }
-        public void SetEulerAngle(Vector3 eulerAngle) => rb.rotation = Quaternion.Euler(eulerAngle);
+
         public void AddEulerAngleY(float eulerAngleY)
         {
-            var euler = rb.rotation.eulerAngles;
+            var euler = GetEulerAngles();
             euler.y += eulerAngleY;    //左右看
             rb.rotation = Quaternion.Euler(euler);
         }
@@ -127,33 +142,35 @@ namespace Game.Client.Bussiness.BattleBussiness
             euler.y = eulerAngle.y;
             rb.rotation = Quaternion.Euler(euler);
         }
-        public void FlushEulerAngle() => OldEulerAngle = EulerAngle;
+
+        public void FlushEulerAngle()
+        {
+            OldEulerAngles = GetEulerAngles();
+        }
+
+        public Vector3 GetFaceDir()
+        {
+            var dir = rb.rotation * Vector3.forward;
+            return dir;
+        }
+
         public bool IsEulerAngleNeedFlush()
         {
-            if (Mathf.Abs(OldEulerAngle.x - EulerAngle.x) > 10) return true;
-            if (Mathf.Abs(OldEulerAngle.y - EulerAngle.y) > 10) return true;
-            if (Mathf.Abs(OldEulerAngle.z - EulerAngle.z) > 10) return true;
+            var eulerAngles = GetEulerAngles();
+            if (Mathf.Abs(OldEulerAngles.x - eulerAngles.x) > 10) return true;
+            if (Mathf.Abs(OldEulerAngles.y - eulerAngles.y) > 10) return true;
+            if (Mathf.Abs(OldEulerAngles.z - eulerAngles.z) > 10) return true;
             return false;
         }
 
-        public void Inject(Rigidbody rb)
+        Vector3 GetEulerAngles()
         {
-            if (rb == null) return;
-            this.rb = rb;
-            rb.useGravity = false;  //关闭地球引力
+            return rb.rotation.eulerAngles;
         }
 
-        public bool TryRoll(Vector3 dir)
-        {
-            if (!IsGrounded) return false;
+        #endregion
 
-            dir.Normalize();
-            var addVelocity = dir * rollSpeed;
-            addVelocity.y = 2.5f;
-            AddExtraVelocity(addVelocity);
-            Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
-            return true;
-        }
+        #region  [状态刷新]
 
         public void Tick_Rigidbody(float fixedDeltaTime)
         {
@@ -175,7 +192,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.velocity = vel;
 
             //限制'最大速度'
-            if (rb.velocity.magnitude > maximumSpeed) rb.velocity = rb.velocity.normalized * 30f;
+            if (rb.velocity.magnitude > maximumVelocity) rb.velocity = rb.velocity.normalized * 30f;
 
             // 重置 ‘一次性速度’
             moveVelocity = Vector3.zero;
@@ -205,7 +222,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 return;
             }
-            
+
             extraVelocity -= reduceVelocity * fixedDeltaTime;
 
             var afterExtraVelocity2DDir = extraVelocity;
@@ -221,7 +238,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             // Debug.Log($"摩擦力----------------------- reduceVelocity {reduceVelocity} extraVelocity {extraVelocity}");
-
         }
 
         public void Tick_Gravity(float fixedDeltaTime)
@@ -252,35 +268,35 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
         }
 
-        public void Reset()
-        {
-            LeaveGround();
-            gravityVelocity = 0;
-            extraVelocity = Vector3.zero;
-            moveVelocity = Vector3.zero;
-            rb.velocity = Vector3.zero;
+        #endregion
 
-            rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
-        }
+        #region [物理碰撞]
 
-        public string ToInfo()
-        {
-            return $"位置: {Position} 移动速度: {MoveVelocity} 跳跃速度: {RollVelocity} 重力速度: {GravityVelocity} 额外速度: {ExtraVelocity} ";
-        }
-
-        #region [ Physics Collision]
-
+        // 尚未测试过 可能存在BUG
         public void MoveHitErase(Vector3 hitDir)
         {
-            var a = MoveVelocity.normalized;
-            var b = hitDir.normalized;
-            var cosValue = Vector3.Dot(a, b);
-            var reduceVelocity = MoveVelocity * cosValue;
-            moveVelocity -= reduceVelocity;
-            if (cosValue != 0)
+            EraseVelocity(ref moveVelocity, -hitDir);
+        }
+
+        public void EraseVelocity(ref Vector3 velocity, Vector3 eraseV)
+        {
+            var cosVal = Vector3.Dot(velocity.normalized, eraseV.normalized);
+            if (cosVal >= 0)
             {
-                DebugExtensions.LogWithColor($"贴墙移动，消除垂直墙面速度 {reduceVelocity}  moveVelocity{moveVelocity} cosValue:{cosValue}", "#48D1CC");
+                return;
             }
+
+            var reduce = eraseV * cosVal;
+            var after = velocity + reduce;
+            if (!IsOppositeDir(reduce, after))
+            {
+                reduce = velocity * cosVal;
+                after = velocity + reduce;
+            }
+
+            velocity = after;
+
+            Debug.Log($"EraseVelocityByDir  cosVal:{cosVal} reduce:{reduce} ");
         }
 
         public void HitSomething(Vector3 hitDir)
@@ -328,17 +344,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             // DebugExtensions.LogWithColor($"碰撞消除'额外速度':{reduceVelocity}---->新'额外速度':{extraVelocity}", "#48D1CC");
         }
 
-        public void JumpboardSpeedUp()
-        {
-            DebugExtensions.LogWithColor($"跳板起飞！！！！！", "#48D1CC");
-            extraVelocity.y += 4f;
-            var addVelocity = rb.velocity;
-            addVelocity.y = 0;
-            addVelocity = addVelocity * 4f;
-            AddExtraVelocity(addVelocity);
-            DebugExtensions.LogWithColor($"跳板起飞  addVelocity:{addVelocity} extraVelocity:{extraVelocity}", "#48D1CC");
-        }
-
         public void EnterGound()
         {
             if (isGrounded) return;
@@ -373,7 +378,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #endregion
 
-        #region [Private Func]
 
         bool IsOppositeDir(Vector3 dir1, Vector3 dir2)
         {
@@ -383,28 +387,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             return cosVal < 0;
         }
 
-        void EraseVelocity(ref Vector3 velocity, Vector3 v)
-        {
-            var cosVal = Vector3.Dot(velocity.normalized, v.normalized);
-            if (cosVal >= 0)
-            {
-                return;
-            }
 
-            var reduce = v * cosVal;
-            var after = velocity + reduce;
-            if (!IsOppositeDir(reduce, after))
-            {
-                reduce = velocity * cosVal;
-                after = velocity + reduce;
-            }
 
-            velocity = after;
 
-            Debug.Log($"EraseVelocityByDir  cosVal:{cosVal} reduce:{reduce} ");
-        }
-
-        #endregion
     }
 
 }
