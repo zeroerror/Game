@@ -53,6 +53,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 roleLogic.Ctor();
                 roleLogic.IDComponent.SetEntityId(entityId);
                 roleLogic.IDComponent.SetLeagueId(entityId);
+                RoleReborn(roleLogic);
 
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 roleRepo.Add(roleLogic);

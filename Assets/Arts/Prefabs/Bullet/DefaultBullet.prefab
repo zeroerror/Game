@@ -143,7 +143,7 @@ MonoBehaviour:
     canHitRepeatly: 0
     attackTag: 1
     damage: 8
-    hitVelocity: {x: 0, y: 0, z: 0}
+    hitVelocityCoefficient: 0.05
     freezeMaintainFrame: 0
   lifeTime: 10
 --- !u!1001 &8100238415778686914

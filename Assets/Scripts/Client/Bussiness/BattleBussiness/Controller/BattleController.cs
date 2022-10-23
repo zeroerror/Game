@@ -168,7 +168,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     battleFacades.Domain.RoleDomain.RoleReborn(roleLogic);
                 }
-                
+
                 stateComponent.SetRoleState(roleState);
             }
         }
@@ -189,6 +189,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 Debug.Log(msg.isOwner ? $"生成自身角色   entityId: {entityId}" : $"生成其他角色 : entityId: {entityId}");
             }
         }
+
         #endregion
 
         #region [Bullet]
@@ -219,9 +220,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (bulletHitRoleQueue.TryDequeue(out var msg))
             {
                 var role = battleFacades.Repo.RoleRepo.Get(msg.roleEntityId);
+                if (role == null)
+                {
+                    continue;
+                }
+
                 var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityId);
                 role.HealthComponent.HurtByDamage(bullet.HitPowerModel.damage);
-                return;
             }
         }
 

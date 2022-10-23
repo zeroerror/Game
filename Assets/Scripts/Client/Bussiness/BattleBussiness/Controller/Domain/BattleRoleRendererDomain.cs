@@ -25,6 +25,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
+                var bloodSlider = role.roleRenderer.BloodSlider;
+                if (role.StateComponent.RoleState == RoleState.Dead || role.StateComponent.RoleState == RoleState.Reborn)
+                {
+                    bloodSlider.value = 0;
+                    bloodSlider.gameObject.SetActive(false);
+                    return;
+                }
+
+                bloodSlider.gameObject.SetActive(true);
                 role.roleRenderer.BloodSlider.maxValue = role.HealthComponent.MaxHealth;
                 role.roleRenderer.BloodSlider.value = role.HealthComponent.Health;
             });
