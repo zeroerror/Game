@@ -55,9 +55,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 var master = roleRepo.Get(msg.masterId);
-                if (master.WeaponComponent.TryWeaponShoot())
+                var weaponComponent = master.WeaponComponent;
+                if (weaponComponent.TryWeaponShoot())
                 {
                     Debug.Log($"角色:{msg.masterId}射击");
+                    var curWeapon = weaponComponent.CurrentWeapon;
+                    curWeapon.PlayShootAudio();
                 }
             }
         }

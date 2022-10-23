@@ -47,9 +47,12 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public BulletType bulletType;
 
+        AudioClip shootAudioClip;
+
         public void Ctor()
         {
             itemType = ItemType.Weapon;
+            shootAudioClip = transform.Find("audio_clip_shoot").GetComponent<AudioSource>().clip;
         }
 
         public void SetMaster(int masterWRid)
@@ -82,6 +85,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 return bulletNum;
             }
+        }
+
+        public void PlayShootAudio()
+        {
+            AudioSource.PlayClipAtPoint(shootAudioClip, ShootPointPos);
         }
 
     }
