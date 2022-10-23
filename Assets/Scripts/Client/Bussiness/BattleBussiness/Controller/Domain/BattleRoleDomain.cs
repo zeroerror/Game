@@ -20,14 +20,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        #region [Spawn]
-
         public BattleRoleLogicEntity SpawnRoleWithRenderer(byte entityId, bool isOwner)
         {
             var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            var domain = battleFacades.Domain.RoleDomain;
+            var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
 
-            var roleRenderer = domain.SpawnRoleRenderer(entityId, fieldEntity.Role_Group_Renderer);
+            var roleRenderer = roleRendererDomain.SpawnRoleRenderer(entityId, fieldEntity.Role_Group_Renderer);
 
             var roleLogic = SpawnRoleLogic(entityId);
             roleLogic.Inject(roleRenderer);
@@ -65,26 +63,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             Debug.Log("生成Logic角色失败");
             return null;
         }
-
-        public BattleRoleRendererEntity SpawnRoleRenderer(int entityId, Transform parent)
-        {
-            string rolePrefabName = "role_renderer";
-            Debug.Log("生成" + rolePrefabName);
-            if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
-            {
-                prefabAsset = GameObject.Instantiate(prefabAsset, parent);
-                var roleRenderer = prefabAsset.GetComponentInChildren<BattleRoleRendererEntity>();
-                roleRenderer.SetEntityId(entityId);
-                roleRenderer.Ctor();
-
-                return roleRenderer;
-            }
-
-            Debug.Log("生成Renderer角色失败");
-            return null;
-        }
-
-        #endregion
 
         public void Tick_RoleRigidbody(float fixedTime)
         {

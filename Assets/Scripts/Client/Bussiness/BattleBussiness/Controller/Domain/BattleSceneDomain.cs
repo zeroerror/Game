@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
-    public class BattleSpawnDomain
+    public class BattleSceneDomain
     {
         BattleFacades battleFacades;
 
-        public BattleSpawnDomain()
+        public BattleSceneDomain()
         {
         }
 

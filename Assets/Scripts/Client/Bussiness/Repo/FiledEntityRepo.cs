@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.Repo
 
         public void Add(FieldEntity entity)
         {
-            dic.Add(entity.FieldId, entity);
+            dic.Add(entity.EntityId, entity);
             CurFieldEntity = entity;
         }
 

@@ -20,7 +20,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             list = new List<BattleRoleLogicEntity>();
         }
 
-        public BattleRoleLogicEntity GetByEntityId(int entityID)
+        public BattleRoleLogicEntity Get(int entityID)
         {
             return list.Find((entity) => entity.IDComponent.EntityId == entityID);
         }

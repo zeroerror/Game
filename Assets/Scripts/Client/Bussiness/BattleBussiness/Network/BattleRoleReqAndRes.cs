@@ -1,12 +1,9 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using ZeroFrame.Protocol;
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Battle;
-using System.Runtime.InteropServices;
-using Game.Client.Bussiness.EventCenter;
-using ZeroFrame.Protocol;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
@@ -38,7 +35,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
                 for (int i = 0; i < actionList.Count; i++)
                 {
                     var action = actionList[i];
-                    action.Invoke();
+                    action?.Invoke();
                 }
                 actionList.Clear();
             }
@@ -110,7 +107,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
-        public void RegistUpdate_WRole(Action<BattleRoleStateUpdateMsg> action)
+        public void RegistUpdate_WRole(Action<BattleRoleSyncMsg> action)
         {
             AddRegister(action);
         }
@@ -122,11 +119,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             {
                 battleClient.RegistMsg<T>((msg) =>
                 {
-                    Action action1 = () =>
+                    actionList.Add(() =>
                     {
                         action.Invoke(msg);
-                    };
-                    actionList.Add(action1);
+                    });
                 });
             }
         }

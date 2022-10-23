@@ -1,6 +1,7 @@
 using UnityEngine;
 using Game.Generic;
 using Game.Client.Bussiness.Interfaces;
+using UnityEngine.UI;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -28,10 +29,17 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float posAdjust;
         public float rotAdjust;
 
+        // == UI ==
+        Slider bloodSlider;
+        public Slider BloodSlider =>bloodSlider;
+
         public void Ctor()
         {
             animator = GetComponent<Animator>();
             Debug.Assert(animator != null);
+
+            bloodSlider = transform.GetComponentInChildren<Slider>();
+            Debug.Assert(bloodSlider != null);
 
             AnimatorComponent = new AnimatorComponent(animator);
             camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");

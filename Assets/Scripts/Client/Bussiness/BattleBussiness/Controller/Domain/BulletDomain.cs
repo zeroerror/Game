@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 bulletEntity.IDComponent.SetEntityId(bulletEntityId);
 
-                var master = battleFacades.Repo.RoleRepo.GetByEntityId(masterEntityId);
+                var master = battleFacades.Repo.RoleRepo.Get(masterEntityId);
                 bulletEntity.IDComponent.SetLeagueId(master.IDComponent.LeagueId);
 
                 bulletEntity.MoveComponent.SetPosition(startPos);
@@ -124,12 +124,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     }
 
                     // TODO: 配置表配置 ----------------------------------------------
-                    HitPowerModel hitPowerModel = new HitPowerModel();
-                    hitPowerModel.canHitRepeatly = false;
-                    hitPowerModel.attackTag = AttackTag.Enemy;
-                    hitPowerModel.damage = 5;
-                    hitPowerModel.hitVelocity = bullet.MoveComponent.Velocity / 10f;
-                    hitPowerModel.freezeMaintainFrame = 30;
+                    HitPowerModel hitPowerModel = bullet.HitPowerModel;
                     // ----------------------------------------------------------------
 
                     var hitDomain = battleFacades.Domain.HitDomain;
@@ -223,14 +218,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var dir = role.MoveComponent.Position - grenadeEntity.MoveComponent.Position;
                     var hitVelocity = dir.normalized * 10f;
 
-                    // Explode To Hit 
                     // - TODO 根据配置的HitPowerModel
-                    HitPowerModel hitPowerModel = new HitPowerModel();
-                    hitPowerModel.attackTag = AttackTag.Enemy;
-                    hitPowerModel.canHitRepeatly = false;
-                    hitPowerModel.damage = 50;
-                    hitPowerModel.hitVelocity = hitVelocity;
-                    hitPowerModel.freezeMaintainFrame = 30;
+                    HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
                     var hitDomain = battleFacades.Domain.HitDomain;
                     hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime);
@@ -264,7 +253,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {
-                var master = battleFacades.Repo.RoleRepo.GetByEntityId(hooker.MasterEntityId);
+                var master = battleFacades.Repo.RoleRepo.Get(hooker.MasterEntityId);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.StateComponent.SetRoleState(RoleState.Normal);

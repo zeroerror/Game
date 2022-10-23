@@ -174,7 +174,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var realMsg = msg.msg;
 
                     var rid = (byte)(realMsg >> 48);
-                    var role = roleRepo.GetByEntityId(rid);
+                    var role = roleRepo.Get(rid);
 
                     // ------------移动 -> Input
                     Vector3 dir = new Vector3((short)(ushort)(realMsg >> 32) / 100f, (short)(ushort)(realMsg >> 16) / 100f, (short)(ushort)realMsg / 100f);
@@ -186,7 +186,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     // ------------转向 -> Input（基于客户端鉴权的同步） 
                     var realMsg = rotateMsg.msg;
                     var rid = (byte)(realMsg >> 48);
-                    var role = roleRepo.GetByEntityId(rid);
+                    var role = roleRepo.Get(rid);
                     Vector3 eulerAngle = new Vector3((short)(realMsg >> 32), (short)(realMsg >> 16), (short)realMsg);
                     role.InputComponent.SetFaceDir(eulerAngle);
                 }
@@ -212,7 +212,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     var wRid = msg.entityId;
                     var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
-                    var role = roleRepo.GetByEntityId(wRid);
+                    var role = roleRepo.Get(wRid);
                     var rqs = battleServerFacades.Network.RoleReqAndRes;
                     Vector3 dir = new Vector3(msg.dirX / 10000f, msg.dirY / 10000f, msg.dirZ / 10000f);
                     role.InputComponent.SetRollDir(dir);
@@ -291,7 +291,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             hitFieldList.ForEach((hitFieldModel) =>
             {
                 var bulletIDC = hitFieldModel.hitter;
-                var bullet = bulletRepo.GetByBulletId(bulletIDC.EntityId);
+                var bullet = bulletRepo.Get(bulletIDC.EntityId);
 
                 ConnIDList.ForEach((connId) =>
                 {
@@ -345,7 +345,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     // TODO:Add judgement like 'Can He Pick It Up?'
                     var repo = battleServerFacades.BattleFacades.Repo;
                     var roleRepo = repo.RoleRepo;
-                    var role = roleRepo.GetByEntityId(msg.wRid);
+                    var role = roleRepo.Get(msg.wRid);
                     ItemType itemType = (ItemType)msg.itemType;
 
                     var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
@@ -458,8 +458,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             // Load Scene And Spawn Field
             var domain = battleServerFacades.BattleFacades.Domain;
-            var fieldEntity = await domain.SpawnDomain.SpawnGameFightScene();
-            fieldEntity.SetFieldId(1);
+            var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
+            fieldEntity.SetEntityId(1);
             var fieldEntityRepo = battleServerFacades.BattleFacades.Repo.FiledRepo;
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());

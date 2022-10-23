@@ -26,6 +26,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         protected MoveComponent moveComponent;
         public MoveComponent MoveComponent => moveComponent;
 
+        [SerializeField]
+        protected HitPowerModel hitPowerModel;
+        public HitPowerModel HitPowerModel => hitPowerModel;
+
         // Life 
 
         [SerializeField]

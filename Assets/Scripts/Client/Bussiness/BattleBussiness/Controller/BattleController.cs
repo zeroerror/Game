@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         Queue<FrameBulletHitWallResMsg> bulletHitWallQueue;
         Queue<FrameBulletLifeOverResMsg> bulletTearDownQueue;
         // 服务器下发的人物状态同步队列
-        Queue<BattleRoleStateUpdateMsg> roleStateQueue;
+        Queue<BattleRoleSyncMsg> roleQueue;
         // 服务器下发的资源拾取队列
         Queue<FrameItemPickResMsg> itemPickQueue;
 
@@ -40,7 +40,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletHitWallQueue = new Queue<FrameBulletHitWallResMsg>();
             bulletTearDownQueue = new Queue<FrameBulletLifeOverResMsg>();
 
-            roleStateQueue = new Queue<BattleRoleStateUpdateMsg>();
+            roleQueue = new Queue<BattleRoleSyncMsg>();
 
             itemPickQueue = new Queue<FrameItemPickResMsg>();
 
@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
-            roleRqs.RegistUpdate_WRole(OnWRoleSync);
+            roleRqs.RegistUpdate_WRole(OnRoleSync);
 
             var bulletRqs = battleFacades.Network.BulletReqAndRes;
             bulletRqs.RegistRes_BulletSpawn(OnBulletSpawn);
@@ -84,16 +84,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 GameFightSpawn();
             }
 
+            if (battleFacades.Repo.FiledRepo.CurFieldEntity == null)
+            {
+                return;
+            }
+
             float deltaTime = UnityEngine.Time.deltaTime;
 
             // == Server Response Physics 
-            Tick_BulletHitWall();
             Tick_BulletHitRole();
+            Tick_BulletHitWall();
             Tick_BulletTearDown();
 
             // == Server Response
             Tick_RoleSpawn();
-            Tick_RoleStateSync();
+            Tick_RoleSync();
 
             Tick_BulletSpawn();
 
@@ -109,11 +114,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Tick Server Resonse]
 
         #region [Role]
-        void Tick_RoleStateSync()
+        void Tick_RoleSync()
         {
-            while (roleStateQueue.TryPeek(out var msg))
+            while (roleQueue.TryPeek(out var msg))
             {
-                roleStateQueue.Dequeue();
+                roleQueue.Dequeue();
 
                 RoleState roleState = (RoleState)msg.roleState;
                 float x = msg.x / 10000f;
@@ -139,7 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRepo = repo.RoleRepo;
                 var fieldRepo = repo.FiledRepo;
                 var entityId = msg.entityId;
-                var roleLogic = battleFacades.Repo.RoleRepo.GetByEntityId(entityId);
+                var roleLogic = battleFacades.Repo.RoleRepo.Get(entityId);
 
                 if (roleLogic == null)
                 {
@@ -158,7 +163,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     moveComponent.SetRotation(eulerAngle);
                 }
 
-                roleLogic.StateComponent.SetRoleState(roleState);
+                var stateComponent = roleLogic.StateComponent;
+                if (stateComponent.RoleState == RoleState.Reborn && roleState == RoleState.Normal)
+                {
+                    battleFacades.Domain.RoleDomain.RoleReborn(roleLogic);
+                }
+                
+                stateComponent.SetRoleState(roleState);
             }
         }
 
@@ -205,25 +216,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_BulletHitRole()
         {
-            while (bulletHitRoleQueue.TryDequeue(out var bulletHitRoleMsg))
+            while (bulletHitRoleQueue.TryDequeue(out var msg))
             {
-                // 只做表现层
+                var role = battleFacades.Repo.RoleRepo.Get(msg.roleEntityId);
+                var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityId);
+                role.HealthComponent.HurtByDamage(bullet.HitPowerModel.damage);
                 return;
-                // var bulletRepo = battleFacades.Repo.BulletRepo;
-                // var roleRepo = battleFacades.Repo.RoleRepo;
-                // var bullet = bulletRepo.GetByBulletId(bulletHitRoleMsg.bulletId);
-                // var role = roleRepo.GetByEntityId(bulletHitRoleMsg.entityId);
-
-                // if (role.HealthComponent.IsDead())
-                // {
-                //     battleFacades.Domain.RoleDomain.RoleReborn(role);
-                // }
-
-                // if (bullet is HookerEntity hookerEntity)
-                // {
-                //     // 如果是爪钩则是抓住某物而不是销毁
-                //     hookerEntity.TryGrabSomthing(role.transform);
-                // }
             }
         }
 
@@ -242,7 +240,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var bulletId = msg.bulletId;
                 var bulletType = msg.bulletType;
                 var bulletRepo = battleFacades.Repo.BulletRepo;
-                var bulletEntity = bulletRepo.GetByBulletId(bulletId);
+                var bulletEntity = bulletRepo.Get(bulletId);
 
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
                 bulletEntity.MoveComponent.SetPosition(pos);
@@ -334,7 +332,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var itemDomain = battleFacades.Domain.ItemDomain;
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleRepo;
-                var role = roleRepo.GetByEntityId(msg.wRid);
+                var role = roleRepo.Get(msg.wRid);
                 if (itemDomain.TryPickUpItem(itemType, itemEntityId, repo, role, role.roleRenderer.handPoint))
                 {
                     Debug.Log($"[wRid:{masterWRID}]拾取 {itemType.ToString()}物件[entityId:{itemEntityId}]");
@@ -349,9 +347,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Server Response]
 
         #region [ROLE] 
-        void OnWRoleSync(BattleRoleStateUpdateMsg msg)
+        void OnRoleSync(BattleRoleSyncMsg msg)
         {
-            roleStateQueue.Enqueue(msg);
+            roleQueue.Enqueue(msg);
             // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
         }
 
@@ -419,13 +417,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             // Load Scene And Spawn Field
             var domain = battleFacades.Domain;
-            var fieldEntity = await domain.SpawnDomain.SpawnGameFightScene();
+            var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
             // Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = true;
-            fieldEntity.SetFieldId(1);
+
+            fieldEntity.SetEntityId(1);
+
             var fieldEntityRepo = battleFacades.Repo.FiledRepo;
-            var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
             fieldEntityRepo.Add(fieldEntity);
+
+            var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
             fieldEntityRepo.SetPhysicsScene(physicsScene);
 
             UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });

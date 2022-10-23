@@ -54,7 +54,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 weaponShootQueue.Dequeue();
 
                 var roleRepo = battleFacades.Repo.RoleRepo;
-                var master = roleRepo.GetByEntityId(msg.masterId);
+                var master = roleRepo.Get(msg.masterId);
                 if (master.WeaponComponent.TryWeaponShoot())
                 {
                     Debug.Log($"角色:{msg.masterId}射击");
@@ -69,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 weaponReloadQueue.Dequeue();
 
                 var roleRepo = battleFacades.Repo.RoleRepo;
-                var master = roleRepo.GetByEntityId(msg.masterId);
+                var master = roleRepo.Get(msg.masterId);
                 var reloadBulletNum = msg.reloadBulletNum;
                 master.WeaponComponent.FinishReloading(reloadBulletNum);
             }
@@ -80,7 +80,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (weaponDropQueue.TryPeek(out var msg))
             {
                 weaponDropQueue.Dequeue();
-                var master = battleFacades.Repo.RoleRepo.GetByEntityId(msg.masterId);
+                var master = battleFacades.Repo.RoleRepo.Get(msg.masterId);
                 master.WeaponComponent.TryDropWeapon(msg.entityId, out var weaponEntity);
                 battleFacades.Domain.WeaponDomain.ReuseWeapon(weaponEntity, master.MoveComponent.Position);
             }

@@ -14,7 +14,7 @@ Dictionary<Type, ushort> messageInfoDic;
             this.messageInfoDic = new Dictionary<Type, ushort>();
             messageInfoDic.Add(typeof(BattleHeartbeatReqMsg), 0);
             messageInfoDic.Add(typeof(BattleHeartbeatResMsg), 1);
-            messageInfoDic.Add(typeof(BattleRoleStateUpdateMsg), 2);
+            messageInfoDic.Add(typeof(BattleRoleSyncMsg), 2);
             messageInfoDic.Add(typeof(FrameBattleRoleSpawnReqMsg), 3);
             messageInfoDic.Add(typeof(FrameBattleRoleSpawnResMsg), 4);
             messageInfoDic.Add(typeof(FrameBulletHitRoleResMsg), 5);

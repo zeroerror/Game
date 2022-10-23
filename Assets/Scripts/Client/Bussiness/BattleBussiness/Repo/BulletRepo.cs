@@ -18,7 +18,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             bulletList = new List<BulletEntity>();
         }
 
-        public BulletEntity GetByBulletId(int bulletId)
+        public BulletEntity Get(int bulletId)
         {
             return bulletList.Find((entity) => entity.IDComponent.EntityId == bulletId);
         }

@@ -73,7 +73,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.IDComponent.EntityId}  位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
 
-            BattleRoleStateUpdateMsg msg = new BattleRoleStateUpdateMsg
+            BattleRoleSyncMsg msg = new BattleRoleSyncMsg
             {
                 serverFrame = serverFrame,
                 entityId = (byte)role.IDComponent.EntityId,
@@ -93,7 +93,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 gravityVelocity = gravityVelocity,
                 isOwner = (connId == role.ConnId)
             };
-            battleServer.SendMsg<BattleRoleStateUpdateMsg>(connId, msg);
+            battleServer.SendMsg<BattleRoleSyncMsg>(connId, msg);
             sendCount++;
         }
 

@@ -5,12 +5,14 @@ using System;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
+
+    [Serializable]
     public struct HitPowerModel
     {
         public bool canHitRepeatly;
         public AttackTag attackTag;
         public int damage;
-        public Vector3 hitVelocity;
+        public float hitVelocityCoefficient;
         public int freezeMaintainFrame;
     }
 

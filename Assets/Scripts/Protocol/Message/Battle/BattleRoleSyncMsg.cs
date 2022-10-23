@@ -4,7 +4,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 {
 
     [ZeroMessage]
-    public class BattleRoleStateUpdateMsg :IZeroMessage<BattleRoleStateUpdateMsg>{
+    public class BattleRoleSyncMsg :IZeroMessage<BattleRoleSyncMsg>{
         public int serverFrame;
         public byte entityId;
         public int roleState;

@@ -5,9 +5,9 @@ namespace Game.Client.Bussiness
 
     public class FieldEntity : MonoBehaviour
     {
-        byte fieldId;
-        public byte FieldId => fieldId;
-        public void SetFieldId(byte id) => fieldId = id;
+        byte entityId;
+        public byte EntityId => entityId;
+        public void SetEntityId(byte entityId) => this.entityId = entityId;
 
         public CinemachineComponent CameraComponent { get; private set; }
 
