@@ -46,11 +46,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             if (isPosChange)
             {
-                roleRenderer.noMoveTime = 0;
+                roleRenderer.staticTime = 0;
             }
             else
             {
-                roleRenderer.noMoveTime++;
+                roleRenderer.staticTime += UnityEngine.Time.deltaTime;
             }
 
             roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, moveComponent.Position, deltaTime * roleRenderer.posAdjust);
@@ -213,7 +213,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         bool IsMoving(BattleRoleLogicEntity role)
         {
-            return role.roleRenderer.noMoveTime < 5f;
+            return role.roleRenderer.staticTime < 0.07f;
         }
 
     }

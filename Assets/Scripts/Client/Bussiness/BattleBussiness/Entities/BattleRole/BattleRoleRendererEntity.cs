@@ -14,7 +14,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         Animator animator;
         public AnimatorComponent AnimatorComponent { get; private set; }
-        public float noMoveTime;
+        public float staticTime;
 
         // == ICameraTrackObj ==
         GameObject camTrackingObj;
