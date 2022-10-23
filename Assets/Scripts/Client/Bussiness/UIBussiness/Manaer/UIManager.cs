@@ -13,25 +13,41 @@ namespace Game.Client.Bussiness.UIBussiness
     public static class UIManager
     {
 
+        public static GameObject UICanvasGo { get; private set; }
+
+        static Canvas _uiCanvas;
+
+        static RectTransform _uiCanvasRt;
+
+        static RectTransform _uiMainView;
+
+        static Dictionary<string, Transform> _uiLayerDic = new Dictionary<string, Transform>();
+
+        static Dictionary<string, Transform> _uiDic = new Dictionary<string, Transform>();
+
+        static Dictionary<string, int2> _layerSortingDic = new Dictionary<string, int2>();
+
+        static int _curSortingOrder = 0;
+        
         public static void Ctor()
         {
             int layer = LayerMask.NameToLayer("UI");
-            UIRoot = new GameObject("UICanvas", typeof(Canvas), typeof(CanvasScaler));
-            _uiRootCanvas = UIRoot.GetComponent<Canvas>();
-            _uiRootCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-            _uiRootCanvas.sortingLayerID = SortingLayer.NameToID("Billboard");
-            UIRoot.layer = layer;
-            _uiRootRt = UIRoot.GetComponent<RectTransform>();
-            GameObject.DontDestroyOnLoad(UIRoot);
-            CanvasScaler tempScale = UIRoot.GetComponent<CanvasScaler>();
+            UICanvasGo = new GameObject("UICanvas", typeof(Canvas), typeof(CanvasScaler));
+            _uiCanvas = UICanvasGo.GetComponent<Canvas>();
+            _uiCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+            _uiCanvas.sortingLayerID = SortingLayer.NameToID("Billboard");
+            UICanvasGo.layer = layer;
+            _uiCanvasRt = UICanvasGo.GetComponent<RectTransform>();
+            GameObject.DontDestroyOnLoad(UICanvasGo);
+            CanvasScaler tempScale = UICanvasGo.GetComponent<CanvasScaler>();
             tempScale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             tempScale.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             tempScale.referenceResolution = UIDef.UIResolution;
-            _uiRootRt.position = Vector3.zero;//CanvasScaler 会进行重置坐标 等其加载完成
+            _uiCanvasRt.position = Vector3.zero;//CanvasScaler 会进行重置坐标 等其加载完成
 
             _uiMainView = new GameObject("UIMainView", typeof(RectTransform)).GetComponent<RectTransform>();
             _SetRectTransform(ref _uiMainView);
-            _uiMainView.transform.SetParent(UIRoot.transform, false);
+            _uiMainView.transform.SetParent(UICanvasGo.transform, false);
 
             foreach (var item in SortingLayer.layers)
             {
@@ -51,7 +67,7 @@ namespace Game.Client.Bussiness.UIBussiness
             }
 
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule), typeof(BaseInput));
-            eventSystem.transform.SetParent(UIRoot.transform, false);
+            eventSystem.transform.SetParent(UICanvasGo.transform, false);
         }
 
         public static bool IsActive(string uiName)
@@ -199,18 +215,6 @@ namespace Game.Client.Bussiness.UIBussiness
             rct.offsetMax = Vector2.zero;
             rct.offsetMin = Vector2.zero;
         }
-
-        public static GameObject UIRoot { get; private set; }
-        static Canvas _uiRootCanvas;
-        static RectTransform _uiRootRt;
-        static GameObject _battleUIRoot;
-        static Canvas _battleUIRootCanvas;
-        static RectTransform _battleUIRootRt;
-        static RectTransform _uiMainView;
-        static Dictionary<string, Transform> _uiLayerDic = new Dictionary<string, Transform>();
-        static Dictionary<string, Transform> _uiDic = new Dictionary<string, Transform>();
-        static int _curSortingOrder = 0;
-        static Dictionary<string, int2> _layerSortingDic = new Dictionary<string, int2>();
 
     }
 

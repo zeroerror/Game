@@ -4,9 +4,7 @@ using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Generic;
-using Game.Client.Bussiness.BattleBussiness.Repo;
-using Game.Client.Bussiness.Repo;
+using Game.Client.Bussiness.UIBussiness;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -436,7 +434,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             rqs.SendReq_BattleRoleSpawn();
 
             Debug.Log($"加载战斗场景结束---------------------------------------------------");
-
         }
 
         #endregion

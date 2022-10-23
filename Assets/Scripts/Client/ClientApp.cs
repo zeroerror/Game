@@ -63,13 +63,14 @@ namespace Game.Client
             BattleEntry.Inject(AllClientNetwork.battleSerClient, playerInputComponent);
 
             // ====== Manager ======
-            UIManager.Ctor();
             CameraManager.Ctor();
 
             // ======  UI ======
             UIEntry.Ctor();
+            UIManager.Ctor();
+
             var uiCamTrans = CameraManager.UICamTrans;
-            uiCamTrans.SetParent(UIManager.UIRoot.transform, false);
+            uiCamTrans.SetParent(UIManager.UICanvasGo.transform, false);
 
             // ======  Input ======
             InputGameSet.Ctor();
