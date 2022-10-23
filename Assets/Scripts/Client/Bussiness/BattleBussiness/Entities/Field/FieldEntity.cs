@@ -14,7 +14,9 @@ namespace Game.Client.Bussiness
         public Transform Role_Group_Logic { get; private set; }
         public Transform Role_Group_Renderer { get; private set; }
 
-        public Vector3 BornPos { get; private set; }
+        [SerializeField]
+        Transform bornPoint;
+        public Vector3 BornPos => bornPoint.position;
 
         void Awake()
         {
@@ -24,7 +26,6 @@ namespace Game.Client.Bussiness
             Debug.Assert(Role_Group_Logic != null);
             Debug.Assert(Role_Group_Renderer != null);
 
-            BornPos = transform.position + new Vector3(0, 5f, 5f);
         }
 
         public void Ctor()

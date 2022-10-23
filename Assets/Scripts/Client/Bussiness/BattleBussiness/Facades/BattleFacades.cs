@@ -23,11 +23,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         {
             Network = new AllBattleNetwork();
             Repo = new AllBattleRepo();
-            Domain = new AllDomains();
             Assets = new AllBattleAssets();
+            Domain = new AllDomains();
+            
             ArbitrationService=new BattleArbitrationService();
             BattleLeagueService=new BattleLeagueService();
 
+            ArbitrationService.Inject(this);
             Domain.Inject(this);
 
             // Asset Load
