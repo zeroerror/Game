@@ -41,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         [Header("前滚翻速度")]
         float rollSpeed;
         public float RollSpeed => rollSpeed;
-        
+
         bool isDead;
         public bool IsDead => isDead;
 
@@ -107,16 +107,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region [Action]
 
-        public bool TryRoll(Vector3 dir)
+        public void Roll(Vector3 dir)
         {
-            if (!moveComponent.IsGrounded) return false;
-
             dir.Normalize();
             var addVelocity = dir * rollSpeed;
             addVelocity.y = 3f;
             moveComponent.AddExtraVelocity(addVelocity);
             Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
-            return true;
         }
 
         public void JumpboardSpeedUp()

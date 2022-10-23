@@ -136,6 +136,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             euler.y += eulerAngleY;    //左右看
             rb.rotation = Quaternion.Euler(euler);
         }
+        
         public void SetEulerAngleY(Vector3 eulerAngle)
         {
             var euler = rb.rotation.eulerAngles;

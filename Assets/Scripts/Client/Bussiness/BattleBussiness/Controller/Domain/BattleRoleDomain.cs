@@ -82,8 +82,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public bool TryRoleRoll(BattleRoleLogicEntity role, Vector3 dir)
         {
+            var moveComponent = role.MoveComponent;
+            if (!moveComponent.IsGrounded)
+            {
+                return false;
+            }
+
+            role.Roll(dir);
             role.StateComponent.EnterRolling(30);
-            return role.TryRoll(dir);
+
+            return true;
         }
 
         public void RoleReborn(BattleRoleLogicEntity role)
