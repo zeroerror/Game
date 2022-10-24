@@ -13,16 +13,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     {
         BattleFacades battleFacades;
         float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
+
         // 服务器下发的生成队列
         Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
         Queue<FrameItemSpawnResMsg> itemSpawnQueue;
+
         // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
         Queue<FrameBulletHitFieldResMsg> bulletHitFieldQueue;
         Queue<FrameBulletLifeOverResMsg> bulletTearDownQueue;
+
         // 服务器下发的人物状态同步队列
         Queue<BattleRoleSyncMsg> roleQueue;
+
         // 服务器下发的资源拾取队列
         Queue<FrameItemPickResMsg> itemPickQueue;
 
@@ -260,7 +264,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 if (bulletEntity is GrenadeEntity grenadeEntity)
                 {
-                    grenadeEntity.TearDown();
+                    var bulletDomain = battleFacades.Domain.BulletDomain;
+                    bulletDomain.GrenadeExplode(grenadeEntity, fixedDeltaTime);
                 }
 
                 if (bulletEntity is HookerEntity hookerEntity)

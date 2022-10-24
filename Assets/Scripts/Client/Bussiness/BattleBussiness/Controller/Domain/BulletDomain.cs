@@ -214,7 +214,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void GrenadeExplode(GrenadeEntity grenadeEntity, float fixedDeltaTime)
         {
             Debug.Log("爆炸");
-            grenadeEntity.TearDown();
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
@@ -235,6 +234,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     }
                 }
             });
+
+            grenadeEntity.TearDown();
         }
 
         #endregion

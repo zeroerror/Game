@@ -20,7 +20,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         public override void TearDown()
         {
             Destroy(gameObject);
-            Debug.Log($"手雷爆炸！！！");
         }
 
 
