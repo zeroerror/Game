@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         Queue<FrameItemSpawnResMsg> itemSpawnQueue;
         // 服务器下发的物理事件队列
         Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
-        Queue<FrameBulletHitWallResMsg> bulletHitWallQueue;
+        Queue<FrameBulletHitFieldResMsg> bulletHitFieldQueue;
         Queue<FrameBulletLifeOverResMsg> bulletTearDownQueue;
         // 服务器下发的人物状态同步队列
         Queue<BattleRoleSyncMsg> roleQueue;
@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
 
             bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
-            bulletHitWallQueue = new Queue<FrameBulletHitWallResMsg>();
+            bulletHitFieldQueue = new Queue<FrameBulletHitFieldResMsg>();
             bulletTearDownQueue = new Queue<FrameBulletLifeOverResMsg>();
 
             roleQueue = new Queue<BattleRoleSyncMsg>();
@@ -68,7 +68,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var bulletRqs = battleFacades.Network.BulletReqAndRes;
             bulletRqs.RegistRes_BulletSpawn(OnBulletSpawn);
             bulletRqs.RegistRes_BulletHitRole(OnBulletHitRole);
-            bulletRqs.RegistRes_BulletHitWall(OnBulletHitWall);
+            bulletRqs.RegistRes_BulletHitField(OnBulletHitField);
             bulletRqs.RegistRes_BulletTearDown(OnBulletTearDown);
 
             var ItemReqAndRes = battleFacades.Network.ItemReqAndRes;
@@ -232,9 +232,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_BulletHitWall()
         {
-            while (bulletHitWallQueue.TryDequeue(out var bulletHitWallResMsg))
+            while (bulletHitFieldQueue.TryDequeue(out var msg))
             {
-                // 只做表现层
+                // - 同步子弹位置
+                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+                var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityID);
+                bullet.MoveComponent.SetPosition(pos);
             }
         }
 
@@ -378,10 +381,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletHitRoleQueue.Enqueue(msg);
         }
 
-        void OnBulletHitWall(FrameBulletHitWallResMsg msg)
+        void OnBulletHitField(FrameBulletHitFieldResMsg msg)
         {
             Debug.Log("加入子弹击中墙壁队列");
-            bulletHitWallQueue.Enqueue(msg);
+            bulletHitFieldQueue.Enqueue(msg);
         }
 
         void OnBulletTearDown(FrameBulletLifeOverResMsg msg)

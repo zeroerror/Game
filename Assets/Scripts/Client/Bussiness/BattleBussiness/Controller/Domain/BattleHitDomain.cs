@@ -49,13 +49,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityId);
             var role = battleFacades.Repo.RoleRepo.Get(victimIDC.EntityId);
 
-            // 作用伤害
-            role.HealthComponent.HurtByDamage(hitPowerModel.damage);
-
-            // 作用物理
-            var addV = bullet.MoveComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
-            role.MoveComponent.AddExtraVelocity(addV);
-            role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
+            if (bullet.BulletType == BulletType.DefaultBullet)
+            {
+                // 作用伤害
+                role.HealthComponent.HurtByDamage(hitPowerModel.damage);
+                // 作用物理
+                var addV = bullet.MoveComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
+                role.MoveComponent.AddExtraVelocity(addV);
+                role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
+            }
 
             // 状态
             role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);

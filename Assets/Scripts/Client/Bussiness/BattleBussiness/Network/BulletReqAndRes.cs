@@ -56,7 +56,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
-        public void RegistRes_BulletHitWall(Action<FrameBulletHitWallResMsg> action)
+        public void RegistRes_BulletHitField(Action<FrameBulletHitFieldResMsg> action)
         {
             AddRegister(action);
         }

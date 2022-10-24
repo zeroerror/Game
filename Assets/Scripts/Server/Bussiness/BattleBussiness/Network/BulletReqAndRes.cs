@@ -86,10 +86,10 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         {
             var bulletPos = bulletEntity.MoveComponent.Position;
             bulletPos *= 10000f;
-            FrameBulletHitWallResMsg msg = new FrameBulletHitWallResMsg
+            FrameBulletHitFieldResMsg msg = new FrameBulletHitFieldResMsg
             {
                 serverFrame = serverFrame,
-                bulletId = (ushort)bulletEntity.IDComponent.EntityId,
+                bulletEntityID = (ushort)bulletEntity.IDComponent.EntityId,
                 posX = (int)bulletPos.x,
                 posY = (int)bulletPos.y,
                 posZ = (int)bulletPos.z,

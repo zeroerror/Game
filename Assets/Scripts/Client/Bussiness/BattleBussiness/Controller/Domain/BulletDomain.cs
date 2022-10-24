@@ -167,6 +167,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var hitFieldList = physicsDomain.GetHitField_ColliderList(bullet);
                 hitFieldList.ForEach((ce) =>
                 {
+                    if (ce.status != CollisionStatus.Enter)
+                    {
+                        return;
+                    }
+
                     HitFieldModel hitFieldModel = new HitFieldModel();
                     hitFieldModel.hitter = bullet.IDComponent;
                     hitFieldModel.fieldCE = ce;
@@ -208,21 +213,26 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void GrenadeExplode(GrenadeEntity grenadeEntity, float fixedDeltaTime)
         {
+            Debug.Log("爆炸");
             grenadeEntity.TearDown();
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
+                // - 根据距离HitActor
                 var dis = Vector3.Distance(role.MoveComponent.Position, grenadeEntity.MoveComponent.Position);
-                if (dis < 7f)
+                if (dis < grenadeEntity.ExplosionRadius)
                 {
                     var dir = role.MoveComponent.Position - grenadeEntity.MoveComponent.Position;
-                    var hitVelocity = dir.normalized * 10f;
 
-                    // - TODO 根据配置的HitPowerModel
                     HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
                     var hitDomain = battleFacades.Domain.HitDomain;
-                    hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime);
+                    if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime))
+                    {
+                        var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient;
+                        role.MoveComponent.AddExtraVelocity(hitVelocity);
+                        role.HealthComponent.HurtByDamage(hitPowerModel.damage);
+                    }
                 }
             });
         }

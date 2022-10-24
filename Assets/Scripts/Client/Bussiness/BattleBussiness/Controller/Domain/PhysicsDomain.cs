@@ -118,7 +118,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             physicsEntity.HitCollisionExtraListForeach((collisionExtra) =>
             {
 
-                if (collisionExtra.status == CollisionStatus.Exit) removeList.Add(collisionExtra);
+                if (collisionExtra.status == CollisionStatus.Exit)
+                {
+                    removeList.Add(collisionExtra);
+                }
+
                 Collider collider = collisionExtra.Collider;
                 if (collider == null || collider.enabled == false)
                 {
@@ -127,7 +131,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     removeList.Add(collisionExtra);
                 }
 
-                if (collisionExtra.layerName == layerName) collisionList.Add(collisionExtra);   //本帧依然添加进List
+                if (collisionExtra.layerName == layerName)
+                {
+                    collisionList.Add(collisionExtra);   //本帧依然添加进List
+                }
             });
 
             removeList.ForEach((ce) =>

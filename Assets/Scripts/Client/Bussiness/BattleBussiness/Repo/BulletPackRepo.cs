@@ -17,13 +17,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             bulletPackList = new List<BulletPackEntity>();
         }
 
-        public bool TryGetByBulletId(ushort bulletId, out BulletPackEntity bulletEntity)
+        public bool TryGet(ushort bulletId, out BulletPackEntity bulletEntity)
         {
             bulletEntity = bulletPackList.Find((entity) => entity.EntityId == bulletId);
             return bulletEntity != null;
         }
 
-        public BulletPackEntity GetByMasterId(ushort wRid)
+        public BulletPackEntity Get(ushort wRid)
         {
             return bulletPackList.Find((entity) => entity.MasterId == wRid);
         }

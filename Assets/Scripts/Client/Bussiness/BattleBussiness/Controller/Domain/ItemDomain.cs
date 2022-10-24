@@ -64,7 +64,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     break;
                 case ItemType.BulletPack:
                     var bulletPackRepo = repo.BulletPackRepo;
-                    if (bulletPackRepo.TryGetByBulletId(entityId, out BulletPackEntity bulletPackEntity))
+                    if (bulletPackRepo.TryGet(entityId, out BulletPackEntity bulletPackEntity))
                     {
                         isPickUpSucceed = true;
                         master.ItemComponent.TryCollectItem_Bullet(bulletPackEntity);

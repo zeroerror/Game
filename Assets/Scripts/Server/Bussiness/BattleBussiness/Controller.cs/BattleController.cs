@@ -243,7 +243,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
             var tearDownList = bulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
-            if (tearDownList.Count == 0) return;
 
             tearDownList.ForEach((bulletEntity) =>
             {
@@ -257,7 +256,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (bulletEntity is GrenadeEntity grenadeEntity)
                 {
-                    Debug.Log("爆炸");
                     var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
                     bulletDomain.GrenadeExplode(grenadeEntity, fixedDeltaTime);
                 }
