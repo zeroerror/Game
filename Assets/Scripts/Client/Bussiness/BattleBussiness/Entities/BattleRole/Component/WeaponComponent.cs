@@ -14,7 +14,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         public WeaponEntity[] AllWeapon;    //所有武器
         public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
         public int CurrentNum { get; private set; }    //当前武器数量
-        public bool IsReloading { get; private set; }
+
+        public bool isReloading;
+        public bool IsReloading => isReloading;
+        public void SetIsReloading(bool value) => isReloading = value;
 
         public bool IsFullReloaded => CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
 
@@ -25,13 +28,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void BeginReloading()
         {
-            this.IsReloading = true;
+            isReloading = true;
             CurrentWeapon.ResetCurrentReloadingFrame();
         }
 
         public void FinishReloading(int reloadBulletNum)
         {
-            IsReloading = false;
+            isReloading = false;
             CurrentWeapon.LoadBullet(reloadBulletNum);
             Debug.Log($"武器装弹：{reloadBulletNum}");
             return;
@@ -108,7 +111,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                     //是否为丢弃当前武器
                     if (CurrentWeapon == weapon)
                     {
-                        IsReloading = false;
+                        isReloading = false;
                         CurrentWeapon = null;
                         Debug.Log($"丢弃当前武器 {w.WeaponType.ToString()}");
                     }

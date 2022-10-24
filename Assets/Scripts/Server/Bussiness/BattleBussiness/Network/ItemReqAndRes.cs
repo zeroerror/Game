@@ -55,7 +55,6 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             };
             battleServer.SendMsg(connId, msg);
             sendCount++;
-            Debug.Log($"SendRes_ItemPickUp connId:{connId}");
         }
 
         public void SendRes_ItemSpawn(int connId, int frameIndex, List<byte> itemTypeList, List<byte> subtypeList, List<ushort> entityIdList)

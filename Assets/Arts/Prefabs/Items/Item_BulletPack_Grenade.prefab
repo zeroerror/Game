@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5906475554322309825}
   - component: {fileID: 6637605190270621414}
   m_Layer: 9
-  m_Name: DefaultBullet_Item
+  m_Name: Item_BulletPack_Grenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e47e8f0bb92aaff4c93eedb0398a1c96, type: 2}
+  - {fileID: 2100000, guid: 0e6d9344d5bbb9a4abca1058f4e295d6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f47fbd6b2848da4d8b390055de60d74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletType: 0
+  bulletType: 1
   bulletNum: 1000
 --- !u!1 &6348179348261528665
 GameObject:

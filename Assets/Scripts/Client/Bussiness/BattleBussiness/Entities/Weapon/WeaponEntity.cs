@@ -39,11 +39,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         int masterWRid;
         public int MasterId => masterWRid;
 
-        bool hasMaster;
-        public bool HasMaster => hasMaster;
-
         public int bulletNum { get; private set; }
         public void LoadBullet(int bulletNum) => this.bulletNum += bulletNum;
+
+        bool hasMaster;
+        public bool HasMaster => hasMaster;
 
         public BulletType bulletType;
 
@@ -85,6 +85,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 return bulletNum;
             }
+        }
+
+        public int GetReloadBulletNum()
+        {
+            return bulletCapacity - bulletNum;
         }
 
         public void PlayShootAudio()

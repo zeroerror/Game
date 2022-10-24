@@ -151,9 +151,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     }
                     else
                     {
-                        int reloadBulletNum = role.FetchBullets();
-                        role.WeaponComponent.FinishReloading(reloadBulletNum);
-                        //TODO: 装弹时间过后才发送回客户端
+                        int reloadBulletNum = role.ReloadBulletsToWeapon(curWeapon);
                         ConnIdList.ForEach((connId) =>
                         {
                             rqs.SendRes_WeaponReloaded(connId, ServeFrame, role.IDComponent.EntityId, reloadBulletNum);
@@ -217,7 +215,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                 long key = (long)ServeFrame << 32;
                 key |= (long)connId;
 
-                Debug.Log($"OnWeaponReload weaponReloadMsgDic: key {key}");
                 if (!weaponReloadMsgDic.TryGetValue(key, out var _))
                 {
                     weaponReloadMsgDic[key] = msg;

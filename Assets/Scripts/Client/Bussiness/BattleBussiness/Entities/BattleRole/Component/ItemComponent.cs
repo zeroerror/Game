@@ -13,11 +13,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public int CurrentCapacity;    //当前武器数量
 
-        Queue<BulletPackEntity> bulletPackItemQueue;
+        List<BulletPackEntity> bulletPackItemList;
 
         public ItemComponent()
         {
-            bulletPackItemQueue = new Queue<BulletPackEntity>();
+            bulletPackItemList = new List<BulletPackEntity>();
         }
 
         // 拾取
@@ -33,14 +33,20 @@ namespace Game.Client.Bussiness.BattleBussiness
             CurrentCapacity += bulletPackEntity.bulletNum * 1;
             Debug.LogWarning($"收集了子弹包[类型:{bulletPackEntity.bulletType.ToString()} 数量:{bulletPackEntity.bulletNum}]");
             Debug.LogWarning($"当前背包容量 占用 {CurrentCapacity}  剩余 {ITEM_CAPACITY - CurrentCapacity}");
-            bulletPackItemQueue.Enqueue(bulletPackEntity);
+            bulletPackItemList.Add(bulletPackEntity);
         }
 
         // 使用
-        public int TakeOutItem_Bullet(int num)
+        public int TakeOutItem_Bullet(BulletType bulletType, int num)
         {
-            if (bulletPackItemQueue.TryPeek(out var bulletPackEntity))
+            for (int i = 0; i < bulletPackItemList.Count; i++)
             {
+                var bulletPackEntity = bulletPackItemList[i];
+                if (bulletPackEntity.bulletType != bulletType)
+                {
+                    continue;
+                }
+
                 if (bulletPackEntity.bulletNum >= num)
                 {
                     bulletPackEntity.bulletNum -= num;
@@ -50,14 +56,14 @@ namespace Game.Client.Bussiness.BattleBussiness
                 {
                     int realTakeOut = bulletPackEntity.bulletNum;
                     bulletPackEntity.bulletNum = 0;
-                    bulletPackItemQueue.Dequeue();
-                    return realTakeOut;
+                    bulletPackItemList.Remove(bulletPackEntity);
+                    return realTakeOut + TakeOutItem_Bullet(bulletType, num - realTakeOut);
                 }
                 else
                 {
                     GameObject.Destroy(bulletPackEntity);
-                    bulletPackItemQueue.Dequeue();
-                    return TakeOutItem_Bullet(num);
+                    bulletPackItemList.Remove(bulletPackEntity);
+                    return TakeOutItem_Bullet(bulletType, num);
                 }
             }
 
@@ -67,7 +73,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public bool HasItem_Bullet(int num)
         {
             int total = 0;
-            var e = bulletPackItemQueue.GetEnumerator();
+            var e = bulletPackItemList.GetEnumerator();
             while (e.MoveNext())
             {
 
@@ -80,24 +86,30 @@ namespace Game.Client.Bussiness.BattleBussiness
         }
 
         //丢弃
-        public IPickable[] DropItems(ItemType itemtype, int num)
+        public List<IPickable> DropItems(ItemType itemtype, int num)
         {
-            IPickable[] items = new IPickable[num];
+            List<IPickable> itemList = new List<IPickable>();
             switch (itemtype)
             {
                 case ItemType.Default:
                     break;
                 case ItemType.BulletPack:
-                    for (int i = 0; i < num; i++)
+                    for (int i = 0; i < bulletPackItemList.Count; i++)
                     {
-                        items[i] = bulletPackItemQueue.Dequeue();
+                        if (num <= i)
+                        {
+                            break;
+                        }
+
+                        itemList.Add(itemList[i]);
                     }
+                    
                     break;
                 case ItemType.Pill:
                     break;
             }
 
-            return items;
+            return itemList;
         }
 
     }

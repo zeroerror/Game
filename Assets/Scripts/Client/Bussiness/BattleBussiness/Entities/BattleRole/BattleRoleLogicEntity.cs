@@ -124,10 +124,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} ExtraVelocity当前值: {moveComponent.ExtraVelocity}", "#48D1CC");
         }
 
-        public int FetchBullets()
+        public int ReloadBulletsToWeapon(WeaponEntity weaponEntity)
         {
-            var curWeapon = weaponComponent.CurrentWeapon;
-            return ItemComponent.TakeOutItem_Bullet(curWeapon.BulletCapacity - curWeapon.bulletNum); ;
+            var num = ItemComponent.TakeOutItem_Bullet(weaponEntity.bulletType, weaponEntity.GetReloadBulletNum());
+            weaponComponent.FinishReloading(num);
+
+            return num;
         }
 
         public void Reborn(in Vector3 pos)

@@ -28,10 +28,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 case ItemType.Default:
                     break;
                 case ItemType.Weapon:
-                    itemName = ((WeaponType)sortType).ToString() + "_Item";
+                    itemName =$"Item_Weapon_{((WeaponType)sortType).ToString()}";
                     break;
                 case ItemType.BulletPack:
-                    itemName = ((BulletType)sortType).ToString() + "_Item";
+                    itemName =$"Item_BulletPack_{((BulletType)sortType).ToString()}";
                     break;
                 case ItemType.Pill:
                     break;
