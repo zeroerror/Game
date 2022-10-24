@@ -62,9 +62,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             this.battleFacades = battleFacades;
 
-            var battleRqs = battleFacades.Network.BattleReqAndRes;
-            battleRqs.RegistRes_HeartBeat(OnHeartbeatRes);
-
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
             roleRqs.RegistUpdate_WRole(OnRoleSync);
@@ -413,12 +410,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             itemPickQueue.Enqueue(msg);
         }
         #endregion
-
-        // Heartbeat
-        void OnHeartbeatRes(BattleHeartbeatResMsg msg)
-        {
-            Debug.Log("收到心跳");
-        }
 
         #endregion
 

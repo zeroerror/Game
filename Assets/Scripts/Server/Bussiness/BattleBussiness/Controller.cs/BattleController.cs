@@ -24,10 +24,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         public int ServeFrame => battleServerFacades.Network.ServeFrame;
         List<int> ConnIDList => battleServerFacades.Network.connIdList;
 
-        // ====== 心跳 ======
-        // - 所有客户端心跳帧
-        Dictionary<long, BattleHeartbeatReqMsg> heartbeatMsgDic;
-
         // ====== 角色 ======
         // - 所有生成帧
         Dictionary<long, FrameBattleRoleSpawnReqMsg> roleSpawnMsgDic;
@@ -48,8 +44,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                 ConnIDList.Add(connId); //添加至连接名单
                 hasBattleBegin = true;
             });
-
-            heartbeatMsgDic = new Dictionary<long, BattleHeartbeatReqMsg>();
 
             roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();

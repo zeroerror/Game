@@ -44,25 +44,8 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendRes_HeartBeat(int connId)
-        {
-            BattleHeartbeatResMsg msg = new BattleHeartbeatResMsg
-            {
-            };
-
-            battleServer.SendMsg(connId, msg);
-            sendCount++;
-            Debug.Log($"发送心跳回复消息");
-        }
-
         // ====== Regist ======
-        public void RegistReq_HeartBeat(Action<int, BattleHeartbeatReqMsg> action)
-        {
-            AddRegister(action);
-            Debug.Log($"收到心跳消息");
-        }
 
-        // Private Func
         void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
         {
             battleServer.AddRegister<T>((connId, msg) =>

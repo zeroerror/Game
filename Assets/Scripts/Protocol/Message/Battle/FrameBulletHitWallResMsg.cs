@@ -1,12 +1,10 @@
 using System;
 using ZeroFrame.Protocol;
-using ZeroFrame.Buffer;
-namespace Game.Protocol.Battle
+using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 {
 
     [ZeroMessage]
-    public class FrameBulletHitFieldResMsg : IZeroMessage<FrameBulletHitFieldResMsg>
-    {
+    public class FrameBulletHitFieldResMsg :IZeroMessage<FrameBulletHitFieldResMsg>{
         public int serverFrame;
         public ushort bulletEntityID;
         public int posX; //(8  8)  (8  8)   整数部16位 int16（-32768 --- +32767） 小数部分16位 uint16(0 --- +65535) 0.0000到0.9999
