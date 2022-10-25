@@ -59,17 +59,10 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             int rotZ = (int)(eulerAngle.z * 10000);
 
             // Velocity
-            var moveVelocity = role.MoveComponent.MoveVelocity;
-            int moveVelocityX = (int)(moveVelocity.x * 10000);
-            int moveVelocityY = (int)(moveVelocity.y * 10000);
-            int moveVelocityZ = (int)(moveVelocity.z * 10000);
-
-            var extraVelocity = role.MoveComponent.ExtraVelocity;
-            int extraVelocityX = (int)(extraVelocity.x * 10000);
-            int extraVelocityY = (int)(extraVelocity.y * 10000);
-            int extraVelocityZ = (int)(extraVelocity.z * 10000);
-
-            int gravityVelocity = (int)(role.MoveComponent.GravityVelocity * 10000);
+            var velocity = role.MoveComponent.Velocity;
+            int velocityX = (int)(velocity.x * 10000);
+            int velocityY = (int)(velocity.y * 10000);
+            int velocityZ = (int)(velocity.z * 10000);
 
             // DebugExtensions.LogWithColor($"发送状态同步帧{serverFrame} connId:{connId} wRid:{role.IDComponent.EntityId}  位置 :{pos} 移动速度：{moveVelocity} 额外速度：{extraVelocity}  重力速度:{role.MoveComponent.GravityVelocity}  旋转角度：{eulerAngle}", "#008000");
 
@@ -78,19 +71,15 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 serverFrame = serverFrame,
                 entityId = (byte)role.IDComponent.EntityId,
                 roleState = (int)role.StateComponent.RoleState,
-                x = x,
-                y = y,
-                z = z,
+                posX = x,
+                posY = y,
+                posZ = z,
                 eulerX = rotX,
                 eulerY = rotY,
                 eulerZ = rotZ,
-                moveVelocityX = moveVelocityX,
-                moveVelocityY = moveVelocityY,
-                moveVelocityZ = moveVelocityZ,
-                extraVelocityX = extraVelocityX,
-                extraVelocityY = extraVelocityY,
-                extraVelocityZ = extraVelocityZ,
-                gravityVelocity = gravityVelocity,
+                velocityX = velocityX,
+                velocityY = velocityY,
+                velocityZ = velocityZ,
                 isOwner = (connId == role.ConnId)
             };
             battleServer.SendMsg<BattleRoleSyncMsg>(connId, msg);

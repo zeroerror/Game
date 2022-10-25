@@ -122,24 +122,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 roleQueue.Dequeue();
 
                 RoleState roleState = (RoleState)msg.roleState;
-                float x = msg.x / 10000f;
-                float y = msg.y / 10000f;
-                float z = msg.z / 10000f;
+                float x = msg.posX / 10000f;
+                float y = msg.posY / 10000f;
+                float z = msg.posZ / 10000f;
                 float eulerX = msg.eulerX / 10000f;
                 float eulerY = msg.eulerY / 10000f;
                 float eulerZ = msg.eulerZ / 10000f;
-                float moveVelocityX = msg.moveVelocityX / 10000f;
-                float moveVelocityY = msg.moveVelocityY / 10000f;
-                float moveVelocityZ = msg.moveVelocityZ / 10000f;
-                float extraVelocityX = msg.extraVelocityX / 10000f;
-                float extraVelocityY = msg.extraVelocityY / 10000f;
-                float extraVelocityZ = msg.extraVelocityZ / 10000f;
-                float gravityVelocity = msg.gravityVelocity / 10000f;
+                float velocityX = msg.velocityX / 10000f;
+                float velocityY = msg.velocityY / 10000f;
+                float velocityZ = msg.velocityZ / 10000f;
 
                 Vector3 pos = new Vector3(x, y, z);
                 Vector3 eulerAngle = new Vector3(eulerX, eulerY, eulerZ);
-                Vector3 moveVelocity = new Vector3(moveVelocityX, moveVelocityY, moveVelocityZ);
-                Vector3 extraVelocity = new Vector3(extraVelocityX, extraVelocityY, extraVelocityZ);
+                Vector3 velocity = new Vector3(velocityX, velocityY, velocityZ);
 
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleRepo;
@@ -154,9 +149,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var moveComponent = roleLogic.MoveComponent;
                 moveComponent.SetPosition(pos);
-                moveComponent.SetMoveVelocity(moveVelocity);
-                moveComponent.SetExtraVelocity(extraVelocity);
-                moveComponent.SetGravityVelocity(gravityVelocity);
+                moveComponent.SetVelocity(velocity);
 
                 if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId)
                 {
@@ -227,6 +220,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
 
                 var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityId);
+                if (bullet == null)
+                {
+                    continue;
+                }
+                
+                if (bullet.BulletType == BulletType.Grenade)
+                {
+                    continue;
+                }
+
                 role.HealthComponent.HurtByDamage(bullet.HitPowerModel.damage);
             }
         }

@@ -228,7 +228,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var hitDomain = battleFacades.Domain.HitDomain;
                     if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime))
                     {
-                        var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient;
+                        var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient + new Vector3(0, 2f, 0);
                         role.MoveComponent.AddExtraVelocity(hitVelocity);
                         role.HealthComponent.HurtByDamage(hitPowerModel.damage);
                     }

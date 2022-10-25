@@ -140,7 +140,7 @@ MonoBehaviour:
     isHitWall: 0
   hitPowerModel:
     canHitRepeatly: 0
-    attackTag: 1
+    attackTag: 2
     damage: 30
     hitVelocityCoefficient: 10
     freezeMaintainFrame: 30
