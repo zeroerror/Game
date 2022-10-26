@@ -8,10 +8,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     public class BattleFacades
     {
         public AllBattleNetwork Network { get; private set; }
+        
         public AllBattleRepo Repo { get; private set; }
+
         public AllDomains Domain { get; private set; }
+
         // Asset
         public AllBattleAssets Assets { get; private set; }
+
         // Controller Set
         public PlayerInputComponent InputComponent { get; private set; }
 
