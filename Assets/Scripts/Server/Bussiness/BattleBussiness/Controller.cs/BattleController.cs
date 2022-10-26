@@ -460,18 +460,18 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void InitAllAssetRepo(AssetPointEntity[] assetPointEntities)
         {
-            var itemTypeList = battleServerFacades.EntityTypeList;
+            var entityTypeList = battleServerFacades.EntityTypeList;
             var entityIDList = battleServerFacades.EntityIDList;
             var itemTypeByteList = battleServerFacades.ItemTypeByteList;
             var subTypeList = battleServerFacades.SubTypeList;
 
-            int count = itemTypeList.Count;
+            int count = entityTypeList.Count;
             Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
 
             var battleFacades = battleServerFacades.BattleFacades;
-            for (int i = 0; i < itemTypeList.Count; i++)
+            for (int i = 0; i < entityTypeList.Count; i++)
             {
-                var entityType = itemTypeList[i];
+                var entityType = entityTypeList[i];
                 var subtype = subTypeList[i];
                 var parent = assetPointEntities[i];
 

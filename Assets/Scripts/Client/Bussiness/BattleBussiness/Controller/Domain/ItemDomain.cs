@@ -29,7 +29,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var itemGo = GameObject.Instantiate(prefab);
             itemGo.SetActive(true);
-            itemGo.transform.SetParent(parent.transform);
+            if (parent != null)
+            {
+                itemGo.transform.SetParent(parent.transform);
+            }
             itemGo.transform.localPosition = Vector3.zero;
 
             var idc = CreateEntity(entityType, itemGo);
@@ -47,16 +50,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var weapon = entityGo.GetComponent<WeaponEntity>();
                     var weaponRepo = battleFacades.Repo.WeaponRepo;
                     weapon.Ctor();
+                    weaponRepo.Add(weapon);
                     return weapon.IDComponent;
                 case EntityType.BulletPack:
                     var bulletPack = entityGo.GetComponent<BulletPackEntity>();
                     var bulletPackRepo = battleFacades.Repo.BulletPackRepo;
                     bulletPack.Ctor();
+                    bulletPackRepo.Add(bulletPack);
                     return bulletPack.IDComponent;
                 case EntityType.Armor:
                     var armorRepo = battleFacades.Repo.ArmorRepo;
                     var armor = entityGo.GetComponent<BattleArmorEntity>();
                     armor.Ctor();
+                    armorRepo.Add(armor);
                     return armor.IDComponent;
             }
 
@@ -124,7 +130,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             }
 
-            Debug.Log($"Prefab Name:{prefabName}");
+            Debug.Log($"Prefab Name:{prefabName}  entityType {entityType.ToString()}");
             return prefabName;
         }
 

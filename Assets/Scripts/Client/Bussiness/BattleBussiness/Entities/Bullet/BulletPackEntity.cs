@@ -8,7 +8,6 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BulletPackEntity : MonoBehaviour, IPickable
     {
 
-        [SerializeField]
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
 
@@ -30,6 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Ctor()
         {
+            idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.BulletPack);
         }
 

@@ -24,6 +24,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int LeagueId => leagueId;
         public void SetLeagueId(int leagueId) => this.leagueId = leagueId;
 
+        public IDComponent()
+        {
+
+        }
+
         public bool HasLeague()
         {
             return leagueId >= 10000;

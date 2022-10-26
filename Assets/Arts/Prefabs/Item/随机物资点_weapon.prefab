@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5022347487175247585}
   - component: {fileID: 5022347487175247590}
   m_Layer: 8
-  m_Name: "\u968F\u673A\u7269\u8D44\u70B9"
+  m_Name: "\u968F\u673A\u7269\u8D44\u70B9_weapon"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,21 +48,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemGenProbabilityArray:
-  - itemType: 1
+  - entityType: 2
     subType: 0
     weight: 1
-  - itemType: 1
+  - entityType: 2
     subType: 1
     weight: 1
-  - itemType: 1
+  - entityType: 2
     subType: 2
-    weight: 3
-  - itemType: 2
+    weight: 1
+  - entityType: 3
     subType: 0
-    weight: 3
-  - itemType: 2
+    weight: 1
+  - entityType: 3
     subType: 1
-    weight: 3
+    weight: 1
 --- !u!33 &5022347487175247585
 MeshFilter:
   m_ObjectHideFlags: 0

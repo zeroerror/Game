@@ -48,13 +48,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemGenProbabilityArray:
-  - itemType: 3
+  - entityType: 4
     subType: 0
     weight: 1
-  - itemType: 3
+  - entityType: 4
     subType: 1
     weight: 1
-  - itemType: 3
+  - entityType: 4
     subType: 2
     weight: 1
 --- !u!33 &5022347487175247585

@@ -47,6 +47,21 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
+  - m_GUID: c51d919648bf41d4aa22e63b07a01289
+    m_Address: Item_Armor_Senior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
+  - m_GUID: c37b935d509a3014a99a6cc6f7805452
+    m_Address: Item_Armor_Normal
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
+  - m_GUID: 70312ff5231b4934e9d3e19c5378d59f
+    m_Address: Item_Armor_Best
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

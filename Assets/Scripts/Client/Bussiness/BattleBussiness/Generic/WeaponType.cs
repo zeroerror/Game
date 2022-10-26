@@ -1,7 +1,7 @@
 namespace Game.Client.Bussiness.BattleBussiness.Generic
 {
 
-    public enum WeaponType
+    public enum WeaponType : byte
     {
         Pistol, // 手枪
         Rifle,  // 步枪

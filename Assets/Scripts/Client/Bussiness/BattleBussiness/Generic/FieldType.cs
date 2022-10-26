@@ -1,7 +1,7 @@
 namespace Game.Client.Bussiness.BattleBussiness.Generic
 {
 
-    public enum FieldType
+    public enum FieldType : byte
     {
         None,
         Wall,

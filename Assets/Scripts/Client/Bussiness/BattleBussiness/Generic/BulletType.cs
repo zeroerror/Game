@@ -1,7 +1,7 @@
 namespace Game.Client.Bussiness.BattleBussiness.Generic
 {
 
-    public enum BulletType
+    public enum BulletType : byte
     {
         DefaultBullet,
         Grenade,

@@ -300,7 +300,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                     // 生成资源
                     var itemDomain = battleFacades.Domain.ItemDomain;
-                    var itemGo = itemDomain.SpawnItem(entityType, subtype, entityID);
+                    var itemGo = itemDomain.SpawnItem(entityType, subtype, entityID, parent);
                     itemGo.transform.SetParent(parent);
                     itemGo.transform.localPosition = Vector3.zero;
                     itemGo.name += entityID;

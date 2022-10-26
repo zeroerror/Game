@@ -51,6 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Ctor()
         {
+            idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.Weapon);
             idComponent.SetSubType((byte)weaponType);
             shootAudioClip = transform.Find("audio_clip_shoot").GetComponent<AudioSource>().clip;
