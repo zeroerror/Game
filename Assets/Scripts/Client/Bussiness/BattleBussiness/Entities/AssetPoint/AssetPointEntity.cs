@@ -5,16 +5,16 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness
 {
     [Serializable]
-    public struct ItemGenProbability
+    public struct AssetGenProbability
     {
-        public ItemType itemType;
+        public EntityType entityType;
         public byte subType;
         public float weight;
     }
 
     public class AssetPointEntity : MonoBehaviour
     {
-        public ItemGenProbability[] itemGenProbabilityArray;
+        public AssetGenProbability[] itemGenProbabilityArray;
     }
 
 }

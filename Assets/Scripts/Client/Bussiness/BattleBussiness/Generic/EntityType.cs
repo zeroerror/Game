@@ -1,12 +1,13 @@
 namespace Game.Client.Bussiness.BattleBussiness.Generic
 {
 
-    public enum EntityType : short
+    public enum EntityType : byte
     {
         BattleRole,
         Bullet,
         Weapon,
-        Item
+        BulletPack,
+        Armor,
     }
 
 }

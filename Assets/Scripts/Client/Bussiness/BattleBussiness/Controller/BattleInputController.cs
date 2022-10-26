@@ -72,7 +72,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (!WillHitOtherRole(owner, moveDir))
                 {
                     var rqs = battleFacades.Network.RoleReqAndRes;
-                    rqs.SendReq_RoleMove(owner.IDComponent.EntityId, moveDir);
+                    rqs.SendReq_RoleMove(owner.IDComponent.EntityID, moveDir);
                 }
             }
         }
@@ -144,7 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (closestGo != null)
                 {
                     var rqs = battleFacades.Network.ItemReqAndRes;
-                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityId, closestPickable.ItemType, closestPickable.EntityId);
+                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityID, closestPickable.EntityType, closestPickable.EntityID);
                 }
             }
         }
@@ -177,7 +177,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
 
                 var rqs = battleFacades.Network.WeaponReqAndRes;
-                rqs.SendReq_WeaponShoot(owner.IDComponent.EntityId, curWeapon.ShootPointPos, input.fireDir);
+                rqs.SendReq_WeaponShoot(owner.IDComponent.EntityID, curWeapon.ShootPointPos, input.fireDir);
             }
         }
 
@@ -240,7 +240,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             for (int i = 0; i < array.Length; i++)
             {
                 var r = array[i];
-                if (r.IDComponent.EntityId == roleEntity.IDComponent.EntityId) continue;
+                if (r.IDComponent.EntityID == roleEntity.IDComponent.EntityID) continue;
 
                 var pos1 = r.MoveComponent.Position;
                 var pos2 = roleEntity.MoveComponent.Position;

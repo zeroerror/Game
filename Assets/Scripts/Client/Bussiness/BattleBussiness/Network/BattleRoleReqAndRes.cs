@@ -60,7 +60,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         public void SendReq_RoleRotate(BattleRoleLogicEntity roleEntity)
         {
             var eulerAngel = roleEntity.transform.rotation.eulerAngles;
-            var rid = roleEntity.IDComponent.EntityId;
+            var rid = roleEntity.IDComponent.EntityID;
             ulong msg = (ulong)(ushort)rid << 48;     //16 wrid 16 x 16 y 16 z
             msg |= (ulong)(ushort)eulerAngel.x << 32;
             msg |= (ulong)(ushort)eulerAngel.y << 16;
@@ -82,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
             FrameRollReqMsg frameJumpReqMsg = new FrameRollReqMsg
             {
-                entityId = (byte)role.IDComponent.EntityId,
+                entityId = (byte)role.IDComponent.EntityID,
                 dirX = dirX,
                 dirY = dirY,
                 dirZ = dirZ

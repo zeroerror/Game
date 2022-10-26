@@ -64,7 +64,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (victim.EntityType == EntityType.BattleRole)
             {
-                var role = battleFacades.Repo.RoleRepo.Get(victim.EntityId);
+                var role = battleFacades.Repo.RoleRepo.Get(victim.EntityID);
                 var stateComponent = role.StateComponent;
                 return stateComponent.RoleState != RoleState.Reborn && stateComponent.RoleState != RoleState.Dead;
             }
@@ -131,10 +131,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         long GetKey(IDComponent attacker, IDComponent victim)
         {
             short attackerEntityType = (short)attacker.EntityType;
-            short attackerEntityId = (short)attacker.EntityId;
+            short attackerEntityId = (short)attacker.EntityID;
 
             short victimEntityType = (short)victim.EntityType;
-            short victimEntityId = (short)victim.EntityId;
+            short victimEntityId = (short)victim.EntityID;
 
             long key = (long)attackerEntityType << 48;
             key |= (long)attackerEntityId << 32;

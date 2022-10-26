@@ -8,10 +8,10 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BulletPackEntity : MonoBehaviour, IPickable
     {
 
-        ItemType itemType;
-        public ItemType ItemType => itemType;
+        [SerializeField]
+        IDComponent idComponent;
+        public IDComponent IDComponent => idComponent;
 
-        // 子弹包具体的子弹类型
         [SerializeField]
         public BulletType bulletType;
 
@@ -23,13 +23,14 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int MasterId => masterId;
         public void SetMasterId(int masterId) => this.masterId = masterId;
 
-        int entityId;
-        public int EntityId => entityId;
-        public void SetEntityId(int entityId) => this.entityId = entityId;
+        // - Interface
+        EntityType IPickable.EntityType => idComponent.EntityType;
+        int IPickable.EntityID => idComponent.EntityID;
+        int IPickable.MasterId => masterId;
 
         public void Ctor()
         {
-            itemType = ItemType.BulletPack;
+            idComponent.SetEntityType(EntityType.BulletPack);
         }
 
         public void TearDown()

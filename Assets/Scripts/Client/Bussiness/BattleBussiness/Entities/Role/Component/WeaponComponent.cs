@@ -100,7 +100,8 @@ namespace Game.Client.Bussiness.BattleBussiness
                 var w = AllWeapon[i];
                 if (w == null) continue;
 
-                if (w.EntityId == entityId)
+                var entityID = w.IDComponent.EntityID;
+                if (entityID == entityId)
                 {
                     weapon = w;
                     weapon.Clear();
@@ -126,7 +127,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                         if (curWeapon != null)
                         {
                             CurrentWeapon = curWeapon;
-                            Debug.Log($"当前武器:{CurrentWeapon.EntityId}");
+                            Debug.Log($"当前武器:{entityId}");
                             break;
                         }
                     }
@@ -144,7 +145,8 @@ namespace Game.Client.Bussiness.BattleBussiness
             for (int i = 0; i < AllWeapon.Length; i++)
             {
                 var w = AllWeapon[i];
-                if (w.EntityId == entityId)
+                var entityID = w.IDComponent.EntityID;
+                if (entityID == entityId)
                 {
                     AllWeapon[i] = null;
                     w.Clear();
@@ -154,12 +156,16 @@ namespace Game.Client.Bussiness.BattleBussiness
             return;
         }
 
-        public WeaponEntity GetWeapon(ushort entityId)
+        public WeaponEntity GetWeapon(ushort entityID)
         {
             for (int i = 0; i < AllWeapon.Length; i++)
             {
                 var w = AllWeapon[i];
-                if (w.EntityId == entityId) return w;
+                var id = w.IDComponent.EntityID;
+                if (id == entityID)
+                {
+                    return w;
+                }
             }
 
             return null;

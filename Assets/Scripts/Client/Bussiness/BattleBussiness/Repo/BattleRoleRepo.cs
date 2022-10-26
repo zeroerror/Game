@@ -22,12 +22,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public BattleRoleLogicEntity Get(int entityID)
         {
-            return list.Find((entity) => entity.IDComponent.EntityId == entityID);
+            return list.Find((entity) => entity.IDComponent.EntityID == entityID);
         }
 
         public bool TryGetByEntityId(int entityID, out BattleRoleLogicEntity entity)
         {
-            entity = list.Find((entity) => entity.IDComponent.EntityId == entityID);
+            entity = list.Find((entity) => entity.IDComponent.EntityID == entityID);
             return entity != null;
         }
 

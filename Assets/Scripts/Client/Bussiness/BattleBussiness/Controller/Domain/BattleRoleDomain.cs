@@ -44,12 +44,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public BattleRoleLogicEntity SpawnRoleLogic(int entityId)
         {
             var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            string rolePrefabName = "role_logic";
-            if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
+            string prefabName = "role_logic";
+            if (battleFacades.Assets.BattleRoleAssets.TryGetByName(prefabName, out GameObject prefab))
             {
-                prefabAsset = GameObject.Instantiate(prefabAsset, fieldEntity.transform);
+                prefab = GameObject.Instantiate(prefab, fieldEntity.transform);
 
-                var roleLogic = prefabAsset.GetComponent<BattleRoleLogicEntity>();
+                var roleLogic = prefab.GetComponent<BattleRoleLogicEntity>();
                 roleLogic.Ctor();
                 roleLogic.IDComponent.SetEntityId(entityId);
                 roleLogic.IDComponent.SetLeagueId(entityId);

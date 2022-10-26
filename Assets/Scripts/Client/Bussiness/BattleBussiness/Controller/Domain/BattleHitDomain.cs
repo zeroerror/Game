@@ -46,8 +46,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityId);
-            var role = battleFacades.Repo.RoleRepo.Get(victimIDC.EntityId);
+            var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityID);
+            var role = battleFacades.Repo.RoleRepo.Get(victimIDC.EntityID);
 
             if (bullet.BulletType == BulletType.DefaultBullet)
             {

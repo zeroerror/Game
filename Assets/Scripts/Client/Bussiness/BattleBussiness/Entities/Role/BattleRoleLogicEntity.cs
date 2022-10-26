@@ -1,24 +1,9 @@
 using UnityEngine;
 using Game.Generic;
-using Game.Client.Bussiness.Interfaces;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
-
-    public enum RoleState
-    {
-        Normal,
-        Rolling,
-        Climbing,
-        Shoot,
-        Reloading,
-        Healing,
-        Switching,
-        BeHit,
-        Dead,
-        Reborn
-    }
 
     public class BattleRoleLogicEntity : PhysicsEntity
     {
@@ -35,8 +20,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 SelfPos => transform.position;
         Vector3 shootPointPos => MoveComponent.Position + transform.forward + new Vector3(0, 0.8f, 0);
 
-        Rigidbody rb;
-
         [SerializeField]
         [Header("前滚翻速度")]
         float rollSpeed;
@@ -45,11 +28,18 @@ namespace Game.Client.Bussiness.BattleBussiness
         bool isDead;
         public bool IsDead => isDead;
 
+        BattleArmorEntity armor;
+        public BattleArmorEntity Armor => armor;
+
         #region [Component]
 
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
+        ItemComponent itemComponent;
+        public ItemComponent ItemComponent => itemComponent;
 
+        RoleInputComponent roleInputComponent;
+        public RoleInputComponent InputComponent => roleInputComponent;
 
         [SerializeField]
         MoveComponent moveComponent;
@@ -67,13 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         RoleStateComponent stateComponent;
         public RoleStateComponent StateComponent => stateComponent;
 
-        public ItemComponent ItemComponent { get; private set; }
-
-        RoleInputComponent roleInputComponent;
-        public RoleInputComponent InputComponent => roleInputComponent;
-
         #endregion
-
 
         public void Inject(BattleRoleRendererEntity roleRendererEntity)
         {
@@ -83,7 +67,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             // == Component
-            rb = transform.GetComponentInParent<Rigidbody>();
+            var rb = transform.GetComponentInParent<Rigidbody>();
             moveComponent.Inject(rb);
             moveComponent.SetMaximumVelocity(30f);
 
@@ -91,7 +75,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             idComponent.SetEntityType(EntityType.BattleRole);
 
             roleInputComponent = new RoleInputComponent();
-            ItemComponent = new ItemComponent(); // TODO: Serializable
+            itemComponent = new ItemComponent(); // TODO: Serializable
 
             moveComponent.Reset();
             healthComponent.Reset();
@@ -118,10 +102,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void JumpboardSpeedUp()
         {
-            var addVelocity = rb.velocity * 4f;
+            var mc = moveComponent;
+            var addVelocity = mc.Velocity * 4f;
             addVelocity = new Vector3(addVelocity.x, 4f, addVelocity.z);
-            moveComponent.AddExtraVelocity(addVelocity);
-            DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} ExtraVelocity当前值: {moveComponent.ExtraVelocity}", "#48D1CC");
+            mc.AddExtraVelocity(addVelocity);
+            DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} ExtraVelocity当前值: {mc.ExtraVelocity}", "#48D1CC");
         }
 
         public int ReloadBulletsToWeapon(WeaponEntity weaponEntity)
@@ -134,33 +119,51 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Reborn(in Vector3 pos)
         {
-            Debug.Log($" ENTITYID:{idComponent.EntityId} 重生----------------------------------");
+            Debug.Log($" ENTITYID:{idComponent.EntityID} 重生----------------------------------");
 
-            moveComponent.SetPosition(pos);
-            moveComponent.Reset();
+            var mc = moveComponent;
+            mc.SetPosition(pos);
+            mc.Reset();
 
             healthComponent.Reset();
 
             isDead = false;
         }
 
+        public void WearOrSwitchArmor(BattleArmorEntity val)
+        {
+            armor = val;
+            val.IDComponent.SetLeagueId(idComponent.LeagueId);
+        }
+
+        public void DropArmor()
+        {
+            if (armor == null)
+            {
+                return;
+            }
+
+            armor = null;
+        }
+
         #endregion
 
         public bool CanWeaponReload()
         {
-            if (weaponComponent.IsReloading)
+            var wc = weaponComponent;
+            if (wc.IsReloading)
             {
                 return false;
             }
 
-            var curWeapon = weaponComponent.CurrentWeapon;
+            var curWeapon = wc.CurrentWeapon;
             if (curWeapon == null)
             {
                 Debug.LogWarning("当前尚未持有武器！");
                 return false;
             }
 
-            if (weaponComponent.IsFullReloaded)
+            if (wc.IsFullReloaded)
             {
                 Debug.LogWarning("当前武器已经装满子弹");
                 return false;

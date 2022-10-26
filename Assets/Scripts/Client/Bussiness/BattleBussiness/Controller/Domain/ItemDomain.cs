@@ -20,64 +20,112 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public GameObject SpawnItem(ItemType itemType, byte sortType)
+        public GameObject SpawnItem(EntityType entityType, byte subType, int entityID, Transform parent = null)
         {
-            string itemName = null;
-            switch (itemType)
-            {
-                case ItemType.Default:
-                    break;
-                case ItemType.Weapon:
-                    itemName =$"Item_Weapon_{((WeaponType)sortType).ToString()}";
-                    break;
-                case ItemType.BulletPack:
-                    itemName =$"Item_BulletPack_{((BulletType)sortType).ToString()}";
-                    break;
-                case ItemType.Pill:
-                    break;
+            string itemName = GetPrefabName(entityType, subType);
 
-            }
             var itemAssets = battleFacades.Assets.ItemAsset;
+            itemAssets.TryGetByName(itemName, out GameObject prefab);
+
+            var itemGo = GameObject.Instantiate(prefab);
+            itemGo.SetActive(true);
+            itemGo.transform.SetParent(parent.transform);
+            itemGo.transform.localPosition = Vector3.zero;
+
+            var idc = CreateEntity(entityType, itemGo);
+            idc.SetEntityId(entityID);
+
             Debug.Log($"生成物件：{itemName}");
-            itemAssets.TryGetByName(itemName, out GameObject item);
-            item = GameObject.Instantiate(item);
-            item.SetActive(true);
-            return item;
+            return itemGo;
         }
 
-        public bool TryPickUpItem(ItemType itemType, ushort entityId, AllBattleRepo repo, BattleRoleLogicEntity master, Transform hangPoint = null)
+        public IDComponent CreateEntity(EntityType entityType, GameObject entityGo)
         {
-            bool isPickUpSucceed = false;
-            switch (itemType)
+            switch (entityType)
             {
-                case ItemType.Default:
-                    break;
-                case ItemType.Weapon:
+                case EntityType.Weapon:
+                    var weapon = entityGo.GetComponent<WeaponEntity>();
+                    var weaponRepo = battleFacades.Repo.WeaponRepo;
+                    weapon.Ctor();
+                    return weapon.IDComponent;
+                case EntityType.BulletPack:
+                    var bulletPack = entityGo.GetComponent<BulletPackEntity>();
+                    var bulletPackRepo = battleFacades.Repo.BulletPackRepo;
+                    bulletPack.Ctor();
+                    return bulletPack.IDComponent;
+                case EntityType.Armor:
+                    var armorRepo = battleFacades.Repo.ArmorRepo;
+                    var armor = entityGo.GetComponent<BattleArmorEntity>();
+                    armor.Ctor();
+                    return armor.IDComponent;
+            }
+
+            return null;
+        }
+
+        public bool TryPickUpItem(EntityType entityType, ushort entityId, int masterEntityID, Transform hangPoint = null)
+        {
+            var repo = battleFacades.Repo;
+            var roleRepo = repo.RoleRepo;
+            var master = roleRepo.Get(masterEntityID);
+            bool isPickUpSucceed = false;
+
+            switch (entityType)
+            {
+                case EntityType.Weapon:
                     var weaponRepo = repo.WeaponRepo;
                     if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster && master.WeaponComponent.TryPickUpWeapon(weaponEntity, hangPoint))
                     {
                         isPickUpSucceed = true;
-                        weaponEntity.SetMaster(master.IDComponent.EntityId);
+                        weaponEntity.SetMaster(masterEntityID);
 
                         weaponRepo.TryRemove(weaponEntity);
                     }
                     break;
-                case ItemType.BulletPack:
+                case EntityType.BulletPack:
+                    // TODO: 背包容量判断
                     var bulletPackRepo = repo.BulletPackRepo;
-                    if (bulletPackRepo.TryGet(entityId, out BulletPackEntity bulletPackEntity))
+                    if (bulletPackRepo.TryGet(entityId, out BulletPackEntity bulletPack))
                     {
                         isPickUpSucceed = true;
-                        master.ItemComponent.TryCollectItem_Bullet(bulletPackEntity);
-                        Debug.Log($"摧毁:{bulletPackEntity.gameObject.name}");
-                        GameObject.Destroy(bulletPackEntity.gameObject);// TODO: 因为背包容量无法全部拾取的情况不能摧毁
-                        bulletPackRepo.TryRemove(bulletPackEntity);
+                        master.ItemComponent.TryCollectItem_Bullet(bulletPack);
+
+                        bulletPackRepo.TryRemove(bulletPack);
+                        GameObject.Destroy(bulletPack.gameObject);
                     }
                     break;
-                case ItemType.Pill:
+                case EntityType.Armor:
+                    var armorRepo = repo.ArmorRepo;
+                    if (armorRepo.TryGet(entityId, out var armor))
+                    {
+                        isPickUpSucceed = true;
+                        master.WearOrSwitchArmor(armor);
+                    }
                     break;
             }
 
             return isPickUpSucceed;
+        }
+
+        string GetPrefabName(EntityType entityType, byte sortType)
+        {
+            string prefabName = null;
+            switch (entityType)
+            {
+                case EntityType.Weapon:
+                    prefabName = $"Item_Weapon_{((WeaponType)sortType).ToString()}";
+                    break;
+                case EntityType.BulletPack:
+                    prefabName = $"Item_BulletPack_{((BulletType)sortType).ToString()}";
+                    break;
+                case EntityType.Armor:
+                    prefabName = $"Item_Armor_{((ArmorType)sortType).ToString()}";
+                    break;
+
+            }
+
+            Debug.Log($"Prefab Name:{prefabName}");
+            return prefabName;
         }
 
     }

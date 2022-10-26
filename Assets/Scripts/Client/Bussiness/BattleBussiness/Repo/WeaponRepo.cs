@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         List<WeaponEntity> weaponList;
         public ushort WeaponCount => (ushort)weaponList.Count;
-        public ushort WeaponIdAutoIncreaseId { get; private set; }
+        public ushort AutoIncreaseID { get; private set; }
 
         public WeaponRepo()
         {
@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public bool TryGetByEntityId(ushort weaponId, out WeaponEntity weaponEntity)
         {
-            weaponEntity = weaponList.Find((entity) => entity.EntityId == weaponId);
+            weaponEntity = weaponList.Find((entity) => entity.IDComponent.EntityID == weaponId);
             Debug.Assert(weaponEntity != null, $"武器{weaponId}不存在，weaponList：{weaponList.Count}");
             return weaponEntity != null;
         }
@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             List<WeaponEntity> weaponEntityList = new List<WeaponEntity>();
             weaponList.ForEach((weapon) =>
             {
-                if (weapon.MasterId == masterWRid) weaponEntityList.Add(weapon);
+                if (weapon.MasterEntityID == masterWRid) weaponEntityList.Add(weapon);
             });
 
             return weaponEntityList;
@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public bool TryRemove(WeaponEntity entity)
         {
-            Debug.Log($"Repo:移除武器{entity.EntityId}");
+            Debug.Log($"Repo:移除武器{entity.IDComponent.EntityID}");
             return weaponList.Remove(entity);
         }
 
@@ -48,9 +48,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public void Add(WeaponEntity entity)
         {
-            Debug.Log($"武器资源添加 [entityId:{entity.EntityId}]");
+            Debug.Log($"武器资源添加 [entityId:{entity.IDComponent.EntityID}]");
             weaponList.Add(entity);
-            WeaponIdAutoIncreaseId++;
+            AutoIncreaseID++;
         }
 
 

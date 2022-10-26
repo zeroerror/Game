@@ -154,7 +154,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                         int reloadBulletNum = role.ReloadBulletsToWeapon(curWeapon);
                         ConnIdList.ForEach((connId) =>
                         {
-                            rqs.SendRes_WeaponReloaded(connId, ServeFrame, role.IDComponent.EntityId, reloadBulletNum);
+                            rqs.SendRes_WeaponReloaded(connId, ServeFrame, role.IDComponent.EntityID, reloadBulletNum);
                         });
                     }
                 }

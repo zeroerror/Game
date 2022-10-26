@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         List<BulletPackEntity> bulletPackList;
         public ushort BulletPackCount => (ushort)bulletPackList.Count;
-        public ushort bulletPackAutoIncreaseId;
+        public ushort AutoIncreaseID;
 
         public BulletPackRepo()
         {
@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public bool TryGet(ushort bulletId, out BulletPackEntity bulletEntity)
         {
-            bulletEntity = bulletPackList.Find((entity) => entity.EntityId == bulletId);
+            bulletEntity = bulletPackList.Find((entity) => entity.IDComponent.EntityID == bulletId);
             return bulletEntity != null;
         }
 

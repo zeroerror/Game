@@ -10,6 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public FiledEntityRepo FiledRepo { get; private set; }
         public BattleRoleRepo RoleRepo { get; private set; }
         public WeaponRepo WeaponRepo { get; private set; }
+        public BattleArmorRepo ArmorRepo { get; private set; }
         public BulletRepo BulletRepo { get; private set; }
         public BulletPackRepo BulletPackRepo { get; private set; }
 
@@ -18,6 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             FiledRepo = new FiledEntityRepo();
             RoleRepo = new BattleRoleRepo();
             WeaponRepo = new WeaponRepo();
+            ArmorRepo = new BattleArmorRepo();
             BulletRepo = new BulletRepo();
             BulletPackRepo = new BulletPackRepo();
         }

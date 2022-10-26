@@ -8,7 +8,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     public class BattleFacades
     {
         public AllBattleNetwork Network { get; private set; }
-        
+
         public AllBattleRepo Repo { get; private set; }
 
         public AllDomains Domain { get; private set; }
@@ -20,8 +20,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public PlayerInputComponent InputComponent { get; private set; }
 
         public BattleArbitrationService ArbitrationService { get; private set; }
-
         public BattleLeagueService BattleLeagueService { get; private set; }
+        public IDService IDService { get; private set; }
 
         public BattleFacades()
         {
@@ -29,9 +29,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             Repo = new AllBattleRepo();
             Assets = new AllBattleAssets();
             Domain = new AllDomains();
-            
-            ArbitrationService=new BattleArbitrationService();
-            BattleLeagueService=new BattleLeagueService();
+
+            ArbitrationService = new BattleArbitrationService();
+            BattleLeagueService = new BattleLeagueService();
+            IDService = new IDService();
 
             ArbitrationService.Inject(this);
             Domain.Inject(this);

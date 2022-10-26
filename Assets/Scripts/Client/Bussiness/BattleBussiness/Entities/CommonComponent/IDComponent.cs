@@ -1,7 +1,6 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -13,17 +12,17 @@ namespace Game.Client.Bussiness.BattleBussiness
         public EntityType EntityType => entityType;
         public void SetEntityType(EntityType entityType) => this.entityType = entityType;
 
+        byte subType;
+        public byte SubType => subType;
+        public void SetSubType(byte val) => subType = val;
+
         int entityId;
-        public int EntityId => entityId;
+        public int EntityID => entityId;
         public void SetEntityId(int entityId) => this.entityId = entityId;
 
         int leagueId;
         public int LeagueId => leagueId;
         public void SetLeagueId(int leagueId) => this.leagueId = leagueId;
-
-        public IDComponent()
-        {
-        }
 
         public bool HasLeague()
         {

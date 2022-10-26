@@ -7,17 +7,12 @@ namespace Game.Client.Bussiness.BattleBussiness
 
     public class WeaponEntity : MonoBehaviour, IPickable
     {
-        int weaponId;
-        public int EntityId => weaponId;
-        public void SetEntityId(int id) => weaponId = id;
+        IDComponent idComponent;
+        public IDComponent IDComponent => idComponent;
 
         [SerializeField]
         WeaponType weaponType;
         public WeaponType WeaponType => weaponType;
-
-        [SerializeField]
-        ItemType itemType;
-        public ItemType ItemType => itemType;
 
         [SerializeField]
         int reloadFrame;
@@ -36,8 +31,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void ResetCurrentReloadingFrame() => curReloadingFrame = reloadFrame;
         public void ReduceCurReloadingFrame() => curReloadingFrame--;
 
-        int masterWRid;
-        public int MasterId => masterWRid;
+        int masterEntityID;
+        public int MasterEntityID => masterEntityID;
 
         public int bulletNum { get; private set; }
         public void LoadBullet(int bulletNum) => this.bulletNum += bulletNum;
@@ -49,15 +44,21 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         AudioClip shootAudioClip;
 
+        // - Interface
+        EntityType IPickable.EntityType => idComponent.EntityType;
+        int IPickable.EntityID => idComponent.EntityID;
+        int IPickable.MasterId => masterEntityID;
+
         public void Ctor()
         {
-            itemType = ItemType.Weapon;
+            idComponent.SetEntityType(EntityType.Weapon);
+            idComponent.SetSubType((byte)weaponType);
             shootAudioClip = transform.Find("audio_clip_shoot").GetComponent<AudioSource>().clip;
         }
 
         public void SetMaster(int masterWRid)
         {
-            this.masterWRid = masterWRid;
+            this.masterEntityID = masterWRid;
             hasMaster = true;
         }
 

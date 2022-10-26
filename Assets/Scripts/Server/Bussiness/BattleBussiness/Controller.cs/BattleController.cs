@@ -148,7 +148,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{entityId} 位置:{roleEntity.MoveComponent.Position}");
 
                     var itemRqs = battleServerFacades.Network.ItemReqAndRes;
-                    itemRqs.SendRes_ItemSpawn(connId, ServeFrame, battleServerFacades.ItemTypeByteList, battleServerFacades.SubTypeList, battleServerFacades.EntityIdList);
+                    itemRqs.SendRes_ItemSpawn(connId, ServeFrame, battleServerFacades.ItemTypeByteList, battleServerFacades.SubTypeList, battleServerFacades.EntityIDList);
                 }
             });
         }
@@ -283,7 +283,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             hitFieldList.ForEach((hitFieldModel) =>
             {
                 var bulletIDC = hitFieldModel.hitter;
-                var bullet = bulletRepo.Get(bulletIDC.EntityId);
+                var bullet = bulletRepo.Get(bulletIDC.EntityID);
 
                 ConnIDList.ForEach((connId) =>
                 {
@@ -303,7 +303,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 hitRoleList.ForEach((attackModel) =>
                 {
-                    bulletRqs.SendRes_BulletHitRole(connId, attackModel.attackerIDC.EntityId, attackModel.victimIDC.EntityId);
+                    bulletRqs.SendRes_BulletHitRole(connId, attackModel.attackerIDC.EntityID, attackModel.victimIDC.EntityID);
                 });
             });
         }
@@ -335,23 +335,20 @@ namespace Game.Server.Bussiness.BattleBussiness
                     itemPickUpMsgDic[key] = null;
 
                     // TODO:Add judgement like 'Can He Pick It Up?'
-                    var repo = battleServerFacades.BattleFacades.Repo;
-                    var roleRepo = repo.RoleRepo;
-                    var role = roleRepo.Get(msg.wRid);
-                    ItemType itemType = (ItemType)msg.itemType;
+                    EntityType entityType = (EntityType)msg.entityType;
 
                     var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
-                    if (itemDomain.TryPickUpItem(itemType, msg.entityId, repo, role))
+                    if (itemDomain.TryPickUpItem(entityType, msg.entityId, msg.entityID))
                     {
                         var rqs = battleServerFacades.Network.ItemReqAndRes;
                         ConnIDList.ForEach((connId) =>
                         {
-                            rqs.SendRes_ItemPickUp(connId, ServeFrame, msg.wRid, itemType, msg.entityId);
+                            rqs.SendRes_ItemPickUp(connId, ServeFrame, msg.entityID, entityType, msg.entityId);
                         });
                     }
                     else
                     {
-                        Debug.Log($"{itemType.ToString()}物品拾取失败");
+                        Debug.Log($"{entityType.ToString()}物品拾取失败");
                     }
                 }
             });
@@ -463,68 +460,32 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void InitAllAssetRepo(AssetPointEntity[] assetPointEntities)
         {
-            var itemTypeList = battleServerFacades.ItemTypeList;
-            var entityIdList = battleServerFacades.EntityIdList;
+            var itemTypeList = battleServerFacades.EntityTypeList;
+            var entityIDList = battleServerFacades.EntityIDList;
             var itemTypeByteList = battleServerFacades.ItemTypeByteList;
             var subTypeList = battleServerFacades.SubTypeList;
 
             int count = itemTypeList.Count;
             Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
-            int index = 0;
+
+            var battleFacades = battleServerFacades.BattleFacades;
             for (int i = 0; i < itemTypeList.Count; i++)
             {
-                var itemType = itemTypeList[i];
-                var subtype = subTypeList[index];
-                var parent = assetPointEntities[index];
+                var entityType = itemTypeList[i];
+                var subtype = subTypeList[i];
+                var parent = assetPointEntities[i];
 
-                itemTypeByteList.Add((byte)itemType);   //记录
+                // - 获取资源ID
+                var idService = battleFacades.IDService;
+                var entityID = idService.GetAutoIDByEntityType(entityType);
 
-                // 生成资源
-                var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
-                var item = itemDomain.SpawnItem(itemType, subtype);
+                // - 生成资源
+                var itemDomain = battleFacades.Domain.ItemDomain;
+                var itemGo = itemDomain.SpawnItem(entityType, subtype, entityID, parent.transform);
 
-                // 根据Entity类型初始化
-                ushort entityId = 0;
-                switch (itemType)
-                {
-                    case ItemType.Default:
-                        break;
-                    case ItemType.Weapon:
-                        var weaponEntity = item.GetComponent<WeaponEntity>();
-                        var weaponRepo = battleServerFacades.BattleFacades.Repo.WeaponRepo;
-                        entityId = weaponRepo.WeaponIdAutoIncreaseId;
-
-                        weaponEntity.Ctor();
-                        weaponEntity.SetEntityId(entityId);
-                        weaponRepo.Add(weaponEntity);
-                        Debug.Log($"生成武器资源:{entityId}");
-
-                        entityIdList.Add(entityId);    //记录
-
-                        break;
-                    case ItemType.BulletPack:
-                        var bulletPackEntity = item.GetComponent<BulletPackEntity>();
-                        var bulletPackRepo = battleServerFacades.BattleFacades.Repo.BulletPackRepo;
-                        entityId = bulletPackRepo.bulletPackAutoIncreaseId;
-                        bulletPackEntity.Ctor();
-                        bulletPackEntity.SetEntityId(entityId);
-                        bulletPackRepo.Add(bulletPackEntity);
-                        bulletPackRepo.bulletPackAutoIncreaseId++;
-                        Debug.Log($"生成子弹包资源:{entityId}");
-
-                        entityIdList.Add(entityId);    //记录
-
-                        break;
-                    case ItemType.Pill:
-                        break;
-
-                }
-
-                item.transform.SetParent(parent.transform);
-                item.transform.localPosition = Vector3.zero;
-                item.name += entityId;
-
-                index++;
+                // - 记录
+                entityIDList.Add(entityID);
+                itemTypeByteList.Add((byte)entityType);
             }
 
             Debug.Log($"物件资源生成完毕******************************************************");
@@ -536,7 +497,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             for (int i = 0; i < assetPointEntities.Length; i++)
             {
                 var assetPoint = assetPointEntities[i];
-                ItemGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
+                AssetGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
                 float totalWeight = 0;
                 for (int j = 0; j < itemGenProbabilities.Length; j++) totalWeight += itemGenProbabilities[j].weight;
                 float lRange = 0;
@@ -544,12 +505,12 @@ namespace Game.Server.Bussiness.BattleBussiness
                 float randomNumber = Random.Range(0f, 1f);
                 for (int j = 0; j < itemGenProbabilities.Length; j++)
                 {
-                    ItemGenProbability igp = itemGenProbabilities[j];
+                    AssetGenProbability igp = itemGenProbabilities[j];
                     if (igp.weight <= 0) continue;
                     rRange = lRange + igp.weight / totalWeight;
                     if (randomNumber >= lRange && randomNumber < rRange)
                     {
-                        battleServerFacades.ItemTypeList.Add(igp.itemType);
+                        battleServerFacades.EntityTypeList.Add(igp.entityType);
                         battleServerFacades.SubTypeList.Add(igp.subType);
                         break;
                     }

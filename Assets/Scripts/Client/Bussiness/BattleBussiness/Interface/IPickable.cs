@@ -6,9 +6,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Interface
 
     public interface IPickable
     {
-        ItemType ItemType { get; }
+        EntityType EntityType { get; }
 
-        int EntityId { get; }
+        int EntityID { get; }
 
         int MasterId { get; }
 

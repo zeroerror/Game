@@ -40,16 +40,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendReq_ItemPickUp(int wRid, ItemType itemType, int entityId)
+        public void SendReq_ItemPickUp(int wRid, EntityType entityType, int entityId)
         {
             FrameItemPickReqMsg msg = new FrameItemPickReqMsg
             {
-                wRid = (byte)wRid,
-                itemType = (byte)itemType,
+                entityID = (byte)wRid,
+                entityType = (byte)entityType,
                 entityId = (ushort)entityId
             };
             battleClient.SendMsg(msg);
-            Debug.Log($"[wRid:{wRid}]请求拾取 {itemType.ToString()}物件[entityId:{entityId}]");
+            Debug.Log($"[wRid:{wRid}]请求拾取 {entityType.ToString()}物件[entityId:{entityId}]");
         }
 
         // ====== Regist ======

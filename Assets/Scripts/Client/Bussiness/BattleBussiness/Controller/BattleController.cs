@@ -151,7 +151,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 moveComponent.SetPosition(pos);
                 moveComponent.SetVelocity(velocity);
 
-                if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityId != roleLogic.IDComponent.EntityId)
+                if (roleRepo.Owner == null || roleRepo.Owner.IDComponent.EntityID != roleLogic.IDComponent.EntityID)
                 {
                     //不是Owner
                     moveComponent.SetRotation(eulerAngle);
@@ -224,7 +224,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     continue;
                 }
-                
+
                 if (bullet.BulletType == BulletType.Grenade)
                 {
                     continue;
@@ -285,48 +285,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 itemSpawnQueue.Dequeue();
 
-                var itemTypeArray = itemSpawnMsg.itemTypeArray;
+                var entityTypeArray = itemSpawnMsg.entityTypeArray;
                 var subtypeArray = itemSpawnMsg.subtypeArray;
-                var entityIdArray = itemSpawnMsg.entityIdArray;
+                var entityIDArray = itemSpawnMsg.entityIDArray;
                 var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
                 AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
 
                 for (int index = 0; index < assetPointEntities.Length; index++)
                 {
                     Transform parent = assetPointEntities[index].transform;
-                    ItemType itemType = (ItemType)itemTypeArray[index];
-                    ushort entityId = entityIdArray[index];
+                    EntityType entityType = (EntityType)entityTypeArray[index];
+                    int entityID = entityIDArray[index];
                     byte subtype = subtypeArray[index];
 
                     // 生成资源
                     var itemDomain = battleFacades.Domain.ItemDomain;
-                    var item = itemDomain.SpawnItem(itemType, subtype);
-                    item.transform.SetParent(parent);
-                    item.transform.localPosition = Vector3.zero;
-                    item.name += entityId;
-
-                    // Entity以及Repo
-                    switch (itemType)
-                    {
-                        case ItemType.Default:
-                            break;
-                        case ItemType.Weapon:
-                            var weaponEntity = item.GetComponent<WeaponEntity>();
-                            var weaponRepo = battleFacades.Repo.WeaponRepo;
-                            weaponEntity.Ctor();
-                            weaponEntity.SetEntityId(entityId);
-                            weaponRepo.Add(weaponEntity);
-                            break;
-                        case ItemType.BulletPack:
-                            var bulletPackEntity = item.GetComponent<BulletPackEntity>();
-                            var bulletPackRepo = battleFacades.Repo.BulletPackRepo;
-                            bulletPackEntity.Ctor();
-                            bulletPackEntity.SetEntityId(entityId);
-                            bulletPackRepo.Add(bulletPackEntity);
-                            break;
-                        case ItemType.Pill:
-                            break;
-                    }
+                    var itemGo = itemDomain.SpawnItem(entityType, subtype, entityID);
+                    itemGo.transform.SetParent(parent);
+                    itemGo.transform.localPosition = Vector3.zero;
+                    itemGo.name += entityID;
                 }
                 Debug.Log($"地图资源生成完毕******************************************************");
             }
@@ -338,17 +315,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 itemPickQueue.Dequeue();
 
-                var masterWRID = msg.wRid;
-                var itemType = (ItemType)msg.itemType;
-                var itemEntityId = msg.entityId;
+                var masterEntityID = msg.masterEntityID;
+                var entityType = (EntityType)msg.itemType;
+                var itemEntityId = msg.itemEntityID;
 
-                var itemDomain = battleFacades.Domain.ItemDomain;
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleRepo;
-                var role = roleRepo.Get(msg.wRid);
-                if (itemDomain.TryPickUpItem(itemType, itemEntityId, repo, role, role.roleRenderer.handPoint))
+                var role = roleRepo.Get(masterEntityID);
+
+                var itemDomain = battleFacades.Domain.ItemDomain;
+                if (itemDomain.TryPickUpItem(entityType, itemEntityId, masterEntityID, role.roleRenderer.handPoint))
                 {
-                    Debug.Log($"[wRid:{masterWRID}]拾取 {itemType.ToString()}物件[entityId:{itemEntityId}]");
+                    Debug.Log($"[masterEntityID:{masterEntityID}]拾取 {entityType.ToString()}物件[entityId:{itemEntityId}]");
                 }
 
             }

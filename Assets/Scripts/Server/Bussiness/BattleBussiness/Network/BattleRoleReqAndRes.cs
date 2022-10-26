@@ -69,7 +69,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             BattleRoleSyncMsg msg = new BattleRoleSyncMsg
             {
                 serverFrame = serverFrame,
-                entityId = (byte)role.IDComponent.EntityId,
+                entityId = (byte)role.IDComponent.EntityID,
                 roleState = (int)role.StateComponent.RoleState,
                 posX = x,
                 posY = y,

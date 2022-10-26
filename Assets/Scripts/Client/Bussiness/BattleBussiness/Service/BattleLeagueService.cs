@@ -52,7 +52,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (ally.HasLeague())
             {
-                Debug.LogWarning($" {ally.EntityType.ToString()} {ally.EntityId} 已经结盟了");
+                Debug.LogWarning($" {ally.EntityType.ToString()} {ally.EntityID} 已经结盟了");
                 return false;
             }
 

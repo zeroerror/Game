@@ -55,7 +55,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 serverFrame = serverFrame,
                 bulletType = (byte)bulletEntity.BulletType,
                 masterEntityId = (byte)bulletEntity.MasterEntityId,
-                bulletEntityId = (ushort)bulletEntity.IDComponent.EntityId,
+                bulletEntityId = (ushort)bulletEntity.IDComponent.EntityID,
                 startPosX = (int)(bulletPos.x * 10000),
                 startPosY = (int)(bulletPos.y * 10000),
                 startPosZ = (int)(bulletPos.z * 10000),
@@ -89,7 +89,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             FrameBulletHitFieldResMsg msg = new FrameBulletHitFieldResMsg
             {
                 serverFrame = serverFrame,
-                bulletEntityID = (ushort)bulletEntity.IDComponent.EntityId,
+                bulletEntityID = (ushort)bulletEntity.IDComponent.EntityID,
                 posX = (int)bulletPos.x,
                 posY = (int)bulletPos.y,
                 posZ = (int)bulletPos.z,
@@ -104,7 +104,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         {
             BulletType bulletType = bulletEntity.BulletType;
             int masterEntityID = bulletEntity.MasterEntityId;
-            int bulletEntityID = bulletEntity.IDComponent.EntityId;
+            int bulletEntityID = bulletEntity.IDComponent.EntityID;
             Vector3 pos = bulletEntity.MoveComponent.Position;
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");
             FrameBulletLifeOverResMsg msg = new FrameBulletLifeOverResMsg

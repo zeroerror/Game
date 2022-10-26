@@ -44,27 +44,27 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Send]
 
-        public void SendRes_ItemPickUp(int connId, int frameIndex, byte wRid, ItemType itemType, ushort entityId)
+        public void SendRes_ItemPickUp(int connId, int frameIndex, byte wRid, EntityType itemType, ushort entityId)
         {
             FrameItemPickResMsg msg = new FrameItemPickResMsg
             {
                 serverFrame = frameIndex,
-                wRid = wRid,
+                masterEntityID = wRid,
                 itemType = (byte)itemType,
-                entityId = entityId
+                itemEntityID = entityId
             };
             battleServer.SendMsg(connId, msg);
             sendCount++;
         }
 
-        public void SendRes_ItemSpawn(int connId, int frameIndex, List<byte> itemTypeList, List<byte> subtypeList, List<ushort> entityIdList)
+        public void SendRes_ItemSpawn(int connId, int frameIndex, List<byte> itemTypeList, List<byte> subtypeList, List<int> entityIdList)
         {
             FrameItemSpawnResMsg msg = new FrameItemSpawnResMsg
             {
                 serverFrame = frameIndex,
-                itemTypeArray = itemTypeList.ToArray(),
+                entityTypeArray = itemTypeList.ToArray(),
                 subtypeArray = subtypeList.ToArray(),
-                entityIdArray = entityIdList.ToArray()
+                entityIDArray = entityIdList.ToArray()
             };
 
             battleServer.SendMsg(connId, msg);

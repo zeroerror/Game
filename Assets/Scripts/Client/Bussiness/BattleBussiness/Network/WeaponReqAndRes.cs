@@ -62,7 +62,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         {
             FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
             {
-                masterId = role.IDComponent.EntityId,
+                masterId = role.IDComponent.EntityID,
             };
             battleClient.SendMsg(frameWeaponReloadReqMsg);
             Debug.Log("发送武器装弹请求");
@@ -74,8 +74,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
             FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
             {
-                entityId = (ushort)role.WeaponComponent.CurrentWeapon.EntityId,
-                masterId = role.IDComponent.EntityId
+                entityId = (ushort)role.WeaponComponent.CurrentWeapon.IDComponent.EntityID,
+                masterId = role.IDComponent.EntityID
             };
             battleClient.SendMsg(frameWeaponDropReqMsg);
             Debug.Log("发送武器丢弃请求");

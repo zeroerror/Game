@@ -86,14 +86,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         }
 
         //丢弃
-        public List<IPickable> DropItems(ItemType itemtype, int num)
+        public List<IPickable> DropItems(EntityType entityType, int num)
         {
             List<IPickable> itemList = new List<IPickable>();
-            switch (itemtype)
+            switch (entityType)
             {
-                case ItemType.Default:
-                    break;
-                case ItemType.BulletPack:
+                case EntityType.BulletPack:
                     for (int i = 0; i < bulletPackItemList.Count; i++)
                     {
                         if (num <= i)
@@ -105,7 +103,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                     }
                     
                     break;
-                case ItemType.Pill:
+                case EntityType.Armor:
                     break;
             }
 
