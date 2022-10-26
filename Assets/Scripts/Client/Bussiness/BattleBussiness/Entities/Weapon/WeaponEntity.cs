@@ -1,11 +1,10 @@
 using UnityEngine;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class WeaponEntity : MonoBehaviour, IPickable
+    public class WeaponEntity : MonoBehaviour
     {
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
@@ -43,11 +42,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         public BulletType bulletType;
 
         AudioClip shootAudioClip;
-
-        // - Interface
-        EntityType IPickable.EntityType => idComponent.EntityType;
-        int IPickable.EntityID => idComponent.EntityID;
-        int IPickable.MasterId => masterEntityID;
 
         public void Ctor()
         {

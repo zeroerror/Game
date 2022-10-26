@@ -1,6 +1,5 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
@@ -118,7 +117,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var nearItemList = domain.GetHitItem_ColliderList(owner);
                 float closestDis = float.MaxValue;
                 GameObject closestGo = null;
-                IPickable closestPickable = null;
+                IDComponent closestIDC = null;
                 Vector3 ownerPos = owner.MoveComponent.Position;
                 Debug.Log($"想要拾取物品，周围可拾取数量为:{nearItemList.Count}");
 
@@ -126,8 +125,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     if (item.status == CollisionStatus.Exit) return;
 
-                    var pickable = item.gameObject.GetComponentInParent<IPickable>();
-                    if (pickable == null) return;
+                    var idc = item.gameObject.GetComponentInParent<IDComponent>();
+                    if (idc == null) return;
 
                     var collider = item.Collider;
                     Debug.Log($"item:{collider.transform.parent.name}");
@@ -137,14 +136,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     {
                         closestDis = dis;
                         closestGo = item.gameObject;
-                        closestPickable = pickable;
+                        closestIDC = idc;
                     }
                 });
 
                 if (closestGo != null)
                 {
                     var rqs = battleFacades.Network.ItemReqAndRes;
-                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityID, closestPickable.EntityType, closestPickable.EntityID);
+                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityID, closestIDC.EntityType, closestIDC.EntityID);
                 }
             }
         }

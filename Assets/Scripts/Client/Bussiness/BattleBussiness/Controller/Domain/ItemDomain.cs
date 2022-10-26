@@ -1,6 +1,5 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
@@ -22,10 +21,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public GameObject SpawnItem(EntityType entityType, byte subType, int entityID, Transform parent = null)
         {
-            string itemName = GetPrefabName(entityType, subType);
+            string prefabName = GetPrefabName(entityType, subType);
 
             var itemAssets = battleFacades.Assets.ItemAsset;
-            itemAssets.TryGetByName(itemName, out GameObject prefab);
+            itemAssets.TryGetByName(prefabName, out GameObject prefab);
 
             var itemGo = GameObject.Instantiate(prefab);
             itemGo.SetActive(true);
@@ -38,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var idc = CreateEntity(entityType, itemGo);
             idc.SetEntityId(entityID);
 
-            Debug.Log($"生成物件：{itemName}");
+            Debug.Log($"生成物件：{prefabName}");
             return itemGo;
         }
 

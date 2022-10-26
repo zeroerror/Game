@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -86,9 +85,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         }
 
         //丢弃
-        public List<IPickable> DropItems(EntityType entityType, int num)
+        public List<IDComponent> DropItems(EntityType entityType, int num)
         {
-            List<IPickable> itemList = new List<IPickable>();
+            List<IDComponent> itemList = new List<IDComponent>();
             switch (entityType)
             {
                 case EntityType.BulletPack:

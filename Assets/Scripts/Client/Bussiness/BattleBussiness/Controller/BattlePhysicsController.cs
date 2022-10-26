@@ -3,7 +3,6 @@ using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
