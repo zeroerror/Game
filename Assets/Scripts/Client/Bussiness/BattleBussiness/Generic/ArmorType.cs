@@ -3,9 +3,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
 
     public enum ArmorType : byte
     {
-        Normal,
-        Senior,
-        Best
+        Level1,
+        Level2,
+        Level3,
+        Level4,
     }
 
 }

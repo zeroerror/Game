@@ -48,17 +48,22 @@ MonoBehaviour:
     m_SerializedLabels:
     - Item
   - m_GUID: c51d919648bf41d4aa22e63b07a01289
-    m_Address: Item_Armor_Senior
+    m_Address: Item_Armor_Level2
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
   - m_GUID: c37b935d509a3014a99a6cc6f7805452
-    m_Address: Item_Armor_Normal
+    m_Address: Item_Armor_Level1
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
   - m_GUID: 70312ff5231b4934e9d3e19c5378d59f
-    m_Address: Item_Armor_Best
+    m_Address: Item_Armor_Level3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
+  - m_GUID: 6aaf731c5dc7d5a45b3fca945bce45a7
+    m_Address: Item_Armor_Level4
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
