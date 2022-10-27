@@ -1,35 +1,13 @@
 using UnityEngine;
 using Game.Generic;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Interface;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BattleRoleLogicEntity : PhysicsEntity
+    public class BattleRoleLogicEntity : PhysicsEntity, IPickable
     {
-
-        // - Connection Info
-        int connId;
-        public int ConnId => connId;
-        public void SetConnId(int connId) => this.connId = connId;
-
-        // - Renderer
-        public BattleRoleRendererEntity roleRenderer { get; private set; }
-
-        // - Pos
-        public Vector3 SelfPos => transform.position;
-        Vector3 shootPointPos => MoveComponent.Position + transform.forward + new Vector3(0, 0.8f, 0);
-
-        [SerializeField]
-        [Header("前滚翻速度")]
-        float rollSpeed;
-        public float RollSpeed => rollSpeed;
-
-        bool isDead;
-        public bool IsDead => isDead;
-
-        BattleArmorEntity armor;
-        public BattleArmorEntity Armor => armor;
 
         #region [Component]
 
@@ -58,6 +36,34 @@ namespace Game.Client.Bussiness.BattleBussiness
         public RoleStateComponent StateComponent => stateComponent;
 
         #endregion
+
+        // - Connection Info
+        int connId;
+        public int ConnId => connId;
+        public void SetConnId(int connId) => this.connId = connId;
+
+        // - Renderer
+        public BattleRoleRendererEntity roleRenderer { get; private set; }
+
+        // - Pos
+        public Vector3 Position => transform.position;
+
+        // - Roll
+        [SerializeField]
+        [Header("前滚翻速度")]
+        float rollSpeed;
+        public float RollSpeed => rollSpeed;
+
+        bool isDead;
+        public bool IsDead => isDead;
+
+        // - Armor
+        BattleArmorEntity armor;
+        public BattleArmorEntity Armor => armor;
+
+        // - Interface
+        EntityType IPickable.EntityType => idComponent.EntityType;
+        int IPickable.EntityID => idComponent.EntityID;
 
         public void Inject(BattleRoleRendererEntity roleRendererEntity)
         {

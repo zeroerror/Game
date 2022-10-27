@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
-                var rolePos = role.SelfPos;
+                var rolePos = role.Position;
                 // 墙体撞击的速度管理
                 var fieldColliderList = GetHitField_ColliderList(role);
                 int enterGroundCount = 0;
@@ -98,7 +98,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
-                var rolePos = role.SelfPos;
+                var rolePos = role.Position;
                 // 墙体撞击：速度管理
                 var fieldColliderList = GetHitField_ColliderList(role);
                 fieldColliderList.ForEach((colliderExtra) =>

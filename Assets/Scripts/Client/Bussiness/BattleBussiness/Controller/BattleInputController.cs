@@ -2,6 +2,7 @@ using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Interface;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -117,7 +118,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var nearItemList = domain.GetHitItem_ColliderList(owner);
                 float closestDis = float.MaxValue;
                 GameObject closestGo = null;
-                IDComponent closestIDC = null;
+                IPickable pick = null;
                 Vector3 ownerPos = owner.MoveComponent.Position;
                 Debug.Log($"想要拾取物品，周围可拾取数量为:{nearItemList.Count}");
 
@@ -125,7 +126,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     if (item.status == CollisionStatus.Exit) return;
 
-                    var idc = item.gameObject.GetComponentInParent<IDComponent>();
+                    var idc = item.gameObject.GetComponentInParent<IPickable>();
                     if (idc == null) return;
 
                     var collider = item.Collider;
@@ -136,14 +137,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     {
                         closestDis = dis;
                         closestGo = item.gameObject;
-                        closestIDC = idc;
+                        pick = idc;
                     }
                 });
 
                 if (closestGo != null)
                 {
                     var rqs = battleFacades.Network.ItemReqAndRes;
-                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityID, closestIDC.EntityType, closestIDC.EntityID);
+                    rqs.SendReq_ItemPickUp(owner.IDComponent.EntityID, pick.EntityType, pick.EntityID);
                 }
             }
         }
