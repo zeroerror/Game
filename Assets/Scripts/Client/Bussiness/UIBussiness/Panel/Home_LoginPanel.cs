@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ZeroUIFrame;
-using Game.Bussiness.UIBussiness;
+using Game.Client.Bussiness.UIBussiness;
 using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Client.Bussiness.UIBussiness.Panel

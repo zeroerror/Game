@@ -230,7 +230,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     continue;
                 }
 
-                role.HealthComponent.TryReiveDamage(bullet.HitPowerModel.damage);
+                var domain = battleFacades.Domain;
+                var roleDomain = domain.RoleDomain;
+                var hitPowerModel = bullet.HitPowerModel;
+                int realDamage = roleDomain.RoleTryReceiveDamage(role, hitPowerModel.damage);
+
+                var rendererDoamin = domain.RoleRendererDomain;
+                rendererDoamin.HUD_ShowDamageText(role, realDamage);
             }
         }
 

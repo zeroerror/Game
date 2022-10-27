@@ -101,6 +101,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
         }
 
+        public int RoleTryReceiveDamage(BattleRoleLogicEntity role, int damage)
+        {
+            return role.TryReceiveDamage(damage);
+        }
+
         public void RoleStateEnterReloading(BattleRoleLogicEntity role)
         {
             role.StateComponent.EnterReloading(40);

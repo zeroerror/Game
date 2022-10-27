@@ -36,7 +36,31 @@ namespace Game.Client.Bussiness.BattleBussiness
         Slider armorSlider;
         public Slider ArmorSlider => armorSlider;
 
+        Transform damageTextTF;
+        public Transform[] DamageTextTFArray { get; private set; }
+
+        int curDamageTextIndex;
+        public Transform GetDamageTextTF()
+        {
+            var array = DamageTextTFArray;
+            if (curDamageTextIndex > array.Length)
+            {
+                curDamageTextIndex = curDamageTextIndex % array.Length;
+            }
+
+            return array[curDamageTextIndex++];
+        }
+
         public void Ctor()
+        {
+            CtorHUD();
+            AnimatorComponent = new AnimatorComponent(animator);
+            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");
+            posAdjust = 15f;
+            rotAdjust = 15f;
+        }
+
+        void CtorHUD()
         {
             animator = GetComponent<Animator>();
             Debug.Assert(animator != null);
@@ -45,11 +69,15 @@ namespace Game.Client.Bussiness.BattleBussiness
             armorSlider = transform.Find("ArmorSlider").GetComponent<Slider>();
             Debug.Assert(armorSlider != null);
 
-            AnimatorComponent = new AnimatorComponent(animator);
-            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");
+            damageTextTF = transform.Find("role_renderer/Root/HUD/DamageText");
+            Debug.Assert(damageTextTF != null);
 
-            posAdjust = 15f;
-            rotAdjust = 15f;
+            var childCount = damageTextTF.childCount;
+            DamageTextTFArray = new Transform[childCount];
+            for (int i = 0; i < childCount; i++)
+            {
+                DamageTextTFArray[i] = damageTextTF.GetChild(i);
+            }
         }
     }
 

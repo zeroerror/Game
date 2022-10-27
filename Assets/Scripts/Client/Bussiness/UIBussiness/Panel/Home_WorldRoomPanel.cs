@@ -4,7 +4,7 @@ using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.UIBussiness;
 using UnityEngine.UI;
 
-namespace Game.Bussiness.UIBussiness.Panel
+namespace Game.Client.Bussiness.UIBussiness.Panel
 {
 
     public class Home_WorldRoomPanel : UIBehavior

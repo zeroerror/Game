@@ -48,7 +48,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (bullet.BulletType == BulletType.DefaultBullet)
             {
                 // - Damage
-                int damage = role.TryReceiveDamage(hitPowerModel.damage);
+                var domain = battleFacades.Domain.RoleDomain;
+                int damage = domain.RoleTryReceiveDamage(role, hitPowerModel.damage);
                 arbitService.AddHitRecord(attackerIDC, victimIDC, damage);
                 // - Physics
                 var addV = bullet.MoveComponent.Velocity * hitPowerModel.hitVelocityCoefficient;

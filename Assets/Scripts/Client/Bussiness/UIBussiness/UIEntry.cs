@@ -1,5 +1,5 @@
 using UnityEngine;
-using Game.Bussiness.UIBussiness;
+using Game.Client.Bussiness.UIBussiness;
 
 namespace Game.Client.Bussiness.EventCenter
 {

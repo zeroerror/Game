@@ -1,6 +1,5 @@
-using Game.Infrastructure.Input;
-using Game.Client.Bussiness.BattleBussiness.Controller.Domain;
 using Game.Infrastructure.Network.Client;
+using Game.Client.Bussiness.BattleBussiness.API;
 
 namespace Game.Client.Bussiness.BattleBussiness.Facades
 {
@@ -19,25 +18,33 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         // Controller Set
         public PlayerInputComponent InputComponent { get; private set; }
 
+        // - Service
         public BattleArbitrationService ArbitrationService { get; private set; }
         public BattleLeagueService BattleLeagueService { get; private set; }
         public IDService IDService { get; private set; }
 
+        // - API
+        public BattleLogicEventTriggerAPI LogicEventTriggerAPI { get; private set; }
+
         public BattleFacades()
         {
             Network = new AllBattleNetwork();
-            Repo = new AllBattleRepo();
-            Assets = new AllBattleAssets();
-            Domain = new AllDomains();
 
-            ArbitrationService = new BattleArbitrationService();
+            Repo = new AllBattleRepo();
+
+            Assets = new AllBattleAssets();
+
+            Domain = new AllDomains();
+            Domain.Inject(this);
+
             BattleLeagueService = new BattleLeagueService();
             IDService = new IDService();
 
+            ArbitrationService = new BattleArbitrationService();
             ArbitrationService.Inject(this);
-            Domain.Inject(this);
 
-            // Asset Load
+            LogicEventTriggerAPI = new BattleLogicEventTriggerAPI();
+
             Assets.LoadAll();
         }
 

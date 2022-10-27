@@ -3,7 +3,7 @@ using ZeroUIFrame;
 using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.UIBussiness;
 
-namespace Game.Bussiness.UIBussiness.Panel
+namespace Game.Client.Bussiness.UIBussiness.Panel
 {
 
     public class Home_WorldServerPanel : UIBehavior

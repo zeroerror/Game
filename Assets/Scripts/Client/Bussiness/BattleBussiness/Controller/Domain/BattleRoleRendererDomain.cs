@@ -1,5 +1,6 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
+using UnityEngine.UI;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -73,6 +74,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             Debug.Log("生成Renderer角色失败");
             return null;
+        }
+
+        public void HUD_ShowDamageText(BattleRoleLogicEntity role, int damage)
+        {
+            var roleRenderer = role.roleRenderer;
+            var textTF = roleRenderer.GetDamageTextTF();
+            var text = textTF.GetComponent<Text>();
+            text.text = damage.ToString();
+            textTF.gameObject.SetActive(true);
         }
 
     }
