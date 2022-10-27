@@ -15,8 +15,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public ArmorType ArmorType => armorType;
 
         [SerializeField]
-        int health;
-        public int Health => health;
+        int maxHealth;
+        public int MaxHealth => maxHealth;
 
         int curHealth;
         public int CurHealth => curHealth;
@@ -50,7 +50,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Reset()
         {
             idComponent.SetLeagueId(-1);
-            curHealth = health;
+            curHealth = maxHealth;
         }
 
     }

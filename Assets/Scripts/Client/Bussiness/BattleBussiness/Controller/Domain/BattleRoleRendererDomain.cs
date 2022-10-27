@@ -26,19 +26,36 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 var bloodSlider = role.roleRenderer.BloodSlider;
+                var armorSlider = role.roleRenderer.ArmorSlider;
                 if (role.StateComponent.RoleState == RoleState.Dead || role.StateComponent.RoleState == RoleState.Reborn)
                 {
                     bloodSlider.value = 0;
                     bloodSlider.gameObject.SetActive(false);
+                    armorSlider.value = 0;
+                    armorSlider.gameObject.SetActive(false);
                     return;
                 }
 
+                var healthComponent = role.HealthComponent;
+                bloodSlider.maxValue = healthComponent.MaxHealth;
+                bloodSlider.value = healthComponent.Health;
+
+                var armor = role.Armor;
+                if (armor == null)
+                {
+                    armorSlider.maxValue = 0;
+                    armorSlider.value = 0;
+                }
+                else
+                {
+                    armorSlider.maxValue = armor.MaxHealth;
+                    armorSlider.value = armor.CurHealth;
+                }
+
                 bloodSlider.gameObject.SetActive(true);
-                role.roleRenderer.BloodSlider.maxValue = role.HealthComponent.MaxHealth;
-                role.roleRenderer.BloodSlider.value = role.HealthComponent.Health;
+                armorSlider.gameObject.SetActive(true);
             });
         }
-
 
         public BattleRoleRendererEntity SpawnRoleRenderer(int entityId, Transform parent)
         {

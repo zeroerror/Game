@@ -56,11 +56,13 @@ namespace Game.Client.Bussiness.BattleBussiness
             return true;
         }
 
-        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC)
+        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC,int damage)
         {
             HitModel hitModel = new HitModel();
             hitModel.attackerIDC =attackerIDC;
             hitModel.victimIDC =victimIDC;
+            hitModel.damage =damage;
+            Debug.Log($"ADD HIT RECORD: attackerIDC {attackerIDC} victimIDC {victimIDC} damage {damage}");
 
             var key = GetKey(attackerIDC, victimIDC);
 

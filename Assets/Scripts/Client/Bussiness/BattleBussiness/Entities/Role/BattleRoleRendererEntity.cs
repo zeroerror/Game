@@ -29,17 +29,21 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float posAdjust;
         public float rotAdjust;
 
-        // == UI ==
+        // == HUD ==
         Slider bloodSlider;
-        public Slider BloodSlider =>bloodSlider;
+        public Slider BloodSlider => bloodSlider;
+
+        Slider armorSlider;
+        public Slider ArmorSlider => armorSlider;
 
         public void Ctor()
         {
             animator = GetComponent<Animator>();
             Debug.Assert(animator != null);
-
-            bloodSlider = transform.GetComponentInChildren<Slider>();
+            bloodSlider = transform.Find("BloodSlider").GetComponent<Slider>();
             Debug.Assert(bloodSlider != null);
+            armorSlider = transform.Find("ArmorSlider").GetComponent<Slider>();
+            Debug.Assert(armorSlider != null);
 
             AnimatorComponent = new AnimatorComponent(animator);
             camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");

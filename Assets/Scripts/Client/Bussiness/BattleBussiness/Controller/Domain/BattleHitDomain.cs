@@ -27,9 +27,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return false;
             }
 
-            // - Record
-            arbitService.AddHitRecord(attackerIDC, victimIDC);
-
             // - Hit Apply
             ApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel, fixedDeltaTime);
 
@@ -44,20 +41,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
+            var arbitService = battleFacades.ArbitrationService;
             var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityID);
             var role = battleFacades.Repo.RoleRepo.Get(victimIDC.EntityID);
 
             if (bullet.BulletType == BulletType.DefaultBullet)
             {
-                // 作用伤害
-                role.TryReceiveDamage(hitPowerModel.damage);
-                // 作用物理
+                // - Damage
+                int damage = role.TryReceiveDamage(hitPowerModel.damage);
+                arbitService.AddHitRecord(attackerIDC, victimIDC, damage);
+                // - Physics
                 var addV = bullet.MoveComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
                 role.MoveComponent.AddExtraVelocity(addV);
                 role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
             }
 
-            // 状态
+            // - State
             role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);
         }
 
