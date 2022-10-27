@@ -136,6 +136,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             isDead = false;
         }
 
+        // - Armor
         public void WearOrSwitchArmor(BattleArmorEntity val)
         {
             armor = val;
@@ -150,6 +151,27 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             armor = null;
+        }
+
+        public int TryReceiveDamage(int damage)
+        {
+            int armorReceiveDamage = 0;
+
+            // - Armor
+            if (armor != null)
+            {
+                armorReceiveDamage = armor.TryRecieveDamage(damage);
+                if (armorReceiveDamage == damage)
+                {
+                    return armorReceiveDamage;
+                }
+            }
+
+            // - Flesh
+            var fleshReceiveDamage = healthComponent.TryReiveDamage(damage - armorReceiveDamage);
+
+            var totalReceiveDamage = armorReceiveDamage + fleshReceiveDamage;
+            return totalReceiveDamage;
         }
 
         #endregion

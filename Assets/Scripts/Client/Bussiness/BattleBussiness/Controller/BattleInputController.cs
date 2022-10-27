@@ -120,18 +120,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 GameObject closestGo = null;
                 IPickable pick = null;
                 Vector3 ownerPos = owner.MoveComponent.Position;
-                Debug.Log($"想要拾取物品，周围可拾取数量为:{nearItemList.Count}");
 
                 nearItemList.ForEach((item) =>
                 {
                     if (item.status == CollisionStatus.Exit) return;
 
                     var idc = item.gameObject.GetComponentInParent<IPickable>();
-                    if (idc == null) return;
+                    if (idc == null)
+                    {
+                        return;
+                    }
 
                     var collider = item.Collider;
-                    Debug.Log($"item:{collider.transform.parent.name}");
-
                     var dis = Vector3.Distance(collider.transform.position, ownerPos);
                     if (dis < closestDis)
                     {
@@ -163,7 +163,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     return;
                 }
 
-                // 射击请求发送前判定
+                // - 默认射击方向为角色前方
                 if (input.fireDir == Vector2.zero)
                 {
                     var forward = owner.transform.forward;
@@ -193,7 +193,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var weaponComponent = owner.WeaponComponent;
                 var animatorComponent = owner.roleRenderer.AnimatorComponent;
                 Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空");
-                // Debug.Assert(!weaponComponent.IsReloading, "当前武器已经在换弹中");
                 if (owner.CanWeaponReload())
                 {
                     var rqs = battleFacades.Network.WeaponReqAndRes;
@@ -224,13 +223,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             //客户端鉴权旋转角度同步
             var rqs = battleFacades.Network.RoleReqAndRes;
             rqs.SendReq_RoleRotate(owner);
-            // if (owner.MoveComponent.IsEulerAngleNeedFlush())
-            // {
-            //     owner.MoveComponent.FlushEulerAngle();
-            //     //客户端鉴权旋转角度同步
-            //     var rqs = battleFacades.Network.RoleReqAndRes;
-            //     rqs.SendReq_RoleRotate(owner);
-            // }
         }
 
         bool WillHitOtherRole(BattleRoleLogicEntity roleEntity, Vector3 moveDir)

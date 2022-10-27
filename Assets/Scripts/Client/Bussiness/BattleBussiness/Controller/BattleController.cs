@@ -230,7 +230,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     continue;
                 }
 
-                role.HealthComponent.HurtByDamage(bullet.HitPowerModel.damage);
+                role.HealthComponent.TryReiveDamage(bullet.HitPowerModel.damage);
             }
         }
 

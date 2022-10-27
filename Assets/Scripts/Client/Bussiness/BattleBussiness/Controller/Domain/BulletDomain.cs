@@ -230,7 +230,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     {
                         var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient + new Vector3(0, 2f, 0);
                         role.MoveComponent.AddExtraVelocity(hitVelocity);
-                        role.HealthComponent.HurtByDamage(hitPowerModel.damage);
+                        role.HealthComponent.TryReiveDamage(hitPowerModel.damage);
                     }
                 }
             });

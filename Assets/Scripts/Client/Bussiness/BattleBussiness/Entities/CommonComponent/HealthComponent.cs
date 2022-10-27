@@ -10,19 +10,29 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
 
         [SerializeField]
-        float maxHealth;
-        public float MaxHealth => maxHealth;
+        int maxHealth;
+        public int MaxHealth => maxHealth;
 
         [SerializeField]
-        float health;
-        public float Health => health;
+        int health;
+        public int Health => health;
 
         public bool CheckIsDead() => health <= 0;
 
-        public void HurtByDamage(int damage)
+        public int TryReiveDamage(int damage)
         {
-            Debug.Log($"受到伤害: {damage}  ->  health {health - damage}");
-            health -= damage;
+            int realDamage = 0;
+            if (health >= damage)
+            {
+                realDamage = damage;
+                health -= realDamage;
+                return realDamage;
+            }
+
+            realDamage = health;
+            health = 0;
+
+            return realDamage;
         }
 
         public void Reset()

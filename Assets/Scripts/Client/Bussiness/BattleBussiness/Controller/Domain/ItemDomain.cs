@@ -73,43 +73,43 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var repo = battleFacades.Repo;
             var roleRepo = repo.RoleRepo;
             var master = roleRepo.Get(masterEntityID);
-            bool isPickUpSucceed = false;
 
-            switch (entityType)
+            if (entityType == EntityType.Weapon)
             {
-                case EntityType.Weapon:
-                    var weaponRepo = repo.WeaponRepo;
-                    if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster && master.WeaponComponent.TryPickUpWeapon(weaponEntity, hangPoint))
-                    {
-                        isPickUpSucceed = true;
-                        weaponEntity.SetMaster(masterEntityID);
-
-                        weaponRepo.TryRemove(weaponEntity);
-                    }
-                    break;
-                case EntityType.BulletPack:
-                    // TODO: 背包容量判断
-                    var bulletPackRepo = repo.BulletPackRepo;
-                    if (bulletPackRepo.TryGet(entityId, out BulletPackEntity bulletPack))
-                    {
-                        isPickUpSucceed = true;
-                        master.ItemComponent.TryCollectItem_Bullet(bulletPack);
-
-                        bulletPackRepo.TryRemove(bulletPack);
-                        GameObject.Destroy(bulletPack.gameObject);
-                    }
-                    break;
-                case EntityType.Armor:
-                    var armorRepo = repo.ArmorRepo;
-                    if (armorRepo.TryGet(entityId, out var armor))
-                    {
-                        isPickUpSucceed = true;
-                        master.WearOrSwitchArmor(armor);
-                    }
-                    break;
+                var weaponRepo = repo.WeaponRepo;
+                if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster && master.WeaponComponent.TryPickUpWeapon(weaponEntity, hangPoint))
+                {
+                    weaponEntity.SetMaster(masterEntityID);
+                    weaponRepo.TryRemove(weaponEntity);
+                    return true;
+                }
             }
 
-            return isPickUpSucceed;
+            if (entityType == EntityType.BulletPack)
+            {
+                // TODO: 背包容量判断
+                var bulletPackRepo = repo.BulletPackRepo;
+                if (bulletPackRepo.TryGet(entityId, out BulletPackEntity bulletPack))
+                {
+                    master.ItemComponent.TryCollectItem_Bullet(bulletPack);
+                    bulletPackRepo.TryRemove(bulletPack);
+                    GameObject.Destroy(bulletPack.gameObject);
+                    return true;
+                }
+            }
+
+            if (entityType == EntityType.Armor)
+            {
+                var armorRepo = repo.ArmorRepo;
+                if (armorRepo.TryGet(entityId, out var armor))
+                {
+                    master.WearOrSwitchArmor(armor);
+                    return true;
+                }
+            }
+
+            Debug.LogWarning("尚未处理的情况");
+            return false;
         }
 
         string GetPrefabName(EntityType entityType, byte sortType)

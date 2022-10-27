@@ -31,13 +31,20 @@ namespace Game.Client.Bussiness.BattleBussiness
             idComponent.SetSubType((byte)armorType);
         }
 
-        public void RecieveDamage(int damage)
+        public int TryRecieveDamage(int damage)
         {
-            curHealth -= damage;
-            if (curHealth < 0)
+            int realDamage = 0;
+            if (curHealth >= damage)
             {
-                curHealth = 0;
+                realDamage = damage;
+                curHealth -= realDamage;
+                return realDamage;
             }
+
+            realDamage = curHealth;
+            curHealth = 0;
+
+            return realDamage;
         }
 
         public void Reset()

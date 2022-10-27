@@ -21,27 +21,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public bool TryHitActor(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel, float fixedDeltaTime)
         {
             var arbitService = battleFacades.ArbitrationService;
-            if (!arbitService.CanHit(attackerIDC, victimIDC, hitPowerModel))
+            if (!arbitService.IsHitSuccess(attackerIDC, victimIDC, hitPowerModel))
             {
-                Debug.Log($"不能造成伤害");
+                Debug.Log($"打击失败!");
                 return false;
             }
 
+            // - Record
+            arbitService.AddHitRecord(attackerIDC, victimIDC);
+
+            // - Hit Apply
             ApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel, fixedDeltaTime);
 
-            Debug.Log($"victimIDC : {victimIDC.EntityType.ToString()}");
             return true;
-
         }
 
         void ApplyBulletHitRole(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel, float fixedDeltaTime)
         {
-            if (attackerIDC.EntityType != EntityType.Bullet)
-            {
-                return;
-            }
-
-            if (victimIDC.EntityType != EntityType.BattleRole)
+            if (attackerIDC.EntityType != EntityType.Bullet
+            || victimIDC.EntityType != EntityType.BattleRole)
             {
                 return;
             }
@@ -52,7 +50,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (bullet.BulletType == BulletType.DefaultBullet)
             {
                 // 作用伤害
-                role.HealthComponent.HurtByDamage(hitPowerModel.damage);
+                role.TryReceiveDamage(hitPowerModel.damage);
                 // 作用物理
                 var addV = bullet.MoveComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
                 role.MoveComponent.AddExtraVelocity(addV);
@@ -61,7 +59,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             // 状态
             role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);
-
         }
 
     }

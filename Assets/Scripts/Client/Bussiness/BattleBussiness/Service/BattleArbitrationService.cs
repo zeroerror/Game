@@ -9,20 +9,20 @@ namespace Game.Client.Bussiness.BattleBussiness
     public enum AttackTag : byte
     {
         None,
-        Enemy,          // - 敌军
-        Ally, // - 友军
+        Enemy,      // - 敌军
+        Ally,       // - 友军
     }
 
     public class BattleArbitrationService
     {
 
-        Dictionary<long, Queue<HitPowerModel>> all;
+        Dictionary<long, Queue<HitModel>> all;
 
         BattleFacades battleFacades;
 
         public BattleArbitrationService()
         {
-            all = new Dictionary<long, Queue<HitPowerModel>>();
+            all = new Dictionary<long, Queue<HitModel>>();
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -30,35 +30,50 @@ namespace Game.Client.Bussiness.BattleBussiness
             this.battleFacades = battleFacades;
         }
 
-        public bool CanHit(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)
+        public bool IsHitSuccess(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)
         {
-
-            // 不可多次伤害
+            // - 不可多次伤害
             if (HasHitRecord(attacker, victim, hitPowerModel) && !hitPowerModel.canHitRepeatly)
             {
                 Debug.LogWarning($"不可多次受击 ");
                 return false;
             }
 
-            // 不是正确的攻击对象
+            // - 不是正确的攻击对象
             if (!IsRightTarget(attacker, victim, hitPowerModel))
             {
                 Debug.LogWarning($"不是正确的受击对象 ");
                 return false;
             }
 
-            // TODO: 是否可以伤害：  对方是否无敌 是否死亡等等
+            // - 不可伤害(无敌、死亡)
             if (!CanDamage(victim))
             {
-                Debug.LogWarning($"受击对象 无法被伤害");
+                Debug.LogWarning($"不可伤害(无敌、死亡)");
                 return false;
             }
 
             return true;
-
         }
 
-        #region [PRIVATE]
+        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC)
+        {
+            HitModel hitModel = new HitModel();
+            hitModel.attackerIDC =attackerIDC;
+            hitModel.victimIDC =victimIDC;
+
+            var key = GetKey(attackerIDC, victimIDC);
+
+            if (all.TryGetValue(key, out var queue))
+            {
+                queue.Enqueue(hitModel);
+                return;
+            }
+
+            queue = new Queue<HitModel>();
+            queue.Enqueue(hitModel);
+            all[key] = queue;
+        }
 
         bool CanDamage(IDComponent victim)
         {
@@ -108,24 +123,16 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         bool HasHitRecord(IDComponent attacker, IDComponent victim, in HitPowerModel hitPowerModel)
         {
-
             long key = GetKey(attacker, victim);
 
-            if (all.TryGetValue(key, out var modelQueue))
+            if (all.TryGetValue(key, out var hitModelQueue))
             {
-                Debug.Log($"Hit Record Exist! num: {modelQueue.Count}  --------------");
-                while (modelQueue.TryDequeue(out var model))
-                {
-                    Debug.Log($"model damage: {model.damage}");
-                }
                 return true;
             }
             else
             {
-                Debug.Log($"Hit Record Not Exist!");
                 return false;
             }
-
         }
 
         long GetKey(IDComponent attacker, IDComponent victim)
@@ -143,8 +150,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             return key;
         }
-
-        #endregion
 
     }
 

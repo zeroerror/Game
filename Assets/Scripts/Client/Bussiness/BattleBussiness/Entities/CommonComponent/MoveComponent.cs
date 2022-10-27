@@ -136,17 +136,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             euler.y += eulerAngleY;    //左右看
             rb.rotation = Quaternion.Euler(euler);
         }
-        
+
         public void SetEulerAngleY(Vector3 eulerAngle)
         {
             var euler = rb.rotation.eulerAngles;
             euler.y = eulerAngle.y;
             rb.rotation = Quaternion.Euler(euler);
-        }
-
-        public void FlushEulerAngle()
-        {
-            OldEulerAngles = GetEulerAngles();
         }
 
         public Vector3 GetFaceDir()
@@ -155,13 +150,18 @@ namespace Game.Client.Bussiness.BattleBussiness
             return dir;
         }
 
-        public bool IsEulerAngleNeedFlush()
+        public bool IsRotationNeedFlush()
         {
             var eulerAngles = GetEulerAngles();
             if (Mathf.Abs(OldEulerAngles.x - eulerAngles.x) > 10) return true;
             if (Mathf.Abs(OldEulerAngles.y - eulerAngles.y) > 10) return true;
             if (Mathf.Abs(OldEulerAngles.z - eulerAngles.z) > 10) return true;
             return false;
+        }
+
+        public void FlushRotation()
+        {
+            OldEulerAngles = GetEulerAngles();
         }
 
         Vector3 GetEulerAngles()
@@ -273,12 +273,19 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region [物理碰撞]
 
-        // 尚未测试过 可能存在BUG
         public void MoveHitErase(Vector3 hitDir)
         {
             EraseVelocity(ref moveVelocity, -hitDir);
         }
 
+        public void HitSomething(Vector3 hitDir)
+        {
+            // DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
+            //  消除反方向Velocity
+            // EraseVelocity(hitDir);  
+        }
+
+        // 尚未测试过 可能存在BUG
         public void EraseVelocity(ref Vector3 velocity, Vector3 eraseV)
         {
             var cosVal = Vector3.Dot(velocity.normalized, eraseV.normalized);
@@ -300,49 +307,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             Debug.Log($"EraseVelocityByDir  cosVal:{cosVal} reduce:{reduce} ");
         }
 
-        public void HitSomething(Vector3 hitDir)
-        {
-            // DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
-            //  消除反方向Velocity
-            // EraseVelocity(hitDir);   // 存在BUG!!!!!
-        }
 
         public void LeaveSomthing(Vector3 leaveDir)
         {
             // DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
-        }
-
-        public void EraseVelocity(Vector3 dir)
-        {
-            dir.Normalize();
-
-            Vector3 a;
-            float cosValue;
-            Vector3 reduceVelocity;
-
-            var grav = new Vector3(0, this.gravityVelocity, 0);
-            a = grav.normalized;
-            cosValue = Vector3.Dot(a, dir);
-            reduceVelocity = grav * cosValue;
-            grav -= reduceVelocity;
-            gravityVelocity = grav.y;
-            if (gravityVelocity > 0)
-            {
-                gravityVelocity = 0;
-            }
-            // DebugExtensions.LogWithColor($"碰撞消除'重力速度':{reduceVelocity}", "#48D1CC");
-
-            a = rb.velocity.normalized;
-            cosValue = Vector3.Dot(a, dir);
-            reduceVelocity = rb.velocity * cosValue;
-            rb.velocity -= reduceVelocity;
-            // DebugExtensions.LogWithColor($"碰撞消除'Rigidbody速度':{reduceVelocity}---->新'Rigidbody速度':{rb.velocity}", "#48D1CC");
-
-            a = extraVelocity.normalized;
-            cosValue = Vector3.Dot(a, dir);
-            reduceVelocity = extraVelocity * cosValue;
-            extraVelocity -= reduceVelocity;
-            // DebugExtensions.LogWithColor($"碰撞消除'额外速度':{reduceVelocity}---->新'额外速度':{extraVelocity}", "#48D1CC");
         }
 
         public void EnterGound()
@@ -379,7 +347,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #endregion
 
-
         bool IsOppositeDir(Vector3 dir1, Vector3 dir2)
         {
             dir1.Normalize();
@@ -387,9 +354,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             var cosVal = Vector3.Dot(dir1, dir2);
             return cosVal < 0;
         }
-
-
-
 
     }
 
