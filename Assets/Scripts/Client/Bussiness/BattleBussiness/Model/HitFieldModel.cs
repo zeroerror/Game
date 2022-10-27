@@ -1,5 +1,5 @@
-
 using System;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
