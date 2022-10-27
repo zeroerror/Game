@@ -1736,7 +1736,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2866247796625563942}
   - component: {fileID: 2781721378193753990}
-  - component: {fileID: 866883619488458285}
   m_Layer: 0
   m_Name: Root
   m_TagString: Untagged
@@ -1781,22 +1780,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &866883619488458285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2867970937803559728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 246c61d492d4b36419c26a171b8b14bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  staticTime: 0
-  handPoint: {fileID: 4375883994080545420}
-  posAdjust: 0
-  rotAdjust: 0
 --- !u!1 &2867976959444368112
 GameObject:
   m_ObjectHideFlags: 0
@@ -3202,6 +3185,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2583249851614347264}
+  - component: {fileID: 7775711276020897131}
   m_Layer: 0
   m_Name: role_renderer
   m_TagString: Untagged
@@ -3225,6 +3209,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7775711276020897131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2923500955502484154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 246c61d492d4b36419c26a171b8b14bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  staticTime: 0
+  handPoint: {fileID: 4375883994080545420}
+  posAdjust: 0
+  rotAdjust: 0
 --- !u!1 &2958142452977593081
 GameObject:
   m_ObjectHideFlags: 0

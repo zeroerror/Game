@@ -54,6 +54,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             CtorHUD();
+            animator = GetComponentInChildren<Animator>();
+            Debug.Assert(animator != null);
             AnimatorComponent = new AnimatorComponent(animator);
             camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");
             posAdjust = 15f;
@@ -62,14 +64,12 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         void CtorHUD()
         {
-            animator = GetComponent<Animator>();
-            Debug.Assert(animator != null);
-            bloodSlider = transform.Find("BloodSlider").GetComponent<Slider>();
+            bloodSlider = transform.Find("Root/HUD/BloodSlider").GetComponent<Slider>();
             Debug.Assert(bloodSlider != null);
-            armorSlider = transform.Find("ArmorSlider").GetComponent<Slider>();
+            armorSlider = transform.Find("Root/HUD/ArmorSlider").GetComponent<Slider>();
             Debug.Assert(armorSlider != null);
 
-            damageTextTF = transform.Find("role_renderer/Root/HUD/DamageText");
+            damageTextTF = transform.Find("Root/HUD/DamageText");
             Debug.Assert(damageTextTF != null);
 
             var childCount = damageTextTF.childCount;
