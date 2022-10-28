@@ -104,7 +104,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             ConnIdList.ForEach((connId) =>
                             {
                                 weaponRqs.SendRes_WeaponShoot(connId, masterId);
-                                bulletRqs.SendRes_BulletSpawn(connId,bulletEntity);
+                                bulletRqs.SendRes_BulletSpawn(connId, bulletEntity);
                             });
                             Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletEntityId}  MasterWRid:{masterId}  起点：{startPos} 飞行方向:{fireDir}");
                         }
@@ -178,8 +178,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     if (roleRepo.TryGetByEntityId(masterId, out var master)
                         && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
                     {
-                        // 服务器逻辑
-                        battleFacades.BattleFacades.Domain.WeaponDomain.ReuseWeapon(weapon, master.MoveComponent.Position);
+                        var itemDomain = battleFacades.BattleFacades.Domain.ItemDomain;
+                        itemDomain.DropWeaponToItem(weapon);
 
                         ConnIdList.ForEach((connId) =>
                         {

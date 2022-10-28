@@ -4,12 +4,14 @@ namespace Game.Generic
     public static class AssetLabelCollection
     {
 
-        public const string CameraAssets = "Camera";
-        public const string UIAssets = "UI";
+        public const string CameraAsset = "Camera";
+        public const string UIAsset = "UI";
         public const string BattleRenderer_Scene = "Scene";
-        public const string RoleAssets = "Role";
-        public const string BulletAssets = "Bullet";
-        public const string ItemAssets = "Item";
+        public const string RoleAsset = "Role";
+        public const string BulletAsset = "Bullet";
+        public const string WeaponAsset = "Weapon";
+        public const string ArmorAsset = "Armor";
+        public const string ItemAsset = "Item";
 
     }
 

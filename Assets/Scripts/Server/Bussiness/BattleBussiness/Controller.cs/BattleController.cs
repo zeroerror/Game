@@ -481,7 +481,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 // - 生成资源
                 var itemDomain = battleFacades.Domain.ItemDomain;
-                var itemGo = itemDomain.SpawnItem(entityType, subtype, entityID, parent.transform);
+                itemDomain.SpawnItem(entityType, subtype, entityID, parent.transform);
 
                 // - 记录
                 entityIDList.Add(entityID);

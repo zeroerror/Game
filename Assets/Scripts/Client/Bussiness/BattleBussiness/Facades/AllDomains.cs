@@ -15,13 +15,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleInputDomain InputDomain { get; private set; }
 
-        public BulletDomain BulletDomain { get; private set; }
+        public PhysicsDomain PhysicsDomain { get; private set; }
 
         public ItemDomain ItemDomain { get; private set; }
 
-        public PhysicsDomain PhysicsDomain { get; private set; }
+        public BulletDomain BulletDomain { get; private set; }
+        public BulletItemDomain BulletItemDomain { get; private set; }
 
         public WeaponDomain WeaponDomain { get; private set; }
+        public WeaponItemDomain WeaponItemDomain { get; private set; }
+
+        public BattleArmorDomain ArmorDomain { get; private set; }
+        public BattleArmorItemDomain ArmorItemDomain { get; private set; }
 
         public BattleHitDomain HitDomain { get; private set; }
 
@@ -38,13 +43,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             InputDomain = new BattleInputDomain();
 
-            BulletDomain = new BulletDomain();
+            PhysicsDomain = new PhysicsDomain();
 
             ItemDomain = new ItemDomain();
 
-            PhysicsDomain = new PhysicsDomain();
+            BulletDomain = new BulletDomain();
+            BulletItemDomain = new BulletItemDomain();
 
             WeaponDomain = new WeaponDomain();
+            WeaponItemDomain = new WeaponItemDomain();
+
+            ArmorDomain = new BattleArmorDomain();
+            ArmorItemDomain = new BattleArmorItemDomain();
 
             HitDomain = new BattleHitDomain();
         }
@@ -62,12 +72,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             InputDomain.Inject(facades);
 
             BulletDomain.Inject(facades);
+            BulletItemDomain.Inject(facades);
 
             ItemDomain.Inject(facades);
 
             PhysicsDomain.Inject(facades);
 
             WeaponDomain.Inject(facades);
+            WeaponItemDomain.Inject(facades);
+
+            ArmorDomain.Inject(facades);
+            ArmorItemDomain.Inject(facades);
 
             HitDomain.Inject(facades);
         }

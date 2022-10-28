@@ -21,7 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public void TickRoleWorldUI()
+        public void Tick_WorldUI()
         {
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
@@ -44,13 +44,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var armor = role.Armor;
                 if (armor == null)
                 {
-                    armorSlider.maxValue = 0;
                     armorSlider.value = 0;
                 }
                 else
                 {
                     armorSlider.maxValue = armor.MaxHealth;
                     armorSlider.value = armor.CurHealth;
+                    Debug.Log($"armor.CurHealth {armor.CurHealth}");
                 }
 
                 bloodSlider.gameObject.SetActive(true);

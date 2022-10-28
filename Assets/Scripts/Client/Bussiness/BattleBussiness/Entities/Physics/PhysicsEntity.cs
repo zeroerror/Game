@@ -83,7 +83,6 @@ namespace Game.Client.Bussiness
                     if (collision.contactCount != 0)
                     {
                         closestPoint = collision.GetContact(0).point;
-                        Debug.LogWarning("collision.contactCount != 0");
                     }
                     else
                     {
@@ -101,17 +100,6 @@ namespace Game.Client.Bussiness
                 else
                 {
                     isGround = true;
-                }
-
-                Debug.LogWarning($"collision hitDir {hitDir}  selfPos {selfPos} closestPoint {closestPoint}");
-                if (isGround)
-                {
-                    Debug.LogWarning($"collision isGround");
-                }
-                else
-                {
-                    Debug.LogWarning($"collision Not isGround");
-
                 }
 
                 if (layerName == "Field")

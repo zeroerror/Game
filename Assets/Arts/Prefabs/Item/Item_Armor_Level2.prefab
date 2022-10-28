@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 246590667525439007}
   - component: {fileID: 221834174194371981}
   - component: {fileID: 229685760668362537}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SM_Icon_Shield_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,8 +92,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2679718073387019245}
-  - component: {fileID: 8282469185183804413}
-  m_Layer: 0
+  - component: {fileID: 5530076921808089273}
+  m_Layer: 9
   m_Name: Item_Armor_Level2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8282469185183804413
+--- !u!114 &5530076921808089273
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,11 +126,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 556889105663022914}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3d0bb0ce6014db4ea8872ed146046e8, type: 3}
+  m_Script: {fileID: 11500000, guid: f177a123cf466664b9480e1c79ddf73d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   armorType: 1
-  maxHealth: 75
 --- !u!1 &6763285817637247548
 GameObject:
   m_ObjectHideFlags: 0

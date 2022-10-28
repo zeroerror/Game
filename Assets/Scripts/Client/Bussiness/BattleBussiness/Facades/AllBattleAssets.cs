@@ -9,25 +9,31 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     {
 
         public BattleRoleAssets BattleRoleAssets { get; private set; }
-        public ItemAsset ItemAsset { get; private set; }
+        public WeaponAsset WeaponAsset { get; private set; }
+        public ArmorAsset ArmorAsset { get; private set; }
         public BulletAsset BulletAsset { get; private set; }
         public CameraAsset CameraAsset { get; private set; }
 
+        public ItemAsset ItemAsset { get; private set; }
         public AllBattleAssets()
         {
             BattleRoleAssets = new BattleRoleAssets();
-            ItemAsset = new ItemAsset();
+            WeaponAsset = new WeaponAsset();
+            ArmorAsset = new ArmorAsset();
             BulletAsset = new BulletAsset();
             CameraAsset = new CameraAsset();
+            ItemAsset = new ItemAsset();
         }
 
         public void LoadAll()
         {
-            Console.WriteLine("世界资源开始加载------------------------------------------");
+            Console.WriteLine("资源开始加载------------------------------------------");
             BattleRoleAssets.LoadAssets();
-            ItemAsset.LoadAssets();
+            WeaponAsset.LoadAssets();
+            ArmorAsset.LoadAssets();
             BulletAsset.LoadAssets();
             CameraAsset.LoadAssets();
+            ItemAsset.LoadAssets();
         }
 
     }

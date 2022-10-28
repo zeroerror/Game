@@ -3,11 +3,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
 
     public enum EntityType : byte
     {
+        None,
         BattleRole,
         Bullet,
+        BulletItem,
         Weapon,
-        BulletPack,
+        WeaponItem,
         Armor,
+        ArmorItem,
     }
 
 }

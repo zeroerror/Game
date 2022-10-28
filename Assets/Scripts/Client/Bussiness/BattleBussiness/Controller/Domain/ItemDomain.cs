@@ -34,82 +34,127 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
             itemGo.transform.localPosition = Vector3.zero;
 
-            var idc = CreateEntity(entityType, itemGo);
-            idc.SetEntityId(entityID);
+            CreateEntity(entityType, entityID, itemGo);
 
             Debug.Log($"生成物件：{prefabName}");
             return itemGo;
         }
 
-        public IDComponent CreateEntity(EntityType entityType, GameObject entityGo)
+        public void CreateEntity(EntityType entityType, int entityID, GameObject entityGo)
         {
-            switch (entityType)
+            if (entityType == EntityType.WeaponItem)
             {
-                case EntityType.Weapon:
-                    var weapon = entityGo.GetComponent<WeaponEntity>();
-                    var weaponRepo = battleFacades.Repo.WeaponRepo;
-                    weapon.Ctor();
-                    weaponRepo.Add(weapon);
-                    return weapon.IDComponent;
-                case EntityType.BulletPack:
-                    var bulletPack = entityGo.GetComponent<BulletPackEntity>();
-                    var bulletPackRepo = battleFacades.Repo.BulletPackRepo;
-                    bulletPack.Ctor();
-                    bulletPackRepo.Add(bulletPack);
-                    return bulletPack.IDComponent;
-                case EntityType.Armor:
-                    var armorRepo = battleFacades.Repo.ArmorRepo;
-                    var armor = entityGo.GetComponent<BattleArmorEntity>();
-                    armor.Ctor();
-                    armorRepo.Add(armor);
-                    return armor.IDComponent;
+                var doamin = battleFacades.Domain.WeaponItemDomain;
+                doamin.SpawnWeaponItem(entityGo, entityID);
+                return;
             }
 
-            return null;
+            if (entityType == EntityType.BulletItem)
+            {
+                var bulletItem = entityGo.GetComponent<BulletItemEntity>();
+                bulletItem.Ctor();
+                bulletItem.IDComponent.SetEntityId(entityID);
+
+                var repo = battleFacades.Repo;
+                var bulletItemRepo = repo.BulletItemRepo;
+                bulletItemRepo.Add(bulletItem);
+                return;
+            }
+
+            if (entityType == EntityType.ArmorItem)
+            {
+                var armorItem = entityGo.GetComponent<BattleArmorItemEntity>();
+                armorItem.Ctor();
+
+                var repo = battleFacades.Repo;
+                var armorItemRepo = repo.ArmorItemRepo;
+                armorItemRepo.Add(armorItem);
+                return;
+            }
+
+            Debug.LogError($"没有处理的情况 {entityType.ToString()}");
         }
 
-        public bool TryPickUpItem(EntityType entityType, ushort entityId, int masterEntityID, Transform hangPoint = null)
+        public bool TryPickUpItem(EntityType entityType, ushort entityID, int masterEntityID, Transform hangPoint = null)
         {
             var repo = battleFacades.Repo;
             var roleRepo = repo.RoleRepo;
             var master = roleRepo.Get(masterEntityID);
 
-            if (entityType == EntityType.Weapon)
+            if (entityType == EntityType.WeaponItem)
             {
-                var weaponRepo = repo.WeaponRepo;
-                if (weaponRepo.TryGetByEntityId(entityId, out var weaponEntity) && !weaponEntity.HasMaster && master.WeaponComponent.TryPickUpWeapon(weaponEntity, hangPoint))
+                var weaponItemRepo = repo.WeaponItemRepo;
+                if (weaponItemRepo.TryGetByEntityId(entityID, out var weaponItem))
                 {
-                    weaponEntity.SetMaster(masterEntityID);
-                    weaponRepo.TryRemove(weaponEntity);
-                    return true;
+                    if (master.WeaponComponent.CanPickUpWeapon())
+                    {
+                        PickItemToWeapon(entityID, hangPoint, master, weaponItem);
+                        return true;
+                    }
                 }
+
+                return false;
             }
 
-            if (entityType == EntityType.BulletPack)
+            if (entityType == EntityType.BulletItem)
             {
                 // TODO: 背包容量判断
-                var bulletPackRepo = repo.BulletPackRepo;
-                if (bulletPackRepo.TryGet(entityId, out BulletPackEntity bulletPack))
+                var bulletItemRepo = repo.BulletItemRepo;
+                if (bulletItemRepo.TryGet(entityID, out BulletItemEntity bulletItem))
                 {
-                    master.ItemComponent.TryCollectItem_Bullet(bulletPack);
-                    bulletPackRepo.TryRemove(bulletPack);
-                    GameObject.Destroy(bulletPack.gameObject);
+                    master.ItemComponent.TryCollectItem_Bullet(bulletItem);
+
+                    var domain = battleFacades.Domain;
+                    var bulletItemDomain = domain.BulletItemDomain;
+                    bulletItemDomain.TearDownBulletItem(bulletItem);
                     return true;
                 }
             }
 
-            if (entityType == EntityType.Armor)
+            if (entityType == EntityType.ArmorItem)
             {
-                var armorRepo = repo.ArmorRepo;
-                if (armorRepo.TryGet(entityId, out var armor))
+                var armorItemRepo = repo.ArmorItemRepo;
+                if (armorItemRepo.TryGet(entityID, out var armorItem))
                 {
+                    var armorDomain = battleFacades.Domain.ArmorDomain;
+                    var armor = armorDomain.SpawnArmor(armorItem.ArmorType, entityID);
+
                     master.WearOrSwitchArmor(armor);
+
+                    var armorItemDomain = battleFacades.Domain.ArmorItemDomain;
+                    armorItemDomain.TearDownWeaponItem(armorItem);
                     return true;
                 }
             }
 
-            Debug.LogWarning("尚未处理的情况");
+            Debug.LogError("尚未处理的情况");
             return false;
+        }
+
+        public void PickItemToWeapon(ushort entityID, Transform hangPoint, BattleRoleLogicEntity master, WeaponItemEntity weaponItem)
+        {
+            var weaponDomain = battleFacades.Domain.WeaponDomain;
+            var weapon = weaponDomain.SpawnWeapon(weaponItem.WeaponType, entityID);
+
+            weapon.SetMaster(master.IDComponent.EntityID);
+            master.WeaponComponent.PickUpWeapon(weapon, hangPoint);
+
+            var weaponItemDomain = battleFacades.Domain.WeaponItemDomain;
+            weaponItemDomain.TearDownWeaponItem(weaponItem);
+        }
+
+        public void DropWeaponToItem(WeaponEntity weapon)
+        {
+            var domain = battleFacades.Domain;
+            var weaponItemDomain = domain.WeaponItemDomain;
+            var weaponItem = weaponItemDomain.SpawnWeaponItem(weapon.WeaponType, weapon.IDComponent.EntityID);
+            weaponItem.Ctor();
+
+            var master = battleFacades.Repo.RoleRepo.Get(weapon.MasterEntityID);
+            weaponItem.transform.position = master.transform.position;
+
+            var weaponDomain = domain.WeaponDomain;
+            weaponDomain.TearDownWeapon(weapon);
         }
 
         string GetPrefabName(EntityType entityType, byte sortType)
@@ -117,13 +162,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             string prefabName = null;
             switch (entityType)
             {
-                case EntityType.Weapon:
+                case EntityType.WeaponItem:
                     prefabName = $"Item_Weapon_{((WeaponType)sortType).ToString()}";
                     break;
-                case EntityType.BulletPack:
-                    prefabName = $"Item_BulletPack_{((BulletType)sortType).ToString()}";
+                case EntityType.BulletItem:
+                    prefabName = $"Item_Bullet_{((BulletType)sortType).ToString()}";
                     break;
-                case EntityType.Armor:
+                case EntityType.ArmorItem:
                     prefabName = $"Item_Armor_{((ArmorType)sortType).ToString()}";
                     break;
 

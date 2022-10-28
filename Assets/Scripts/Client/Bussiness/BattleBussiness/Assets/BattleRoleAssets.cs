@@ -19,10 +19,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Assets
 
         public void LoadAssets()
         {
-            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.RoleAssets, (obj) =>
+            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.RoleAsset, (obj) =>
             {
                 dic_name.TryAdd(obj.name, obj);
-                Console.WriteLine($"角色资源添加：{obj.name}");
             });
         }
 

@@ -12,15 +12,15 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public int CurrentCapacity;    //当前武器数量
 
-        List<BulletPackEntity> bulletPackItemList;
+        List<BulletItemEntity> bulletPackItemList;
 
         public ItemComponent()
         {
-            bulletPackItemList = new List<BulletPackEntity>();
+            bulletPackItemList = new List<BulletItemEntity>();
         }
 
         // 拾取
-        public void TryCollectItem_Bullet(BulletPackEntity bulletPackEntity)
+        public void TryCollectItem_Bullet(BulletItemEntity bulletPackEntity)
         {
             // TODO: 根据配置表获取物件单位占用容量
             // TODO: 只收集最大可收集数量
@@ -90,7 +90,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             List<IDComponent> itemList = new List<IDComponent>();
             switch (entityType)
             {
-                case EntityType.BulletPack:
+                case EntityType.BulletItem:
                     for (int i = 0; i < bulletPackItemList.Count; i++)
                     {
                         if (num <= i)

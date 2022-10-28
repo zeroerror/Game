@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             roleStateRendererDomain.ApplyRoleState(deltaTime);
 
             var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
-            roleRendererDomain.TickRoleWorldUI();
+            roleRendererDomain.Tick_WorldUI();
         }
 
         void Update_Camera()

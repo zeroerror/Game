@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 2568667215872069754}
   - component: {fileID: 1444079521361829855}
   - component: {fileID: 3742088755677293333}
-  - component: {fileID: 319446024169729765}
+  - component: {fileID: 5586837495509374238}
   m_Layer: 9
   m_Name: Item_Weapon_GrenadeLauncher
   m_TagString: Untagged
@@ -215,7 +215,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &319446024169729765
+--- !u!114 &5586837495509374238
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -224,14 +224,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2949415295620434624}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b744f057505fb53459931915066f2178, type: 3}
+  m_Script: {fileID: 11500000, guid: bf503693726415744a13a86ac4a01d85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 2
-  itemType: 1
   reloadFrame: 90
-  bulletCapacity: 10
-  firePoint: {fileID: 870315521853926398}
+  bulletCapacity: 0
+  firePoint: {fileID: 0}
   bulletType: 1
 --- !u!1 &7984027852196034228
 GameObject:

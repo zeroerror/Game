@@ -19,10 +19,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Assets
 
         public void LoadAssets()
         {
-            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.BulletAssets, (obj) =>
+            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.BulletAsset, (obj) =>
             {
                 dic_name.TryAdd(obj.name, obj);
-                Console.WriteLine($"子弹资源添加：{obj.name}");
             });
         }
 

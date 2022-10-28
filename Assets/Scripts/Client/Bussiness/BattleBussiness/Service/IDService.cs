@@ -10,9 +10,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public int roleAutoID;
         public int bulletAutoID;
-        public int bulletPackAutoID;
+        public int bulletItemAutoID;
         public int armorAutoID;
+        public int armorItemAutoID;
         public int weaponAutoID;
+        public int weaponItemAutoID;
 
         public IDService()
         {
@@ -28,17 +30,25 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 return ++bulletAutoID;
             }
-            if (entityType == EntityType.BulletPack)
+            if (entityType == EntityType.BulletItem)
             {
-                return ++bulletPackAutoID;
+                return ++bulletItemAutoID;
             }
             if (entityType == EntityType.Weapon)
             {
                 return ++weaponAutoID;
             }
+               if (entityType == EntityType.WeaponItem)
+            {
+                return ++weaponItemAutoID;
+            }
             if (entityType == EntityType.Armor)
             {
                 return ++armorAutoID;
+            }
+              if (entityType == EntityType.ArmorItem)
+            {
+                return ++armorItemAutoID;
             }
 
             Debug.LogWarning("未处理情况");

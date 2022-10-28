@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.Assets
 
         public void LoadAssets()
         {
-            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.CameraAssets, (obj) =>
+            Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.CameraAsset, (obj) =>
             {
                 dic_name.Add(obj.name, obj);
                 Console.WriteLine($"相机资源添加：{obj.name}");

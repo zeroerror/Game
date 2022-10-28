@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ArmorAsset
+  m_EditorClassIdentifier: 
+  m_GroupName: ArmorAsset
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 66a1f74832a8d774c8ee9d88fac45cd7
+  m_SerializeEntries:
+  - m_GUID: 4bc9c51e0be77644fb87c9922c18738c
+    m_Address: Armor_Level1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+  - m_GUID: e2e7da160d106a54aa56f799927570fa
+    m_Address: Armor_Level2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+  - m_GUID: 971ff5869a565a4479f82aebb36eb62d
+    m_Address: Armor_Level3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+  - m_GUID: 5a652f0496b270d4298e6374b418f2e9
+    m_Address: Armor_Level4
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: f1b6618bc4c5a4b4d999d6e08c204eaf, type: 2}
+    - {fileID: 11400000, guid: 05d1f1d782cf7274f8cadd14d5948c45, type: 2}

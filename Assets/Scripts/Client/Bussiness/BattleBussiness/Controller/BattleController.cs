@@ -332,7 +332,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var itemDomain = battleFacades.Domain.ItemDomain;
                 if (itemDomain.TryPickUpItem(entityType, itemEntityId, masterEntityID, role.roleRenderer.handPoint))
                 {
-                    Debug.Log($"[masterEntityID:{masterEntityID}]拾取 {entityType.ToString()}物件[entityId:{itemEntityId}]");
+                    Debug.Log($"[MasterEntityID:{masterEntityID}] 拾取 {entityType.ToString()} [EntityID:{itemEntityId}]");
                 }
 
             }

@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
 
         // 拾取武器
-        public bool TryPickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
+        public bool CanPickUpWeapon()
         {
             if (CurrentNum >= WEAPON_CAPICY)
             {
@@ -55,6 +55,11 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return false;
             }
 
+            return true;
+        }
+        
+        public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
+        {
             var colliders = weaponEntity.GetComponentsInChildren<Collider>();
             for (int i = 0; i < colliders.Length; i++)
             {
@@ -73,11 +78,10 @@ namespace Game.Client.Bussiness.BattleBussiness
                 if (AllWeapon[i] == null)
                 {
                     AllWeapon[i] = weaponEntity;
-                    return true;
+                    return;
                 }
             }
 
-            return false;
         }
 
         // 切换武器

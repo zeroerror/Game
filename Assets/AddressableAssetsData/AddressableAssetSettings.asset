@@ -49,6 +49,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15c0f3baf1502e246b7f68b4f7184529, type: 2}
   - {fileID: 11400000, guid: fe87583b4162ff54bb6a7fade34feac1, type: 2}
   - {fileID: 11400000, guid: 0047247b04008f84a8b129f2795cfd65, type: 2}
+  - {fileID: 11400000, guid: d418423c186015d439ca8d8cd45effb6, type: 2}
+  - {fileID: 11400000, guid: 929973b4a7a81d947bc943c329c173f4, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -97,6 +99,7 @@ MonoBehaviour:
     - Bullet
     - Weapon
     - Item
+    - Armor
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 7bd76f96a6249af4ea39e86aeb76659e, type: 2}

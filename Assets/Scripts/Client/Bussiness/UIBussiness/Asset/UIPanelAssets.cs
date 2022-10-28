@@ -15,7 +15,7 @@ namespace Game.Client.Bussiness.UIBussiness
         public static async Task LoadAll()
         {
             all = new Dictionary<string, GameObject>();
-            IList<GameObject> list = await Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.UIAssets, null).Task;
+            IList<GameObject> list = await Addressables.LoadAssetsAsync<GameObject>(AssetLabelCollection.UIAsset, null).Task;
             IEnumerator<GameObject> enumerator = list.GetEnumerator();
             while (enumerator.MoveNext())
             {
