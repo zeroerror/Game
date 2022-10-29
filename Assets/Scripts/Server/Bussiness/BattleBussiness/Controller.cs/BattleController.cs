@@ -14,7 +14,6 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleController
     {
         BattleServerFacades battleServerFacades;
-        float fixedDeltaTime;  //0.03f
 
         // Scene Spawn Trigger
         bool hasBattleBegin;
@@ -53,17 +52,13 @@ namespace Game.Server.Bussiness.BattleBussiness
             itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
         }
 
-        public void Inject(BattleServerFacades battleFacades, float fixedDeltaTime)
+        public void Inject(BattleServerFacades battleFacades)
         {
             this.battleServerFacades = battleFacades;
-            this.fixedDeltaTime = fixedDeltaTime;
-
-            var battleRqs = battleFacades.Network.BattleReqAndRes;
 
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMove);
             roleRqs.RegistReq_RoleRotate(OnRoleRotate);
-
             roleRqs.RegistReq_Jump(OnRoleJump);
             roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawn);
 
@@ -72,7 +67,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             if (!hasBattleBegin)
             {
@@ -84,24 +79,25 @@ namespace Game.Server.Bussiness.BattleBussiness
                 SpawBattleScene();
             }
 
-            var CurFieldEntity = battleServerFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
-            if (CurFieldEntity == null)
+            var curFieldEntity = battleServerFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
+            if (curFieldEntity == null)
             {
                 return;
             }
-            // ====== Bullet
-            Tick_BulletLifeCycle();
 
-            // ====== Role
+            // - Bullet
+            Tick_BulletLifeCycle(fixedDeltaTime);
+
+            // - Role
             Tick_RoleSpawn();
             Tick_RoleRollOpt();
             Tick_RoleMoveRotateOpt();
             ApplyAllRoleState();
 
-            // ====== Item
+            // - Item
             Tick_ItemPickUp();
 
-            // ====== Broadcast
+            // - Broadcast
             BroadcastAllRoleState();
         }
 
@@ -212,7 +208,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                     role.InputComponent.SetRollDir(dir);
                 }
             });
-
         }
 
         void ApplyAllRoleState()
@@ -225,17 +220,16 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Bullet]
 
-        void Tick_BulletLifeCycle()
+        void Tick_BulletLifeCycle(float fixedDeltaTime)
         {
-            Tick_DeadLifeBulletTearDown();
-            Tick_BulletHitRole();
-            Tick_BulletHitField();
-            Tick_ActiveHookerDraging();
+            Tick_DeadLifeBulletTearDown(fixedDeltaTime);
+            Tick_BulletHitRole(fixedDeltaTime);
+            Tick_ActiveHookerDraging(fixedDeltaTime);
         }
 
-        void Tick_DeadLifeBulletTearDown()
+        void Tick_DeadLifeBulletTearDown(float fixedDeltaTime)
         {
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
             var tearDownList = bulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
 
             tearDownList.ForEach((bulletEntity) =>
@@ -250,8 +244,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (bulletEntity is GrenadeEntity grenadeEntity)
                 {
-                    var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
-                    bulletDomain.GrenadeExplode(grenadeEntity, fixedDeltaTime);
+                    var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
+                    bulletDomain.GrenadeExplode(grenadeEntity);
                 }
 
                 if (bulletEntity is HookerEntity hookerEntity)
@@ -272,32 +266,11 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
-        void Tick_BulletHitField()
+        void Tick_BulletHitRole(float fixedDeltaTime)
         {
-            var physicsDomain = battleServerFacades.BattleFacades.Domain.PhysicsDomain;
-            var hitFieldList = physicsDomain.Tick_BulletHitField();
-
-            Transform field = null;
-            var bulletRepo = battleServerFacades.BattleFacades.Repo.BulletRepo;
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
             var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
-            hitFieldList.ForEach((hitFieldModel) =>
-            {
-                var bulletIDC = hitFieldModel.hitter;
-                var bullet = bulletRepo.Get(bulletIDC.EntityID);
-
-                ConnIDList.ForEach((connId) =>
-                {
-                    bulletRqs.SendRes_BulletHitField(connId, bullet);
-                });
-                field = hitFieldModel.fieldCE.GetCollider().transform;
-            });
-        }
-
-        void Tick_BulletHitRole()
-        {
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
-            var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
-            var hitRoleList = bulletDomain.Tick_BulletHitRole(fixedDeltaTime);
+            var hitRoleList = bulletDomain.Tick_BulletHitRoleHitModel(fixedDeltaTime);
 
             ConnIDList.ForEach((connId) =>
             {
@@ -308,9 +281,9 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
-        void Tick_ActiveHookerDraging()
+        void Tick_ActiveHookerDraging(float fixedDeltaTime)
         {
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
+            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
             bulletDomain.Tick_ActiveHookerDraging(fixedDeltaTime);
         }
 

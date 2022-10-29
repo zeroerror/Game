@@ -18,7 +18,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = battleFacades;
         }
 
-        public bool TryHitActor(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel, float fixedDeltaTime)
+        public bool TryHitActor(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel)
         {
             var arbitService = battleFacades.ArbitrationService;
             if (!arbitService.IsHitSuccess(attackerIDC, victimIDC, hitPowerModel))
@@ -28,12 +28,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             // - Hit Apply
-            ApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel, fixedDeltaTime);
+            ApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel);
 
             return true;
         }
 
-        void ApplyBulletHitRole(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel, float fixedDeltaTime)
+        void ApplyBulletHitRole(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel)
         {
             if (attackerIDC.EntityType != EntityType.Bullet
             || victimIDC.EntityType != EntityType.BattleRole)
@@ -54,7 +54,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 // - Physics
                 var addV = bullet.MoveComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
                 role.MoveComponent.AddExtraVelocity(addV);
-                role.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
             }
 
             // - State

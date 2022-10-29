@@ -8,10 +8,10 @@ namespace Game.Client.Bussiness.BattleBussiness
 
     public class BattleRoleRendererEntity : MonoBehaviour, ICameraTrackObj
     {
-
-        int entityId;
-        public int EntityId => entityId;
-        public void SetEntityId(int entityId) => this.entityId = entityId;
+        // ID Info
+        int entityID;
+        public int EntityID => entityID;
+        public void SetEntityID(int v) => entityID = v;
 
         Animator animator;
         public AnimatorComponent AnimatorComponent { get; private set; }
@@ -26,8 +26,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         // == Hang Point ==
         public Transform handPoint;
 
-        public float posAdjust;
-        public float rotAdjust;
+        public float posAdjust = 15f;
+        public float rotAdjust = 15f;
 
         // == HUD ==
         Slider bloodSlider;
@@ -57,9 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             animator = GetComponentInChildren<Animator>();
             Debug.Assert(animator != null);
             AnimatorComponent = new AnimatorComponent(animator);
-            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityId}");
-            posAdjust = 15f;
-            rotAdjust = 15f;
+            camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityID}");
         }
 
         void CtorHUD()

@@ -56,7 +56,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
         {
-            var domain = battleFacades.Domain.BulletDomain;
+            var domain = battleFacades.Domain.BulletLogicDomain;
             domain.Tick_BulletMovement(fixedDeltaTime);
         }
 

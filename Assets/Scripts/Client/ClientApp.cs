@@ -26,9 +26,12 @@ namespace Game.Client
         float time;
         bool isStarted;
 
+        float fixedDeltaTime;
 
         void Awake()
         {
+            fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;
+
             DontDestroyOnLoad(this.gameObject);
             StartAllAsync();
         }
@@ -88,7 +91,7 @@ namespace Game.Client
             // == Entry ==
             LoginEntry.Tick();
             WorldEntry.Tick();
-            BattleEntry.Tick();
+            BattleEntry.Tick(fixedDeltaTime);
             UIEntry.Tick();
 
         }

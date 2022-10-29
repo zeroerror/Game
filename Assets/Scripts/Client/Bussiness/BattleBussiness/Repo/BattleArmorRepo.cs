@@ -8,18 +8,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     public class BattleArmorRepo
     {
 
-        List<BattleArmorEntity> armorList;
+        List<BattleArmorEntity> all;
         ushort autoIncreaseId;
         public ushort AutoIncreaseID => autoIncreaseId;
 
         public BattleArmorRepo()
         {
-            armorList = new List<BattleArmorEntity>();
+            all = new List<BattleArmorEntity>();
         }
 
         public bool TryGet(ushort entityId, out BattleArmorEntity entity)
         {
-            entity = armorList.Find((entity) => entity.IDComponent.EntityID == entityId);
+            entity = all.Find((entity) => entity.IDComponent.EntityID == entityId);
             Debug.Assert(entity != null, $"护甲 {entityId} 不存在");
             return entity != null;
         }
@@ -27,25 +27,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public bool TryRemove(BattleArmorEntity entity)
         {
             Debug.Log($"移除护甲 {entity.IDComponent.EntityID}");
-            return armorList.Remove(entity);
+            return all.Remove(entity);
         }
 
         public BattleArmorEntity[] GetAll()
         {
-            return armorList.ToArray();
+            return all.ToArray();
         }
 
         public void Add(BattleArmorEntity entity)
         {
             Debug.Log($"添加护甲 [entityId:{entity.IDComponent.EntityID}]");
-            armorList.Add(entity);
+            all.Add(entity);
             autoIncreaseId++;
         }
 
         public void Foreach(Action<BattleArmorEntity> action)
         {
             if (action == null) return;
-            armorList.ForEach((bullet) =>
+            all.ForEach((bullet) =>
             {
                 action.Invoke(bullet);
             });

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Protocol.Battle;
 using Game.Server.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.BattleBussiness.Repo;
 using Game.Client.Bussiness.BattleBussiness;
 
 namespace Game.Server.Bussiness.BattleBussiness
@@ -33,7 +32,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             weaponDropMsgDic = new Dictionary<long, FrameWeaponDropReqMsg>();
         }
 
-        public void Inject(BattleServerFacades battleFacades, float fixedDeltaTime)
+        public void Inject(BattleServerFacades battleFacades)
         {
             this.battleFacades = battleFacades;
 
@@ -99,7 +98,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             var bulletEntityId = clientFacades.Repo.BulletRepo.AutoEntityID;
                             var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
 
-                            var bulletEntity = clientFacades.Domain.BulletDomain.SpawnBullet(bulletType, bulletEntityId, masterId, startPos, fireDir);
+                            var bulletEntity = clientFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, bulletEntityId, masterId, startPos, fireDir);
 
                             ConnIdList.ForEach((connId) =>
                             {

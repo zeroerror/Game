@@ -17,6 +17,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleNetworkController battleNetworkController;
         BattleWeaponController battleWeaponController;
         BattleLifeController battleLifeController;
+
         Thread _battleServerThread;
 
         public BattleEntry()
@@ -27,30 +28,30 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleNetworkController = new BattleNetworkController();
             battleWeaponController = new BattleWeaponController();
             battleLifeController = new BattleLifeController();
-   
+
             ServerNetworkEventCenter.Regist_BattleServerNeedCreate(StartBattleServer);
         }
 
-        public void Inject(NetworkServer server, float fixedDeltaTime)
+        public void Inject(NetworkServer server)
         {
             // Facades
             battleFacades.Inject(server);
 
             // Conntroller
-            battleController.Inject(battleFacades, fixedDeltaTime);
-            battlePhysicsController.Inject(battleFacades, fixedDeltaTime);
-            battleNetworkController.Inject(battleFacades, fixedDeltaTime);
-            battleWeaponController.Inject(battleFacades, fixedDeltaTime);
-            battleLifeController.Inject(battleFacades, fixedDeltaTime);
+            battleController.Inject(battleFacades);
+            battlePhysicsController.Inject(battleFacades);
+            battleNetworkController.Inject(battleFacades);
+            battleWeaponController.Inject(battleFacades);
+            battleLifeController.Inject(battleFacades);
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             battleNetworkController.Tick();
 
-            battlePhysicsController.Tick();
+            battleController.Tick(fixedDeltaTime);
+            battlePhysicsController.Tick(fixedDeltaTime);
             battleWeaponController.Tick();
-            battleController.Tick();
             battleLifeController.Tick();
         }
 
@@ -81,7 +82,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                 ServerNetworkEventCenter.battleSerConnect.Invoke(connID);
             };
         }
-
 
     }
 

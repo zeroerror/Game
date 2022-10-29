@@ -13,10 +13,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         #region [基础]
 
         Rigidbody rb;
+        public Rigidbody RB => rb;
 
         // == Position
         public Vector3 Position => rb.position;
-        public void SetPosition(Vector3 curPos) => rb.position = curPos;
+        public void SetPosition(Vector3 v) => rb.position = v;
 
         // == Rotation
         public Quaternion Rotation => rb.rotation;

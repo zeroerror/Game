@@ -16,6 +16,7 @@ namespace Game.Server
 
         // Network
         AllServerNetwork allServerNetwork;
+        float fixedDeltaTime;
 
         // Entry
         BattleEntry battleEntry;
@@ -28,11 +29,12 @@ namespace Game.Server
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
-            
+
             // == Network ==
             allServerNetwork = new AllServerNetwork();
             StartLoginServer();
             StartWorldServer();
+            fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;
             //战斗服的启动是由客户端在世界服候创建战斗对局决定启动
 
             // == Event Center ==
@@ -47,7 +49,7 @@ namespace Game.Server
             worldEntry.Inject(allServerNetwork.WorldServer);
             // BattleEntry
             battleEntry = new BattleEntry();
-            battleEntry.Inject(allServerNetwork.BattleServer, UnityEngine.Time.fixedDeltaTime);
+            battleEntry.Inject(allServerNetwork.BattleServer);
 
             // == Physics ==
             Physics.autoSimulation = false;
@@ -59,7 +61,7 @@ namespace Game.Server
             // == Entry ==
             loginEntry.Tick();
             worldEntry.Tick();
-            battleEntry.Tick();
+            battleEntry.Tick(fixedDeltaTime);
         }
 
         void OnDestroy()

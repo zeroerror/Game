@@ -18,7 +18,7 @@ MonoBehaviour:
   m_GUID: 6f69178abc378a14b9475a7d0e25d648
   m_SerializeEntries:
   - m_GUID: afc4510e420fe2445b4a6e3e0b376a4e
-    m_Address: Bullet
+    m_Address: DefaultBullet_Logic
     m_ReadOnly: 0
     m_SerializedLabels:
     - Bullet
@@ -29,6 +29,11 @@ MonoBehaviour:
     - Bullet
   - m_GUID: 8b154418733e926419436dd64fd5df70
     m_Address: Hooker
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Bullet
+  - m_GUID: f236d2191e1593549a4af09b2e3fa3e8
+    m_Address: DefaultBullet_Renderer
     m_ReadOnly: 0
     m_SerializedLabels:
     - Bullet

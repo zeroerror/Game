@@ -21,7 +21,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public void Tick_WorldUI()
+        public void Update_RoleRenderer(float deltaTime)
+        {
+            var roleStateRendererDomain = battleFacades.Domain.RoleStateRendererDomain;
+            roleStateRendererDomain.ApplyRoleState(deltaTime);
+
+            var roleRepo = battleFacades.Repo.RoleRepo;
+            roleRepo.Foreach((role) =>
+            {
+                var roleRenderer = role.roleRenderer;
+                var moveComponent = role.MoveComponent;
+                roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, moveComponent.Position, deltaTime * roleRenderer.posAdjust);
+                roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, moveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
+            });
+        }
+
+        public void Update_WorldUI()
         {
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
@@ -66,8 +81,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var roleRenderer = prefabAsset.GetComponentInChildren<BattleRoleRendererEntity>();
-                roleRenderer.SetEntityId(entityId);
+                roleRenderer.SetEntityID(entityId);
                 roleRenderer.Ctor();
+
+                var repo = battleFacades.Repo;
+                var roleRendererRepo = repo.RoleRendererRepo;
+                roleRendererRepo.Add(roleRenderer);
 
                 return roleRenderer;
             }

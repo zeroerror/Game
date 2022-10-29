@@ -62,6 +62,18 @@ namespace Game.Client.Bussiness.BattleBussiness
             Destroy(gameObject);
         }
 
+        public void SetPosition(Vector3 pos)
+        {
+            moveComponent.SetPosition(pos);
+            transform.position = pos;
+        }
+
+        public void FaceTo(Vector3 forward)
+        {
+            moveComponent.FaceTo(forward);
+            transform.rotation = moveComponent.RB.rotation;
+        }
+
     }
 
 }

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.EventCenter;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Client.Bussiness.UIBussiness;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -12,17 +11,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     public class BattleController
     {
         BattleFacades battleFacades;
-        float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
+        float fixedDeltaTime;
 
         // 服务器下发的生成队列
         Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
-        Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
         Queue<FrameItemSpawnResMsg> itemSpawnQueue;
-
-        // 服务器下发的物理事件队列
-        Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
-        Queue<FrameBulletHitFieldResMsg> bulletHitFieldQueue;
-        Queue<FrameBulletLifeOverResMsg> bulletTearDownQueue;
 
         // 服务器下发的人物状态同步队列
         Queue<BattleRoleSyncMsg> roleQueue;
@@ -37,12 +30,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
 
             roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
-            bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
             itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
-
-            bulletHitRoleQueue = new Queue<FrameBulletHitRoleResMsg>();
-            bulletHitFieldQueue = new Queue<FrameBulletHitFieldResMsg>();
-            bulletTearDownQueue = new Queue<FrameBulletLifeOverResMsg>();
 
             roleQueue = new Queue<BattleRoleSyncMsg>();
 
@@ -66,18 +54,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
             roleRqs.RegistUpdate_WRole(OnRoleSync);
 
-            var bulletRqs = battleFacades.Network.BulletReqAndRes;
-            bulletRqs.RegistRes_BulletSpawn(OnBulletSpawn);
-            bulletRqs.RegistRes_BulletHitRole(OnBulletHitRole);
-            bulletRqs.RegistRes_BulletHitField(OnBulletHitField);
-            bulletRqs.RegistRes_BulletTearDown(OnBulletTearDown);
-
             var ItemReqAndRes = battleFacades.Network.ItemReqAndRes;
             ItemReqAndRes.RegistRes_ItemSpawn(OnItemSpawn);
             ItemReqAndRes.RegistRes_ItemPickUp(OnItemPickUp);
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             if (hasBattleBegin && !hasSpawnBegin)
             {
@@ -92,29 +74,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             float deltaTime = UnityEngine.Time.deltaTime;
 
-            // == Server Response Physics 
-            Tick_BulletHitRole();
-            Tick_BulletHitWall();
-            Tick_BulletTearDown();
-
             // == Server Response
             Tick_RoleSpawn();
             Tick_RoleSync();
-
-            Tick_BulletSpawn();
 
             Tick_ItemAssetsSpawn();
             Tick_ItemPick();
 
         }
 
-        #region [Input]
-
-        #endregion
-
-        #region [Tick Server Resonse]
-
-        #region [Role]
+        #region [Role Tick]
         void Tick_RoleSync()
         {
             while (roleQueue.TryPeek(out var msg))
@@ -186,105 +155,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #endregion
 
-        #region [Bullet]
-        void Tick_BulletSpawn()
-        {
-            if (bulletSpawnQueue.TryPeek(out var msg))
-            {
-                bulletSpawnQueue.Dequeue();
-
-                var bulletId = msg.bulletEntityId;
-                var bulletTypeByte = msg.bulletType;
-                var bulletType = (BulletType)bulletTypeByte;
-
-                Vector3 startPos = new Vector3(msg.startPosX / 10000f, msg.startPosY / 10000f, msg.startPosZ / 10000f);
-                Vector3 fireDir = new Vector3(msg.fireDirX / 100f, 0, msg.fireDirZ / 100f);
-
-                var bulletRepo = battleFacades.Repo.BulletRepo;
-
-                var bulletEntity = battleFacades.Domain.BulletDomain.SpawnBullet(bulletType, msg.bulletEntityId, msg.masterEntityId, startPos, fireDir);
-
-                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletEntity.MasterEntityId} 起点位置：{startPos}  飞行方向{fireDir}");
-
-            }
-        }
-
-        void Tick_BulletHitRole()
-        {
-            while (bulletHitRoleQueue.TryDequeue(out var msg))
-            {
-                var role = battleFacades.Repo.RoleRepo.Get(msg.roleEntityId);
-                if (role == null)
-                {
-                    continue;
-                }
-
-                var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityId);
-                if (bullet == null)
-                {
-                    continue;
-                }
-
-                if (bullet.BulletType == BulletType.Grenade)
-                {
-                    continue;
-                }
-
-                var domain = battleFacades.Domain;
-                var roleDomain = domain.RoleDomain;
-                var hitPowerModel = bullet.HitPowerModel;
-                int realDamage = roleDomain.RoleTryReceiveDamage(role, hitPowerModel.damage);
-
-                var rendererDoamin = domain.RoleRendererDomain;
-                rendererDoamin.HUD_ShowDamageText(role, realDamage);
-            }
-        }
-
-        void Tick_BulletHitWall()
-        {
-            while (bulletHitFieldQueue.TryDequeue(out var msg))
-            {
-                // - 同步子弹位置
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityID);
-                bullet.MoveComponent.SetPosition(pos);
-            }
-        }
-
-        void Tick_BulletTearDown()
-        {
-            while (bulletTearDownQueue.TryDequeue(out var msg))
-            {
-                var bulletId = msg.bulletId;
-                var bulletType = msg.bulletType;
-                var bulletRepo = battleFacades.Repo.BulletRepo;
-                var bulletEntity = bulletRepo.Get(bulletId);
-
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                bulletEntity.MoveComponent.SetPosition(pos);
-
-                if (bulletEntity.BulletType == BulletType.DefaultBullet)
-                {
-                    bulletEntity.TearDown();
-                }
-
-                if (bulletEntity is GrenadeEntity grenadeEntity)
-                {
-                    var bulletDomain = battleFacades.Domain.BulletDomain;
-                    bulletDomain.GrenadeExplode(grenadeEntity, fixedDeltaTime);
-                }
-
-                if (bulletEntity is HookerEntity hookerEntity)
-                {
-                    hookerEntity.TearDown();
-                }
-
-                bulletRepo.TryRemove(bulletEntity);
-            }
-        }
-        #endregion
-
-        #region [Item]
+        #region [Item Tick]
         void Tick_ItemAssetsSpawn()
         {
             if (itemSpawnQueue.TryPeek(out var itemSpawnMsg))
@@ -339,11 +210,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
         #endregion
 
-        #endregion
-
-        #region [Server Response]
-
-        #region [ROLE] 
+        #region [Role Ser Res] 
         void OnRoleSync(BattleRoleSyncMsg msg)
         {
             roleQueue.Enqueue(msg);
@@ -357,34 +224,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
         #endregion
 
-        #region [BULLET]
-        void OnBulletSpawn(FrameBulletSpawnResMsg msg)
-        {
-            Debug.Log($"加入子弹生成队列");
-            bulletSpawnQueue.Enqueue(msg);
-        }
-
-        void OnBulletHitRole(FrameBulletHitRoleResMsg msg)
-        {
-            Debug.Log("加入子弹击中角色队列");
-            bulletHitRoleQueue.Enqueue(msg);
-        }
-
-        void OnBulletHitField(FrameBulletHitFieldResMsg msg)
-        {
-            Debug.Log("加入子弹击中墙壁队列");
-            bulletHitFieldQueue.Enqueue(msg);
-        }
-
-        void OnBulletTearDown(FrameBulletLifeOverResMsg msg)
-        {
-            Debug.Log($"{msg.bulletType.ToString()} 加入子弹销毁队列");
-            bulletTearDownQueue.Enqueue(msg);
-        }
-
-        #endregion
-
-        #region [ITEM]
+        #region [Item Ser Res]
         void OnItemSpawn(FrameItemSpawnResMsg msg)
         {
             Debug.Log($"加入武器生成队列");
@@ -396,8 +236,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Debug.Log($"加入物件拾取队列");
             itemPickQueue.Enqueue(msg);
         }
-        #endregion
-
         #endregion
 
         #region [Network Event Center]

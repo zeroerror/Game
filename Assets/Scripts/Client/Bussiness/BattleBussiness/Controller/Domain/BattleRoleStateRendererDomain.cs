@@ -53,8 +53,6 @@ namespace Game.Client.Bussiness.BattleBussiness
                 roleRenderer.staticTime += UnityEngine.Time.deltaTime;
             }
 
-            roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, moveComponent.Position, deltaTime * roleRenderer.posAdjust);
-            roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, moveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
         }
 
         void ApplyNormal(BattleRoleLogicEntity role)

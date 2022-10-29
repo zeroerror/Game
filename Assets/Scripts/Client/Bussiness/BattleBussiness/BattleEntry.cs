@@ -13,6 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         // Controller
         static BattleController battleController;
+        static BattleBulletController BattleBulletController;
         static BattlePhysicsController battlePhysicsController;
         static BattleInputController battleInputController;
         static BattleWeaponController battleWeaponController;
@@ -27,6 +28,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleFacades = new BattleFacades();
             // == Controller ==
             battleController = new BattleController();
+            BattleBulletController = new BattleBulletController();
             battlePhysicsController = new BattlePhysicsController();
             battleInputController = new BattleInputController();
             battleWeaponController = new BattleWeaponController();
@@ -40,6 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleFacades.Inject(client, inputComponent);
             // == Controller ==
             battleController.Inject(battleFacades);
+            BattleBulletController.Inject(battleFacades);
             battlePhysicsController.Inject(battleFacades);
             battleInputController.Inject(battleFacades);
             battleWeaponController.Inject(battleFacades);
@@ -47,12 +50,13 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleNetworkController.Inject(battleFacades);
         }
 
-        public static void Tick()
+        public static void Tick(float fixedDeltaTime)
         {
             // == Controller ==
             battleNetworkController.Tick();
 
-            battleController.Tick();
+            battleController.Tick(fixedDeltaTime);
+            BattleBulletController.Tick(fixedDeltaTime);
             battlePhysicsController.Tick();
             battleInputController.Tick();
             battleWeaponController.Tick();

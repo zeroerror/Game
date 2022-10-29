@@ -31,6 +31,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public void Update(float deltaTime)
         {
             Update_RoleRenderer(deltaTime);
+            Update_BulletRenderer(deltaTime);
             Update_Camera();
         }
 
@@ -38,11 +39,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Update_RoleRenderer(float deltaTime)
         {
-            var roleStateRendererDomain = battleFacades.Domain.RoleStateRendererDomain;
-            roleStateRendererDomain.ApplyRoleState(deltaTime);
-
             var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
-            roleRendererDomain.Tick_WorldUI();
+            roleRendererDomain.Update_WorldUI();
+            roleRendererDomain.Update_RoleRenderer(deltaTime);
+        }
+
+        void Update_BulletRenderer(float deltaTime)
+        {
+            var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
+            bulletRendererDomain.Update_BulletRenderer(deltaTime);
         }
 
         void Update_Camera()

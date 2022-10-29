@@ -112,7 +112,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 serverFrame = serverFrame,
                 bulletType = (byte)bulletType,
                 wRid = (byte)masterEntityID,
-                bulletId = (ushort)bulletEntityID,
+                bulletEntityID = (ushort)bulletEntityID,
                 posX = (int)(pos.x * 10000f),  // (16 16) 整数部16位 short -32768 --- +32767 小数部分16位 ushort(0 --- +65535) 0.0000到0.9999
                 posY = (int)(pos.y * 10000f),
                 posZ = (int)(pos.z * 10000f)

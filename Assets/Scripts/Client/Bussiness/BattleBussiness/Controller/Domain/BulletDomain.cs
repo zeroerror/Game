@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Protocol.Battle;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -10,6 +11,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
     {
 
         BattleFacades battleFacades;
+
+        // 事件队列
+        Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
+        Queue<FrameBulletHitRoleResMsg> bulletHitRoleQueue;
+        Queue<FrameBulletHitFieldResMsg> bulletHitFieldQueue;
+        Queue<FrameBulletLifeOverResMsg> bulletLifeOverQueue;
 
         public BulletDomain()
         {
@@ -20,9 +27,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletEntity SpawnBullet(BulletType bulletType, int bulletEntityId, int masterEntityId, Vector3 startPos, Vector3 fireDir)
+        public BulletEntity SpawnBulletLogic(BulletType bulletType, int bulletEntityId, int masterEntityId, Vector3 startPos, Vector3 fireDir)
         {
-            string bulletPrefabName = bulletType.ToString();
+            string bulletPrefabName = bulletType.ToString() + "_Logic";
 
             if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
@@ -31,18 +38,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
 
-                bulletEntity.SetBulletType(bulletType);
-                bulletEntity.SetMasterEntityId(masterEntityId);
                 bulletEntity.Ctor();
                 bulletEntity.gameObject.SetActive(true);
-
+                bulletEntity.SetBulletType(bulletType);
                 bulletEntity.IDComponent.SetEntityId(bulletEntityId);
-
+                bulletEntity.SetMasterEntityId(masterEntityId);
                 var master = battleFacades.Repo.RoleRepo.Get(masterEntityId);
                 bulletEntity.IDComponent.SetLeagueId(master.IDComponent.LeagueId);
-
-                bulletEntity.MoveComponent.SetPosition(startPos);
-                bulletEntity.MoveComponent.FaceTo(fireDir);
+                bulletEntity.SetPosition(startPos);
+                bulletEntity.FaceTo(fireDir);
                 bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
 
                 battleFacades.Repo.BulletRepo.Add(bulletEntity);
@@ -56,6 +60,27 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             return null;
+        }
+
+        public void TearDownBulletLogic(BulletEntity bullet)
+        {
+            if (bullet.BulletType == BulletType.DefaultBullet)
+            {
+                bullet.TearDown();
+            }
+
+            if (bullet is GrenadeEntity grenadeEntity)
+            {
+                var bulletDomain = battleFacades.Domain.BulletLogicDomain;
+                bulletDomain.GrenadeExplode(grenadeEntity);
+            }
+
+            if (bullet is HookerEntity hookerEntity)
+            {
+                hookerEntity.TearDown();
+            }
+
+            battleFacades.Repo.BulletRepo.TryRemove(bullet);
         }
 
         public List<BulletEntity> Tick_BulletLife(float deltaTime)
@@ -85,7 +110,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public List<HitModel> Tick_BulletHitRole(float fixedDeltaTime)
+        public List<HitModel> Tick_BulletHitRoleHitModel(float fixedDeltaTime)
         {
             List<HitModel> attackList = new List<HitModel>();
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
@@ -120,7 +145,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var hitDomain = battleFacades.Domain.HitDomain;
                     var roleIDC = role.IDComponent;
                     var bulletIDC = bullet.IDComponent;
-                    if (!hitDomain.TryHitActor(bulletIDC, roleIDC, in hitPowerModel, fixedDeltaTime))
+                    if (!hitDomain.TryHitActor(bulletIDC, roleIDC, in hitPowerModel))
                     {
                         Debug.LogWarning($"TryHitActor 失败! return");
                         return;
@@ -174,7 +199,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         #region [Grenade]
 
-        public void GrenadeExplode(GrenadeEntity grenadeEntity, float fixedDeltaTime)
+        public void GrenadeExplode(GrenadeEntity grenadeEntity)
         {
             Debug.Log("爆炸");
             var roleRepo = battleFacades.Repo.RoleRepo;
@@ -189,7 +214,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
                     var hitDomain = battleFacades.Domain.HitDomain;
-                    if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime))
+                    if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel))
                     {
                         var roleDomain = battleFacades.Domain.RoleDomain;
                         roleDomain.RoleTryReceiveDamage(role, hitPowerModel.damage);
@@ -225,7 +250,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void Tick_ActiveHookerDraging(float fixedDeltaTime)
         {
-            var activeHookers = battleFacades.Domain.BulletDomain.GetActiveHookerList();
+            var activeHookers = battleFacades.Domain.BulletLogicDomain.GetActiveHookerList();
             var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {

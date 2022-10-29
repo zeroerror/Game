@@ -11,6 +11,7 @@ namespace Game.Client.Bussiness
     {
 
         public Vector3 Position => transform.position;
+        public Quaternion Rotation => transform.rotation;
 
         List<CollisionExtra> hitCollisionList;
         int id = 0;

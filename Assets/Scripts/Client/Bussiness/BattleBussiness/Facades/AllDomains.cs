@@ -19,7 +19,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public ItemDomain ItemDomain { get; private set; }
 
-        public BulletDomain BulletDomain { get; private set; }
+        public BulletDomain BulletLogicDomain { get; private set; }
+        public BulletRendererDomain BulletRendererDomain { get; private set; }
         public BulletItemDomain BulletItemDomain { get; private set; }
 
         public WeaponDomain WeaponDomain { get; private set; }
@@ -47,7 +48,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             ItemDomain = new ItemDomain();
 
-            BulletDomain = new BulletDomain();
+            BulletLogicDomain = new BulletDomain();
+
+            BulletRendererDomain = new BulletRendererDomain();
             BulletItemDomain = new BulletItemDomain();
 
             WeaponDomain = new WeaponDomain();
@@ -71,7 +74,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             InputDomain.Inject(facades);
 
-            BulletDomain.Inject(facades);
+            BulletLogicDomain.Inject(facades);
+            BulletRendererDomain.Inject(facades);
             BulletItemDomain.Inject(facades);
 
             ItemDomain.Inject(facades);
