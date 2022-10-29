@@ -35,11 +35,10 @@ MonoBehaviour:
     m_SerializedLabels:
     - Weapo
     - Weapon
-  - m_GUID: 5c57c2f3f5f953047bacdca589b10cba
+  - m_GUID: 10804b4e2b2a85243915e56be74dd029
     m_Address: Weapon_GrenadeLauncher
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Weapo
     - Weapon
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}

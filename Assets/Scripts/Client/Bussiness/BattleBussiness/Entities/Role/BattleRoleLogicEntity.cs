@@ -45,9 +45,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         // - Renderer
         public BattleRoleRendererEntity roleRenderer { get; private set; }
 
-        // - Pos
-        public Vector3 Position => transform.position;
-
         // - Roll
         [SerializeField]
         [Header("前滚翻速度")]
@@ -193,7 +190,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return false;
             }
 
-            if (wc.IsFullReloaded)
+            if (wc.IsFullReloaded())
             {
                 Debug.LogWarning("当前武器已经装满子弹");
                 return false;

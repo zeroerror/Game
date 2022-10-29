@@ -17,9 +17,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool isReloading;
         public bool IsReloading => isReloading;
-        public void SetIsReloading(bool value) => isReloading = value;
-
-        public bool IsFullReloaded => CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
 
         public void Reset()
         {
@@ -40,6 +37,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             return;
         }
 
+        public bool IsFullReloaded()
+        {
+            return CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
+        }
+
         public bool TryWeaponShoot()
         {
             return CurrentWeapon.TryShootBullet(1) == 1;
@@ -57,31 +59,35 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             return true;
         }
-        
+
         public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
         {
-            var colliders = weaponEntity.GetComponentsInChildren<Collider>();
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                colliders[i].enabled = false;
-            }
-
-            if (hangPoint != null) Debug.Log($"{weaponEntity.transform.name} 武器挂点:{hangPoint.name}");
-            weaponEntity.transform.SetParent(hangPoint);
-            weaponEntity.transform.localPosition = Vector3.zero;
-            weaponEntity.transform.localRotation = Quaternion.identity;
-            CurrentWeapon = weaponEntity;
-            CurrentWeapon.gameObject.SetActive(true);
-
             for (int i = 0; i < AllWeapon.Length; i++)
             {
                 if (AllWeapon[i] == null)
                 {
-                    AllWeapon[i] = weaponEntity;
+                    var colliders = weaponEntity.GetComponentsInChildren<Collider>();
+                    for (int j = 0; j < colliders.Length; j++)
+                    {
+                        colliders[j].enabled = false;
+                    }
+
+                    if (hangPoint != null)
+                    {
+                        Debug.Log($"{weaponEntity.transform.name} 武器挂点:{hangPoint.name}");
+                        weaponEntity.transform.SetParent(hangPoint);
+                        weaponEntity.transform.localPosition = Vector3.zero;
+                        weaponEntity.transform.localRotation = Quaternion.identity;
+                    }
+
+                    CurrentWeapon = weaponEntity;
+                    CurrentWeapon.gameObject.SetActive(true);
+
+                    AllWeapon[i] = CurrentWeapon;
+                    CurrentNum++;
                     return;
                 }
             }
-
         }
 
         // 切换武器

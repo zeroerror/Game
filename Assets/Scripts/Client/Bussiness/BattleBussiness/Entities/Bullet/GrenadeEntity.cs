@@ -14,7 +14,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         protected override void Init()
         {
             base.Init();
-            moveComponent.SetPersistentMove(false);
         }
 
         public override void TearDown()

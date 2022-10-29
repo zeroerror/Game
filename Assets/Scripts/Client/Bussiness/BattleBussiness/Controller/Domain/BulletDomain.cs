@@ -79,16 +79,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var bulletRepo = battleFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
-                switch (bullet.BulletType)
-                {
-                    case BulletType.DefaultBullet:
-                        break;
-                    case BulletType.Grenade:
-                        break;
-                    case BulletType.Hooker:
-                        break;
-                }
-
                 bullet.MoveComponent.Tick_Friction(fixedDeltaTime);
                 bullet.MoveComponent.Tick_Gravity(fixedDeltaTime);
                 bullet.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
@@ -154,58 +144,31 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         }
 
-        public List<HitFieldModel> Tick_BulletHitField(float fixedDeltaTime)
+        public void ApplyBulletHitEffector(BulletEntity bullet, Transform hitTF)
         {
-            List<HitFieldModel> list = new List<HitFieldModel>();
-            var physicsDomain = battleFacades.Domain.PhysicsDomain;
-            Transform hookedTrans = null;
-            var bulletRepo = battleFacades.Repo.BulletRepo;
-
-            bulletRepo.Foreach((bullet) =>
-            {
-                bool hashit = false;
-                var hitFieldList = physicsDomain.GetHitField_ColliderList(bullet);
-                hitFieldList.ForEach((ce) =>
-                {
-                    if (ce.status != CollisionStatus.Enter)
-                    {
-                        return;
-                    }
-
-                    HitFieldModel hitFieldModel = new HitFieldModel();
-                    hitFieldModel.hitter = bullet.IDComponent;
-                    hitFieldModel.fieldCE = ce;
-                    list.Add(hitFieldModel);
-
-                    hookedTrans = ce.Collider.transform;
-                    hashit = true;
-                });
-
-                if (hashit)
-                {
-                    ApplyBulletHitEffector(bullet, hookedTrans);
-                }
-            });
-
-            return list;
-        }
-
-        void ApplyBulletHitEffector(BulletEntity bullet, Transform hookedRoleTrans)
-        {
-            // 普通子弹的逻辑，只是单纯的TearDown
+            // 普通子弹
             if (bullet.BulletType == BulletType.DefaultBullet)
             {
                 bullet.SetLifeTime(0);
             }
-            // 爪钩逻辑
+            // 爪钩
             if (bullet is HookerEntity hookerEntity)
             {
-                hookerEntity.TryGrabSomthing(hookedRoleTrans);
+                hookerEntity.TryGrabSomthing(hitTF);
             }
-            // 手雷逻辑: 速度清零
+            // 手雷
             else if (bullet is GrenadeEntity grenadeEntity)
             {
-                grenadeEntity.MoveComponent.SetMoveVelocity(Vector3.zero);
+                var moveComponent = grenadeEntity.MoveComponent;
+                moveComponent.SetPersistentMove(false);
+                moveComponent.SetMoveVelocity(Vector3.zero);
+                moveComponent.SetGravityVelocity(0);
+                moveComponent.SetIsGrounded(true);
+                moveComponent.SetVelocity(Vector3.zero);
+
+                var tf = grenadeEntity.transform;
+                var collider = tf.GetComponent<Collider>();
+                collider.enabled = false;
             }
         }
 
@@ -228,9 +191,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var hitDomain = battleFacades.Domain.HitDomain;
                     if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel, fixedDeltaTime))
                     {
+                        var roleDomain = battleFacades.Domain.RoleDomain;
+                        roleDomain.RoleTryReceiveDamage(role, hitPowerModel.damage);
+
                         var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient + new Vector3(0, 2f, 0);
                         role.MoveComponent.AddExtraVelocity(hitVelocity);
-                        role.HealthComponent.TryReiveDamage(hitPowerModel.damage);
                     }
                 }
             });

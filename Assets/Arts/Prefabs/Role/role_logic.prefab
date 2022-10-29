@@ -77,7 +77,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a869ae89333f2143a582a9bf6d88085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rollSpeed: 10
   moveComponent:
     basicMoveSpeed: 4
     moveVelocity: {x: 0, y: 0, z: 0}
@@ -85,7 +84,7 @@ MonoBehaviour:
     gravity: 150
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
-    frictionReduce: 15
+    frictionReduce: 30
     isGrounded: 0
     isHitWall: 0
   healthComponent:
@@ -94,6 +93,7 @@ MonoBehaviour:
   weaponComponent:
     AllWeapon:
     - {fileID: 0}
+    isReloading: 0
   stateComponent:
     roleState: 0
     rollingMod:
@@ -120,6 +120,7 @@ MonoBehaviour:
     roleStateSwitchingMod:
       isFirstEnter: 0
       maintainFrame: 0
+  rollSpeed: 15
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0

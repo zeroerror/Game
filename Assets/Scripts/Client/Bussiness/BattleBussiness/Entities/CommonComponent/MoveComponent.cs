@@ -178,12 +178,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (fixedDeltaTime == 0) return;
 
             Vector3 vel = Vector3.zero;
-            if (isPersistentMove)
-            {
-                //比如子弹
-                rb.velocity = moveVelocity;
-                return;
-            }
 
             // 移动速度可以抵消extraVelocity
             EraseVelocity(ref extraVelocity, moveVelocity);
@@ -193,10 +187,16 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.velocity = vel;
 
             //限制'最大速度'
-            if (rb.velocity.magnitude > maximumVelocity) rb.velocity = rb.velocity.normalized * 30f;
+            if (rb.velocity.magnitude > maximumVelocity)
+            {
+                rb.velocity = rb.velocity.normalized * maximumVelocity;
+            }
 
             // 重置 ‘一次性速度’
-            moveVelocity = Vector3.zero;
+            if (!isPersistentMove)
+            {
+                moveVelocity = Vector3.zero;
+            }
         }
 
         public void Tick_Friction(float fixedDeltaTime)
@@ -258,9 +258,9 @@ namespace Game.Client.Bussiness.BattleBussiness
                 }
 
                 gravityVelocity -= (fixedDeltaTime * gravity);
-                if (gravityVelocity > 100)
+                if (gravityVelocity < -100)
                 {
-                    gravityVelocity = 100;
+                    gravityVelocity = -100;
                 }
             }
             else
@@ -272,6 +272,14 @@ namespace Game.Client.Bussiness.BattleBussiness
         #endregion
 
         #region [物理碰撞]
+
+        public void JumpboardSpeedUp()
+        {
+            var addVelocity = rb.velocity * 4f;
+            addVelocity = new Vector3(addVelocity.x, 4f, addVelocity.z);
+            AddExtraVelocity(addVelocity);
+            DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} extraVelocity: {extraVelocity}", "#48D1CC");
+        }
 
         public void MoveHitErase(Vector3 hitDir)
         {

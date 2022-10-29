@@ -33,20 +33,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             physicsScene.Simulate(fixedDeltaTime);
 
             // == Physics Collision(Only For Client Performances Like Hit Effect,etc.)
-            Tick_Physics_Collision_Role(fixedDeltaTime);
-            Tick_Physics_Collision_Bullet();
+            Tick_Physics_Collision(fixedDeltaTime);
 
         }
 
-        void Tick_Physics_Collision_Role(float fixedDeltaTime)
+        void Tick_Physics_Collision(float fixedDeltaTime)
         {
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
-            var roleList = physicsDomain.Tick_AllRoleHitField(fixedDeltaTime);
-        }
-
-        void Tick_Physics_Collision_Bullet()
-        {
-            // TODO:客户端这边就负责击中特效啥的
+            physicsDomain.Tick_RoleHitField();
+            physicsDomain.Tick_BulletHitField();
         }
 
         void Tick_Physics_Movement_Role(float deltaTime)

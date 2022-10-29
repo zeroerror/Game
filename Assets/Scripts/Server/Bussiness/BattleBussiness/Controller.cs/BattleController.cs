@@ -274,12 +274,12 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_BulletHitField()
         {
+            var physicsDomain = battleServerFacades.BattleFacades.Domain.PhysicsDomain;
+            var hitFieldList = physicsDomain.Tick_BulletHitField();
+
             Transform field = null;
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletDomain;
             var bulletRepo = battleServerFacades.BattleFacades.Repo.BulletRepo;
             var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
-            var hitFieldList = bulletDomain.Tick_BulletHitField(fixedDeltaTime);
-
             hitFieldList.ForEach((hitFieldModel) =>
             {
                 var bulletIDC = hitFieldModel.hitter;
@@ -289,7 +289,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     bulletRqs.SendRes_BulletHitField(connId, bullet);
                 });
-                field = hitFieldModel.fieldCE.Collider.transform;
+                field = hitFieldModel.fieldCE.GetCollider().transform;
             });
         }
 

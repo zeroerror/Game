@@ -9,6 +9,9 @@ namespace Game.Client.Bussiness
 
     public class PhysicsEntity : MonoBehaviour
     {
+
+        public Vector3 Position => transform.position;
+
         List<CollisionExtra> hitCollisionList;
         int id = 0;
 
@@ -49,12 +52,13 @@ namespace Game.Client.Bussiness
         {
             if (!Exist(collider))
             {
-                CollisionExtra collisionExtra = new CollisionExtra();
-                collisionExtra.status = CollisionStatus.Enter;
-                collisionExtra.gameObject = collider.gameObject;
-                collisionExtra.layerName = LayerMask.LayerToName(collider.gameObject.layer);
-                hitCollisionList.Add(collisionExtra);
-                DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layerName:{collisionExtra.layerName}", "#48D1CC");
+                CollisionExtra ce = new CollisionExtra();
+                ce.status = CollisionStatus.Enter;
+                ce.gameObject = collider.gameObject;
+                ce.layerName = LayerMask.LayerToName(collider.gameObject.layer);
+                ce.fieldType = FieldType.Ground;
+                hitCollisionList.Add(ce);
+                DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layerName:{ce.layerName}", "#48D1CC");
             }
         }
 
@@ -72,11 +76,7 @@ namespace Game.Client.Bussiness
         {
             if (!Exist(collision.collider))
             {
-                CollisionExtra collisionExtra = new CollisionExtra();
-                FieldType fieldType = FieldType.None;
-                string layerName = LayerMask.LayerToName(collision.gameObject.layer);
                 Vector3 selfPos = transform.position;
-
                 var closestPoint = collision.collider.bounds.ClosestPoint(selfPos);
                 if (closestPoint.MostEqualsY(selfPos))
                 {
@@ -102,12 +102,21 @@ namespace Game.Client.Bussiness
                     isGround = true;
                 }
 
+                FieldType fieldType = FieldType.None;
+                string layerName = LayerMask.LayerToName(collision.gameObject.layer);
                 if (layerName == "Field")
                 {
-                    if (isGround) fieldType = FieldType.Ground;
-                    else fieldType = FieldType.Wall;
+                    if (isGround)
+                    {
+                        fieldType = FieldType.Ground;
+                    }
+                    else
+                    {
+                        fieldType = FieldType.Wall;
+                    }
                 }
 
+                CollisionExtra collisionExtra = new CollisionExtra();
                 collisionExtra.status = CollisionStatus.Enter;
                 collisionExtra.collision = collision;
                 collisionExtra.gameObject = collision.gameObject;

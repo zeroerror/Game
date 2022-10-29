@@ -18,7 +18,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
 
         public Collision collision;
         public GameObject gameObject;
-        public Collider Collider => gameObject != null ? gameObject.GetComponent<Collider>() : null;
+        public Collider GetCollider() => gameObject != null ? gameObject.GetComponent<Collider>() : null;
 
         public string layerName;
 

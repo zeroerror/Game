@@ -45,7 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         void Tick_Physics_Collision_Role()
         {
             var physicsDomain = battleFacades.BattleFacades.Domain.PhysicsDomain;
-            var roleList = physicsDomain.Tick_AllRoleHitField(fixedDeltaTime);
+            physicsDomain.Tick_RoleHitField();
         }
 
         void Tick_Physics_Movement_Role(float fixedDeltaTime)

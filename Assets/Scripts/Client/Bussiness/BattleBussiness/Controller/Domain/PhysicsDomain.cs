@@ -23,93 +23,112 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Item");
         public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Role");
 
-        public List<BattleRoleLogicEntity> Tick_AllRoleHitField(float fixedDeltaTime)
+        public void Tick_RoleHitField()
         {
-            List<BattleRoleLogicEntity> hitRoleList = new List<BattleRoleLogicEntity>();
+            // - Role
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
-                var rolePos = role.Position;
-                // 墙体撞击的速度管理
-                var fieldColliderList = GetHitField_ColliderList(role);
-                int enterGroundCount = 0;
-                int hitWallCount = 0;
-                fieldColliderList.ForEach((collisionExtra) =>
+                PhysicsEntityHitField(role, role.MoveComponent);
+            });
+        }
+
+        public List<HitFieldModel> Tick_BulletHitField()
+        {
+            List<HitFieldModel> list = new List<HitFieldModel>();
+            Transform hitTrans = null;
+            var bulletRepo = battleFacades.Repo.BulletRepo;
+            var bulletDomain = battleFacades.Domain.BulletDomain;
+
+            bulletRepo.Foreach((bullet) =>
+            {
+                bool hashit = false;
+                var hitFieldList = GetHitField_ColliderList(bullet);
+                hitFieldList.ForEach((ce) =>
                 {
-                    var collision = collisionExtra.collision;
-                    var closestPoint = collision.collider.bounds.ClosestPoint(rolePos);
-                    var hitDir = collisionExtra.hitDir;
-                    role.MoveComponent.HitSomething(hitDir);
-                    if (collisionExtra.status != CollisionStatus.Exit)
+                    if (ce.status != CollisionStatus.Enter)
                     {
-                        if (collisionExtra.fieldType == FieldType.Ground) enterGroundCount++;
-                        else if (collisionExtra.fieldType == FieldType.Wall) hitWallCount++;
+                        return;
                     }
 
-                    if (collisionExtra.status == CollisionStatus.Enter)
-                    {
-                        collisionExtra.status = CollisionStatus.Stay;
-                        if (collision.gameObject.tag == "Jumpboard")
-                        {
-                            role.JumpboardSpeedUp();
-                        }
-                        hitRoleList.Add(role);
-                    }
-                    else if (collisionExtra.status == CollisionStatus.Stay)
-                    {
+                    HitFieldModel hitFieldModel = new HitFieldModel();
+                    hitFieldModel.hitter = bullet.IDComponent;
+                    hitFieldModel.fieldCE = ce;
+                    list.Add(hitFieldModel);
 
-                    }
-                    else if (collisionExtra.status == CollisionStatus.Exit)
-                    {
-                        var leaveDir = -hitDir;
-                        role.MoveComponent.LeaveSomthing(leaveDir);
-                        if (collisionExtra.fieldType == FieldType.Wall) hitWallCount--;
-                        else if (collisionExtra.fieldType == FieldType.Ground) enterGroundCount--;
-                    }
-
+                    hitTrans = ce.GetCollider().transform;
+                    hashit = true;
                 });
 
-                // 人物撞击状态管理
-                if (enterGroundCount <= 0)
+                if (hashit)
                 {
-                    role.MoveComponent.LeaveGround();
+                    bulletDomain.ApplyBulletHitEffector(bullet, hitTrans);
                 }
-                else
+            });
+
+            return list;
+        }
+
+        void PhysicsEntityHitField(PhysicsEntity entity, MoveComponent moveComponent)
+        {
+            var entityPos = entity.Position;
+
+            // 墙体撞击的速度管理
+            var fieldColliderList = GetHitField_ColliderList(entity);
+            int enterGroundCount = 0;
+            int hitWallCount = 0;
+            fieldColliderList.ForEach((collisionExtra) =>
+            {
+                var go = collisionExtra.gameObject;
+                var hitDir = collisionExtra.hitDir;
+                moveComponent.HitSomething(hitDir);
+                if (collisionExtra.status != CollisionStatus.Exit)
                 {
-                    role.MoveComponent.EnterGound();
+                    if (collisionExtra.fieldType == FieldType.Ground) enterGroundCount++;
+                    else if (collisionExtra.fieldType == FieldType.Wall) hitWallCount++;
                 }
 
-                if (hitWallCount <= 0)
+                if (collisionExtra.status == CollisionStatus.Enter)
                 {
-                    role.MoveComponent.LeaveWall();
+                    collisionExtra.status = CollisionStatus.Stay;
+                    if (go.tag == "Jumpboard")
+                    {
+                        moveComponent.JumpboardSpeedUp();
+                    }
                 }
-                else
+                else if (collisionExtra.status == CollisionStatus.Stay)
                 {
-                    role.MoveComponent.EnterWall();
+
+                }
+                else if (collisionExtra.status == CollisionStatus.Exit)
+                {
+                    var leaveDir = -hitDir;
+                    moveComponent.LeaveSomthing(leaveDir);
+                    if (collisionExtra.fieldType == FieldType.Wall) hitWallCount--;
+                    else if (collisionExtra.fieldType == FieldType.Ground) enterGroundCount--;
                 }
 
             });
 
-            return hitRoleList;
-        }
-
-        public void Tick_RoleMoveHitErase()
-        {
-            var roleRepo = battleFacades.Repo.RoleRepo;
-            roleRepo.Foreach((role) =>
+            // 撞击状态管理
+            if (enterGroundCount <= 0)
             {
-                var rolePos = role.Position;
-                // 墙体撞击：速度管理
-                var fieldColliderList = GetHitField_ColliderList(role);
-                fieldColliderList.ForEach((colliderExtra) =>
-                {
-                    role.MoveComponent.MoveHitErase(colliderExtra.hitDir);
-                });
-            });
+                moveComponent.LeaveGround();
+            }
+            else
+            {
+                moveComponent.EnterGound();
+            }
+
+            if (hitWallCount <= 0)
+            {
+                moveComponent.LeaveWall();
+            }
+            else
+            {
+                moveComponent.EnterWall();
+            }
         }
-
-
-        #region [Private Func]
 
         List<CollisionExtra> GetCollisionExtraList(PhysicsEntity physicsEntity, string layerName)
         {
@@ -123,7 +142,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     removeList.Add(collisionExtra);
                 }
 
-                Collider collider = collisionExtra.Collider;
+                Collider collider = collisionExtra.GetCollider();
                 if (collider == null || collider.enabled == false)
                 {
                     // 目标被摧毁,等价于Exit
@@ -144,8 +163,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             return collisionList;
         }
-
-        #endregion
 
     }
 

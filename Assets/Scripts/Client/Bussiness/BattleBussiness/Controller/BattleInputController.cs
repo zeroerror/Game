@@ -131,7 +131,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                         return;
                     }
 
-                    var collider = item.Collider;
+                    var collider = item.GetCollider();
                     var dis = Vector3.Distance(collider.transform.position, ownerPos);
                     if (dis < closestDis)
                     {

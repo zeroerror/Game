@@ -79,8 +79,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (inputComponent.pressReload)
             {
                 var weaponComponent = role.WeaponComponent;
-                role.WeaponComponent.BeginReloading();
-                stateComponent.EnterReloading(weaponComponent.CurrentWeapon.ReloadFrame);
+                if (role.CanWeaponReload())
+                {
+                    weaponComponent.BeginReloading();
+                    stateComponent.EnterReloading(weaponComponent.CurrentWeapon.ReloadFrame);
+                }
+
                 return;
             }
 
