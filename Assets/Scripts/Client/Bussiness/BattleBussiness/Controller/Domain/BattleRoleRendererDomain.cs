@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var bloodSlider = role.roleRenderer.BloodSlider;
                 var armorSlider = role.roleRenderer.ArmorSlider;
-                if (role.StateComponent.RoleState == RoleState.Dead || role.StateComponent.RoleState == RoleState.Reborn)
+                if (role.StateComponent.RoleState == RoleState.Dying || role.StateComponent.RoleState == RoleState.Reborning)
                 {
                     bloodSlider.value = 0;
                     bloodSlider.gameObject.SetActive(false);

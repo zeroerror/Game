@@ -83,7 +83,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 var role = battleFacades.Repo.RoleRepo.Get(victim.EntityID);
                 var stateComponent = role.StateComponent;
-                return stateComponent.RoleState != RoleState.Reborn && stateComponent.RoleState != RoleState.Dead;
+                return stateComponent.RoleState != RoleState.Reborning && stateComponent.RoleState != RoleState.Dying;
             }
 
             return false;

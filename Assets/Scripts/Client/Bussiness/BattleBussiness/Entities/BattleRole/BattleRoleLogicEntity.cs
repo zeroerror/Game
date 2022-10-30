@@ -175,6 +175,34 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #endregion
 
+        public bool CanWeaponShoot()
+        {
+            var wc = weaponComponent;
+            var curWeapon = wc.CurrentWeapon;
+
+            if (curWeapon == null)
+            {
+                Debug.LogWarning("当前武器为空，无法射击");
+                return false;
+            }
+
+            if (wc.IsReloading)
+            {
+                Debug.LogWarning("换弹中，无法射击");
+                return false;
+            }
+
+            var sc = stateComponent;
+            var shootingMod = sc.ShootingMod;
+            if (sc.RoleState == RoleState.Shooting && shootingMod.maintainFrame > shootingMod.breakFrame)
+            {
+                Debug.LogWarning("射击CD未结束");
+                return false;
+            }
+
+            return true;
+        }
+
         public bool CanWeaponReload()
         {
             var wc = weaponComponent;

@@ -107,7 +107,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1672643454398842135}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.431, y: 0, z: -0}
+  m_LocalPosition: {x: 0.345, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -162,8 +162,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 1
-  reloadFrame: 90
-  bulletCapacity: 10
+  reloadFrame: 100
+  freezeMaintainFrame: 40
+  breakFrame: 5
+  bulletCapacity: 8
   firePoint: {fileID: 3517488532659085502}
   bulletType: 1
 --- !u!1 &2739236041744508303

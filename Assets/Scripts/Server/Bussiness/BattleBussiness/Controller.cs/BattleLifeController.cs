@@ -22,7 +22,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             roleRepo.Foreach((role) =>
             {
                 var roleState = role.StateComponent.RoleState;
-                if (roleState == RoleState.Dead || roleState == RoleState.Reborn)
+                if (roleState == RoleState.Dying || roleState == RoleState.Reborning)
                 {
                     return;
                 }

@@ -127,7 +127,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
 
                 var stateComponent = roleLogic.StateComponent;
-                if (stateComponent.RoleState == RoleState.Reborn && roleState == RoleState.Normal)
+                if (stateComponent.RoleState == RoleState.Reborning && roleState == RoleState.Normal)
                 {
                     battleFacades.Domain.RoleDomain.RoleReborn(roleLogic);
                 }

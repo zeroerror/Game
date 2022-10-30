@@ -9,20 +9,22 @@ namespace Game.Client.Bussiness.BattleBussiness
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
 
-        [SerializeField]
-        WeaponType weaponType;
+        [SerializeField] WeaponType weaponType;
         public WeaponType WeaponType => weaponType;
 
-        [SerializeField]
-        int reloadFrame;
+        [SerializeField] int reloadFrame;
         public int ReloadFrame => reloadFrame;
 
-        [SerializeField]
-        int bulletCapacity;
+        [SerializeField] int freezeMaintainFrame;
+        public int FreezeMaintainFrame => freezeMaintainFrame;
+
+        [SerializeField] int breakFrame;
+        public int BreakFrame => breakFrame;
+
+        [SerializeField] int bulletCapacity;
         public int BulletCapacity => bulletCapacity;
 
-        [SerializeField]
-        Transform firePoint;
+        [SerializeField] Transform firePoint;
         public Vector3 ShootPointPos => firePoint.position;
 
         int curReloadingFrame;

@@ -78,12 +78,13 @@ namespace Game.Client.Bussiness.BattleBussiness
             rollingMod.maintainFrame = maintainFrame;
         }
 
-        public void EnterFiring(int maintainFrame)
+        public void EnterShooting(int maintainFrame, int breakFrame)
         {
-            roleState = RoleState.Shoot;
+            roleState = RoleState.Shooting;
 
             shootingMod.isFirstEnter = true;
             shootingMod.maintainFrame = maintainFrame;
+            shootingMod.breakFrame = breakFrame;
         }
 
         public void EnterReloading(int maintainFrame)
@@ -104,7 +105,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void EnterDead(int maintainFrame)
         {
-            roleState = RoleState.Dead;
+            roleState = RoleState.Dying;
 
             deadMod.isFirstEnter = true;
             deadMod.maintainFrame = maintainFrame;
@@ -112,7 +113,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void EnterReborn(int maintainFrame)
         {
-            roleState = RoleState.Reborn;
+            roleState = RoleState.Reborning;
 
             rebornMod.isFirstEnter = true;
             rebornMod.maintainFrame = maintainFrame;

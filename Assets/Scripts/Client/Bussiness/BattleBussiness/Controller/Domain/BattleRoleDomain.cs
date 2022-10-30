@@ -116,35 +116,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.StateComponent.EnterDead(60);
         }
 
-        public bool CanRoleShoot(BattleRoleLogicEntity role)
-        {
-            var weaponComponent = role.WeaponComponent;
-            var curWeapon = weaponComponent.CurrentWeapon;
-
-            if (curWeapon == null)
-            {
-                Debug.LogWarning("当前武器为空，无法射击");
-                return false;
-            }
-
-            if (weaponComponent.IsReloading)
-            {
-                Debug.LogWarning("换弹中，无法射击");
-                return false;
-            }
-
-            var stateComponent = role.StateComponent;
-            Debug.LogWarning($"stateComponent.RoleState  {stateComponent.RoleState.ToString()}");
-            Debug.LogWarning($"stateComponent.ShootingMod.maintainFrame  {stateComponent.ShootingMod.maintainFrame}");
-            if (stateComponent.RoleState == RoleState.Shoot && stateComponent.ShootingMod.maintainFrame > 3)
-            {
-                Debug.LogWarning("射击CD未结束");
-                return false;
-            }
-
-            return true;
-        }
-
     }
 
 }

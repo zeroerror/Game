@@ -4,11 +4,11 @@
         Normal,
         Rolling,
         Climbing,
-        Shoot,
+        Shooting,
         Reloading,
         Healing,
         Switching,
         BeHit,
-        Dead,
-        Reborn
+        Dying,
+        Reborning
     }

@@ -86,18 +86,20 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var fireDirX = msg.fireDirX;
                     var fireDirZ = msg.fireDirZ;
 
-                    if (roleRepo.TryGetByEntityId(masterId, out var master) && clientFacades.Domain.RoleDomain.CanRoleShoot(master))
+                    if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponShoot())
                     {
-                        if (master.WeaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
+                        var weaponComponent = master.WeaponComponent;
+                        if (weaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
                             Vector3 fireDir = new Vector3(fireDirX / 100f, 0, fireDirZ / 100f);
                             master.InputComponent.SetShootDir(fireDir);
-                            master.StateComponent.EnterFiring(5);
 
-                            var bulletType = master.WeaponComponent.CurrentWeapon.bulletType;
+                            var curWeapon = weaponComponent.CurrentWeapon;
+                            master.StateComponent.EnterShooting(curWeapon.FreezeMaintainFrame, curWeapon.BreakFrame);
+
+                            var bulletType = curWeapon.bulletType;
                             var bulletEntityId = clientFacades.Repo.BulletRepo.AutoEntityID;
                             var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
-
                             var bulletEntity = clientFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, bulletEntityId, masterId, startPos, fireDir);
 
                             ConnIdList.ForEach((connId) =>
@@ -105,7 +107,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                                 weaponRqs.SendRes_WeaponShoot(connId, masterId);
                                 bulletRqs.SendRes_BulletSpawn(connId, bulletEntity);
                             });
-                            Debug.Log($"生成子弹bulletType:{bulletType.ToString()} bulletId:{bulletEntityId}  MasterWRid:{masterId}  起点：{startPos} 飞行方向:{fireDir}");
                         }
                     }
                 }

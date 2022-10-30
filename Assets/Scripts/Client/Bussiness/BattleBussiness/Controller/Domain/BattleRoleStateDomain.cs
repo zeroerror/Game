@@ -153,7 +153,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         void ApplyFiring(BattleRoleLogicEntity role)
         {
             var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Shoot)
+            if (stateComponent.RoleState != RoleState.Shooting)
             {
                 return;
             }
@@ -234,7 +234,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         void ApplyDead(BattleRoleLogicEntity role)
         {
             var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Dead)
+            if (stateComponent.RoleState != RoleState.Dying)
             {
                 return;
             }
@@ -262,7 +262,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         void ApplyReborn(BattleRoleLogicEntity role)
         {
             var stateComponent = role.StateComponent;
-            if (stateComponent.RoleState != RoleState.Reborn)
+            if (stateComponent.RoleState != RoleState.Reborning)
             {
                 return;
             }

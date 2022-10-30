@@ -8,6 +8,8 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
         public bool isFirstEnter;
         public int maintainFrame;
+
+        public int breakFrame;
     }
 
 }

@@ -132,8 +132,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 0
-  reloadFrame: 20
-  bulletCapacity: 30
+  reloadFrame: 30
+  freezeMaintainFrame: 12
+  breakFrame: 2
+  bulletCapacity: 12
   firePoint: {fileID: 2140167003263957955}
   bulletType: 0
 --- !u!1 &3160420142573990592
