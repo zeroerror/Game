@@ -1,6 +1,5 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Client.Bussiness.BattleBussiness.Interface;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {

@@ -5,24 +5,26 @@ using Game.Infrastructure.Network.Client;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public static class BattleEntry
+    public class BattleEntry
     {
 
         // Facades
-        static BattleFacades battleFacades;
+        BattleFacades battleFacades;
 
         // Controller
-        static BattleController battleController;
-        static BattleBulletController BattleBulletController;
-        static BattlePhysicsController battlePhysicsController;
-        static BattleInputController battleInputController;
-        static BattleWeaponController battleWeaponController;
-        static BattleRendererController battleRendererController;
-        static BattleNetworkController battleNetworkController;
+        BattleController battleController;
+        BattleBulletController BattleBulletController;
+        BattlePhysicsController battlePhysicsController;
+        BattleInputController battleInputController;
+        BattleWeaponController battleWeaponController;
+        BattleRendererController battleRendererController;
+        BattleNetworkController battleNetworkController;
+        BattleArmorController battleArmorController;
 
         #region [Life Cycle]
+        public BattleEntry() { }
 
-        public static void Ctor()
+        public void Ctor()
         {
             // == Facades ==
             battleFacades = new BattleFacades();
@@ -34,9 +36,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleWeaponController = new BattleWeaponController();
             battleRendererController = new BattleRendererController();
             battleNetworkController = new BattleNetworkController();
+            battleArmorController = new BattleArmorController();
         }
 
-        public static void Inject(NetworkClient client, PlayerInputComponent inputComponent)
+        public void Inject(NetworkClient client, PlayerInputComponent inputComponent)
         {
             // == Facades ==
             battleFacades.Inject(client, inputComponent);
@@ -48,9 +51,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleWeaponController.Inject(battleFacades);
             battleRendererController.Inject(battleFacades);
             battleNetworkController.Inject(battleFacades);
+            battleArmorController.Inject(battleFacades);
         }
 
-        public static void Tick(float fixedDeltaTime)
+        public void Tick(float fixedDeltaTime)
         {
             // == Controller ==
             battleNetworkController.Tick();
@@ -60,15 +64,16 @@ namespace Game.Client.Bussiness.BattleBussiness
             battlePhysicsController.Tick(fixedDeltaTime);
             battleInputController.Tick(fixedDeltaTime);
             battleWeaponController.Tick(fixedDeltaTime);
+            battleArmorController.Tick(fixedDeltaTime);
         }
 
-        public static void Update()
+        public void Update()
         {
             float deltaTime = UnityEngine.Time.deltaTime;
             battleRendererController.Update(deltaTime);
         }
 
-        public static void TearDown()
+        public void TearDown()
         {
 
         }

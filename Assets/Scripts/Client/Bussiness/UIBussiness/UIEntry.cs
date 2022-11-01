@@ -4,22 +4,24 @@ using Game.Client.Bussiness.UIBussiness;
 namespace Game.Client.Bussiness.EventCenter
 {
 
-    public static class UIEntry
+    public class UIEntry
     {
 
-        static UIController uIController;
+        UIController uIController;
 
-        public static void Ctor()
+        public UIEntry() { }
+        
+        public void Ctor()
         {
             // == EventCenter
             UIEventCenter.Ctor();
             UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_LoginPanel" });
-            
+
             // == Controller
             uIController = new UIController();
         }
 
-        public static void Tick()
+        public void Tick()
         {
 
             // == Controller
@@ -27,7 +29,7 @@ namespace Game.Client.Bussiness.EventCenter
 
         }
 
-        public static void TearDown()
+        public void TearDown()
         {
             // == EventCenter
             UIEventCenter.TearDown();

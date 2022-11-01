@@ -18,6 +18,11 @@ namespace Game.Client
     public class ClientApp : MonoBehaviour
     {
 
+        BattleEntry battleEntry;
+        LoginEntry loginEntry;
+        WorldEntry worldEntry;
+        UIEntry uiEntry;
+
         Thread _loginServClientThread;
         Thread _worldServClientThread;
         Thread _battleServClientThread;
@@ -25,18 +30,16 @@ namespace Game.Client
         PlayerInputComponent playerInputComponent;
         float time;
         bool isStarted;
-
         float fixedDeltaTime;
 
         void Awake()
         {
-            fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;
-
             DontDestroyOnLoad(this.gameObject);
-            StartAllAsync();
+            fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;
+            StartAll();
         }
 
-        async void StartAllAsync()
+        async void StartAll()
         {
             // ====== Network ======
             AllClientNetwork.Ctor();
@@ -53,25 +56,33 @@ namespace Game.Client
             // ====== EventCenter ======
             NetworkEventCenter.Ctor();
 
+            // ====== InputComponent ======
+            playerInputComponent = new PlayerInputComponent();
+
             // ====== Entry ======
             // Login
-            LoginEntry.Ctor();
-            LoginEntry.Inject(AllClientNetwork.loginSerClient);
+            loginEntry = new LoginEntry();
+            loginEntry.Ctor();
+            loginEntry.Inject(AllClientNetwork.loginSerClient);
+
             // World
-            WorldEntry.Ctor();
-            WorldEntry.Inject(AllClientNetwork.worldSerClient);
+            worldEntry = new WorldEntry();
+            worldEntry.Ctor();
+            worldEntry.Inject(AllClientNetwork.worldSerClient);
+
             // Battle
-            BattleEntry.Ctor();
-            playerInputComponent = new PlayerInputComponent();
-            BattleEntry.Inject(AllClientNetwork.battleSerClient, playerInputComponent);
+            battleEntry = new BattleEntry();
+            battleEntry.Ctor();
+            battleEntry.Inject(AllClientNetwork.battleSerClient, playerInputComponent);
+
+            uiEntry = new UIEntry();
+            uiEntry.Ctor();
 
             // ====== Manager ======
             CameraManager.Ctor();
 
             // ======  UI ======
-            UIEntry.Ctor();
             UIManager.Ctor();
-
             var uiCamTrans = CameraManager.UICamTrans;
             uiCamTrans.SetParent(UIManager.UICanvasGo.transform, false);
 
@@ -89,10 +100,10 @@ namespace Game.Client
             if (!isStarted) return;
 
             // == Entry ==
-            LoginEntry.Tick();
-            WorldEntry.Tick();
-            BattleEntry.Tick(fixedDeltaTime);
-            UIEntry.Tick();
+            loginEntry.Tick();
+            worldEntry.Tick();
+            battleEntry.Tick(fixedDeltaTime);
+            uiEntry.Tick();
 
         }
 
@@ -101,7 +112,7 @@ namespace Game.Client
             if (!isStarted) return;
 
             InputGameSet.Receive_Input(ref playerInputComponent);
-            BattleEntry.Update();
+            battleEntry.Update();
         }
 
         void LoginSceneLoaded(Scene scene, LoadSceneMode sceneMode)
@@ -166,10 +177,10 @@ namespace Game.Client
 
         void OnDestroy()
         {
-            LoginEntry.TearDown();
-            WorldEntry.TearDown();
-            BattleEntry.TearDown();
-            UIEntry.TearDown();
+            loginEntry.TearDown();
+            worldEntry.TearDown();
+            battleEntry.TearDown();
+            uiEntry.TearDown();
             InputGameSet.TearDown();
 
             _loginServClientThread.Abort();

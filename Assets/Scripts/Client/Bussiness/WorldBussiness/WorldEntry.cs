@@ -6,18 +6,18 @@ using Game.Infrastructure.Network.Client;
 namespace Game.Client.Bussiness.WorldBussiness
 {
 
-    public static class WorldEntry
+    public class WorldEntry
     {
 
         // Facades
-        static WorldFacades worldFacades;
+        WorldFacades worldFacades;
 
         // Controller
-        static WorldController worldController;
+        WorldController worldController;
 
-        #region [Life Cycle]
+        public WorldEntry() { }
 
-        public static void Ctor()
+        public void Ctor()
         {
             // == Facades ==
             worldFacades = new WorldFacades();
@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.WorldBussiness
             worldController = new WorldController();
         }
 
-        public static void Inject(NetworkClient client)
+        public void Inject(NetworkClient client)
         {
             // == Facades ==
             worldFacades.Inject(client);
@@ -34,19 +34,17 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         }
 
-        public static void Tick()
+        public void Tick()
         {
             // == Controller ==
             worldController.Tick();
         }
 
-        public static void TearDown()
+        public void TearDown()
         {
             // Send Disconnection
             worldFacades.Network.WorldReqAndRes.SendReq_WorldLeaveMsg();
         }
-
-        #endregion
 
     }
 

@@ -6,14 +6,18 @@ using Game.Client.Bussiness.LoginBussiness.Controllers;
 namespace Game.Client.Bussiness.LoginBussiness
 {
 
-    public static class LoginEntry
+    public class LoginEntry
     {
 
-        static LoginController loginController;
+        LoginController loginController;
 
         #region [Life Cycle]
+        public LoginEntry()
+        {
 
-        public static void Ctor()
+        }
+
+        public void Ctor()
         {
             // == Asset ==
             AllLoginAsset.Ctor();
@@ -22,7 +26,7 @@ namespace Game.Client.Bussiness.LoginBussiness
             loginController = new LoginController();
         }
 
-        public static void Inject(NetworkClient client)
+        public void Inject(NetworkClient client)
         {
             // == Network ==
 
@@ -30,13 +34,13 @@ namespace Game.Client.Bussiness.LoginBussiness
             loginController.Inject(client);
         }
 
-        public static void Tick()
+        public void Tick()
         {
             // == Controller ==
             loginController.Tick();
         }
 
-        public static void TearDown()
+        public void TearDown()
         {
 
         }
