@@ -42,7 +42,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             weaponRqs.RegistReq_WeaponDrop(OnWeaponDrop);
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             Tick_WeaponShoot();
             Tick_WeaponReloadBegin();

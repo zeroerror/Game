@@ -88,8 +88,7 @@ MonoBehaviour:
     isGrounded: 0
     isHitWall: 0
   healthComponent:
-    maxHealth: 100
-    health: 0
+    maxHealth: 1000
   weaponComponent:
     AllWeapon:
     - {fileID: 0}
@@ -102,6 +101,7 @@ MonoBehaviour:
     shootingMod:
       isFirstEnter: 0
       maintainFrame: 0
+      breakFrame: 0
     reloadingMod:
       isFirstEnter: 0
       maintainFrame: 0

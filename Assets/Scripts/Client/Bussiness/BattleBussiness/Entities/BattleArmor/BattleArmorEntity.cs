@@ -21,6 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         int curHealth;
         public int CurHealth => curHealth;
+        public void SetCurHealth(int v) => curHealth = v;
 
         Rigidbody rb;
 

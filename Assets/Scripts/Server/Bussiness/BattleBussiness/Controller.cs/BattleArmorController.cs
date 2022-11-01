@@ -4,7 +4,7 @@ using Game.Server.Bussiness.BattleBussiness.Facades;
 namespace Game.Server.Bussiness.BattleBussiness
 {
 
-    public class BattleLifeController
+    public class BattleArmorController
     {
 
         BattleServerFacades battleFacades;
@@ -21,19 +21,16 @@ namespace Game.Server.Bussiness.BattleBussiness
             var roleDomain = battleFacades.BattleFacades.Domain.RoleDomain;
             roleRepo.Foreach((role) =>
             {
-                var roleState = role.StateComponent.RoleState;
-                if (roleState == RoleState.Dying || roleState == RoleState.Reborning)
+                var armor = role.Armor;
+                if (armor == null)
                 {
                     return;
                 }
 
-                var healthComponent = role.HealthComponent;
-                if (healthComponent.CheckIsDead())
-                {
-                    roleDomain.RoleState_EnterDead(role);
-                    return;
-                }
-
+                var health = armor.CurHealth + 1;
+                var maxHealth = armor.MaxHealth;
+                health = health < maxHealth ? health : maxHealth;
+                armor.SetCurHealth(health);
             });
         }
 

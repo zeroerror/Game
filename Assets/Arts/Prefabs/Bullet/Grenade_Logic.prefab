@@ -160,11 +160,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletType: 1
-  moveComponent:
-    basicMoveSpeed: 4
+  locomotionComponent:
+    basicMoveSpeed: 0
     moveVelocity: {x: 0, y: 0, z: 0}
-    isPersistentMove: 1
-    gravity: 100
+    isPersistentMove: 0
+    gravity: 0
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
     frictionReduce: 10
@@ -173,7 +173,7 @@ MonoBehaviour:
   hitPowerModel:
     canHitRepeatly: 0
     attackTag: 1
-    damage: 50
+    damage: 300
     hitVelocityCoefficient: 10
     freezeMaintainFrame: 30
   lifeTime: 3

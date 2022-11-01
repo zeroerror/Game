@@ -17,6 +17,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleNetworkController battleNetworkController;
         BattleWeaponController battleWeaponController;
         BattleLifeController battleLifeController;
+        BattleArmorController battleArmorController;
 
         Thread _battleServerThread;
 
@@ -28,6 +29,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleNetworkController = new BattleNetworkController();
             battleWeaponController = new BattleWeaponController();
             battleLifeController = new BattleLifeController();
+            battleArmorController = new BattleArmorController();
 
             ServerNetworkEventCenter.Regist_BattleServerNeedCreate(StartBattleServer);
         }
@@ -43,6 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleNetworkController.Inject(battleFacades);
             battleWeaponController.Inject(battleFacades);
             battleLifeController.Inject(battleFacades);
+            battleArmorController.Inject(battleFacades);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -51,8 +54,9 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             battleController.Tick(fixedDeltaTime);
             battlePhysicsController.Tick(fixedDeltaTime);
-            battleWeaponController.Tick();
-            battleLifeController.Tick();
+            battleWeaponController.Tick(fixedDeltaTime);
+            battleLifeController.Tick(fixedDeltaTime);
+            battleArmorController.Tick(fixedDeltaTime);
         }
 
         void StartBattleServer()

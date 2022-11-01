@@ -54,7 +54,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 var healthComponent = role.HealthComponent;
                 bloodSlider.maxValue = healthComponent.MaxHealth;
-                bloodSlider.value = healthComponent.Health;
+                bloodSlider.value = healthComponent.CurHealth;
 
                 var armor = role.Armor;
                 if (armor == null)
