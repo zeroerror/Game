@@ -1,11 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Protocol.Battle;
-using Game.Client.Bussiness.EventCenter;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Client.Bussiness.UIBussiness;
-using Game.Client.Bussiness.BattleBussiness.Repo;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -13,7 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     public class BattleBulletController
     {
         BattleFacades battleFacades;
-        float fixedDeltaTime;
 
         // 事件队列
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
@@ -104,7 +100,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var domain = battleFacades.Domain;
                 var roleDomain = domain.RoleDomain;
                 var hitPowerModel = bullet.HitPowerModel;
-                int realDamage = roleDomain.RoleTryReceiveDamage(role, hitPowerModel.damage);
+                int realDamage = roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
 
                 var rendererDoamin = domain.RoleRendererDomain;
                 rendererDoamin.HUD_ShowDamageText(role, realDamage);
@@ -118,7 +114,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 // - 同步子弹位置
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
                 var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityID);
-                bullet.MoveComponent.SetPosition(pos);
+                bullet.LocomotionComponent.SetPosition(pos);
             }
         }
 
@@ -137,7 +133,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void TearDownBulletLogicAndRenderer(Vector3 pos, BulletEntity bulletLogic)
         {
-            bulletLogic.MoveComponent.SetPosition(pos);
+            bulletLogic.LocomotionComponent.SetPosition(pos);
 
             var domain = battleFacades.Domain;
 

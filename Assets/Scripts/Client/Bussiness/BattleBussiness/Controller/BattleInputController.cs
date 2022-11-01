@@ -11,7 +11,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     {
 
         BattleFacades battleFacades;
-        float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
 
         public BattleInputController()
         {
@@ -36,7 +35,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             this.battleFacades = battleFacades;
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             Tick_Input();
         }

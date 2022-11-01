@@ -7,8 +7,7 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class GrenadeEntity : BulletEntity
     {
 
-        [SerializeField]
-        float explosionRadius;
+        [SerializeField] float explosionRadius;
         public float ExplosionRadius => explosionRadius;
 
         protected override void Init()
@@ -20,7 +19,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             Destroy(gameObject);
         }
-
 
     }
 

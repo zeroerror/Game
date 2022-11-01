@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 bulletEntity.IDComponent.SetLeagueId(master.IDComponent.LeagueId);
                 bulletEntity.SetPosition(startPos);
                 bulletEntity.FaceTo(fireDir);
-                bulletEntity.MoveComponent.ActivateMoveVelocity(fireDir);
+                bulletEntity.LocomotionComponent.ApplyMoveVelocity(fireDir);
 
                 battleFacades.Repo.BulletRepo.Add(bulletEntity);
 
@@ -104,9 +104,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var bulletRepo = battleFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
-                bullet.MoveComponent.Tick_Friction(fixedDeltaTime);
-                bullet.MoveComponent.Tick_Gravity(fixedDeltaTime);
-                bullet.MoveComponent.Tick_Rigidbody(fixedDeltaTime);
+                bullet.LocomotionComponent.SimulatePhysics(fixedDeltaTime);
             });
         }
 
@@ -184,7 +182,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             // 手雷
             else if (bullet is GrenadeEntity grenadeEntity)
             {
-                var moveComponent = grenadeEntity.MoveComponent;
+                var moveComponent = grenadeEntity.LocomotionComponent;
                 moveComponent.SetPersistentMove(false);
                 moveComponent.SetMoveVelocity(Vector3.zero);
                 moveComponent.SetGravityVelocity(0);
@@ -206,10 +204,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 // - 根据距离HitActor
-                var dis = Vector3.Distance(role.MoveComponent.Position, grenadeEntity.MoveComponent.Position);
+                var dis = Vector3.Distance(role.MoveComponent.Position, grenadeEntity.LocomotionComponent.Position);
                 if (dis < grenadeEntity.ExplosionRadius)
                 {
-                    var dir = role.MoveComponent.Position - grenadeEntity.MoveComponent.Position;
+                    var dir = role.MoveComponent.Position - grenadeEntity.LocomotionComponent.Position;
 
                     HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
@@ -217,7 +215,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel))
                     {
                         var roleDomain = battleFacades.Domain.RoleDomain;
-                        roleDomain.RoleTryReceiveDamage(role, hitPowerModel.damage);
+                        roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
 
                         var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient + new Vector3(0, 2f, 0);
                         role.MoveComponent.AddExtraVelocity(hitVelocity);
@@ -262,7 +260,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 }
 
                 var masterMC = master.MoveComponent;
-                var hookerEntityMC = hooker.MoveComponent;
+                var hookerEntityMC = hooker.LocomotionComponent;
                 var dir = hookerEntityMC.Position - masterMC.Position;
                 var dis = Vector3.Distance(hookerEntityMC.Position, masterMC.Position);
                 dir.Normalize();

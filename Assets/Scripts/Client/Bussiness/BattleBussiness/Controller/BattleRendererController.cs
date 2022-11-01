@@ -3,8 +3,6 @@
 
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Protocol.Battle;
-using System.Collections.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -13,7 +11,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     {
 
         BattleFacades battleFacades;
-        float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
 
         public BattleRendererController()
         {
@@ -24,7 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             this.battleFacades = battleFacades;
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
         }
 

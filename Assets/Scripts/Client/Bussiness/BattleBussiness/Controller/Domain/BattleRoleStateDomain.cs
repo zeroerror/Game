@@ -51,11 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleDomain = battleFacades.Domain.RoleDomain;
 
             // Locomotion
-            bool hasMoveDir = inputComponent.MoveDir != Vector3.zero;
-            if (hasMoveDir)
-            {
-                roleDomain.RoleMoveActivate(role, inputComponent.MoveDir);
-            }
+            role.MoveComponent.ApplyMoveVelocity(inputComponent.MoveDir);
 
         }
 
@@ -69,9 +65,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var inputComponent = role.InputComponent;
 
-            var roleDomain = battleFacades.Domain.RoleDomain;
-            bool hasRollDir = inputComponent.RollDir != Vector3.zero;
-            if (hasRollDir && roleDomain.TryRoleRoll(role, inputComponent.RollDir))
+            if (role.TryRoll(inputComponent.RollDir))
             {
                 return;
             }
@@ -202,10 +196,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             }
 
-            var roleDomain = battleFacades.Domain.RoleDomain;
             var moveComponent = role.MoveComponent;
-            roleDomain.RoleMoveActivate(role, moveComponent.MoveVelocity * 0.7f);
-
+            moveComponent.ApplyMoveVelocity(moveComponent.MoveVelocity * 0.7f);
         }
 
         void ApplyClimbing(BattleRoleLogicEntity role)
@@ -244,7 +236,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (stateMod.maintainFrame <= 0)
             {
                 stateComponent.EnterReborn(30);
-                roleDomain.RoleReborn(role);
+                roleDomain.Reborn(role);
                 return;
             }
 

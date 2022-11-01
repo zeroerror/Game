@@ -53,7 +53,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 roleLogic.Ctor();
                 roleLogic.IDComponent.SetEntityId(entityId);
                 roleLogic.IDComponent.SetLeagueId(entityId);
-                RoleReborn(roleLogic);
+                Reborn(roleLogic);
 
                 var roleRepo = battleFacades.Repo.RoleRepo;
                 roleRepo.Add(roleLogic);
@@ -70,48 +70,31 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleRepo;
             roleRepo.Foreach((role) =>
             {
-                role.MoveComponent.Tick_Friction(fixedTime);
-                role.MoveComponent.Tick_Gravity(fixedTime);
-                role.MoveComponent.Tick_Rigidbody(fixedTime);
+                role.MoveComponent.SimulatePhysics(fixedTime);
             });
         }
 
         public void RoleMoveActivate(BattleRoleLogicEntity role, Vector3 dir)
         {
-            role.MoveComponent.ActivateMoveVelocity(dir);
         }
 
-        public bool TryRoleRoll(BattleRoleLogicEntity role, Vector3 dir)
-        {
-            var moveComponent = role.MoveComponent;
-            if (!moveComponent.IsGrounded)
-            {
-                return false;
-            }
-
-            role.Roll(dir);
-            role.StateComponent.EnterRolling(30);
-
-            return true;
-        }
-
-        public void RoleReborn(BattleRoleLogicEntity role)
+        public void Reborn(BattleRoleLogicEntity role)
         {
             role.TearDown();
             role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
         }
 
-        public int RoleTryReceiveDamage(BattleRoleLogicEntity role, int damage)
+        public int TryReceiveDamage(BattleRoleLogicEntity role, int damage)
         {
             return role.TryReceiveDamage(damage);
         }
 
-        public void RoleStateEnterReloading(BattleRoleLogicEntity role)
+        public void RoleState_EnterReloading(BattleRoleLogicEntity role)
         {
             role.StateComponent.EnterReloading(40);
         }
 
-        public void RoleStateEnterDead(BattleRoleLogicEntity role)
+        public void RoleState_EnterDead(BattleRoleLogicEntity role)
         {
             role.StateComponent.EnterDead(60);
         }

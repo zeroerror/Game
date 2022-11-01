@@ -23,15 +23,14 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetBulletType(BulletType bulletType) => this.bulletType = bulletType;
 
         [SerializeField]
-        protected MoveComponent moveComponent;
-        public MoveComponent MoveComponent => moveComponent;
+        protected LocomotionComponent locomotionComponent;
+        public LocomotionComponent LocomotionComponent => locomotionComponent;
 
         [SerializeField]
         protected HitPowerModel hitPowerModel;
         public HitPowerModel HitPowerModel => hitPowerModel;
 
         // Life 
-
         [SerializeField]
         float lifeTime;
         public float LifeTime => lifeTime;
@@ -47,14 +46,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.Bullet);
 
-            moveComponent.Inject(transform.GetComponent<Rigidbody>());
+            locomotionComponent.Inject(transform.GetComponent<Rigidbody>());
             Init();
         }
 
-        protected virtual void Init()
-        {
-
-        }
+        protected virtual void Init() { }
 
         public virtual void TearDown()
         {
@@ -64,14 +60,14 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void SetPosition(Vector3 pos)
         {
-            moveComponent.SetPosition(pos);
+            locomotionComponent.SetPosition(pos);
             transform.position = pos;
         }
 
         public void FaceTo(Vector3 forward)
         {
-            moveComponent.FaceTo(forward);
-            transform.rotation = moveComponent.RB.rotation;
+            locomotionComponent.FaceTo(forward);
+            transform.rotation = locomotionComponent.RB.rotation;
         }
 
     }

@@ -7,7 +7,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 {
 
     [Serializable]
-    public class MoveComponent
+    public class LocomotionComponent
     {
 
         #region [基础]
@@ -54,60 +54,42 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region [序列化变量]
 
-        [SerializeField]
-        [Header("基础移动速度")]
-        float basicMoveSpeed;
+        [SerializeField][Header("基础移动速度")] float basicMoveSpeed;
 
-        [SerializeField]
-        [Header("当前移动速度")]
-        Vector3 moveVelocity;
+        [SerializeField][Header("当前移动速度")] Vector3 moveVelocity;
         public Vector3 MoveVelocity => moveVelocity;
         public void SetMoveVelocity(Vector3 moveVelocity) => this.moveVelocity = moveVelocity;
 
-        [SerializeField]
-        [Header("持续移动")]
-        bool isPersistentMove;
+        [SerializeField][Header("持续移动")] bool isPersistentMove;
         public void SetPersistentMove(bool flag) => isPersistentMove = flag;
 
-        [SerializeField]
-        [Header("所受重力")]
-        float gravity;
+        [SerializeField][Header("所受重力")] float gravity;
 
         // == 重力速度
-        [SerializeField]
-        [Header("当前重力速度")]
-        float gravityVelocity;
+        [SerializeField][Header("当前重力速度")] float gravityVelocity;
         public float GravityVelocity => gravityVelocity;
         public void SetGravityVelocity(float gravityVelocity) => this.gravityVelocity = gravityVelocity;
 
-        [SerializeField]
-        [Header("额外速度")]
-        Vector3 extraVelocity;
+        [SerializeField][Header("额外速度")] Vector3 extraVelocity;
         public Vector3 ExtraVelocity => extraVelocity;
         public void SetExtraVelocity(Vector3 extraVelocity) => this.extraVelocity = extraVelocity;
 
-        [SerializeField]
-        [Header("摩擦力")]
-        float frictionReduce = 10f;
+        [SerializeField][Header("摩擦力")] float frictionReduce = 10f;
 
         // == 碰撞状态
-        [SerializeField]
-        [Header("是否接触地面")]
-        bool isGrounded;
+
+        [SerializeField][Header("是否接触地面")] bool isGrounded;
         public bool IsGrounded => isGrounded;
         public void SetIsGrounded(bool flag) => this.isGrounded = flag;
 
-        [SerializeField]
-        [Header("是否接触墙面")]
-        bool isHitWall;
+        [SerializeField][Header("是否接触墙面")] bool isHitWall;
         public bool IsHitWall => isHitWall;
-        public void SetIsHitWall(bool flag) => this.isHitWall = flag;
 
         #endregion
 
         #region [速度]
 
-        public void ActivateMoveVelocity(Vector3 dir)
+        public void ApplyMoveVelocity(Vector3 dir)
         {
             dir.Normalize();
             dir = dir.FixDecimal(2);
@@ -172,9 +154,79 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #endregion
 
-        #region  [状态刷新]
+        #region  [物理模拟]
 
-        public void Tick_Rigidbody(float fixedDeltaTime)
+        public void SimulatePhysics(float fixedDeltaTime)
+        {
+            Tick_Friction(fixedDeltaTime);
+            Tick_Gravity(fixedDeltaTime);
+            Tick_Rigidbody(fixedDeltaTime);
+        }
+
+        public void JumpboardSpeedUp()
+        {
+            var addVelocity = rb.velocity * 4f;
+            addVelocity = new Vector3(addVelocity.x, 4f, addVelocity.z);
+            AddExtraVelocity(addVelocity);
+            DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} extraVelocity: {extraVelocity}", "#48D1CC");
+        }
+
+        public void EraseVelocity(ref Vector3 velocity, Vector3 eraseV)
+        {
+            var cosVal = Vector3.Dot(velocity.normalized, eraseV.normalized);
+            if (cosVal >= 0)
+            {
+                return;
+            }
+
+            var reduce = eraseV * cosVal;
+            var after = velocity + reduce;
+            if (!IsOppositeDir(reduce, after))
+            {
+                reduce = velocity * cosVal;
+                after = velocity + reduce;
+            }
+
+            velocity = after;
+
+            Debug.Log($"EraseVelocityByDir  cosVal:{cosVal} reduce:{reduce} ");
+        }
+
+        public void EnterGound()
+        {
+            if (isGrounded) return;
+
+            DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
+            isGrounded = true;
+        }
+
+        public void LeaveGround()
+        {
+            if (!isGrounded) return;
+
+            DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
+            isGrounded = false;
+        }
+
+        public void EnterWall()
+        {
+            if (isHitWall) return;
+
+            DebugExtensions.LogWithColor($"{rb.gameObject.name}接触墙体---------------------------", "#48D1CC");
+            isHitWall = true;
+        }
+
+        public void LeaveWall()
+        {
+            if (!isHitWall) return;
+
+            DebugExtensions.LogWithColor($"{rb.gameObject.name}离开墙体-----------------------------", "#48D1CC");
+            isHitWall = false;
+        }
+
+        #endregion
+
+        void Tick_Rigidbody(float fixedDeltaTime)
         {
             if (fixedDeltaTime == 0) return;
 
@@ -200,7 +252,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
         }
 
-        public void Tick_Friction(float fixedDeltaTime)
+        void Tick_Friction(float fixedDeltaTime)
         {
             if (!IsGrounded)
             {
@@ -242,7 +294,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             // Debug.Log($"摩擦力----------------------- reduceVelocity {reduceVelocity} extraVelocity {extraVelocity}");
         }
 
-        public void Tick_Gravity(float fixedDeltaTime)
+        void Tick_Gravity(float fixedDeltaTime)
         {
             //模拟重力
             if (!IsGrounded)
@@ -269,92 +321,6 @@ namespace Game.Client.Bussiness.BattleBussiness
                 gravityVelocity = 0;
             }
         }
-
-        #endregion
-
-        #region [物理碰撞]
-
-        public void JumpboardSpeedUp()
-        {
-            var addVelocity = rb.velocity * 4f;
-            addVelocity = new Vector3(addVelocity.x, 4f, addVelocity.z);
-            AddExtraVelocity(addVelocity);
-            DebugExtensions.LogWithColor($"跳板起飞  加速 {addVelocity} extraVelocity: {extraVelocity}", "#48D1CC");
-        }
-
-        public void MoveHitErase(Vector3 hitDir)
-        {
-            EraseVelocity(ref moveVelocity, -hitDir);
-        }
-
-        public void HitSomething(Vector3 hitDir)
-        {
-            // DebugExtensions.LogWithColor($"碰撞某物，碰撞方向:{hitDir}", "#48D1CC");
-            //  消除反方向Velocity
-            // EraseVelocity(hitDir);  
-        }
-
-        // 尚未测试过 可能存在BUG
-        public void EraseVelocity(ref Vector3 velocity, Vector3 eraseV)
-        {
-            var cosVal = Vector3.Dot(velocity.normalized, eraseV.normalized);
-            if (cosVal >= 0)
-            {
-                return;
-            }
-
-            var reduce = eraseV * cosVal;
-            var after = velocity + reduce;
-            if (!IsOppositeDir(reduce, after))
-            {
-                reduce = velocity * cosVal;
-                after = velocity + reduce;
-            }
-
-            velocity = after;
-
-            Debug.Log($"EraseVelocityByDir  cosVal:{cosVal} reduce:{reduce} ");
-        }
-
-
-        public void LeaveSomthing(Vector3 leaveDir)
-        {
-            // DebugExtensions.LogWithColor($"离开某物，方向:{leaveDir}", "#48D1CC");
-        }
-
-        public void EnterGound()
-        {
-            if (isGrounded) return;
-
-            DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
-            isGrounded = true;
-        }
-
-        public void LeaveGround()
-        {
-            if (!isGrounded) return;
-
-            DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
-            isGrounded = false;
-        }
-
-        public void EnterWall()
-        {
-            if (isHitWall) return;
-
-            DebugExtensions.LogWithColor($"{rb.gameObject.name}接触墙体---------------------------", "#48D1CC");
-            isHitWall = true;
-        }
-
-        public void LeaveWall()
-        {
-            if (!isHitWall) return;
-
-            DebugExtensions.LogWithColor($"{rb.gameObject.name}离开墙体-----------------------------", "#48D1CC");
-            isHitWall = false;
-        }
-
-        #endregion
 
         bool IsOppositeDir(Vector3 dir1, Vector3 dir2)
         {

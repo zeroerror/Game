@@ -1,7 +1,6 @@
-using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Infrastructure.Input;
 using UnityEngine;
 using ZeroFrame.ZeroMath;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {

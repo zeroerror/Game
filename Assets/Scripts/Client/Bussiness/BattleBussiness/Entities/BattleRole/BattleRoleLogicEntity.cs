@@ -20,8 +20,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public RoleInputComponent InputComponent => roleInputComponent;
 
         [SerializeField]
-        MoveComponent moveComponent;
-        public MoveComponent MoveComponent => moveComponent;
+        LocomotionComponent moveComponent;
+        public LocomotionComponent MoveComponent => moveComponent;
 
         [SerializeField]
         HealthComponent healthComponent;
@@ -94,13 +94,26 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region [Action]
 
-        public void Roll(Vector3 dir)
+        public bool TryRoll(Vector3 dir)
         {
+            if(dir==Vector3.zero){
+                return false;
+            }
+
+            var mc = moveComponent;
+            if (!mc.IsGrounded)
+            {
+                return false;
+            }
+
             dir.Normalize();
             var addVelocity = dir * rollSpeed;
             addVelocity.y = 3f;
-            moveComponent.AddExtraVelocity(addVelocity);
+            mc.AddExtraVelocity(addVelocity);
+            stateComponent.EnterRolling(30);
+
             Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
+            return true;
         }
 
         public void JumpboardSpeedUp()

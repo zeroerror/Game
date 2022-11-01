@@ -47,8 +47,8 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_BulletSpawn(int connId, BulletEntity bulletEntity)
         {
-            var bulletPos = bulletEntity.MoveComponent.Position;
-            var fireDir = bulletEntity.MoveComponent.GetFaceDir();
+            var bulletPos = bulletEntity.LocomotionComponent.Position;
+            var fireDir = bulletEntity.LocomotionComponent.GetFaceDir();
 
             FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
             {
@@ -84,7 +84,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)
         {
-            var bulletPos = bulletEntity.MoveComponent.Position;
+            var bulletPos = bulletEntity.LocomotionComponent.Position;
             bulletPos *= 10000f;
             FrameBulletHitFieldResMsg msg = new FrameBulletHitFieldResMsg
             {
@@ -105,7 +105,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             BulletType bulletType = bulletEntity.BulletType;
             int masterEntityID = bulletEntity.MasterEntityId;
             int bulletEntityID = bulletEntity.IDComponent.EntityID;
-            Vector3 pos = bulletEntity.MoveComponent.Position;
+            Vector3 pos = bulletEntity.LocomotionComponent.Position;
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");
             FrameBulletLifeOverResMsg msg = new FrameBulletLifeOverResMsg
             {

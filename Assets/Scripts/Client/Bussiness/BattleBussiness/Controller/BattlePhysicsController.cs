@@ -12,14 +12,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     {
 
         BattleFacades battleFacades;
-        float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
 
         public void Inject(BattleFacades battleFacades)
         {
             this.battleFacades = battleFacades;
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             // == Physics Movement
             if (battleFacades.Repo.FiledRepo.CurFieldEntity != null)

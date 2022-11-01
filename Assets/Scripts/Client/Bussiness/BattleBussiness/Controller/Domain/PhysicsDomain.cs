@@ -69,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return list;
         }
 
-        void PhysicsEntityHitField(PhysicsEntity entity, MoveComponent moveComponent)
+        void PhysicsEntityHitField(PhysicsEntity entity, LocomotionComponent moveComponent)
         {
             var entityPos = entity.Position;
 
@@ -81,7 +81,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var go = collisionExtra.gameObject;
                 var hitDir = collisionExtra.hitDir;
-                moveComponent.HitSomething(hitDir);
                 if (collisionExtra.status != CollisionStatus.Exit)
                 {
                     if (collisionExtra.fieldType == FieldType.Ground) enterGroundCount++;
@@ -103,7 +102,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 else if (collisionExtra.status == CollisionStatus.Exit)
                 {
                     var leaveDir = -hitDir;
-                    moveComponent.LeaveSomthing(leaveDir);
                     if (collisionExtra.fieldType == FieldType.Wall) hitWallCount--;
                     else if (collisionExtra.fieldType == FieldType.Ground) enterGroundCount--;
                 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Client.Bussiness.BattleBussiness
@@ -54,8 +53,8 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (GrabPoint != null) return;
 
             Debug.Log("钩爪击中！");
-            moveComponent.SetPersistentMove(false);
-            moveComponent.SetVelocity(Vector3.zero);
+            locomotionComponent.SetPersistentMove(false);
+            locomotionComponent.SetVelocity(Vector3.zero);
 
             var shootEndTrans = ShootEnd.transform;
             shootEndTrans.localScale = new Vector3(2, 2, 2);
@@ -71,8 +70,8 @@ namespace Game.Client.Bussiness.BattleBussiness
             Debug.Log("钩爪击中！");
             if (GrabPoint != null) return;
 
-            moveComponent.SetPersistentMove(false);
-            moveComponent.SetVelocity(Vector3.zero);
+            locomotionComponent.SetPersistentMove(false);
+            locomotionComponent.SetVelocity(Vector3.zero);
 
             var shootEndTrans = ShootEnd.transform;
             shootEndTrans.position = pos;

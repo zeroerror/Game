@@ -30,7 +30,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 var healthComponent = role.HealthComponent;
                 if (healthComponent.CheckIsDead())
                 {
-                    roleDomain.RoleStateEnterDead(role);
+                    roleDomain.RoleState_EnterDead(role);
                 }
             });
         }

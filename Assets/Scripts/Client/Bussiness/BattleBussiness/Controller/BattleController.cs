@@ -11,7 +11,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     public class BattleController
     {
         BattleFacades battleFacades;
-        float fixedDeltaTime;
 
         // 服务器下发的生成队列
         Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
@@ -129,7 +128,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var stateComponent = roleLogic.StateComponent;
                 if (stateComponent.RoleState == RoleState.Reborning && roleState == RoleState.Normal)
                 {
-                    battleFacades.Domain.RoleDomain.RoleReborn(roleLogic);
+                    battleFacades.Domain.RoleDomain.Reborn(roleLogic);
                 }
 
                 stateComponent.SetRoleState(roleState);

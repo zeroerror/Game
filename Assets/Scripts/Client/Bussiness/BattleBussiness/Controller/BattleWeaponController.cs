@@ -10,8 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     {
 
         BattleFacades battleFacades;
-        float fixedDeltaTime => UnityEngine.Time.fixedDeltaTime;
-
 
         // 服务器下发的武器射击队列
         Queue<FrameWeaponShootResMsg> weaponShootQueue;
@@ -38,7 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             weaponRqs.RegistRes_WeaponDrop(OnWeaponDrop);
         }
 
-        public void Tick()
+        public void Tick(float fixedDeltaTime)
         {
             Tick_WeaponShoot();
             Tick_WeaponReload();

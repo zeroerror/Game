@@ -57,16 +57,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             battleController.Tick(fixedDeltaTime);
             BattleBulletController.Tick(fixedDeltaTime);
-            battlePhysicsController.Tick();
-            battleInputController.Tick();
-            battleWeaponController.Tick();
-            
-            battleRendererController.Tick();    // Last But No Least
+            battlePhysicsController.Tick(fixedDeltaTime);
+            battleInputController.Tick(fixedDeltaTime);
+            battleWeaponController.Tick(fixedDeltaTime);
         }
 
         public static void Update()
         {
-            // Renderer
             float deltaTime = UnityEngine.Time.deltaTime;
             battleRendererController.Update(deltaTime);
         }
