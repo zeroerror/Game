@@ -8,7 +8,6 @@ namespace Game.Server.Bussiness.BattleBussiness
     {
 
         BattleServerFacades battleFacades;
-        int serveFrame;
 
         public void Inject(BattleServerFacades battleFacades)
         {
