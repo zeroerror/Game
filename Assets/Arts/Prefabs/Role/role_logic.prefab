@@ -77,14 +77,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a869ae89333f2143a582a9bf6d88085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveComponent:
-    basicMoveSpeed: 4
+  locomotionComponent:
+    basicMoveSpeed: 5
     moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 0
     gravity: 150
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
-    frictionReduce: 30
+    frictionReduce: 10
     isGrounded: 0
     isHitWall: 0
   healthComponent:

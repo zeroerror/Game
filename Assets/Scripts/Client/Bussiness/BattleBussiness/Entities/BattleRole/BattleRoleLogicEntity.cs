@@ -187,14 +187,14 @@ namespace Game.Client.Bussiness.BattleBussiness
                 armorReceiveDamage = armor.TryRecieveDamage(damage);
                 if (armorReceiveDamage == damage)
                 {
-                    Debug.Log($"Role Receive Damage: armorReceiveDamage {armorReceiveDamage}");
+                    Debug.Log($"damage {damage} armorReceiveDamage {armorReceiveDamage}");
                     return armorReceiveDamage;
                 }
             }
 
             // - Flesh
             var fleshReceiveDamage = healthComponent.TryReiveDamage(damage - armorReceiveDamage);
-            Debug.Log($"Role Receive Damage: armorReceiveDamage {armorReceiveDamage} fleshReceiveDamage {fleshReceiveDamage}");
+            Debug.Log($"damage {damage}: armorReceiveDamage {armorReceiveDamage} fleshReceiveDamage {fleshReceiveDamage}");
 
             var totalReceiveDamage = armorReceiveDamage + fleshReceiveDamage;
             return totalReceiveDamage;

@@ -23,6 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Reset()
         {
+            damageCoefficient = 1f;
             AllWeapon = new WeaponEntity[WEAPON_CAPICY];
         }
 

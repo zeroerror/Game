@@ -3,9 +3,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
 
     public enum ArmorType : byte
     {
-        Aggressive,
-        Defensive,
-        Flexible
+        Level1,
+        Level2,
+        Level3,
+        Level4,
     }
 
 }

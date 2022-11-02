@@ -67,6 +67,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
+  - m_GUID: bbaa6433b86204f4c8cda3e18df38790
+    m_Address: Item_Evolve_2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
+  - m_GUID: f512e1f591a94b249885925e05993abf
+    m_Address: Item_Evolve_1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

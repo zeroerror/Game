@@ -67,8 +67,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             {
                 return false;
             }
-            
+
             return true;
+        }
+
+        public bool HasOwner()
+        {
+            return owner != null;
         }
 
     }

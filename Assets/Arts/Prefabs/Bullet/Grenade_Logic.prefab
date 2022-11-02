@@ -161,13 +161,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletType: 1
   locomotionComponent:
-    basicMoveSpeed: 0
+    basicMoveSpeed: 10
     moveVelocity: {x: 0, y: 0, z: 0}
-    isPersistentMove: 0
-    gravity: 0
+    isPersistentMove: 1
+    gravity: 150
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
-    frictionReduce: 10
+    frictionReduce: 20
     isGrounded: 0
     isHitWall: 0
   hitPowerModel:

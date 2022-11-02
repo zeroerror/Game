@@ -7,13 +7,13 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
     public class FrameBattleRoleSpawnResMsg :IZeroMessage<FrameBattleRoleSpawnResMsg>{
         public int serverFrame;
         public byte entityId;
-        public bool isOwner;
+        public byte controlType;
 
         public void FromBytes(byte[] src, ref int offset)
         {
             serverFrame = BufferReader.ReadInt32(src, ref offset);
             entityId = BufferReader.ReadByte(src, ref offset);
-            isOwner = BufferReader.ReadBool(src, ref offset);
+            controlType = BufferReader.ReadByte(src, ref offset);
             offset += src.Length;
         }
 
@@ -23,7 +23,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             byte[] result = new byte[1000];
             BufferWriter.WriteInt32(result, serverFrame, ref offset);
             BufferWriter.WriteByte(result, entityId, ref offset);
-            BufferWriter.WriteBool(result, isOwner, ref offset);
+            BufferWriter.WriteByte(result, controlType, ref offset);
             return result;
         }
     }

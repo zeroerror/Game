@@ -113,8 +113,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (roleLogic == null)
                 {
                     var roleLogicRepo = repo.RoleLogicRepo;
-                    bool isOwner = roleLogicRepo.IsOwner(entityID);
-                    roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId, isOwner);
+                    bool HasOwner = roleLogicRepo.HasOwner();
+                    var roleDoamin = battleFacades.Domain.RoleDomain;
+                    if (!HasOwner)
+                    {
+                        roleLogic = roleDoamin.SpawnRoleWithRenderer(msg.entityId, ControlType.Owner);
+                    }
+                    else
+                    {
+                        roleLogic = roleDoamin.SpawnRoleWithRenderer(msg.entityId, ControlType.Other);
+                    }
                 }
 
                 var moveComponent = roleLogic.LocomotionComponent;
@@ -149,8 +157,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRepo = repo.RoleLogicRepo;
                 var fieldEntity = repo.FiledRepo.CurFieldEntity;
                 var domain = battleFacades.Domain.RoleDomain;
-                domain.SpawnRoleWithRenderer(entityId, msg.isOwner);
-                Debug.Log(msg.isOwner ? $"生成自身角色   entityId: {entityId}" : $"生成其他角色 : entityId: {entityId}");
+                var controlType = (ControlType)msg.controlType;
+                domain.SpawnRoleWithRenderer(entityId, controlType);
+                Debug.Log($"生成自身角色  ControlType {controlType}");
             }
         }
 
@@ -262,7 +271,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
 
             var rqs = battleFacades.Network.RoleReqAndRes;
-            rqs.SendReq_BattleRoleSpawn();
+            rqs.SendReq_BattleRoleSpawn(1000, ControlType.Owner);
 
             Debug.Log($"加载战斗场景结束---------------------------------------------------");
         }

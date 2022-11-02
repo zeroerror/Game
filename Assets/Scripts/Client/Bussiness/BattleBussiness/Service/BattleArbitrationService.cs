@@ -62,7 +62,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             hitModel.attackerIDC =attackerIDC;
             hitModel.victimIDC =victimIDC;
             hitModel.damage =damage;
-            Debug.Log($"ADD HIT RECORD: attackerIDC {attackerIDC} victimIDC {victimIDC} damage {damage}");
+            Debug.Log($"ADD HIT RECORD:damage {damage}");
 
             var key = GetKey(attackerIDC, victimIDC);
 

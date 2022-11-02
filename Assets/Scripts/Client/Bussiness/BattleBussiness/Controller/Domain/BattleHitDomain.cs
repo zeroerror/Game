@@ -49,8 +49,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 // - Damage
                 var domain = battleFacades.Domain.RoleDomain;
-                float damage = domain.TryReceiveDamage(role, hitPowerModel.damage);
-                arbitService.AddHitRecord(attackerIDC, victimIDC, damage);
+                float receivedDamage = domain.TryReceiveDamage(role, hitPowerModel.damage);
+                arbitService.AddHitRecord(attackerIDC, victimIDC, receivedDamage);
                 // - Physics
                 var addV = bullet.LocomotionComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
                 role.LocomotionComponent.AddExtraVelocity(addV);

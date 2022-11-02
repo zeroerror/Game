@@ -129,7 +129,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f177a123cf466664b9480e1c79ddf73d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strengthenTM: {fileID: 11400000, guid: b3c86d85f61c36945864ce0ec2a06857, type: 2}
+  armorPrefab: {fileID: 556889105663022914, guid: e2e7da160d106a54aa56f799927570fa,
+    type: 3}
 --- !u!1 &6763285817637247548
 GameObject:
   m_ObjectHideFlags: 0

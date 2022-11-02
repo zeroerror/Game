@@ -87,9 +87,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletType: 0
   locomotionComponent:
-    basicMoveSpeed: 0
+    basicMoveSpeed: 25
     moveVelocity: {x: 0, y: 0, z: 0}
-    isPersistentMove: 0
+    isPersistentMove: 1
     gravity: 0
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}

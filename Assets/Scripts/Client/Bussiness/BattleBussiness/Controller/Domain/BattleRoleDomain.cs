@@ -1,5 +1,6 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -20,7 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleRoleLogicEntity SpawnRoleWithRenderer(int entityId, bool isOwner)
+        public BattleRoleLogicEntity SpawnRoleWithRenderer(int entityId, ControlType controlType)
         {
             var repo = battleFacades.Repo;
             var fieldEntity = repo.FiledRepo.CurFieldEntity;
@@ -33,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var fieldCameraComponent = fieldEntity.CameraComponent;
 
-            if (isOwner)
+            if (controlType == ControlType.Owner)
             {
                 var roleRepo = battleFacades.Repo.RoleLogicRepo;
                 roleRepo.SetOwner(roleLogic);

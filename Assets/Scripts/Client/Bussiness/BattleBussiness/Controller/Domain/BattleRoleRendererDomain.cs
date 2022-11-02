@@ -33,6 +33,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var moveComponent = role.LocomotionComponent;
                 roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, moveComponent.Position, deltaTime * roleRenderer.posAdjust);
                 roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, moveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
+                if (role.HasArmor())
+                {
+                    role.Armor.transform.position = role.Position;
+                }
+
             });
         }
 
@@ -65,7 +70,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 {
                     armorSlider.maxValue = armor.MaxHealth;
                     armorSlider.value = armor.CurHealth;
-                    Debug.Log($"armor.CurHealth {armor.CurHealth}");
                 }
 
                 bloodSlider.gameObject.SetActive(true);

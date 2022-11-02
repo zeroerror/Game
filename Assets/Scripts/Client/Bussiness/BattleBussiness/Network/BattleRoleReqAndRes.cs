@@ -4,6 +4,7 @@ using UnityEngine;
 using ZeroFrame.Protocol;
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Battle;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
@@ -92,10 +93,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             Debug.Log($"SendReq_RoleRoll dir:{dir} ");
         }
 
-        public void SendReq_BattleRoleSpawn()
+        public void SendReq_BattleRoleSpawn(int typeID, ControlType controlType)
         {
             FrameBattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameBattleRoleSpawnReqMsg
             {
+                typeID = 1000,
+                controlType = (byte)controlType,
             };
             battleClient.SendMsg(frameReqWRoleSpawnMsg);
         }

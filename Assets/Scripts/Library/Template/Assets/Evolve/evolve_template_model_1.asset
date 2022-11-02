@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modelID: 1000
   modelName: "\u8FDB\u5316\u7C7B\u578B_\u52A0\u8840"
-  addHealth: 1000
+  addHealth: 2000
   addDamageCoefficient: 0
   addSpeed: 0

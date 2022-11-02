@@ -21,7 +21,6 @@ namespace Game.Client.Bussiness.UIBussiness
             {
                 GameObject go = enumerator.Current;
                 all.Add(go.name, go);
-                Debug.Log($"ui asstet :{go.name}");
             }
         }
 

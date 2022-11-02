@@ -6,6 +6,7 @@ using Game.Infrastructure.Network.Server;
 using Game.Protocol.Battle;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Generic;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness.Network
 {
@@ -85,13 +86,13 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BattleRoleSpawn(int connId, int entityID, bool isOwner)
+        public void SendRes_BattleRoleSpawn(int connId, int entityID, byte controlType)
         {
             FrameBattleRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameBattleRoleSpawnResMsg
             {
                 serverFrame = serverFrame,
                 entityId = (byte)entityID,
-                isOwner = isOwner
+                controlType = controlType
             };
             battleServer.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
             Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");

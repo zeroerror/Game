@@ -78,6 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetDamageByCoefficient(float coefficient)
         {
             hitPowerModel.damage *= coefficient;
+            Debug.Log($"SetDamageByCoefficient {hitPowerModel.damage}");
         }
 
     }

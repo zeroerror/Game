@@ -73,6 +73,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
+            if (entityType == EntityType.EvolveItem)
+            {
+                var evolveItem = entityGo.GetComponent<BattleEvolveItemEntity>();
+                evolveItem.Ctor();
+                evolveItem.IDComponent.SetEntityId(entityID);
+
+                var repo = battleFacades.Repo;
+                var evolveItemRepo = repo.EvolveItemRepo;
+                evolveItemRepo.Add(evolveItem);
+                return;
+            }
+
             Debug.LogError($"没有处理的情况 {entityType.ToString()}");
         }
 
@@ -139,32 +151,34 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                     if (evolveType == EntityType.Armor)
                     {
-                        if (master.HasArmor())
+                        if (!master.HasArmor())
                         {
-                            var evolveTM = evolveItem.evolveTM;
-                            var armor = master.Armor;
-                            armor.EvolveFrom(evolveTM);
-
-                            var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                            armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
-                            return true;
+                            return false;
                         }
+                        
+                        var evolveTM = evolveItem.evolveTM;
+                        var armor = master.Armor;
+                        armor.EvolveFrom(evolveTM);
+
+                        var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                        armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                        return true;
                     }
 
                     if (evolveType == EntityType.BattleRole)
                     {
-                            var evolveTM = evolveItem.evolveTM;
-                            master.EvolveFrom(evolveTM);
+                        var evolveTM = evolveItem.evolveTM;
+                        master.EvolveFrom(evolveTM);
 
-                            var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                            armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
-                            return true;
+                        var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                        armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                        return true;
                     }
 
                 }
             }
 
-            Debug.LogError("尚未处理的情况");
+            Debug.LogError($"尚未处理的情况 entityType {entityType.ToString()}");
             return false;
         }
 
