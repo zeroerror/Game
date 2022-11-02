@@ -81,7 +81,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (victim.EntityType == EntityType.BattleRole)
             {
-                var role = battleFacades.Repo.RoleRepo.Get(victim.EntityID);
+                var role = battleFacades.Repo.RoleLogicRepo.Get(victim.EntityID);
                 var stateComponent = role.StateComponent;
                 return stateComponent.RoleState != RoleState.Reborning && stateComponent.RoleState != RoleState.Dying;
             }

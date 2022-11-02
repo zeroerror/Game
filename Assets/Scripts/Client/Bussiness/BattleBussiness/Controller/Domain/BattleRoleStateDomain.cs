@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void ApplyAllRoleState()
         {
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 ApplyRoleState(role);

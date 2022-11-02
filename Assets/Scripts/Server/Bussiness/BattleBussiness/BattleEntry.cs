@@ -10,7 +10,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
     public class BattleEntry
     {
-        BattleServerFacades battleFacades;
+        BattleServerFacades serverFacades;
 
         BattleController battleController;
         BattlePhysicsController battlePhysicsController;
@@ -18,18 +18,20 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleWeaponController battleWeaponController;
         BattleLifeController battleLifeController;
         BattleArmorController battleArmorController;
+        BattleBulletController battleBulletController;
 
         Thread _battleServerThread;
 
         public BattleEntry()
         {
-            battleFacades = new BattleServerFacades();
+            serverFacades = new BattleServerFacades();
             battleController = new BattleController();
             battlePhysicsController = new BattlePhysicsController();
             battleNetworkController = new BattleNetworkController();
             battleWeaponController = new BattleWeaponController();
             battleLifeController = new BattleLifeController();
             battleArmorController = new BattleArmorController();
+            battleBulletController = new BattleBulletController();
 
             ServerNetworkEventCenter.Regist_BattleServerNeedCreate(StartBattleServer);
         }
@@ -37,15 +39,16 @@ namespace Game.Server.Bussiness.BattleBussiness
         public void Inject(NetworkServer server)
         {
             // Facades
-            battleFacades.Inject(server);
+            serverFacades.Inject(server);
 
             // Conntroller
-            battleController.Inject(battleFacades);
-            battlePhysicsController.Inject(battleFacades);
-            battleNetworkController.Inject(battleFacades);
-            battleWeaponController.Inject(battleFacades);
-            battleLifeController.Inject(battleFacades);
-            battleArmorController.Inject(battleFacades);
+            battleController.Inject(serverFacades);
+            battlePhysicsController.Inject(serverFacades);
+            battleNetworkController.Inject(serverFacades);
+            battleWeaponController.Inject(serverFacades);
+            battleLifeController.Inject(serverFacades);
+            battleArmorController.Inject(serverFacades);
+            battleBulletController.Inject(serverFacades);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -57,6 +60,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleWeaponController.Tick(fixedDeltaTime);
             battleLifeController.Tick(fixedDeltaTime);
             battleArmorController.Tick(fixedDeltaTime);
+            battleBulletController.Tick(fixedDeltaTime);
         }
 
         void StartBattleServer()
@@ -69,7 +73,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             var port = NetworkConfig.BATTLESERVER_PORT[0];
             Debug.Log($"战斗服启动！端口:{port}");
-            var battleServer = battleFacades.Network.BattleServer;
+            var battleServer = serverFacades.Network.BattleServer;
             battleServer.StartListen(port);
             _battleServerThread = new Thread(() =>
             {

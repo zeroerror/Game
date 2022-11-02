@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var arbitService = battleFacades.ArbitrationService;
             var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityID);
-            var role = battleFacades.Repo.RoleRepo.Get(victimIDC.EntityID);
+            var role = battleFacades.Repo.RoleLogicRepo.Get(victimIDC.EntityID);
 
             if (bullet.BulletType == BulletType.DefaultBullet)
             {

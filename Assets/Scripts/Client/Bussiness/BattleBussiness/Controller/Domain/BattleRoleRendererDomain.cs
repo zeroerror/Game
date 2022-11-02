@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleStateRendererDomain = battleFacades.Domain.RoleStateRendererDomain;
             roleStateRendererDomain.ApplyRoleState(deltaTime);
 
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 var roleRenderer = role.roleRenderer;
@@ -38,7 +38,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void Update_WorldUI()
         {
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 var bloodSlider = role.roleRenderer.BloodSlider;

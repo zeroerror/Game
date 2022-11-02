@@ -20,6 +20,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             all = new List<BattleRoleLogicEntity>();
         }
 
+        public void Add(BattleRoleLogicEntity entity)
+        {
+            all.Add(entity);
+        }
+
+        public void Remove(BattleRoleLogicEntity entity)
+        {
+            all.Remove(entity);
+        }
+
         public BattleRoleLogicEntity Get(int entityID)
         {
             return all.Find((entity) => entity.IDComponent.EntityID == entityID);
@@ -36,17 +46,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return all.ToArray();
         }
 
-        public void Add(BattleRoleLogicEntity entity)
-        {
-            all.Add(entity);
-        }
-
-
-        public void Remove(BattleRoleLogicEntity entity)
-        {
-            all.Remove(entity);
-        }
-
         public void Foreach(Action<BattleRoleLogicEntity> action)
         {
             if (action == null) return;
@@ -55,6 +54,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             {
                 action.Invoke(role);
             });
+        }
+
+        public bool IsOwner(int entityID)
+        {
+            if (owner == null)
+            {
+                return false;
+            }
+
+            if (owner.IDComponent.EntityID != entityID)
+            {
+                return false;
+            }
+            
+            return true;
         }
 
     }

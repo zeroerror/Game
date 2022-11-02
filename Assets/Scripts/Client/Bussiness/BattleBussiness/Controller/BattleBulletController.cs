@@ -80,7 +80,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             while (bulletHitRoleQueue.TryDequeue(out var msg))
             {
-                var role = battleFacades.Repo.RoleRepo.Get(msg.roleEntityId);
+                var role = battleFacades.Repo.RoleLogicRepo.Get(msg.roleEntityId);
                 if (role == null)
                 {
                     continue;

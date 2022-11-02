@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public bool TryPickUpItem(EntityType entityType, ushort entityID, int masterEntityID, Transform hangPoint = null)
         {
             var repo = battleFacades.Repo;
-            var roleRepo = repo.RoleRepo;
+            var roleRepo = repo.RoleLogicRepo;
             var master = roleRepo.Get(masterEntityID);
 
             if (entityType == EntityType.WeaponItem)
@@ -150,7 +150,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var weaponItem = weaponItemDomain.SpawnWeaponItem(weapon.WeaponType, weapon.IDComponent.EntityID);
             weaponItem.Ctor();
 
-            var master = battleFacades.Repo.RoleRepo.Get(weapon.MasterEntityID);
+            var master = battleFacades.Repo.RoleLogicRepo.Get(weapon.MasterEntityID);
             weaponItem.transform.position = master.transform.position;
 
             var weaponDomain = domain.WeaponDomain;

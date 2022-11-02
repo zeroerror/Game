@@ -80,7 +80,6 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 velocityX = velocityX,
                 velocityY = velocityY,
                 velocityZ = velocityZ,
-                isOwner = (connId == role.ConnId)
             };
             battleServer.SendMsg<BattleRoleSyncMsg>(connId, msg);
             sendCount++;

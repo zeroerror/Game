@@ -49,7 +49,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             Tick_ReloadingFrame();
             Tick_WeaponDrop();
 
-            var allRole = battleFacades.BattleFacades.Repo.RoleRepo;
+            var allRole = battleFacades.BattleFacades.Repo.RoleLogicRepo;
             allRole.Foreach((role) =>
             {
                 var WeaponComponent = role.WeaponComponent;
@@ -74,7 +74,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     var clientFacades = battleFacades.BattleFacades;
                     var weaponRepo = clientFacades.Repo.WeaponRepo;
-                    var roleRepo = clientFacades.Repo.RoleRepo;
+                    var roleRepo = clientFacades.Repo.RoleLogicRepo;
 
                     var weaponRqs = battleFacades.Network.WeaponReqAndRes;
                     var bulletRqs = battleFacades.Network.BulletReqAndRes;
@@ -125,7 +125,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 if (weaponReloadMsgDic.TryGetValue(key, out var msg))
                 {
                     var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
+                    var roleRepo = battleFacades.BattleFacades.Repo.RoleLogicRepo;
                     var masterId = msg.masterId;
 
                     if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
@@ -138,7 +138,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_ReloadingFrame()
         {
-            var allRole = battleFacades.BattleFacades.Repo.RoleRepo;
+            var allRole = battleFacades.BattleFacades.Repo.RoleLogicRepo;
             var rqs = battleFacades.Network.WeaponReqAndRes;
             allRole.Foreach((role) =>
             {
@@ -171,7 +171,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 if (weaponDropMsgDic.TryGetValue(key, out var msg))
                 {
                     var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
+                    var roleRepo = battleFacades.BattleFacades.Repo.RoleLogicRepo;
                     var rqs = battleFacades.Network.WeaponReqAndRes;
                     var entityId = msg.entityId;
                     var masterId = msg.masterId;

@@ -51,7 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 weaponShootQueue.Dequeue();
 
-                var roleRepo = battleFacades.Repo.RoleRepo;
+                var roleRepo = battleFacades.Repo.RoleLogicRepo;
                 var master = roleRepo.Get(msg.masterId);
                 var weaponComponent = master.WeaponComponent;
                 if (weaponComponent.TryWeaponShoot())
@@ -69,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 weaponReloadQueue.Dequeue();
 
-                var roleRepo = battleFacades.Repo.RoleRepo;
+                var roleRepo = battleFacades.Repo.RoleLogicRepo;
                 var master = roleRepo.Get(msg.masterId);
                 var reloadBulletNum = msg.reloadBulletNum;
                 master.WeaponComponent.FinishReloading(reloadBulletNum);
@@ -81,7 +81,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (weaponDropQueue.TryPeek(out var msg))
             {
                 weaponDropQueue.Dequeue();
-                var master = battleFacades.Repo.RoleRepo.Get(msg.masterId);
+                var master = battleFacades.Repo.RoleLogicRepo.Get(msg.masterId);
                 master.WeaponComponent.TryDropWeapon(msg.entityId, out var weapon);
 
                 var itemDomain = battleFacades.Domain.ItemDomain;

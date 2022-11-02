@@ -1,27 +1,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Protocol.Battle;
-using Game.Infrastructure.Generic;
+using Game.Client.Bussiness;
 using Game.Client.Bussiness.BattleBussiness;
-using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Server.Bussiness.EventCenter;
-using Game.Client.Bussiness;
+using Game.Server.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
 
     public class BattleController
     {
-        BattleServerFacades battleServerFacades;
+        BattleServerFacades serverFacades;
 
         // Scene Spawn Trigger
         bool hasBattleBegin;
         bool hasSpawnBegin;
 
         // NetWork Info
-        public int ServeFrame => battleServerFacades.Network.ServeFrame;
-        List<int> ConnIDList => battleServerFacades.Network.connIdList;
+        public int ServeFrame => serverFacades.Network.ServeFrame;
+        List<int> ConnIDList => serverFacades.Network.connIdList;
 
         // ====== 角色 ======
         // - 所有生成帧
@@ -54,7 +53,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Inject(BattleServerFacades battleFacades)
         {
-            this.battleServerFacades = battleFacades;
+            this.serverFacades = battleFacades;
 
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMove);
@@ -79,14 +78,11 @@ namespace Game.Server.Bussiness.BattleBussiness
                 SpawBattleScene();
             }
 
-            var curFieldEntity = battleServerFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
+            var curFieldEntity = serverFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
             if (curFieldEntity == null)
             {
                 return;
             }
-
-            // - Bullet
-            Tick_BulletLifeCycle(fixedDeltaTime);
 
             // - Role
             Tick_RoleSpawn();
@@ -107,8 +103,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void BroadcastAllRoleState()
         {
-            var roleRqs = battleServerFacades.Network.RoleReqAndRes;
-            var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
+            var roleRqs = serverFacades.Network.RoleReqAndRes;
+            var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
             ConnIDList.ForEach((connID) =>
             {
                 roleRepo.Foreach((role) =>
@@ -133,9 +129,9 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     roleSpawnMsgDic[key] = null;
 
-                    var battleFacades = battleServerFacades.BattleFacades;
+                    var battleFacades = serverFacades.BattleFacades;
                     var weaponRepo = battleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.Repo.RoleRepo;
+                    var roleRepo = battleFacades.Repo.RoleLogicRepo;
                     var entityId = roleRepo.Size;
 
                     // 服务器逻辑
@@ -143,8 +139,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleEntity.SetConnId(connId);
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{entityId} 位置:{roleEntity.MoveComponent.Position}");
 
-                    var itemRqs = battleServerFacades.Network.ItemReqAndRes;
-                    itemRqs.SendRes_ItemSpawn(connId, ServeFrame, battleServerFacades.ItemTypeByteList, battleServerFacades.SubTypeList, battleServerFacades.EntityIDList);
+                    var itemRqs = serverFacades.Network.ItemReqAndRes;
+                    itemRqs.SendRes_ItemSpawn(connId, ServeFrame, serverFacades.ItemTypeByteList, serverFacades.SubTypeList, serverFacades.EntityIDList);
                 }
             });
         }
@@ -155,8 +151,8 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 long key = GetCurFrameKey(connId);
 
-                var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
-                var rqs = battleServerFacades.Network.RoleReqAndRes;
+                var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
+                var rqs = serverFacades.Network.RoleReqAndRes;
 
                 if (roleMoveMsgDic.TryGetValue(key, out var msg))
                 {
@@ -201,9 +197,9 @@ namespace Game.Server.Bussiness.BattleBussiness
                     rollOptMsgDic[key] = null;
 
                     var wRid = msg.entityId;
-                    var roleRepo = battleServerFacades.BattleFacades.Repo.RoleRepo;
+                    var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
                     var role = roleRepo.Get(wRid);
-                    var rqs = battleServerFacades.Network.RoleReqAndRes;
+                    var rqs = serverFacades.Network.RoleReqAndRes;
                     Vector3 dir = new Vector3(msg.dirX / 10000f, msg.dirY / 10000f, msg.dirZ / 10000f);
                     role.InputComponent.SetRollDir(dir);
                 }
@@ -212,83 +208,13 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void ApplyAllRoleState()
         {
-            var roleStateDomain = battleServerFacades.BattleFacades.Domain.RoleStateDomain;
+            var roleStateDomain = serverFacades.BattleFacades.Domain.RoleStateDomain;
             roleStateDomain.ApplyAllRoleState();
         }
 
         #endregion
 
-        #region [Bullet]
-
-        void Tick_BulletLifeCycle(float fixedDeltaTime)
-        {
-            Tick_DeadLifeBulletTearDown(fixedDeltaTime);
-            Tick_BulletHitRole(fixedDeltaTime);
-            Tick_ActiveHookerDraging(fixedDeltaTime);
-        }
-
-        void Tick_DeadLifeBulletTearDown(float fixedDeltaTime)
-        {
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
-            var tearDownList = bulletDomain.Tick_BulletLife(NetworkConfig.FIXED_DELTA_TIME);
-
-            tearDownList.ForEach((bulletEntity) =>
-            {
-
-                var bulletType = bulletEntity.BulletType;
-
-                if (bulletType == BulletType.DefaultBullet)
-                {
-                    bulletEntity.TearDown();
-                }
-
-                if (bulletEntity is GrenadeEntity grenadeEntity)
-                {
-                    var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
-                    bulletDomain.GrenadeExplode(grenadeEntity);
-                }
-
-                if (bulletEntity is HookerEntity hookerEntity)
-                {
-                    hookerEntity.TearDown();
-                }
-
-                var bulletRepo = battleServerFacades.BattleFacades.Repo.BulletRepo;
-                bulletRepo.TryRemove(bulletEntity);
-
-                var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
-                ConnIDList.ForEach((connId) =>
-                {
-                    // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletLifeFrameOver(connId, bulletEntity);
-                });
-
-            });
-        }
-
-        void Tick_BulletHitRole(float fixedDeltaTime)
-        {
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
-            var bulletRqs = battleServerFacades.Network.BulletReqAndRes;
-            var hitRoleList = bulletDomain.Tick_BulletHitRoleHitModel(fixedDeltaTime);
-
-            ConnIDList.ForEach((connId) =>
-            {
-                hitRoleList.ForEach((attackModel) =>
-                {
-                    bulletRqs.SendRes_BulletHitRole(connId, attackModel.attackerIDC.EntityID, attackModel.victimIDC.EntityID);
-                });
-            });
-        }
-
-        void Tick_ActiveHookerDraging(float fixedDeltaTime)
-        {
-            var bulletDomain = battleServerFacades.BattleFacades.Domain.BulletLogicDomain;
-            bulletDomain.Tick_ActiveHookerDraging(fixedDeltaTime);
-        }
-
-        #endregion
-
+  
         #region [Item]
 
         void Tick_ItemPickUp()
@@ -310,10 +236,10 @@ namespace Game.Server.Bussiness.BattleBussiness
                     // TODO:Add judgement like 'Can He Pick It Up?'
                     EntityType entityType = (EntityType)msg.entityType;
 
-                    var itemDomain = battleServerFacades.BattleFacades.Domain.ItemDomain;
+                    var itemDomain = serverFacades.BattleFacades.Domain.ItemDomain;
                     if (itemDomain.TryPickUpItem(entityType, msg.entityId, msg.entityID))
                     {
-                        var rqs = battleServerFacades.Network.ItemReqAndRes;
+                        var rqs = serverFacades.Network.ItemReqAndRes;
                         ConnIDList.ForEach((connId) =>
                         {
                             rqs.SendRes_ItemPickUp(connId, ServeFrame, msg.entityID, entityType, msg.entityId);
@@ -419,10 +345,10 @@ namespace Game.Server.Bussiness.BattleBussiness
             hasSpawnBegin = true;
 
             // Load Scene And Spawn Field
-            var domain = battleServerFacades.BattleFacades.Domain;
+            var domain = serverFacades.BattleFacades.Domain;
             var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
             fieldEntity.SetEntityId(1);
-            var fieldEntityRepo = battleServerFacades.BattleFacades.Repo.FiledRepo;
+            var fieldEntityRepo = serverFacades.BattleFacades.Repo.FiledRepo;
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
 
@@ -433,15 +359,15 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void InitAllAssetRepo(AssetPointEntity[] assetPointEntities)
         {
-            var entityTypeList = battleServerFacades.EntityTypeList;
-            var entityIDList = battleServerFacades.EntityIDList;
-            var itemTypeByteList = battleServerFacades.ItemTypeByteList;
-            var subTypeList = battleServerFacades.SubTypeList;
+            var entityTypeList = serverFacades.EntityTypeList;
+            var entityIDList = serverFacades.EntityIDList;
+            var itemTypeByteList = serverFacades.ItemTypeByteList;
+            var subTypeList = serverFacades.SubTypeList;
 
             int count = entityTypeList.Count;
             Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
 
-            var battleFacades = battleServerFacades.BattleFacades;
+            var battleFacades = serverFacades.BattleFacades;
             for (int i = 0; i < entityTypeList.Count; i++)
             {
                 var entityType = entityTypeList[i];
@@ -483,8 +409,8 @@ namespace Game.Server.Bussiness.BattleBussiness
                     rRange = lRange + igp.weight / totalWeight;
                     if (randomNumber >= lRange && randomNumber < rRange)
                     {
-                        battleServerFacades.EntityTypeList.Add(igp.entityType);
-                        battleServerFacades.SubTypeList.Add(igp.subType);
+                        serverFacades.EntityTypeList.Add(igp.entityType);
+                        serverFacades.SubTypeList.Add(igp.subType);
                         break;
                     }
                     lRange = rRange;

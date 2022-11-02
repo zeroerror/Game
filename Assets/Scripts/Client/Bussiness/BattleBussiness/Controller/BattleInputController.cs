@@ -56,7 +56,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_Move()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_Roll()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -90,7 +90,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_SwitchingView()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -106,7 +106,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_Pick()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -150,7 +150,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_Shoot()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -182,7 +182,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_Reload()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -202,7 +202,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_DropWeapon()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             var input = battleFacades.InputComponent;
@@ -216,7 +216,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void TickInput_Rotate()
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null || owner.IsDead) return;
 
             //客户端鉴权旋转角度同步
@@ -226,7 +226,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         bool WillHitOtherRole(BattleRoleLogicEntity roleEntity, Vector3 moveDir)
         {
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             var array = roleRepo.GetAll();
             for (int i = 0; i < array.Length; i++)
             {

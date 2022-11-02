@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 bulletEntity.SetBulletType(bulletType);
                 bulletEntity.IDComponent.SetEntityId(bulletEntityId);
                 bulletEntity.SetMasterEntityId(masterEntityId);
-                var master = battleFacades.Repo.RoleRepo.Get(masterEntityId);
+                var master = battleFacades.Repo.RoleLogicRepo.Get(masterEntityId);
                 bulletEntity.IDComponent.SetLeagueId(master.IDComponent.LeagueId);
                 bulletEntity.SetPosition(startPos);
                 bulletEntity.FaceTo(fireDir);
@@ -83,7 +83,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             battleFacades.Repo.BulletRepo.TryRemove(bullet);
         }
 
-        public List<BulletEntity> Tick_BulletLife(float deltaTime)
+        public List<BulletEntity> Tick_BulletLifeTime(float deltaTime)
         {
             var bulletRepo = battleFacades.Repo.BulletRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
@@ -200,7 +200,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void GrenadeExplode(GrenadeEntity grenadeEntity)
         {
             Debug.Log("爆炸");
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 // - 根据距离HitActor
@@ -252,7 +252,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {
-                var master = battleFacades.Repo.RoleRepo.Get(hooker.MasterEntityId);
+                var master = battleFacades.Repo.RoleLogicRepo.Get(hooker.MasterEntityId);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.StateComponent.SetRoleState(RoleState.Normal);

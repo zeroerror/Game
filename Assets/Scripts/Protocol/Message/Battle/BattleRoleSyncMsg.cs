@@ -18,8 +18,6 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
         public int velocityY;
         public int velocityZ;
 
-        public bool isOwner;
-
         public void FromBytes(byte[] src, ref int offset)
         {
             serverFrame = BufferReader.ReadInt32(src, ref offset);
@@ -34,7 +32,6 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             velocityX = BufferReader.ReadInt32(src, ref offset);
             velocityY = BufferReader.ReadInt32(src, ref offset);
             velocityZ = BufferReader.ReadInt32(src, ref offset);
-            isOwner = BufferReader.ReadBool(src, ref offset);
             offset += src.Length;
         }
 
@@ -54,7 +51,6 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             BufferWriter.WriteInt32(result, velocityX, ref offset);
             BufferWriter.WriteInt32(result, velocityY, ref offset);
             BufferWriter.WriteInt32(result, velocityZ, ref offset);
-            BufferWriter.WriteBool(result, isOwner, ref offset);
             return result;
         }
     }

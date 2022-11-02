@@ -1,4 +1,3 @@
-using Game.Client.Bussiness.BattleBussiness;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Server.Bussiness.BattleBussiness
@@ -16,7 +15,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick(float fixedDeltaTime)
         {
-            var roleRepo = battleFacades.BattleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.BattleFacades.Repo.RoleLogicRepo;
             var roleDomain = battleFacades.BattleFacades.Domain.RoleDomain;
             roleRepo.Foreach((role) =>
             {

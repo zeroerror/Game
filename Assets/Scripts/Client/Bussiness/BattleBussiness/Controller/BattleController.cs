@@ -105,14 +105,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 Vector3 velocity = new Vector3(velocityX, velocityY, velocityZ);
 
                 var repo = battleFacades.Repo;
-                var roleRepo = repo.RoleRepo;
+                var roleRepo = repo.RoleLogicRepo;
                 var fieldRepo = repo.FiledRepo;
-                var entityId = msg.entityId;
-                var roleLogic = battleFacades.Repo.RoleRepo.Get(entityId);
+                var entityID = msg.entityId;
+                var roleLogic = battleFacades.Repo.RoleLogicRepo.Get(entityID);
 
                 if (roleLogic == null)
                 {
-                    roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId, msg.isOwner);
+                    var roleLogicRepo = repo.RoleLogicRepo;
+                    bool isOwner = roleLogicRepo.IsOwner(entityID);
+                    roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId, isOwner);
                 }
 
                 var moveComponent = roleLogic.MoveComponent;
@@ -144,7 +146,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var entityId = msg.entityId;
                 var repo = battleFacades.Repo;
-                var roleRepo = repo.RoleRepo;
+                var roleRepo = repo.RoleLogicRepo;
                 var fieldEntity = repo.FiledRepo.CurFieldEntity;
                 var domain = battleFacades.Domain.RoleDomain;
                 domain.SpawnRoleWithRenderer(entityId, msg.isOwner);
@@ -196,7 +198,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var itemEntityId = msg.itemEntityID;
 
                 var repo = battleFacades.Repo;
-                var roleRepo = repo.RoleRepo;
+                var roleRepo = repo.RoleLogicRepo;
                 var role = roleRepo.Get(masterEntityID);
 
                 var itemDomain = battleFacades.Domain.ItemDomain;

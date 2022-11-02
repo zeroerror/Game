@@ -24,7 +24,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void ApplyRoleState(float deltaTime)
         {
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 ApplyAny(role, deltaTime);

@@ -13,6 +13,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         int autoEntityID;
         public int AutoEntityID => autoEntityID;
 
+
         public BattleRoleRendererRepo()
         {
             all = new List<BattleRoleRendererEntity>();

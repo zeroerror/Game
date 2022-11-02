@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void UpdateCameraByCameraView(Vector2 inputAxis)
         {
-            var owner = battleFacades.Repo.RoleRepo.Owner;
+            var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null) return;
 
             var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;

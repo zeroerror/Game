@@ -20,9 +20,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleRoleLogicEntity SpawnRoleWithRenderer(byte entityId, bool isOwner)
+        public BattleRoleLogicEntity SpawnRoleWithRenderer(int entityId, bool isOwner)
         {
-            var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            var repo = battleFacades.Repo;
+            var fieldEntity = repo.FiledRepo.CurFieldEntity;
             var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
 
             var roleRenderer = roleRendererDomain.SpawnRoleRenderer(entityId, fieldEntity.Role_Group_Renderer);
@@ -31,9 +32,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleLogic.Inject(roleRenderer);
 
             var fieldCameraComponent = fieldEntity.CameraComponent;
+
             if (isOwner)
             {
-                var roleRepo = battleFacades.Repo.RoleRepo;
+                var roleRepo = battleFacades.Repo.RoleLogicRepo;
                 roleRepo.SetOwner(roleLogic);
                 fieldCameraComponent.OpenThirdViewCam(roleLogic.roleRenderer);
             }
@@ -55,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 roleLogic.IDComponent.SetLeagueId(entityId);
                 Reborn(roleLogic);
 
-                var roleRepo = battleFacades.Repo.RoleRepo;
+                var roleRepo = battleFacades.Repo.RoleLogicRepo;
                 roleRepo.Add(roleLogic);
 
                 return roleLogic;
@@ -67,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void Tick_RoleRigidbody(float fixedTime)
         {
-            var roleRepo = battleFacades.Repo.RoleRepo;
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 role.MoveComponent.SimulatePhysics(fixedTime);
