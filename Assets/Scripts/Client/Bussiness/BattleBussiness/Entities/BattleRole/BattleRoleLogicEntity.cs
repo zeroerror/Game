@@ -74,11 +74,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             moveComponent.Inject(rb);
             moveComponent.SetMaximumVelocity(30f);
 
-            idComponent = new IDComponent();    // TODO: Serializable
+            idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.BattleRole);
 
             roleInputComponent = new RoleInputComponent();
-            itemComponent = new ItemComponent(); // TODO: Serializable
+
+            itemComponent = new ItemComponent();
 
             moveComponent.Reset();
             healthComponent.Reset();
@@ -96,7 +97,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool TryRoll(Vector3 dir)
         {
-            if(dir==Vector3.zero){
+            if (dir == Vector3.zero)
+            {
                 return false;
             }
 
@@ -147,20 +149,21 @@ namespace Game.Client.Bussiness.BattleBussiness
         }
 
         // - Armor
-        public void WearOrSwitchArmor(BattleArmorEntity val)
+        public void WearArmro(BattleArmorEntity v)
         {
-            armor = val;
-            val.IDComponent.SetLeagueId(idComponent.LeagueId);
-        }
-
-        public void DropArmor()
-        {
-            if (armor == null)
+            if (HasArmor())
             {
                 return;
             }
 
-            armor = null;
+            var idc = v.IDComponent;
+            idc.SetLeagueId(idComponent.LeagueId);
+            armor = v;
+        }
+
+        public bool HasArmor()
+        {
+            return armor != null;
         }
 
         public int TryReceiveDamage(int damage)
@@ -168,7 +171,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             int armorReceiveDamage = 0;
 
             // - Armor
-            if (armor != null)
+            if (HasArmor())
             {
                 armorReceiveDamage = armor.TryRecieveDamage(damage);
                 if (armorReceiveDamage == damage)

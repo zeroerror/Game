@@ -1,31 +1,28 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Client.Bussiness.BattleBussiness.Interface;
+using Game.Library;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BattleArmorItemEntity : MonoBehaviour, IPickable
+    public class BattleArmorEvolveItemEntity : MonoBehaviour, IPickable
     {
+
         // == Component
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
 
-        [SerializeField]
-        GameObject armorPrefab;
-        public string GetArmorPrefabName() => armorPrefab.name;
+        public EvolveTM evolveTM;
 
         EntityType IPickable.EntityType => idComponent.EntityType;
-        int IPickable.EntityID => idComponent.EntityID;
 
-        Rigidbody rb;
+        int IPickable.EntityID => idComponent.EntityID;
 
         public void Ctor()
         {
-            rb = GetComponentInChildren<Rigidbody>();
-
             idComponent = new IDComponent();
-            idComponent.SetEntityType(EntityType.ArmorItem);
+            idComponent.SetEntityType(EntityType.ArmorEvolveItem);
         }
 
     }

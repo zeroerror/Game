@@ -1,5 +1,6 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Library;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -9,10 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         // == Component
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
-
-        [SerializeField]
-        ArmorType armorType;
-        public ArmorType ArmorType => armorType;
 
         [SerializeField]
         int maxHealth;
@@ -30,9 +27,25 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.Armor);
-            idComponent.SetSubType((byte)armorType);
 
             curHealth = maxHealth;
+        }
+
+        public void Reset()
+        {
+            idComponent.SetLeagueId(-1);
+            curHealth = maxHealth;
+        }
+
+        public void EvolveFrom(in EvolveTM evolveTM)
+        {
+            var addHealth = evolveTM.addHealth;
+            var addSpeed = evolveTM.addSpeed;
+            var addDamageCoefficient = evolveTM.addDamageCoefficient;
+            maxHealth += addHealth;
+            curHealth += addHealth;
+            curHealth = curHealth > maxHealth ? maxHealth : curHealth;
+            Debug.Log($"进化护甲 addHealth {addHealth} addSpeed {addSpeed} addDamageCoefficient {addDamageCoefficient} ");
         }
 
         public int TryRecieveDamage(int damage)
@@ -49,12 +62,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             curHealth = 0;
 
             return realDamage;
-        }
-
-        public void Reset()
-        {
-            idComponent.SetLeagueId(-1);
-            curHealth = maxHealth;
         }
 
     }

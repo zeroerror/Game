@@ -3,6 +3,7 @@ using UnityEngine;
 using Game.Protocol.Battle;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -10,11 +11,11 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleWeaponController
     {
 
-        BattleServerFacades battleFacades;
+        BattleServerFacades serverFacades;
 
         // NetWorkd Info
-        public int ServeFrame => battleFacades.Network.ServeFrame;
-        List<int> ConnIdList => battleFacades.Network.connIdList;
+        public int ServeFrame => serverFacades.Network.ServeFrame;
+        List<int> ConnIdList => serverFacades.Network.connIdList;
 
         // 记录所有武器射击帧
         Dictionary<long, FrameWeaponShootReqMsg> weaponShootMsgDic;
@@ -34,7 +35,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Inject(BattleServerFacades battleFacades)
         {
-            this.battleFacades = battleFacades;
+            this.serverFacades = battleFacades;
 
             var weaponRqs = battleFacades.Network.WeaponReqAndRes;
             weaponRqs.RegistReq_WeaponShoot(OnWeaponShoot);
@@ -49,7 +50,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             Tick_ReloadingFrame();
             Tick_WeaponDrop();
 
-            var allRole = battleFacades.BattleFacades.Repo.RoleLogicRepo;
+            var allRole = serverFacades.BattleFacades.Repo.RoleLogicRepo;
             allRole.Foreach((role) =>
             {
                 var WeaponComponent = role.WeaponComponent;
@@ -72,12 +73,12 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (weaponShootMsgDic.TryGetValue(key, out var msg))
                 {
-                    var clientFacades = battleFacades.BattleFacades;
-                    var weaponRepo = clientFacades.Repo.WeaponRepo;
-                    var roleRepo = clientFacades.Repo.RoleLogicRepo;
+                    var battleFacades = serverFacades.BattleFacades;
+                    var weaponRepo = battleFacades.Repo.WeaponRepo;
+                    var roleRepo = battleFacades.Repo.RoleLogicRepo;
 
-                    var weaponRqs = battleFacades.Network.WeaponReqAndRes;
-                    var bulletRqs = battleFacades.Network.BulletReqAndRes;
+                    var weaponRqs = serverFacades.Network.WeaponReqAndRes;
+                    var bulletRqs = serverFacades.Network.BulletReqAndRes;
 
                     var masterId = msg.masterId;
                     var firePointPosX = msg.firePointPosX;
@@ -98,9 +99,11 @@ namespace Game.Server.Bussiness.BattleBussiness
                             master.StateComponent.EnterShooting(curWeapon.FreezeMaintainFrame, curWeapon.BreakFrame);
 
                             var bulletType = curWeapon.bulletType;
-                            var bulletEntityId = clientFacades.Repo.BulletRepo.AutoEntityID;
+                            // - 获取资源ID
+                            var idService = battleFacades.IDService;
+                            var bulletEntityId = idService.GetAutoIDByEntityType(EntityType.Bullet);
                             var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
-                            var bulletEntity = clientFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, bulletEntityId, masterId, startPos, fireDir);
+                            var bulletEntity = battleFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, bulletEntityId, masterId, startPos, fireDir);
 
                             ConnIdList.ForEach((connId) =>
                             {
@@ -124,8 +127,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (weaponReloadMsgDic.TryGetValue(key, out var msg))
                 {
-                    var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.BattleFacades.Repo.RoleLogicRepo;
+                    var weaponRepo = serverFacades.BattleFacades.Repo.WeaponRepo;
+                    var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
                     var masterId = msg.masterId;
 
                     if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
@@ -138,8 +141,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_ReloadingFrame()
         {
-            var allRole = battleFacades.BattleFacades.Repo.RoleLogicRepo;
-            var rqs = battleFacades.Network.WeaponReqAndRes;
+            var allRole = serverFacades.BattleFacades.Repo.RoleLogicRepo;
+            var rqs = serverFacades.Network.WeaponReqAndRes;
             allRole.Foreach((role) =>
             {
                 if (role.WeaponComponent.IsReloading)
@@ -170,15 +173,15 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (weaponDropMsgDic.TryGetValue(key, out var msg))
                 {
-                    var weaponRepo = battleFacades.BattleFacades.Repo.WeaponRepo;
-                    var roleRepo = battleFacades.BattleFacades.Repo.RoleLogicRepo;
-                    var rqs = battleFacades.Network.WeaponReqAndRes;
+                    var weaponRepo = serverFacades.BattleFacades.Repo.WeaponRepo;
+                    var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
+                    var rqs = serverFacades.Network.WeaponReqAndRes;
                     var entityId = msg.entityId;
                     var masterId = msg.masterId;
                     if (roleRepo.TryGetByEntityId(masterId, out var master)
                         && master.WeaponComponent.TryDropWeapon(entityId, out var weapon))
                     {
-                        var itemDomain = battleFacades.BattleFacades.Domain.ItemDomain;
+                        var itemDomain = serverFacades.BattleFacades.Domain.ItemDomain;
                         itemDomain.DropWeaponToItem(weapon);
 
                         ConnIdList.ForEach((connId) =>

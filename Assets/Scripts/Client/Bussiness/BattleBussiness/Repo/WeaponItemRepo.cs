@@ -9,7 +9,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<WeaponItemEntity> weaponItemList;
-        public ushort AutoIncreaseID { get; private set; }
 
         public WeaponItemRepo()
         {
@@ -35,7 +34,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public void Add(WeaponItemEntity entity)
         {
             weaponItemList.Add(entity);
-            AutoIncreaseID++;
         }
 
         public void Foreach(Action<WeaponItemEntity> action)

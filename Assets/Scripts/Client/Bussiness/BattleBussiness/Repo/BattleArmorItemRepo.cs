@@ -9,12 +9,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<BattleArmorItemEntity> all;
-        ushort autoIncreaseId;
-        public ushort AutoIncreaseID => autoIncreaseId;
 
         public BattleArmorItemRepo()
         {
             all = new List<BattleArmorItemEntity>();
+        }
+
+
+        public void Add(BattleArmorItemEntity entity)
+        {
+            Debug.Log($"添加护甲ITEM [entityId:{entity.IDComponent.EntityID}]");
+            all.Add(entity);
+        }
+        
+        public bool TryRemove(BattleArmorItemEntity entity)
+        {
+            Debug.Log($"移除护甲ITEM {entity.IDComponent.EntityID}");
+            return all.Remove(entity);
         }
 
         public bool TryGet(ushort entityId, out BattleArmorItemEntity entity)
@@ -24,22 +35,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return entity != null;
         }
 
-        public bool TryRemove(BattleArmorItemEntity entity)
-        {
-            Debug.Log($"移除护甲ITEM {entity.IDComponent.EntityID}");
-            return all.Remove(entity);
-        }
-
         public BattleArmorItemEntity[] GetAll()
         {
             return all.ToArray();
-        }
-
-        public void Add(BattleArmorItemEntity entity)
-        {
-            Debug.Log($"添加护甲ITEM [entityId:{entity.IDComponent.EntityID}]");
-            all.Add(entity);
-            autoIncreaseId++;
         }
 
         public void Foreach(Action<BattleArmorItemEntity> action)

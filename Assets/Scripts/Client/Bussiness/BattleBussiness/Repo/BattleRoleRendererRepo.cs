@@ -10,10 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         List<BattleRoleRendererEntity> all;
 
-        int autoEntityID;
-        public int AutoEntityID => autoEntityID;
-
-
         public BattleRoleRendererRepo()
         {
             all = new List<BattleRoleRendererEntity>();
@@ -32,7 +28,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public void Add(BattleRoleRendererEntity entity)
         {
             all.Add(entity);
-            autoEntityID++;
         }
 
         public bool TryRemove(BattleRoleRendererEntity entity)

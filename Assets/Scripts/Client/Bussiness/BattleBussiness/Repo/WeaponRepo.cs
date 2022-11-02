@@ -10,7 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         List<WeaponEntity> weaponList;
         public ushort WeaponCount => (ushort)weaponList.Count;
-        public ushort AutoIncreaseID { get; private set; }
 
         public WeaponRepo()
         {
@@ -50,10 +49,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         {
             Debug.Log($"武器资源添加 [entityId:{entity.IDComponent.EntityID}]");
             weaponList.Add(entity);
-            AutoIncreaseID++;
         }
-
-
 
         public void Foreach(Action<WeaponEntity> action)
         {

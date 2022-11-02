@@ -226,4 +226,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f177a123cf466664b9480e1c79ddf73d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  armorType: 3
+  strengthenTM: {fileID: 11400000, guid: b3c86d85f61c36945864ce0ec2a06857, type: 2}

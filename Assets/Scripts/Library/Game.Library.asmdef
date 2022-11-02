@@ -1,0 +1,16 @@
+{
+    "name": "Game.Library",
+    "rootNamespace": "",
+    "references": [
+        "GUID:aca395109ad97fd43aa40683dee65616"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

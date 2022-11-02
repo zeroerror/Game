@@ -19,10 +19,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleArmorEntity SpawnArmor(ArmorType armorType, int entityID)
+        public BattleArmorEntity SpawnArmor(string prefabName, int entityID)
         {
-            string prefabName = $"Armor_{armorType.ToString()}";
-
             var asset = battleFacades.Assets.ArmorAsset;
             if (asset.TryGetByName(prefabName, out var prefab))
             {

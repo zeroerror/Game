@@ -10,7 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         List<BulletItemEntity> bulletPackList;
         public ushort BulletPackCount => (ushort)bulletPackList.Count;
-        public ushort AutoIncreaseID;
 
         public BulletItemRepo()
         {

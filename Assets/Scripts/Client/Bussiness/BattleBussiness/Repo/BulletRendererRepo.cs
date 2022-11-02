@@ -10,9 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         List<BulletRendererEntity> all;
 
-        int autoEntityID;
-        public int AutoEntityID => autoEntityID;
-
         public BulletRendererRepo()
         {
             all = new List<BulletRendererEntity>();
@@ -31,7 +28,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public void Add(BulletRendererEntity entity)
         {
             all.Add(entity);
-            autoEntityID++;
         }
 
         public bool TryRemove(BulletRendererEntity entity)

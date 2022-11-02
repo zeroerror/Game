@@ -9,8 +9,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<BattleArmorEntity> all;
-        ushort autoIncreaseId;
-        public ushort AutoIncreaseID => autoIncreaseId;
 
         public BattleArmorRepo()
         {
@@ -39,7 +37,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         {
             Debug.Log($"添加护甲 [entityId:{entity.IDComponent.EntityID}]");
             all.Add(entity);
-            autoIncreaseId++;
         }
 
         public void Foreach(Action<BattleArmorEntity> action)

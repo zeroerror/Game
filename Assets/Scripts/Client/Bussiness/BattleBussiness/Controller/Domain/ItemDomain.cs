@@ -65,6 +65,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var armorItem = entityGo.GetComponent<BattleArmorItemEntity>();
                 armorItem.Ctor();
+                armorItem.IDComponent.SetEntityId(entityID);
 
                 var repo = battleFacades.Repo;
                 var armorItemRepo = repo.ArmorItemRepo;
@@ -117,13 +118,33 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 if (armorItemRepo.TryGet(entityID, out var armorItem))
                 {
                     var armorDomain = battleFacades.Domain.ArmorDomain;
-                    var armor = armorDomain.SpawnArmor(armorItem.ArmorType, entityID);
+                    var armor = armorDomain.SpawnArmor(armorItem.GetArmorPrefabName(), entityID);
 
-                    master.WearOrSwitchArmor(armor);
+                    master.WearArmro(armor);
 
                     var armorItemDomain = battleFacades.Domain.ArmorItemDomain;
                     armorItemDomain.TearDownWeaponItem(armorItem);
                     return true;
+                }
+            }
+
+            if (entityType == EntityType.ArmorEvolveItem)
+            {
+                var armorEvolveItemRepo = repo.ArmorEvolveItemRepo;
+                if (armorEvolveItemRepo.TryGet(entityID, out var armorEvolveItem))
+                {
+                    var armorDomain = battleFacades.Domain.ArmorDomain;
+
+                    if (master.HasArmor())
+                    {
+                        var evolveTM = armorEvolveItem.evolveTM;
+                        var armor = master.Armor;
+                        armor.EvolveFrom(evolveTM);
+
+                        var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                        armorEvolveItemDomain.TearDownArmorEvolveItem(armorEvolveItem);
+                        return true;
+                    }
                 }
             }
 
