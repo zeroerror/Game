@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 2679718073387019245}
   - component: {fileID: 7604512745281635994}
   m_Layer: 9
-  m_Name: Item_Evolve_1000
+  m_Name: Item_Evolve_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

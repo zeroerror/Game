@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 currentCam.AddEulerAngleX(-inputAxis.y);
                 currentCam.AddEulerAngleY(inputAxis.x);
-                owner.MoveComponent.SetEulerAngleY(currentCam.EulerAngles);
+                owner.LocomotionComponent.SetEulerAngleY(currentCam.EulerAngles);
             }
 
             roleRenderer.SetCamTrackingPos(trackPos);
@@ -87,7 +87,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                     break;
                 case CameraView.ThirdView:
-                    var roleTrans = roleLogicEntity.MoveComponent.Position;
+                    var roleTrans = roleLogicEntity.LocomotionComponent.Position;
                     var forward = roleLogicEntity.transform.forward;
                     var pos = roleLogicEntity.transform.position + forward * 10f;
                     return pos;

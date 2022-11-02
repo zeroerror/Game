@@ -1,4 +1,5 @@
 using UnityEngine;
+using Game.Library;
 using Game.Generic;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Client.Bussiness.BattleBussiness.Interface;
@@ -20,8 +21,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public RoleInputComponent InputComponent => roleInputComponent;
 
         [SerializeField]
-        LocomotionComponent moveComponent;
-        public LocomotionComponent MoveComponent => moveComponent;
+        LocomotionComponent locomotionComponent;
+        public LocomotionComponent LocomotionComponent => locomotionComponent;
 
         [SerializeField]
         HealthComponent healthComponent;
@@ -71,8 +72,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             // == Component
             var rb = transform.GetComponentInParent<Rigidbody>();
-            moveComponent.Inject(rb);
-            moveComponent.SetMaximumVelocity(30f);
+            locomotionComponent.Inject(rb);
+            locomotionComponent.SetMaximumVelocity(30f);
 
             idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.BattleRole);
@@ -81,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             itemComponent = new ItemComponent();
 
-            moveComponent.Reset();
+            locomotionComponent.Reset();
             healthComponent.Reset();
             weaponComponent.Reset();
             stateComponent.Reset();
@@ -102,7 +103,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return false;
             }
 
-            var mc = moveComponent;
+            var mc = locomotionComponent;
             if (!mc.IsGrounded)
             {
                 return false;
@@ -120,7 +121,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void JumpboardSpeedUp()
         {
-            var mc = moveComponent;
+            var mc = locomotionComponent;
             var addVelocity = mc.Velocity * 4f;
             addVelocity = new Vector3(addVelocity.x, 4f, addVelocity.z);
             mc.AddExtraVelocity(addVelocity);
@@ -139,13 +140,28 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             Debug.Log($" ENTITYID:{idComponent.EntityID} 重生----------------------------------");
 
-            var mc = moveComponent;
+            var mc = locomotionComponent;
             mc.SetPosition(pos);
             mc.Reset();
 
             healthComponent.Reset();
 
             isDead = false;
+        }
+
+        public void EvolveFrom(EvolveTM evolveTM)
+        {
+            // - Health
+            var hc = healthComponent;
+            hc.AddCurHealth(evolveTM.addHealth);
+
+            // - Locomotion
+            var lc = LocomotionComponent;
+            lc.AddBasicMoveSpeed(evolveTM.addSpeed);
+
+            // - WeaponComponent
+            var wc = weaponComponent;
+            wc.AddDamageCoefficient(evolveTM.addDamageCoefficient);
         }
 
         // - Armor
@@ -161,14 +177,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             armor = v;
         }
 
-        public bool HasArmor()
+        public float TryReceiveDamage(float damage)
         {
-            return armor != null;
-        }
-
-        public int TryReceiveDamage(int damage)
-        {
-            int armorReceiveDamage = 0;
+            float armorReceiveDamage = 0;
 
             // - Armor
             if (HasArmor())
@@ -190,6 +201,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         }
 
         #endregion
+
+        public bool HasArmor()
+        {
+            return armor != null;
+        }
 
         public bool CanWeaponShoot()
         {

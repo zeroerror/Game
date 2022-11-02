@@ -49,11 +49,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 // - Damage
                 var domain = battleFacades.Domain.RoleDomain;
-                int damage = domain.TryReceiveDamage(role, hitPowerModel.damage);
+                float damage = domain.TryReceiveDamage(role, hitPowerModel.damage);
                 arbitService.AddHitRecord(attackerIDC, victimIDC, damage);
                 // - Physics
                 var addV = bullet.LocomotionComponent.Velocity * hitPowerModel.hitVelocityCoefficient;
-                role.MoveComponent.AddExtraVelocity(addV);
+                role.LocomotionComponent.AddExtraVelocity(addV);
             }
 
             // - State

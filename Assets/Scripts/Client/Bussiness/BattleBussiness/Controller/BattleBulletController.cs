@@ -100,7 +100,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var domain = battleFacades.Domain;
                 var roleDomain = domain.RoleDomain;
                 var hitPowerModel = bullet.HitPowerModel;
-                int realDamage = roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
+                float realDamage = roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
 
                 var rendererDoamin = domain.RoleRendererDomain;
                 rendererDoamin.HUD_ShowDamageText(role, realDamage);

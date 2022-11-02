@@ -204,10 +204,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 // - 根据距离HitActor
-                var dis = Vector3.Distance(role.MoveComponent.Position, grenadeEntity.LocomotionComponent.Position);
+                var dis = Vector3.Distance(role.LocomotionComponent.Position, grenadeEntity.LocomotionComponent.Position);
                 if (dis < grenadeEntity.ExplosionRadius)
                 {
-                    var dir = role.MoveComponent.Position - grenadeEntity.LocomotionComponent.Position;
+                    var dir = role.LocomotionComponent.Position - grenadeEntity.LocomotionComponent.Position;
 
                     HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
@@ -218,7 +218,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                         roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
 
                         var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient + new Vector3(0, 2f, 0);
-                        role.MoveComponent.AddExtraVelocity(hitVelocity);
+                        role.LocomotionComponent.AddExtraVelocity(hitVelocity);
                     }
                 }
             });
@@ -259,7 +259,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     return;
                 }
 
-                var masterMC = master.MoveComponent;
+                var masterMC = master.LocomotionComponent;
                 var hookerEntityMC = hooker.LocomotionComponent;
                 var dir = hookerEntityMC.Position - masterMC.Position;
                 var dis = Vector3.Distance(hookerEntityMC.Position, masterMC.Position);

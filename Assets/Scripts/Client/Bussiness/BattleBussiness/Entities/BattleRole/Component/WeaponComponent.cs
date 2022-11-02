@@ -15,6 +15,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
         public int CurrentNum { get; private set; }    //当前武器数量
 
+        float damageCoefficient;
+        public float DamageCoefficient => damageCoefficient;
+
         public bool isReloading;
         public bool IsReloading => isReloading;
 
@@ -179,6 +182,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             return null;
+        }
+
+        public void AddDamageCoefficient(float v)
+        {
+            damageCoefficient += v;
         }
 
     }

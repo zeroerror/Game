@@ -66,7 +66,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var cameraView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
                 Vector3 moveDir = battleFacades.Domain.InputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
-                owner.MoveComponent.FaceTo(moveDir);
+                owner.LocomotionComponent.FaceTo(moveDir);
 
                 if (!WillHitOtherRole(owner, moveDir))
                 {
@@ -118,7 +118,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 float closestDis = float.MaxValue;
                 GameObject closestGo = null;
                 IPickable pick = null;
-                Vector3 ownerPos = owner.MoveComponent.Position;
+                Vector3 ownerPos = owner.LocomotionComponent.Position;
 
                 nearItemList.ForEach((item) =>
                 {
@@ -172,7 +172,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 {
                     var faceDir = new Vector3(input.fireDir.x, 0, input.fireDir.y);
                     owner.transform.forward = faceDir;
-                    owner.MoveComponent.FaceTo(faceDir);
+                    owner.LocomotionComponent.FaceTo(faceDir);
                 }
 
                 var rqs = battleFacades.Network.WeaponReqAndRes;
@@ -233,8 +233,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var r = array[i];
                 if (r.IDComponent.EntityID == roleEntity.IDComponent.EntityID) continue;
 
-                var pos1 = r.MoveComponent.Position;
-                var pos2 = roleEntity.MoveComponent.Position;
+                var pos1 = r.LocomotionComponent.Position;
+                var pos2 = roleEntity.LocomotionComponent.Position;
                 if (Vector3.Distance(pos1, pos2) < 1f)
                 {
                     var betweenV = pos1 - pos2;

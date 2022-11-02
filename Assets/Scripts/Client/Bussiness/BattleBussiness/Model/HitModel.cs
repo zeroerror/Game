@@ -7,7 +7,7 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
         public IDComponent attackerIDC;
         public IDComponent victimIDC;
-        public int damage;
+        public float damage;
     }
 
 }

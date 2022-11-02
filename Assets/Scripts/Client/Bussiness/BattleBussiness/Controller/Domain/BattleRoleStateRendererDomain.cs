@@ -39,7 +39,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         void ApplyAny(BattleRoleLogicEntity role, float deltaTime)
         {
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             var roleRenderer = role.roleRenderer;
 
             bool isPosChange = !roleRenderer.transform.position.MostEquals(moveComponent.Position);
@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return;
             }
 
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             var weaponComponent = role.WeaponComponent;
             var roleRenderer = role.roleRenderer;
             var animatorComponent = roleRenderer.AnimatorComponent;

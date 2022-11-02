@@ -56,7 +56,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             return true;
         }
 
-        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC,int damage)
+        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC,float damage)
         {
             HitModel hitModel = new HitModel();
             hitModel.attackerIDC =attackerIDC;

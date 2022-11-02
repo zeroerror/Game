@@ -13,10 +13,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int bulletItemAutoID;
         public int armorAutoID;
         public int armorItemAutoID;
-        public int armorEvolveItemAutoID;
         public int weaponAutoID;
         public int weaponItemAutoID;
-
+        public int evolveItemAutoID;
+        
         public IDService()
         {
         }
@@ -51,9 +51,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 return ++armorItemAutoID;
             }
-            if (entityType == EntityType.ArmorEvolveItem)
+            if (entityType == EntityType.EvolveItem)
             {
-                return ++armorEvolveItemAutoID;
+                return ++evolveItemAutoID;
             }
 
             Debug.LogWarning("未处理情况");

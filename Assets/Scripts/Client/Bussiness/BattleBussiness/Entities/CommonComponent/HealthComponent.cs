@@ -12,15 +12,15 @@ namespace Game.Client.Bussiness.BattleBussiness
         [SerializeField] int maxHealth;
         public int MaxHealth => maxHealth;
 
-        int curHealth;
-        public int CurHealth => curHealth;
-        public int SetCurHealth(int v) => curHealth = v;
+        float curHealth;
+        public float CurHealth => curHealth;
+        public void SetCurHealth(float v) => curHealth = v > maxHealth ? maxHealth : v;
 
         public bool CheckIsDead() => curHealth <= 0;
 
-        public int TryReiveDamage(int damage)
+        public float TryReiveDamage(float damage)
         {
-            int realDamage = 0;
+            float realDamage = 0;
             if (curHealth >= damage)
             {
                 realDamage = damage;
@@ -32,6 +32,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             curHealth = 0;
 
             return realDamage;
+        }
+
+        public void AddCurHealth(float v)
+        {
+            curHealth += v;
+            curHealth = curHealth > maxHealth ? maxHealth : curHealth;
         }
 
         public void Reset()

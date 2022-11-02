@@ -51,7 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleDomain = battleFacades.Domain.RoleDomain;
 
             // Locomotion
-            role.MoveComponent.ApplyMoveVelocity(inputComponent.MoveDir);
+            role.LocomotionComponent.ApplyMoveVelocity(inputComponent.MoveDir);
 
         }
 
@@ -82,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             moveComponent.SetRotation(inputComponent.FaceDir);
 
         }
@@ -108,7 +108,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.isFirstEnter = false;
             }
 
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             moveComponent.SetMoveVelocity(Vector3.zero);
 
             var inputComponent = role.InputComponent;
@@ -138,7 +138,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             // Locomotion
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             moveComponent.SetMoveVelocity(moveComponent.MoveVelocity * 0.7f);
             var inputComponent = role.InputComponent;
             moveComponent.SetRotation(inputComponent.FaceDir);
@@ -167,7 +167,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             // Locomotion
             var roleDomain = battleFacades.Domain.RoleDomain;
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             moveComponent.SetMoveVelocity(moveComponent.MoveVelocity * 0.7f);
 
             var inputComponent = role.InputComponent;
@@ -196,7 +196,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             }
 
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             moveComponent.ApplyMoveVelocity(moveComponent.MoveVelocity * 0.7f);
         }
 
@@ -247,7 +247,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             }
 
-            var moveComponent = role.MoveComponent;
+            var moveComponent = role.LocomotionComponent;
             moveComponent.SetMoveVelocity(Vector3.zero);
         }
 

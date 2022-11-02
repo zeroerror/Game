@@ -89,6 +89,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region [速度]
 
+        public void AddBasicMoveSpeed(int v)
+        {
+            basicMoveSpeed += v;
+        }
+
         public void ApplyMoveVelocity(Vector3 dir)
         {
             dir.Normalize();

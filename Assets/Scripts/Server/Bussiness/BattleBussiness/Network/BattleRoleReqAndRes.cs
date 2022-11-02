@@ -46,7 +46,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public void SendUpdate_RoleState(int connId, BattleRoleLogicEntity role)
         {
             // Position
-            var pos = role.MoveComponent.Position;
+            var pos = role.LocomotionComponent.Position;
             int x = (int)(pos.x * 10000);
             int y = (int)(pos.y * 10000);
             int z = (int)(pos.z * 10000);
@@ -59,7 +59,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             int rotZ = (int)(eulerAngle.z * 10000);
 
             // Velocity
-            var velocity = role.MoveComponent.Velocity;
+            var velocity = role.LocomotionComponent.Velocity;
             int velocityX = (int)(velocity.x * 10000);
             int velocityY = (int)(velocity.y * 10000);
             int velocityZ = (int)(velocity.z * 10000);

@@ -37,12 +37,17 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetLifeTime(float lifeTime) => this.lifeTime = lifeTime;
         public void ReduceLifeTime(float time) => this.lifeTime -= time;
 
+        // Damage Coefficient
+        float damageCoefficient;
+
         float existTime;
         public float ExistTime => existTime;
         public void AddExistTime(float time) => existTime += time;
 
         public void Ctor()
         {
+            damageCoefficient = 1f;
+
             idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.Bullet);
 
@@ -68,6 +73,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             locomotionComponent.FaceTo(forward);
             transform.rotation = locomotionComponent.RB.rotation;
+        }
+
+        public void SetDamageByCoefficient(float coefficient)
+        {
+            hitPowerModel.damage *= coefficient;
         }
 
     }

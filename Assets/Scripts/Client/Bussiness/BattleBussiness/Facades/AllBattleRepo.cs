@@ -17,7 +17,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleArmorRepo ArmorRepo { get; private set; }
         public BattleArmorItemRepo ArmorItemRepo { get; private set; }
-        public BattleArmorEvolveItemRepo ArmorEvolveItemRepo { get; private set; }
+        public BattleEvolveItemRepo EvolveItemRepo { get; private set; }
         public BulletRepo BulletRepo { get; private set; }
         public BulletRendererRepo BulletRendererRepo { get; private set; }
         public BulletItemRepo BulletItemRepo { get; private set; }
@@ -36,11 +36,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             ArmorRepo = new BattleArmorRepo();
             ArmorItemRepo = new BattleArmorItemRepo();
-            ArmorEvolveItemRepo = new BattleArmorEvolveItemRepo();
 
             BulletRepo = new BulletRepo();
             BulletRendererRepo = new BulletRendererRepo();
             BulletItemRepo = new BulletItemRepo();
+
+            EvolveItemRepo = new BattleEvolveItemRepo();
         }
 
     }

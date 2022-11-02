@@ -128,29 +128,47 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 }
             }
 
-            if (entityType == EntityType.ArmorEvolveItem)
+            if (entityType == EntityType.EvolveItem)
             {
-                var armorEvolveItemRepo = repo.ArmorEvolveItemRepo;
-                if (armorEvolveItemRepo.TryGet(entityID, out var armorEvolveItem))
+                var evolveItemRepo = repo.EvolveItemRepo;
+                if (evolveItemRepo.TryGet(entityID, out var evolveItem))
                 {
                     var armorDomain = battleFacades.Domain.ArmorDomain;
 
-                    if (master.HasArmor())
-                    {
-                        var evolveTM = armorEvolveItem.evolveTM;
-                        var armor = master.Armor;
-                        armor.EvolveFrom(evolveTM);
+                    var evolveType = evolveItem.evolveEntityType;
 
-                        var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                        armorEvolveItemDomain.TearDownArmorEvolveItem(armorEvolveItem);
-                        return true;
+                    if (evolveType == EntityType.Armor)
+                    {
+                        if (master.HasArmor())
+                        {
+                            var evolveTM = evolveItem.evolveTM;
+                            var armor = master.Armor;
+                            armor.EvolveFrom(evolveTM);
+
+                            var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                            armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                            return true;
+                        }
                     }
+
+                    if (evolveType == EntityType.BattleRole)
+                    {
+                            var evolveTM = evolveItem.evolveTM;
+                            master.EvolveFrom(evolveTM);
+
+                            var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                            armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                            return true;
+                    }
+
                 }
             }
 
             Debug.LogError("尚未处理的情况");
             return false;
         }
+
+        #region [Weapon]
 
         public void PickItemToWeapon(ushort entityID, Transform hangPoint, BattleRoleLogicEntity master, WeaponItemEntity weaponItem)
         {
@@ -178,25 +196,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             weaponDomain.TearDownWeapon(weapon);
         }
 
+        #endregion
+
         string GetPrefabName(EntityType entityType, byte sortType)
         {
-            string prefabName = null;
-            switch (entityType)
+            if (entityType == EntityType.WeaponItem)
             {
-                case EntityType.WeaponItem:
-                    prefabName = $"Item_Weapon_{((WeaponType)sortType).ToString()}";
-                    break;
-                case EntityType.BulletItem:
-                    prefabName = $"Item_Bullet_{((BulletType)sortType).ToString()}";
-                    break;
-                case EntityType.ArmorItem:
-                    prefabName = $"Item_Armor_{((ArmorType)sortType).ToString()}";
-                    break;
-
+                return $"Item_Weapon_{((WeaponType)sortType).ToString()}";
+            }
+            if (entityType == EntityType.BulletItem)
+            {
+                return $"Item_Bullet_{((BulletType)sortType).ToString()}";
+            }
+            if (entityType == EntityType.ArmorItem)
+            {
+                return $"Item_Armor_{((ArmorType)sortType).ToString()}";
+            }
+            if (entityType == EntityType.EvolveItem)
+            {
+                return $"Item_Evolve_{sortType.ToString()}";
             }
 
-            Debug.Log($"Prefab Name:{prefabName}  entityType {entityType.ToString()}");
-            return prefabName;
+            return null;
         }
 
     }

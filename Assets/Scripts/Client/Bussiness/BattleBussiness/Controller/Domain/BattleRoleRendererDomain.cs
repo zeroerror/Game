@@ -30,7 +30,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             roleRepo.Foreach((role) =>
             {
                 var roleRenderer = role.roleRenderer;
-                var moveComponent = role.MoveComponent;
+                var moveComponent = role.LocomotionComponent;
                 roleRenderer.transform.position = Vector3.Lerp(roleRenderer.transform.position, moveComponent.Position, deltaTime * roleRenderer.posAdjust);
                 roleRenderer.transform.rotation = Quaternion.Lerp(roleRenderer.transform.rotation, moveComponent.Rotation, deltaTime * roleRenderer.rotAdjust);
             });
@@ -95,7 +95,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void HUD_ShowDamageText(BattleRoleLogicEntity role, int damage)
+        public void HUD_ShowDamageText(BattleRoleLogicEntity role, float damage)
         {
             var roleRenderer = role.roleRenderer;
             var textTF = roleRenderer.GetDamageTextTF();

@@ -72,7 +72,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
-                role.MoveComponent.SimulatePhysics(fixedTime);
+                role.LocomotionComponent.SimulatePhysics(fixedTime);
             });
         }
 
@@ -86,7 +86,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
         }
 
-        public int TryReceiveDamage(BattleRoleLogicEntity role, int damage)
+        public float TryReceiveDamage(BattleRoleLogicEntity role, float damage)
         {
             return role.TryReceiveDamage(damage);
         }

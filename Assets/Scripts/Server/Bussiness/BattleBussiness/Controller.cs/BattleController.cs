@@ -137,7 +137,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     // 服务器逻辑
                     var roleEntity = battleFacades.Domain.RoleDomain.SpawnRoleLogic(entityId);
                     roleEntity.SetConnId(connId);
-                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{entityId} 位置:{roleEntity.MoveComponent.Position}");
+                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServeFrame} wRid:{entityId} 位置:{roleEntity.LocomotionComponent.Position}");
 
                     var itemRqs = serverFacades.Network.ItemReqAndRes;
                     itemRqs.SendRes_ItemSpawn(connId, ServeFrame, serverFacades.ItemTypeByteList, serverFacades.SubTypeList, serverFacades.EntityIDList);

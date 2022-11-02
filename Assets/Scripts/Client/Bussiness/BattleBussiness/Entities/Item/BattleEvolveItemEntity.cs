@@ -6,13 +6,14 @@ using Game.Library;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BattleArmorEvolveItemEntity : MonoBehaviour, IPickable
+    public class BattleEvolveItemEntity : MonoBehaviour, IPickable
     {
 
         // == Component
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
 
+        public EntityType evolveEntityType;
         public EvolveTM evolveTM;
 
         EntityType IPickable.EntityType => idComponent.EntityType;
@@ -22,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void Ctor()
         {
             idComponent = new IDComponent();
-            idComponent.SetEntityType(EntityType.ArmorEvolveItem);
+            idComponent.SetEntityType(EntityType.EvolveItem);
         }
 
     }

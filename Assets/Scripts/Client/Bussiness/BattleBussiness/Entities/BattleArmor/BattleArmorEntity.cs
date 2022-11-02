@@ -15,9 +15,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         int maxHealth;
         public int MaxHealth => maxHealth;
 
-        int curHealth;
-        public int CurHealth => curHealth;
-        public void SetCurHealth(int v) => curHealth = v;
+        float curHealth;
+        public float CurHealth => curHealth;
+        public void SetCurHealth(float v) => curHealth = v;
 
         Rigidbody rb;
 
@@ -48,9 +48,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             Debug.Log($"进化护甲 addHealth {addHealth} addSpeed {addSpeed} addDamageCoefficient {addDamageCoefficient} ");
         }
 
-        public int TryRecieveDamage(int damage)
+        public float TryRecieveDamage(float damage)
         {
-            int realDamage = 0;
+            float realDamage = 0;
             if (curHealth >= damage)
             {
                 realDamage = damage;

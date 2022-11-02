@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
         WeaponItem,
         Armor,
         ArmorItem,
-        ArmorEvolveItem,
+        EvolveItem,
     }
 
 }

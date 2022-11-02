@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
-                PhysicsEntityHitField(role, role.MoveComponent);
+                PhysicsEntityHitField(role, role.LocomotionComponent);
             });
         }
 

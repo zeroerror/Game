@@ -117,7 +117,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     roleLogic = battleFacades.Domain.RoleDomain.SpawnRoleWithRenderer(msg.entityId, isOwner);
                 }
 
-                var moveComponent = roleLogic.MoveComponent;
+                var moveComponent = roleLogic.LocomotionComponent;
                 moveComponent.SetPosition(pos);
                 moveComponent.SetVelocity(velocity);
 

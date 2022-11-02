@@ -19,23 +19,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleArmorEvolveItemEntity SpawnBattleArmorEvolveItem(GameObject entityGo, int entityID)
+        public BattleEvolveItemEntity SpawnBattleArmorEvolveItem(GameObject entityGo, int entityID)
         {
-            var armorItem = entityGo.GetComponent<BattleArmorEvolveItemEntity>();
+            var armorItem = entityGo.GetComponent<BattleEvolveItemEntity>();
             armorItem.Ctor();
             armorItem.IDComponent.SetEntityId(entityID);
 
             var repo = battleFacades.Repo;
-            var armorEvolveItemRepo = repo.ArmorEvolveItemRepo;
+            var armorEvolveItemRepo = repo.EvolveItemRepo;
             armorEvolveItemRepo.Add(armorItem);
             
             return armorItem;
         }
 
-        public void TearDownArmorEvolveItem(BattleArmorEvolveItemEntity weaponItem)
+        public void TearDownArmorEvolveItem(BattleEvolveItemEntity weaponItem)
         {
             var repo = battleFacades.Repo;
-            var armorEvolveItemRepo = repo.ArmorEvolveItemRepo;
+            var armorEvolveItemRepo = repo.EvolveItemRepo;
             armorEvolveItemRepo.TryRemove(weaponItem);
             GameObject.Destroy(weaponItem.gameObject);
             GameObject.Destroy(weaponItem);

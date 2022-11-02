@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public AttackTag attackTag;
 
-        public int damage;
+        public float damage;
 
         [Header("撞击速度系数")]
         public float hitVelocityCoefficient;
