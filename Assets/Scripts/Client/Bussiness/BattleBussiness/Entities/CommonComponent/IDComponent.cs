@@ -1,5 +1,3 @@
-using System;
-using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness

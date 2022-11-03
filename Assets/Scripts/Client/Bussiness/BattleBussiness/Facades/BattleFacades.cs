@@ -1,4 +1,5 @@
 using Game.Infrastructure.Network.Client;
+using Game.Client.Bussiness.BattleBussiness.API;
 
 namespace Game.Client.Bussiness.BattleBussiness.Facades
 {
@@ -22,6 +23,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public BattleLeagueService BattleLeagueService { get; private set; }
         public IDService IDService { get; private set; }
 
+        // - API
+        public LogicTriggerAPI LogicTriggerAPI { get; private set; }
+
         public BattleFacades()
         {
             Network = new AllBattleNetwork();
@@ -38,6 +42,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             ArbitrationService = new BattleArbitrationService();
             ArbitrationService.Inject(this);
+
+            LogicTriggerAPI = new LogicTriggerAPI();
 
             Assets.LoadAll();
         }

@@ -71,39 +71,24 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 bulletRenderer.SetPosition(bulletLogic.Position);
                 bulletRenderer.SetRotation(bulletLogic.Rotation);
 
-                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletLogic.MasterEntityId} 起点位置：{startPos}  飞行方向{fireDir}");
+                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletLogic.MasterEntityID} 起点位置：{startPos}  飞行方向{fireDir}");
 
             }
         }
 
         void Tick_BulletHitRole(float fixedDeltaTime)
         {
+            var domain = battleFacades.Domain;
+            var roleDomain = domain.RoleDomain;
+            var hitDomain = domain.HitDomain;
+
             while (bulletHitRoleQueue.TryDequeue(out var msg))
             {
                 var role = battleFacades.Repo.RoleLogicRepo.Get(msg.roleEntityId);
-                if (role == null)
-                {
-                    continue;
-                }
-
                 var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityId);
-                if (bullet == null)
-                {
-                    continue;
-                }
-
-                if (bullet.BulletType == BulletType.Grenade)
-                {
-                    continue;
-                }
-
-                var domain = battleFacades.Domain;
-                var roleDomain = domain.RoleDomain;
-                var hitPowerModel = bullet.HitPowerModel;
-                float realDamage = roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
-
-                var rendererDoamin = domain.RoleRendererDomain;
-                rendererDoamin.HUD_ShowDamageText(role, realDamage);
+                var atkIDC = bullet.IDComponent;
+                var vicIDC = role.IDComponent;
+                hitDomain.TryHitActor(atkIDC, vicIDC, bullet.HitPowerModel);
             }
         }
 

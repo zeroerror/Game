@@ -2,6 +2,7 @@ using UnityEngine;
 using Game.Generic;
 using Game.Client.Bussiness.Interfaces;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -36,47 +37,74 @@ namespace Game.Client.Bussiness.BattleBussiness
         Slider armorSlider;
         public Slider ArmorSlider => armorSlider;
 
-        Transform damageTextTF;
-        public Transform[] DamageTextTFArray { get; private set; }
+        Transform damageTextGroupTF;
 
-        int curDamageTextIndex;
-        public Transform GetDamageTextTF()
-        {
-            var array = DamageTextTFArray;
-            if (curDamageTextIndex > array.Length)
-            {
-                curDamageTextIndex = curDamageTextIndex % array.Length;
-            }
-
-            return array[curDamageTextIndex++];
-        }
+        Transform[] damageTextTFArray;
 
         public void Ctor()
         {
-            CtorHUD();
-            animator = GetComponentInChildren<Animator>();
-            Debug.Assert(animator != null);
-            AnimatorComponent = new AnimatorComponent(animator);
+            Ctor_Obj();
+            Ctor_HUD();
+            Ctor_Component();
+        }
+
+        void Ctor_Obj()
+        {
             camTrackingObj = new GameObject($"相机跟随角色物体_RID_{entityID}");
         }
 
-        void CtorHUD()
+        void Ctor_HUD()
         {
             bloodSlider = transform.Find("Root/HUD/BloodSlider").GetComponent<Slider>();
             Debug.Assert(bloodSlider != null);
             armorSlider = transform.Find("Root/HUD/ArmorSlider").GetComponent<Slider>();
             Debug.Assert(armorSlider != null);
 
-            damageTextTF = transform.Find("Root/HUD/DamageText");
-            Debug.Assert(damageTextTF != null);
+            damageTextGroupTF = transform.Find("Root/HUD/DamageTextGroup");
+            Debug.Assert(damageTextGroupTF != null);
 
-            var childCount = damageTextTF.childCount;
-            DamageTextTFArray = new Transform[childCount];
+            var childCount = damageTextGroupTF.childCount;
+            damageTextTFArray = new Transform[childCount];
             for (int i = 0; i < childCount; i++)
             {
-                DamageTextTFArray[i] = damageTextTF.GetChild(i);
+                damageTextTFArray[i] = damageTextGroupTF.GetChild(i);
             }
         }
+
+        void Ctor_Component()
+        {
+            animator = GetComponentInChildren<Animator>();
+            Debug.Assert(animator != null);
+            AnimatorComponent = new AnimatorComponent(animator);
+        }
+
+        public void SetDamageText(string damageText)
+        {
+            // - Random TextTF
+            var array = damageTextTFArray;
+            var randomIndex = Random.Range(0, array.Length);
+            var damageTextTF = array[randomIndex];
+            var text = damageTextTF.GetComponent<TMP_Text>();
+            text.text = damageText;
+            text.gameObject.SetActive(true);
+
+            // - Random Clip
+            var anim = damageTextTF.GetComponent<Animation>();
+            var clipCount = anim.GetClipCount();
+            var randomClipIndex = Random.Range(0, clipCount);
+            int i = 0;
+            foreach (AnimationState animationState in anim)
+            {
+                if (i == randomClipIndex)
+                {
+                    animationState.normalizedTime = 0;
+                    anim.Play(animationState.name);
+                    return;
+                }
+                i++;
+            }
+        }
+
     }
 
 }

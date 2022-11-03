@@ -99,15 +99,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void HUD_ShowDamageText(BattleRoleLogicEntity role, float damage)
-        {
-            var roleRenderer = role.roleRenderer;
-            var textTF = roleRenderer.GetDamageTextTF();
-            var text = textTF.GetComponent<Text>();
-            text.text = damage.ToString();
-            textTF.gameObject.SetActive(true);
-        }
-
     }
 
 }

@@ -25,6 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var itemAssets = battleFacades.Assets.ItemAsset;
             itemAssets.TryGetByName(prefabName, out GameObject prefab);
+            Debug.Assert(prefab != null, $"prefabName {prefabName} Asset Dont Exist");
 
             var itemGo = GameObject.Instantiate(prefab);
             itemGo.SetActive(true);

@@ -28,12 +28,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             // - Hit Apply
-            ApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel);
+            TryApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel);
 
             return true;
         }
 
-        void ApplyBulletHitRole(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel)
+        void TryApplyBulletHitRole(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel)
         {
             if (attackerIDC.EntityType != EntityType.Bullet
             || victimIDC.EntityType != EntityType.BattleRole)
@@ -41,23 +41,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            var role = battleFacades.Repo.RoleLogicRepo.Get(victimIDC.EntityID);
-            CauseAndRecordDamage(attackerIDC, victimIDC, hitPowerModel.damage, role);
-
             var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityID);
+            var role = battleFacades.Repo.RoleLogicRepo.Get(victimIDC.EntityID);
+
             CausePhysics(role, bullet, hitPowerModel.knockBackSpeed, hitPowerModel.blowUpSpeed);
+
+            CauseAndRecordDamage(attackerIDC, victimIDC, hitPowerModel.damage, role);
 
             // - State
             role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);
+
+            return;
         }
 
         void CausePhysics(BattleRoleLogicEntity role, BulletEntity bullet, float knockBackSpeed, float blowUpSpeed)
         {
-            if (bullet is GrenadeEntity grenadeEntity && !grenadeEntity.isTrigger)
-            {
-                return;
-            }
-
             // - Physics
             var dir = role.LocomotionComponent.Position - bullet.LocomotionComponent.Position;
             var addV = dir.normalized * knockBackSpeed;
@@ -71,8 +69,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var domain = battleFacades.Domain.RoleDomain;
             float receivedDamage = domain.TryReceiveDamage(role, damage);
             arbitService.AddHitRecord(attackerIDC, victimIDC, receivedDamage);
+
+            // -  Logic Trigger
+            var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+            DamageRecordArgs args;
+            args.atkEntityType = attackerIDC.EntityType;
+            args.atkEntityID = attackerIDC.EntityID;
+            args.vicEntityType = victimIDC.EntityType;
+            args.vicEntityID = victimIDC.EntityID;
+            args.damage = receivedDamage;
+            logicTriggerAPI.Invoke_DamageRecordAction(args);
         }
-        
+
     }
 
 }

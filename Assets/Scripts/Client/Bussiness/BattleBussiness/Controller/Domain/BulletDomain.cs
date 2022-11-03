@@ -122,6 +122,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 hitRoleList.ForEach((ce) =>
                 {
+                    if (bullet.BulletType == BulletType.Grenade)
+                    {
+                        return;
+                    }
+
                     if (hookedTrans == null)
                     {
                         hookedTrans = ce.gameObject.transform;
@@ -191,7 +196,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void GrenadeExplode(GrenadeEntity grenadeEntity)
         {
             Debug.Log("爆炸");
-            grenadeEntity.isTrigger = true;
+            grenadeEntity.isExploded = true;
 
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
@@ -240,7 +245,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {
-                var master = battleFacades.Repo.RoleLogicRepo.Get(hooker.MasterEntityId);
+                var master = battleFacades.Repo.RoleLogicRepo.Get(hooker.MasterEntityID);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.StateComponent.SetRoleState(RoleState.Normal);

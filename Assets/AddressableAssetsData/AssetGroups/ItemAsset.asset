@@ -68,12 +68,17 @@ MonoBehaviour:
     m_SerializedLabels:
     - Item
   - m_GUID: bbaa6433b86204f4c8cda3e18df38790
-    m_Address: Item_Evolve_2
+    m_Address: Item_Evolve_1001
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
   - m_GUID: f512e1f591a94b249885925e05993abf
-    m_Address: Item_Evolve_1
+    m_Address: Item_Evolve_1000
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
+  - m_GUID: cc51bea329f8e00419628561deb97f75
+    m_Address: Item_Evolve_1002
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item

@@ -3,6 +3,7 @@
 
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -12,13 +13,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         BattleFacades battleFacades;
 
-        public BattleRendererController()
-        {
-        }
+        public BattleRendererController() { }
 
-        public void Inject(BattleFacades battleFacades)
+        public void Inject(BattleFacades facades)
         {
-            this.battleFacades = battleFacades;
+            battleFacades = facades;
+            battleFacades.LogicTriggerAPI.damageRecordAction += DamageRecord;
         }
 
         public void Tick(float fixedDeltaTime)
@@ -52,6 +52,27 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             var inputDomain = battleFacades.Domain.InputDomain;
             inputDomain.UpdateCameraByCameraView(inputAxis);
+        }
+
+        void DamageRecord(DamageRecordArgs args)
+        {
+            var atkEntityType = args.atkEntityType;
+            var atkEntityID = args.atkEntityID;
+            var vicEntityType = args.vicEntityType;
+            var vicEntityID = args.vicEntityID;
+            var damage = args.damage;
+            Debug.Log($"args {atkEntityType.ToString()} {atkEntityID.ToString()} {vicEntityType.ToString()} {vicEntityID.ToString()}");
+
+            if (atkEntityType == EntityType.Bullet)
+            {
+                var repo = battleFacades.Repo;
+                var roleRendererRepo = repo.RoleRendererRepo;
+                var vicRenderer = roleRendererRepo.Get(vicEntityID);
+                vicRenderer.SetDamageText(damage.ToString());
+                return;
+            }
+
+            Debug.LogError("未处理情况 DamageRecord ");
         }
 
         #endregion

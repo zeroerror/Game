@@ -15,6 +15,6 @@ public class FaceToCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.forward = -faceCamera.transform.forward;
+        transform.forward = faceCamera.transform.forward;
     }
 }
