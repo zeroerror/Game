@@ -122,8 +122,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 hitRoleList.ForEach((ce) =>
                 {
-                    Debug.Log($"打中敌人");
-
                     if (hookedTrans == null)
                     {
                         hookedTrans = ce.gameObject.transform;
@@ -136,13 +134,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                         return;
                     }
 
-                    // TODO: 配置表配置 ----------------------------------------------
-                    HitPowerModel hitPowerModel = bullet.HitPowerModel;
-                    // ----------------------------------------------------------------
-
                     var hitDomain = battleFacades.Domain.HitDomain;
                     var roleIDC = role.IDComponent;
                     var bulletIDC = bullet.IDComponent;
+                    HitPowerModel hitPowerModel = bullet.HitPowerModel;
                     if (!hitDomain.TryHitActor(bulletIDC, roleIDC, in hitPowerModel))
                     {
                         Debug.LogWarning($"TryHitActor 失败! return");
@@ -153,7 +148,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     model.attackerIDC = bulletIDC;
                     model.victimIDC = roleIDC;
                     attackList.Add(model);
-
                     hashit = true;
                 });
 
@@ -164,7 +158,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
 
             return attackList;
-
         }
 
         public void ApplyBulletHitEffector(BulletEntity bullet, Transform hitTF)
@@ -183,11 +176,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             else if (bullet is GrenadeEntity grenadeEntity)
             {
                 var moveComponent = grenadeEntity.LocomotionComponent;
+                moveComponent.Reset();
                 moveComponent.SetPersistentMove(false);
-                moveComponent.SetMoveVelocity(Vector3.zero);
-                moveComponent.SetGravityVelocity(0);
                 moveComponent.SetIsGrounded(true);
-                moveComponent.SetVelocity(Vector3.zero);
 
                 var tf = grenadeEntity.transform;
                 var collider = tf.GetComponent<Collider>();
@@ -200,6 +191,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void GrenadeExplode(GrenadeEntity grenadeEntity)
         {
             Debug.Log("爆炸");
+            grenadeEntity.isTrigger = true;
+
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
@@ -207,8 +200,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var dis = Vector3.Distance(role.LocomotionComponent.Position, grenadeEntity.LocomotionComponent.Position);
                 if (dis < grenadeEntity.ExplosionRadius)
                 {
-                    var dir = role.LocomotionComponent.Position - grenadeEntity.LocomotionComponent.Position;
-
                     HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
                     var hitDomain = battleFacades.Domain.HitDomain;
@@ -216,9 +207,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     {
                         var roleDomain = battleFacades.Domain.RoleDomain;
                         roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
-
-                        var hitVelocity = dir.normalized * hitPowerModel.hitVelocityCoefficient + new Vector3(0, 2f, 0);
-                        role.LocomotionComponent.AddExtraVelocity(hitVelocity);
                     }
                 }
             });

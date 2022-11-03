@@ -100,7 +100,8 @@ MonoBehaviour:
     canHitRepeatly: 0
     attackTag: 1
     damage: 80
-    hitVelocityCoefficient: 0.05
+    knockBackSpeed: 2
+    blowUpSpeed: 0
     freezeMaintainFrame: 1
   lifeTime: 10
 --- !u!1001 &8100238415778686914

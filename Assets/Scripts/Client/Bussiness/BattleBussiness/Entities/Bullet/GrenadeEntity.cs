@@ -10,6 +10,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         [SerializeField] float explosionRadius;
         public float ExplosionRadius => explosionRadius;
 
+        public bool isTrigger;
+        
         protected override void Init()
         {
             base.Init();

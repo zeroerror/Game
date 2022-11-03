@@ -13,8 +13,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public float damage;
 
-        [Header("撞击速度系数")]
-        public float hitVelocityCoefficient;
+        [Header("击退速度")]
+        public float knockBackSpeed;
+
+        [Header("击飞速度")]
+        public float blowUpSpeed;
 
         public int freezeMaintainFrame;
     }
