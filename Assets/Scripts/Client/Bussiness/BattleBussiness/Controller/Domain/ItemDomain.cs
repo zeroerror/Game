@@ -155,7 +155,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                         {
                             return false;
                         }
-                        
+
                         var evolveTM = evolveItem.evolveTM;
                         var armor = master.Armor;
                         armor.EvolveFrom(evolveTM);
@@ -228,7 +228,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
             if (entityType == EntityType.EvolveItem)
             {
-                return $"Item_Evolve_{sortType.ToString()}";
+                return $"Item_Evolve_{(1000 + sortType).ToString()}";
             }
 
             return null;
