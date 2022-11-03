@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
-using Game.Generic;
-using Game.Client.Bussiness.Interfaces;
 using UnityEngine.UI;
 using TMPro;
+using Game.Client.Bussiness.Interfaces;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -41,6 +41,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         Transform[] damageTextTFArray;
 
+        Dictionary<int, List<AnimationState>> damageTextAnimDic;
+
         public void Ctor()
         {
             Ctor_Obj();
@@ -55,19 +57,39 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         void Ctor_HUD()
         {
+            Ctor_HUD_Slider();
+            Ctor_HUD_DamageText();
+        }
+
+        void Ctor_HUD_Slider()
+        {
+            // - Slider
             bloodSlider = transform.Find("Root/HUD/BloodSlider").GetComponent<Slider>();
             Debug.Assert(bloodSlider != null);
             armorSlider = transform.Find("Root/HUD/ArmorSlider").GetComponent<Slider>();
             Debug.Assert(armorSlider != null);
+        }
 
+        void Ctor_HUD_DamageText()
+        {
             damageTextGroupTF = transform.Find("Root/HUD/DamageTextGroup");
             Debug.Assert(damageTextGroupTF != null);
 
             var childCount = damageTextGroupTF.childCount;
             damageTextTFArray = new Transform[childCount];
+            damageTextAnimDic = new Dictionary<int, List<AnimationState>>();
             for (int i = 0; i < childCount; i++)
             {
-                damageTextTFArray[i] = damageTextGroupTF.GetChild(i);
+                var damageTextTF = damageTextGroupTF.GetChild(i);
+                damageTextTFArray[i] = damageTextTF;
+
+                var anim = damageTextTF.GetComponent<Animation>();
+                var list = new List<AnimationState>();
+                foreach (AnimationState animationState in anim)
+                {
+                    list.Add(animationState);
+                }
+                damageTextAnimDic[i] = list;
             }
         }
 
@@ -89,20 +111,12 @@ namespace Game.Client.Bussiness.BattleBussiness
             text.gameObject.SetActive(true);
 
             // - Random Clip
+            var animStateList = damageTextAnimDic[randomIndex];
+            var randomIndex2 = Random.Range(0, animStateList.Count);
+            var animState = animStateList[randomIndex2];
             var anim = damageTextTF.GetComponent<Animation>();
-            var clipCount = anim.GetClipCount();
-            var randomClipIndex = Random.Range(0, clipCount);
-            int i = 0;
-            foreach (AnimationState animationState in anim)
-            {
-                if (i == randomClipIndex)
-                {
-                    animationState.normalizedTime = 0;
-                    anim.Play(animationState.name);
-                    return;
-                }
-                i++;
-            }
+            anim.Play(animState.name);
+            return;
         }
 
     }
