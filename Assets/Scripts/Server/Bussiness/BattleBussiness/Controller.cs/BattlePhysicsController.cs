@@ -50,7 +50,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var hitFieldList = physicsDomain.Tick_BulletHitField();
 
             // - Send To Client
-            SendBulletHitField(hitFieldList);
+            SendBulletHitFieldRes(hitFieldList);
         }
 
         void Tick_Physics_Movement_Role(float fixedDeltaTime)
@@ -69,7 +69,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #endregion
 
-        void SendBulletHitField(List<HitFieldModel> hitFieldList)
+        void SendBulletHitFieldRes(List<HitFieldModel> hitFieldList)
         {
             var bulletRepo = battleFacades.BattleFacades.Repo.BulletRepo;
             var bulletRqs = battleFacades.Network.BulletReqAndRes;

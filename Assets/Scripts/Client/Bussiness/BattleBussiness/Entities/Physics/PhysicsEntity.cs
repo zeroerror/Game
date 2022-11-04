@@ -51,92 +51,122 @@ namespace Game.Client.Bussiness
         //====== Unity Physics 
         void OnTriggerEnter(Collider collider)
         {
-            if (!Exist(collider))
+            if (Exist(collider))
             {
-                CollisionExtra ce = new CollisionExtra();
-                ce.status = CollisionStatus.Enter;
-                ce.gameObject = collider.gameObject;
-                ce.layerName = LayerMask.LayerToName(collider.gameObject.layer);
-                ce.fieldType = FieldType.Ground;
-                hitCollisionList.Add(ce);
-                DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layerName:{ce.layerName}", "#48D1CC");
+                return;
             }
+            
+            CollisionExtra ce = new CollisionExtra();
+            ce.status = CollisionStatus.Enter;
+            ce.gameObject = collider.gameObject;
+            ce.layerName = LayerMask.LayerToName(collider.gameObject.layer);
+            ce.fieldType = FieldType.Ground;
+            hitCollisionList.Add(ce);
+            DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layerName:{ce.layerName}", "#48D1CC");
+        }
+
+        void OnTriggerStay(Collider collider)
+        {
+            var ce = Find(collider);
+            if (ce == null)
+            {
+                return;
+            }
+
+            ce.status = CollisionStatus.Stay;
         }
 
         void OnTriggerExit(Collider collider)
         {
             var ce = Find(collider);
-            if (ce != null)
+            if (ce == null)
             {
-                ce.status = CollisionStatus.Exit;
-                DebugExtensions.LogWithColor($"Trigger离开:{collider.name} layer:{LayerMask.LayerToName(collider.gameObject.layer)}", "#48D1CC");
+                return;
             }
+
+            ce.status = CollisionStatus.Exit;
+            DebugExtensions.LogWithColor($"Trigger离开:{collider.name} layer:{LayerMask.LayerToName(collider.gameObject.layer)}", "#48D1CC");
         }
 
         void OnCollisionEnter(Collision collision)
         {
-            if (!Exist(collision.collider))
+            if (Exist(collision.collider))
             {
-                Vector3 selfPos = transform.position;
-                var closestPoint = collision.collider.bounds.ClosestPoint(selfPos);
-                if (closestPoint.MostEqualsY(selfPos))
-                {
-                    if (collision.contactCount != 0)
-                    {
-                        closestPoint = collision.GetContact(0).point;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("collision.contactCount == 0");
-                    }
-                }
+                return;
+            }
 
-                Vector3 hitDir = Vector3.zero;
-                bool isGround = false;
-                if (!closestPoint.MostEqualsY(selfPos))
+            Vector3 selfPos = transform.position;
+            var closestPoint = collision.collider.bounds.ClosestPoint(selfPos);
+            if (closestPoint.MostEqualsY(selfPos))
+            {
+                if (collision.contactCount != 0)
                 {
-                    hitDir = (closestPoint - selfPos).normalized;
-                    isGround = hitDir.y <= 0;
+                    closestPoint = collision.GetContact(0).point;
                 }
                 else
                 {
-                    isGround = true;
+                    Debug.LogWarning("collision.contactCount == 0");
                 }
-
-                FieldType fieldType = FieldType.None;
-                string layerName = LayerMask.LayerToName(collision.gameObject.layer);
-                if (layerName == "Field")
-                {
-                    if (isGround)
-                    {
-                        fieldType = FieldType.Ground;
-                    }
-                    else
-                    {
-                        fieldType = FieldType.Wall;
-                    }
-                }
-
-                CollisionExtra collisionExtra = new CollisionExtra();
-                collisionExtra.status = CollisionStatus.Enter;
-                collisionExtra.collision = collision;
-                collisionExtra.gameObject = collision.gameObject;
-                collisionExtra.fieldType = fieldType;
-                collisionExtra.layerName = LayerMask.LayerToName(collision.gameObject.layer);
-                collisionExtra.hitDir = hitDir;
-                hitCollisionList.Add(collisionExtra);
-                // DebugExtensions.LogWithColor($"接触:fieldType:{fieldType.ToString()} {collision.gameObject.name} ", "#48D1CC");
             }
+
+            Vector3 hitDir = Vector3.zero;
+            bool isGround = false;
+            if (!closestPoint.MostEqualsY(selfPos))
+            {
+                hitDir = (closestPoint - selfPos).normalized;
+                isGround = hitDir.y <= 0;
+            }
+            else
+            {
+                isGround = true;
+            }
+
+            FieldType fieldType = FieldType.None;
+            string layerName = LayerMask.LayerToName(collision.gameObject.layer);
+            if (layerName == "Field")
+            {
+                if (isGround)
+                {
+                    fieldType = FieldType.Ground;
+                }
+                else
+                {
+                    fieldType = FieldType.Wall;
+                }
+            }
+
+            CollisionExtra collisionExtra = new CollisionExtra();
+            collisionExtra.status = CollisionStatus.Enter;
+            collisionExtra.collision = collision;
+            collisionExtra.gameObject = collision.gameObject;
+            collisionExtra.fieldType = fieldType;
+            collisionExtra.layerName = LayerMask.LayerToName(collision.gameObject.layer);
+            collisionExtra.hitDir = hitDir;
+            hitCollisionList.Add(collisionExtra);
+            // DebugExtensions.LogWithColor($"接触:fieldType:{fieldType.ToString()} {collision.gameObject.name} ", "#48D1CC");
+        }
+
+        void OnCollisionStay(Collision collision)
+        {
+            var ce = Find(collision.collider);
+            if (ce == null)
+            {
+                return;
+            }
+
+            ce.status = CollisionStatus.Stay;
         }
 
         void OnCollisionExit(Collision collision)
         {
             var ce = Find(collision.collider);
-            if (ce != null)
+            if (ce == null)
             {
-                ce.status = CollisionStatus.Exit;
-                // DebugExtensions.LogWithColor($"离开:fieldType:{ce.fieldType.ToString()} {collision.gameObject.name}", "#48D1CC");
+                return;
             }
+
+            ce.status = CollisionStatus.Exit;
+            // DebugExtensions.LogWithColor($"离开:fieldType:{ce.fieldType.ToString()} {collision.gameObject.name}", "#48D1CC");
         }
 
         CollisionExtra Find(Collider collider)
