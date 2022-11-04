@@ -24,6 +24,7 @@ namespace Game.Client.Bussiness.EventCenter
         public static void AddToTearDown(string uiName) => uiTearDownQueue.Enqueue(uiName);
         public static bool TryDequeueTearDownQueue(out string uiName) => uiTearDownQueue.TryDequeue(out uiName);
 
+        // UI Trigger
         public static Action<string, string> LoginAction;       // 登录
         public static Action<string, string> RegistAction;       // 注册
         public static Action<string, ushort> ConnWorSerAction;// 连接世界服
@@ -36,6 +37,9 @@ namespace Game.Client.Bussiness.EventCenter
         public static Action ReloadAction;   // 战斗换弹操作
         public static Action JumpAction;   // 战斗跳跃操作
         public static Action DropWeaponAction;   // 战斗丢弃操作
+
+        // UI Listen
+        public static Action<int, int> KillAndDamageInfoUpdateAction;       // 击杀及伤害
 
         public static void Ctor()
         {

@@ -16,13 +16,13 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BattleArbitrationService
     {
 
-        Dictionary<long, Queue<HitModel>> all;
+        Dictionary<long, List<HitModel>> all;
 
         BattleFacades battleFacades;
 
         public BattleArbitrationService()
         {
-            all = new Dictionary<long, Queue<HitModel>>();
+            all = new Dictionary<long, List<HitModel>>();
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -56,25 +56,49 @@ namespace Game.Client.Bussiness.BattleBussiness
             return true;
         }
 
-        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC,float damage)
+        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC, float damage)
         {
             HitModel hitModel = new HitModel();
-            hitModel.attackerIDC =attackerIDC;
-            hitModel.victimIDC =victimIDC;
-            hitModel.damage =damage;
+            hitModel.attackerIDC = attackerIDC;
+            hitModel.victimIDC = victimIDC;
+            hitModel.damage = damage;
             Debug.Log($"ADD HIT RECORD:damage {damage}");
 
             var key = GetKey(attackerIDC, victimIDC);
 
-            if (all.TryGetValue(key, out var queue))
+            if (all.TryGetValue(key, out var list))
             {
-                queue.Enqueue(hitModel);
+                list.Add(hitModel);
                 return;
             }
 
-            queue = new Queue<HitModel>();
-            queue.Enqueue(hitModel);
-            all[key] = queue;
+            list = new List<HitModel>();
+            list.Add(hitModel);
+            all[key] = list;
+        }
+
+        public float GetAtkerTotalCauseDamage(EntityType entityType, int entityID)
+        {
+            float totalDamage = 0;
+
+            int key1 = 0;
+            key1 |= (int)entityType << 16;
+            key1 |= (int)entityID;
+
+            foreach (var obj in all)
+            {
+                var key2 = (int)(obj.Key >> 32);
+                if (key1 == key2)
+                {
+                    var list = obj.Value;
+                    list.ForEach((hitModel) =>
+                    {
+                        totalDamage += hitModel.damage;
+                    });
+                }
+            }
+
+            return totalDamage;
         }
 
         bool CanDamage(IDComponent victim)

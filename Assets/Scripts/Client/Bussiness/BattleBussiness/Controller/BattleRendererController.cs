@@ -2,6 +2,7 @@
 
 
 using UnityEngine;
+using Game.Client.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
@@ -69,6 +70,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRendererRepo = repo.RoleRendererRepo;
                 var vicRenderer = roleRendererRepo.Get(vicEntityID);
                 vicRenderer.SetDamageText(damage.ToString());
+
+                // - UI
+                var roleLogicRepo = repo.RoleLogicRepo;
+                if (roleLogicRepo.IsOwner(atkEntityID))
+                {
+                    var arbitService = battleFacades.ArbitrationService; ;
+                    var totalDamage = arbitService.GetAtkerTotalCauseDamage(atkEntityType, atkEntityID);
+                    int kill = 1;
+
+                    UIEventCenter.KillAndDamageInfoUpdateAction.Invoke(kill, (int)totalDamage);
+                }
+
                 return;
             }
 
