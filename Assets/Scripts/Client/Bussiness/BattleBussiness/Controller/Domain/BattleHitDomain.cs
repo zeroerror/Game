@@ -41,12 +41,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
+            // - Damage Coefficient
             var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityID);
             var role = battleFacades.Repo.RoleLogicRepo.Get(victimIDC.EntityID);
 
             CausePhysics(role, bullet, hitPowerModel.knockBackSpeed, hitPowerModel.blowUpSpeed);
 
-            CauseAndRecordDamage(attackerIDC, victimIDC, hitPowerModel.damage, role);
+            var repo = battleFacades.Repo;
+            var roleRepo = repo.RoleLogicRepo;
+            var master = roleRepo.Get(bullet.MasterEntityID);
+            var weaponComponent = master.WeaponComponent;
+            var bulletDamage = bullet.GetDamageByCoefficient(weaponComponent.DamageCoefficient);
+            CauseAndRecordDamage(attackerIDC, victimIDC, bulletDamage, role);
 
             // - State
             role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);

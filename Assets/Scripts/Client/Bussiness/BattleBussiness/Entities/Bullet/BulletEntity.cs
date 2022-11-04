@@ -75,10 +75,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             transform.rotation = locomotionComponent.RB.rotation;
         }
 
-        public void SetDamageByCoefficient(float coefficient)
+        public float GetDamageByCoefficient(float coefficient)
         {
-            hitPowerModel.damage *= coefficient;
-            Debug.Log($"SetDamageByCoefficient {hitPowerModel.damage}");
+            var realDamage = hitPowerModel.damage * coefficient;
+            Debug.Log($"GetDamageByCoefficient {realDamage}");
+            return realDamage;
         }
 
     }

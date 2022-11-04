@@ -104,7 +104,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                             var bulletEntityId = idService.GetAutoIDByEntityType(EntityType.Bullet);
                             var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
                             var bulletEntity = battleFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, bulletEntityId, masterId, startPos, fireDir);
-                            bulletEntity.SetDamageByCoefficient(weaponComponent.DamageCoefficient);
 
                             ConnIdList.ForEach((connId) =>
                             {
