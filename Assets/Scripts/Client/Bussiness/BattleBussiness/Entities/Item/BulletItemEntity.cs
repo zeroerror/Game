@@ -14,7 +14,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetEntityID(int v) => idComponent.SetEntityID(v);
 
         [SerializeField]
-        public BulletType bulletType;
+        BulletType bulletType;
+        public BulletType BulletType => bulletType;
 
         [SerializeField]
         public int bulletNum;

@@ -156,8 +156,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var input = battleFacades.InputComponent;
             if (input.isPressShoot)
             {
-                var curWeapon = owner.WeaponComponent.CurrentWeapon;
-                if (curWeapon == null)
+                if (!owner.CanWeaponShoot())
                 {
                     return;
                 }
@@ -175,8 +174,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     owner.LocomotionComponent.FaceTo(faceDir);
                 }
 
-                var rqs = battleFacades.Network.WeaponReqAndRes;
+                var wc = owner.WeaponComponent;
+                var curWeapon = wc.CurrentWeapon;
                 var weaponEntityID = curWeapon.IDComponent.EntityID;
+                var rqs = battleFacades.Network.WeaponReqAndRes;
                 rqs.SendReq_WeaponShoot(weaponEntityID, curWeapon.ShootPointPos, input.fireDir);
             }
         }
@@ -190,9 +191,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             if (input.isPressWeaponReload)
             {
                 // 换弹前判断流程
-                var weaponComponent = owner.WeaponComponent;
-                var animatorComponent = owner.roleRenderer.AnimatorComponent;
-                Debug.Assert(weaponComponent.CurrentWeapon != null, "当前武器为空");
                 if (owner.CanWeaponReload())
                 {
                     var rqs = battleFacades.Network.WeaponReqAndRes;

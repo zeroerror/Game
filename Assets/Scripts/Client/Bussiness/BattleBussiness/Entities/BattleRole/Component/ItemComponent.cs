@@ -31,7 +31,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             CurrentCapacity += bulletItemEntity.bulletNum * 1;
-            Debug.LogWarning($"收集了子弹包[类型:{bulletItemEntity.bulletType.ToString()} 数量:{bulletItemEntity.bulletNum}]");
+            Debug.LogWarning($"收集了子弹包[类型:{bulletItemEntity.BulletType.ToString()} 数量:{bulletItemEntity.bulletNum}]");
             Debug.LogWarning($"当前背包容量 占用 {CurrentCapacity}  剩余 {ITEM_CAPACITY - CurrentCapacity}");
             bulletItemList.Add(bulletItemEntity);
             return true;
@@ -43,8 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             for (int i = 0; i < bulletItemList.Count; i++)
             {
                 var bulletItem = bulletItemList[i];
-                Debug.Log($"bulletType {bulletType} num {num} ----  bulletItem {bulletItem.bulletType} {bulletItem.bulletNum}");
-                if (bulletItem.bulletType != bulletType)
+                if (bulletItem.BulletType != bulletType)
                 {
                     continue;
                 }
@@ -72,16 +71,23 @@ namespace Game.Client.Bussiness.BattleBussiness
             return 0;
         }
 
-        public bool HasItem_Bullet(int num)
+        public bool HasItem_Bullet(BulletType bulletType, int num)
         {
             int total = 0;
             var e = bulletItemList.GetEnumerator();
             while (e.MoveNext())
             {
-
                 var bulletPackEntity = e.Current;
+                if (bulletType != bulletPackEntity.BulletType)
+                {
+                    continue;
+                }
+
                 total += bulletPackEntity.bulletNum;
-                if (total >= num) return true;
+                if (total >= num)
+                {
+                    return true;
+                }
             }
 
             return false;

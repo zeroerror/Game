@@ -133,7 +133,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public int ReloadBulletsToWeapon(WeaponEntity weaponEntity)
         {
-            var num = ItemComponent.TakeOutItem_Bullet(weaponEntity.bulletType, weaponEntity.GetReloadBulletNum());
+            var num = ItemComponent.TakeOutItem_Bullet(weaponEntity.BulletType, weaponEntity.GetReloadBulletNum());
             weaponComponent.FinishReloading(num);
 
             return num;
@@ -246,26 +246,26 @@ namespace Game.Client.Bussiness.BattleBussiness
         public bool CanWeaponReload()
         {
             var wc = weaponComponent;
-            if (wc.IsReloading)
-            {
-                return false;
-            }
 
             var curWeapon = wc.CurrentWeapon;
             if (curWeapon == null)
             {
-                Debug.LogWarning("当前尚未持有武器！");
+                Debug.LogWarning("当前尚未持有武器!");
                 return false;
             }
-
             if (wc.IsFullReloaded())
             {
-                Debug.LogWarning("当前武器已经装满子弹");
+                Debug.LogWarning("当前武器已经装满子弹!");
                 return false;
             }
-            if (!ItemComponent.HasItem_Bullet(1))
+            if (wc.IsReloading)
             {
-                Debug.LogWarning("当前1颗子弹都没了");
+                Debug.LogWarning("当前正在换弹!");
+                return false;
+            }
+            if (!ItemComponent.HasItem_Bullet(curWeapon.BulletType, 1))
+            {
+                Debug.LogWarning($"当前子弹类型 {curWeapon.BulletType.ToString()} 1颗都没了!");
                 return false;
             }
 
