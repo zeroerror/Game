@@ -46,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         bool hasMaster;
         public bool HasMaster => hasMaster;
 
-        BulletType bulletType;
+        [SerializeField] BulletType bulletType;
         public BulletType BulletType => bulletType;
 
         AudioClip shootAudioClip;

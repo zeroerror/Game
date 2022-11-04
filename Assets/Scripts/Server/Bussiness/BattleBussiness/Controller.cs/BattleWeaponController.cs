@@ -103,7 +103,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             var curWeapon = weaponComponent.CurrentWeapon;
                             master.StateComponent.EnterShooting(curWeapon.FreezeMaintainFrame, curWeapon.BreakFrame);
 
-                            var bulletType = curWeapon.bulletType;
+                            var bulletType = curWeapon.BulletType;
                             var idService = battleFacades.IDService;
                             var bulletEntityId = idService.GetAutoIDByEntityType(EntityType.Bullet);
                             var weaponEntityID = weapon.IDComponent.EntityID;
