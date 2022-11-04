@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 bulletSpawnQueue.Dequeue();
 
-                var bulletId = msg.bulletEntityId;
+                var bulletID = msg.bulletID;
                 var bulletTypeByte = msg.bulletType;
                 var bulletType = (BulletType)bulletTypeByte;
 
@@ -66,12 +66,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var bulletRepo = battleFacades.Repo.BulletRepo;
 
-                var bulletLogic = battleFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, msg.bulletEntityId, msg.masterEntityId, startPos, fireDir);
+                var bulletLogic = battleFacades.Domain.BulletLogicDomain.SpawnBulletLogic(bulletType, msg.bulletID, msg.weaponID, startPos, fireDir);
                 var bulletRenderer = battleFacades.Domain.BulletRendererDomain.SpawnBulletRenderer(bulletLogic.BulletType, bulletLogic.IDComponent.EntityID);
                 bulletRenderer.SetPosition(bulletLogic.Position);
                 bulletRenderer.SetRotation(bulletLogic.Rotation);
 
-                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletLogic.MasterEntityID} 起点位置：{startPos}  飞行方向{fireDir}");
+                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletLogic.WeaponID} 起点位置：{startPos}  飞行方向{fireDir}");
 
             }
         }
@@ -108,8 +108,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (bulletLifeOverQueue.TryDequeue(out var msg))
             {
                 var bulletRepo = battleFacades.Repo.BulletRepo;
-                var entityID = msg.bulletEntityID;
-                var bulletEntity = bulletRepo.Get(entityID);
+                var ID = msg.bulletEntityID;
+                var bulletEntity = bulletRepo.Get(ID);
 
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
                 TearDownBulletLogicAndRenderer(pos, bulletEntity);

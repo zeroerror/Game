@@ -99,7 +99,7 @@ MonoBehaviour:
   hitPowerModel:
     canHitRepeatly: 0
     attackTag: 1
-    damage: 80
+    damage: 40
     knockBackSpeed: 2
     blowUpSpeed: 0
     freezeMaintainFrame: 1

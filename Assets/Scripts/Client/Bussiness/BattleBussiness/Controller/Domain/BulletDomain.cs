@@ -27,13 +27,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletEntity SpawnBulletLogic(BulletType bulletType, int bulletEntityId, int masterEntityId, Vector3 startPos, Vector3 fireDir)
+        public BulletEntity SpawnBulletLogic(BulletType bulletType, int bulletEntityID, int weaponEntityID, Vector3 startPos, Vector3 fireDir)
         {
             string bulletPrefabName = bulletType.ToString() + "_Logic";
 
             if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
-                var parent = battleFacades.Repo.FiledRepo.CurFieldEntity.transform;
+                var repo = battleFacades.Repo;
+                var parent = repo.FiledRepo.CurFieldEntity.transform;
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
 
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
@@ -41,10 +42,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 bulletEntity.Ctor();
                 bulletEntity.gameObject.SetActive(true);
                 bulletEntity.SetBulletType(bulletType);
-                bulletEntity.IDComponent.SetEntityId(bulletEntityId);
-                bulletEntity.SetMasterEntityId(masterEntityId);
-                var master = battleFacades.Repo.RoleLogicRepo.Get(masterEntityId);
-                bulletEntity.IDComponent.SetLeagueId(master.IDComponent.LeagueId);
+                bulletEntity.SetEntityID(bulletEntityID);
+                bulletEntity.SetWeaponID(weaponEntityID);
+                var weapon = repo.WeaponRepo.Get(weaponEntityID);
+                bulletEntity.SetLeagueID(weapon.IDComponent.LeagueId);
                 bulletEntity.SetPosition(startPos);
                 bulletEntity.FaceTo(fireDir);
                 bulletEntity.LocomotionComponent.ApplyMoveVelocity(fireDir);
@@ -53,7 +54,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 if (bulletEntity is HookerEntity hookerEntity)
                 {
-                    hookerEntity.SetMasterGrabPoint(master.transform);
+                    hookerEntity.SetMasterGrabPoint(weapon.transform);
                 }
 
                 return bulletEntity;
@@ -245,7 +246,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var rqs = battleFacades.Network.RoleReqAndRes;
             activeHookers.ForEach((hooker) =>
             {
-                var master = battleFacades.Repo.RoleLogicRepo.Get(hooker.MasterEntityID);
+                var master = battleFacades.Repo.RoleLogicRepo.Get(hooker.WeaponID);
                 if (!hooker.TickHooker(out float force))
                 {
                     master.StateComponent.SetRoleState(RoleState.Normal);

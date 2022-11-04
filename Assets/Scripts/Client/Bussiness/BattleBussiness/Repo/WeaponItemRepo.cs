@@ -15,7 +15,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             weaponItemList = new List<WeaponItemEntity>();
         }
 
-        public bool TryGetByEntityId(ushort weaponId, out WeaponItemEntity weaponEntity)
+        public bool TryGetByEntityId(int weaponId, out WeaponItemEntity weaponEntity)
         {
             weaponEntity = weaponItemList.Find((entity) => entity.IDComponent.EntityID == weaponId);
             return weaponEntity != null;

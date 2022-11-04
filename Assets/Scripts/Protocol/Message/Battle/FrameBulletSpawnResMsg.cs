@@ -7,8 +7,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
     public class FrameBulletSpawnResMsg :IZeroMessage<FrameBulletSpawnResMsg>{
         public int serverFrame;
         public byte bulletType;
-        public byte masterEntityId;
-        public ushort bulletEntityId;
+        public byte weaponID;
+        public ushort bulletID;
         public int startPosX;   
         public int startPosY;
         public int startPosZ;
@@ -19,8 +19,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
         {
             serverFrame = BufferReader.ReadInt32(src, ref offset);
             bulletType = BufferReader.ReadByte(src, ref offset);
-            masterEntityId = BufferReader.ReadByte(src, ref offset);
-            bulletEntityId = BufferReader.ReadUInt16(src, ref offset);
+            weaponID = BufferReader.ReadByte(src, ref offset);
+            bulletID = BufferReader.ReadUInt16(src, ref offset);
             startPosX = BufferReader.ReadInt32(src, ref offset);
             startPosY = BufferReader.ReadInt32(src, ref offset);
             startPosZ = BufferReader.ReadInt32(src, ref offset);
@@ -35,8 +35,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
             byte[] result = new byte[1000];
             BufferWriter.WriteInt32(result, serverFrame, ref offset);
             BufferWriter.WriteByte(result, bulletType, ref offset);
-            BufferWriter.WriteByte(result, masterEntityId, ref offset);
-            BufferWriter.WriteUInt16(result, bulletEntityId, ref offset);
+            BufferWriter.WriteByte(result, weaponID, ref offset);
+            BufferWriter.WriteUInt16(result, bulletID, ref offset);
             BufferWriter.WriteInt32(result, startPosX, ref offset);
             BufferWriter.WriteInt32(result, startPosY, ref offset);
             BufferWriter.WriteInt32(result, startPosZ, ref offset);

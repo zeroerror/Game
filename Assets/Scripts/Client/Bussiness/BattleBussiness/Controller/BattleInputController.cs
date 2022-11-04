@@ -176,7 +176,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
 
                 var rqs = battleFacades.Network.WeaponReqAndRes;
-                rqs.SendReq_WeaponShoot(owner.IDComponent.EntityID, curWeapon.ShootPointPos, input.fireDir);
+                var weaponEntityID = curWeapon.IDComponent.EntityID;
+                rqs.SendReq_WeaponShoot(weaponEntityID, curWeapon.ShootPointPos, input.fireDir);
             }
         }
 

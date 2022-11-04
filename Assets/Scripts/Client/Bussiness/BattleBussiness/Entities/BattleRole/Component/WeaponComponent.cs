@@ -51,7 +51,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             return CurrentWeapon.TryShootBullet(1) == 1;
         }
 
-
         // 拾取武器
         public bool CanPickUpWeapon()
         {

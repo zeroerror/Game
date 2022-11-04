@@ -43,11 +43,11 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Send]
 
-        public void SendRes_WeaponShoot(int connId, byte masterId)
+        public void SendRes_WeaponShoot(int connId, byte weaponID)
         {
             FrameWeaponShootResMsg msg = new FrameWeaponShootResMsg
             {
-                masterId = masterId,
+                weaponID = weaponID,
             };
             battleServer.SendMsg(connId, msg);
             sendCount++;
@@ -70,8 +70,8 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         {
             FrameWeaponDropResMsg msg = new FrameWeaponDropResMsg
             {
-                entityId = entityId,
-                masterId = (byte)masterId,
+                weaponID = entityId,
+                masterID = (byte)masterId,
             };
             battleServer.SendMsg(connId, msg);
             sendCount++;

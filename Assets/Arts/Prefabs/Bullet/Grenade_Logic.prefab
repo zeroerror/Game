@@ -173,10 +173,10 @@ MonoBehaviour:
   hitPowerModel:
     canHitRepeatly: 0
     attackTag: 1
-    damage: 300
+    damage: 150
     knockBackSpeed: 5
     blowUpSpeed: 5
     freezeMaintainFrame: 30
   lifeTime: 3
   explosionRadius: 7
-  isTrigger: 0
+  isExploded: 0

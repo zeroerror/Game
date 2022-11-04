@@ -54,8 +54,8 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             {
                 serverFrame = serverFrame,
                 bulletType = (byte)bulletEntity.BulletType,
-                masterEntityId = (byte)bulletEntity.MasterEntityID,
-                bulletEntityId = (ushort)bulletEntity.IDComponent.EntityID,
+                weaponID = (byte)bulletEntity.WeaponID,
+                bulletID = (ushort)bulletEntity.IDComponent.EntityID,
                 startPosX = (int)(bulletPos.x * 10000),
                 startPosY = (int)(bulletPos.y * 10000),
                 startPosZ = (int)(bulletPos.z * 10000),
@@ -65,7 +65,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
-            
+
         }
 
         public void SendRes_BulletHitRole(int connId, int bulletEntityId, int roleEntityId)
@@ -103,7 +103,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         public void SendRes_BulletLifeFrameOver(int connId, BulletEntity bulletEntity)
         {
             BulletType bulletType = bulletEntity.BulletType;
-            int masterEntityID = bulletEntity.MasterEntityID;
+            int masterEntityID = bulletEntity.WeaponID;
             int bulletEntityID = bulletEntity.IDComponent.EntityID;
             Vector3 pos = bulletEntity.LocomotionComponent.Position;
             Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");

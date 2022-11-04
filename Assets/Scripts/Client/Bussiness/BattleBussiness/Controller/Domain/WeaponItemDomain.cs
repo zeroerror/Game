@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var repo = battleFacades.Repo;
             var weaponItemRepo = repo.WeaponItemRepo;
-            weaponItem.IDComponent.SetEntityId(entityID);
+            weaponItem.SetEntityID(entityID);
             weaponItemRepo.Add(weaponItem);
 
             return weaponItem;
@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var go = GameObject.Instantiate(prefab);
                 var weaponItem = go.GetComponent<WeaponItemEntity>();
                 weaponItem.Ctor();
-                weaponItem.IDComponent.SetEntityId(entityID);
+                weaponItem.SetEntityID(entityID);
 
                 var repo = battleFacades.Repo;
                 var weaponItemRepo = repo.WeaponItemRepo;

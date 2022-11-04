@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             fireDir.Normalize();
             FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
             {
-                masterId = (byte)masterId,
+                weaponID = (byte)masterId,
                 firePointPosX = (int)(firePointPos.x * 10000f),
                 firePointPosY = (int)(firePointPos.y * 10000f),
                 firePointPosZ = (int)(firePointPos.z * 10000f),
@@ -74,7 +74,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
             FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
             {
-                entityId = (ushort)role.WeaponComponent.CurrentWeapon.IDComponent.EntityID,
+                entityID = (ushort)role.WeaponComponent.CurrentWeapon.IDComponent.EntityID,
                 masterId = role.IDComponent.EntityID
             };
             battleClient.SendMsg(frameWeaponDropReqMsg);

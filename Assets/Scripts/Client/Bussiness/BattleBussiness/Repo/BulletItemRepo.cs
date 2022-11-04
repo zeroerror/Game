@@ -9,22 +9,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<BulletItemEntity> bulletPackList;
-        public ushort BulletPackCount => (ushort)bulletPackList.Count;
+        public int BulletPackCount => (int)bulletPackList.Count;
 
         public BulletItemRepo()
         {
             bulletPackList = new List<BulletItemEntity>();
         }
 
-        public bool TryGet(ushort bulletId, out BulletItemEntity bulletEntity)
+        public bool TryGet(int bulletId, out BulletItemEntity bulletEntity)
         {
             bulletEntity = bulletPackList.Find((entity) => entity.IDComponent.EntityID == bulletId);
             return bulletEntity != null;
         }
 
-        public BulletItemEntity Get(ushort wRid)
+        public BulletItemEntity Get(int masterID)
         {
-            return bulletPackList.Find((entity) => entity.MasterId == wRid);
+            return bulletPackList.Find((entity) => entity.MasterID == masterID);
         }
 
         public BulletItemEntity[] GetAll()

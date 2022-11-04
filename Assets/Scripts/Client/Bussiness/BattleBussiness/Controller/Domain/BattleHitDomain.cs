@@ -48,10 +48,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             CausePhysics(role, bullet, hitPowerModel.knockBackSpeed, hitPowerModel.blowUpSpeed);
 
             var repo = battleFacades.Repo;
-            var roleRepo = repo.RoleLogicRepo;
-            var master = roleRepo.Get(bullet.MasterEntityID);
-            var weaponComponent = master.WeaponComponent;
-            var bulletDamage = bullet.GetDamageByCoefficient(weaponComponent.DamageCoefficient);
+            var weaponRepo = repo.WeaponRepo;
+            var weapon = weaponRepo.Get(bullet.WeaponID);
+            var bulletDamage = bullet.GetDamageByCoefficient(weapon.DamageCoefficient);
             CauseAndRecordDamage(attackerIDC, victimIDC, bulletDamage, role);
 
             // - State

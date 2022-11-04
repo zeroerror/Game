@@ -27,7 +27,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var go = GameObject.Instantiate(prefab);
                 var armor = go.GetComponent<BattleArmorEntity>();
                 armor.Ctor();
-                armor.IDComponent.SetEntityId(entityID);
+                armor.SetEntityID(entityID);
 
                 var repo = battleFacades.Repo;
                 var armorRepo = repo.ArmorRepo;

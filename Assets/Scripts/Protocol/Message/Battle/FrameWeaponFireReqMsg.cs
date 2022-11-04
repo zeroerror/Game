@@ -5,7 +5,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 
     [ZeroMessage]
     public class FrameWeaponShootReqMsg :IZeroMessage<FrameWeaponShootReqMsg>{
-        public byte masterId;
+        public byte weaponID;
         public int firePointPosX;
         public int firePointPosY;
         public int firePointPosZ;
@@ -14,7 +14,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 
         public void FromBytes(byte[] src, ref int offset)
         {
-            masterId = BufferReader.ReadByte(src, ref offset);
+            weaponID = BufferReader.ReadByte(src, ref offset);
             firePointPosX = BufferReader.ReadInt32(src, ref offset);
             firePointPosY = BufferReader.ReadInt32(src, ref offset);
             firePointPosZ = BufferReader.ReadInt32(src, ref offset);
@@ -27,7 +27,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
         {
             int offset = 0;
             byte[] result = new byte[1000];
-            BufferWriter.WriteByte(result, masterId, ref offset);
+            BufferWriter.WriteByte(result, weaponID, ref offset);
             BufferWriter.WriteInt32(result, firePointPosX, ref offset);
             BufferWriter.WriteInt32(result, firePointPosY, ref offset);
             BufferWriter.WriteInt32(result, firePointPosZ, ref offset);

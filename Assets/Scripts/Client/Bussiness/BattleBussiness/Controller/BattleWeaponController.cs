@@ -51,12 +51,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 weaponShootQueue.Dequeue();
 
-                var roleRepo = battleFacades.Repo.RoleLogicRepo;
-                var master = roleRepo.Get(msg.masterId);
+                var repo = battleFacades.Repo;
+
+                var weaponRepo = repo.WeaponRepo;
+                var weapon = weaponRepo.Get(msg.weaponID);
+
+                var roleRepo = repo.RoleLogicRepo;
+                var master = roleRepo.Get(weapon.MasterID);
+
                 var weaponComponent = master.WeaponComponent;
+                if (weapon != weaponComponent.CurrentWeapon)
+                {
+                    Debug.LogError("客服不一致!");
+                }
+
                 if (weaponComponent.TryWeaponShoot())
                 {
-                    Debug.Log($"角色:{msg.masterId}射击");
+                    Debug.Log($"角色:{master.IDComponent.EntityID} 射击");
                     var curWeapon = weaponComponent.CurrentWeapon;
                     curWeapon.PlayShootAudio();
                 }
@@ -81,8 +92,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (weaponDropQueue.TryPeek(out var msg))
             {
                 weaponDropQueue.Dequeue();
-                var master = battleFacades.Repo.RoleLogicRepo.Get(msg.masterId);
-                master.WeaponComponent.TryDropWeapon(msg.entityId, out var weapon);
+                var master = battleFacades.Repo.RoleLogicRepo.Get(msg.masterID);
+                master.WeaponComponent.TryDropWeapon(msg.weaponID, out var weapon);
 
                 var itemDomain = battleFacades.Domain.ItemDomain;
                 itemDomain.DropWeaponToItem(weapon);

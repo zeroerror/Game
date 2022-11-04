@@ -10,11 +10,13 @@ namespace Game.Client.Bussiness.BattleBussiness
         // ID Info
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
+        public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
+        public void SetEntityID(int v) => idComponent.SetEntityID(v);
 
         // Master Info
-        int masterEntityID;
-        public int MasterEntityID => masterEntityID;
-        public void SetMasterEntityId(int v) => this.masterEntityID = v;
+        int weaponID;
+        public int WeaponID => weaponID;
+        public void SetWeaponID(int v) => this.weaponID = v;
 
         // Bullet Info
         [SerializeField]
@@ -37,17 +39,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetLifeTime(float lifeTime) => this.lifeTime = lifeTime;
         public void ReduceLifeTime(float time) => this.lifeTime -= time;
 
-        // Damage Coefficient
-        float damageCoefficient;
-
         float existTime;
         public float ExistTime => existTime;
         public void AddExistTime(float time) => existTime += time;
 
         public void Ctor()
         {
-            damageCoefficient = 1f;
-
             idComponent = new IDComponent();
             idComponent.SetEntityType(EntityType.Bullet);
 
@@ -78,7 +75,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float GetDamageByCoefficient(float coefficient)
         {
             var realDamage = hitPowerModel.damage * coefficient;
-            Debug.Log($"GetDamageByCoefficient {realDamage}");
             return realDamage;
         }
 

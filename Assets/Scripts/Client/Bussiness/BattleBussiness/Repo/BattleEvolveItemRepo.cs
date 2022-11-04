@@ -15,7 +15,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             all = new List<BattleEvolveItemEntity>();
         }
 
-        public bool TryGet(ushort entityId, out BattleEvolveItemEntity entity)
+        public bool TryGet(int entityId, out BattleEvolveItemEntity entity)
         {
             entity = all.Find((entity) => entity.IDComponent.EntityID == entityId);
             Debug.Assert(entity != null, $"进化ITEM {entityId} 不存在");

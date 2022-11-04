@@ -23,12 +23,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var armorItem = entityGo.GetComponent<BattleArmorItemEntity>();
             armorItem.Ctor();
-            armorItem.IDComponent.SetEntityId(entityID);
+            armorItem.SetEntityID(entityID);
 
             var repo = battleFacades.Repo;
             var armorItemRepo = repo.ArmorItemRepo;
             armorItemRepo.Add(armorItem);
-            
+
             return armorItem;
         }
 
@@ -41,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var go = GameObject.Instantiate(prefab);
                 var armorItem = go.GetComponent<BattleArmorItemEntity>();
-                armorItem.IDComponent.SetEntityId(entityID);
+                armorItem.SetEntityID(entityID);
 
                 var repo = battleFacades.Repo;
                 var armorItemRepo = repo.ArmorItemRepo;

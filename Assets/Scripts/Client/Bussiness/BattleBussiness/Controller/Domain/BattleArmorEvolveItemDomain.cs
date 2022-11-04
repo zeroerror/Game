@@ -23,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var armorItem = entityGo.GetComponent<BattleEvolveItemEntity>();
             armorItem.Ctor();
-            armorItem.IDComponent.SetEntityId(entityID);
+            armorItem.SetEntityID(entityID);
 
             var repo = battleFacades.Repo;
             var armorEvolveItemRepo = repo.EvolveItemRepo;

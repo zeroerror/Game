@@ -10,6 +10,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
+        public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
+        public void SetEntityID(int v) => idComponent.SetEntityID(v);
 
         [SerializeField]
         public BulletType bulletType;
@@ -18,13 +20,13 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int bulletNum;
 
         // Master Info
-        int masterId;
-        public int MasterId => masterId;
+        int masterID;
+        public int MasterID => masterID;
 
         EntityType IPickable.EntityType => idComponent.EntityType;
         int IPickable.EntityID => idComponent.EntityID;
 
-        public void SetMasterId(int masterId) => this.masterId = masterId;
+        public void SetMasterId(int masterId) => this.masterID = masterId;
 
         public void Ctor()
         {

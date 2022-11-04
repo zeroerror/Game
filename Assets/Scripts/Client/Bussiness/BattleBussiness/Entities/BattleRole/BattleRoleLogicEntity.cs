@@ -14,6 +14,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
+        public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
+        public void SetEntityID(int v) => idComponent.SetEntityID(v);
+
         ItemComponent itemComponent;
         public ItemComponent ItemComponent => itemComponent;
 
@@ -172,8 +175,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return;
             }
 
-            var idc = v.IDComponent;
-            idc.SetLeagueId(idComponent.LeagueId);
+            SetLeagueID(idComponent.LeagueId);
             armor = v;
         }
 

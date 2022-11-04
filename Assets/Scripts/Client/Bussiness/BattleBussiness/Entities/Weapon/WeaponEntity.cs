@@ -8,6 +8,8 @@ namespace Game.Client.Bussiness.BattleBussiness
     {
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
+        public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
+        public void SetEntityID(int v) => idComponent.SetEntityID(v);
 
         [SerializeField] WeaponType weaponType;
         public WeaponType WeaponType => weaponType;
@@ -27,13 +29,16 @@ namespace Game.Client.Bussiness.BattleBussiness
         [SerializeField] Transform firePoint;
         public Vector3 ShootPointPos => firePoint.position;
 
+        [SerializeField] float damageCoefficient;
+        public float DamageCoefficient => damageCoefficient;
+
         int curReloadingFrame;
         public int CurReloadingFrame => curReloadingFrame;
         public void ResetCurrentReloadingFrame() => curReloadingFrame = reloadFrame;
         public void ReduceCurReloadingFrame() => curReloadingFrame--;
 
         int masterEntityID;
-        public int MasterEntityID => masterEntityID;
+        public int MasterID => masterEntityID;
 
         public int bulletNum { get; private set; }
         public void LoadBullet(int bulletNum) => this.bulletNum += bulletNum;
@@ -93,6 +98,11 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void PlayShootAudio()
         {
             AudioSource.PlayClipAtPoint(shootAudioClip, ShootPointPos);
+        }
+
+        public void AddDamageCoefficient(float v)
+        {
+            damageCoefficient += v;
         }
 
     }

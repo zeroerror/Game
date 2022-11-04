@@ -9,26 +9,33 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     {
 
         List<WeaponEntity> weaponList;
-        public ushort WeaponCount => (ushort)weaponList.Count;
+        public int WeaponCount => (int)weaponList.Count;
 
         public WeaponRepo()
         {
             weaponList = new List<WeaponEntity>();
         }
 
-        public bool TryGetByEntityId(ushort weaponId, out WeaponEntity weaponEntity)
+        public bool TryGet(int weaponId, out WeaponEntity weaponEntity)
         {
             weaponEntity = weaponList.Find((entity) => entity.IDComponent.EntityID == weaponId);
             Debug.Assert(weaponEntity != null, $"武器{weaponId}不存在，weaponList：{weaponList.Count}");
             return weaponEntity != null;
         }
 
-        public List<WeaponEntity> TryGetByMasterWRid(ushort masterWRid)
+        public WeaponEntity Get(int weaponId)
+        {
+            var weaponEntity = weaponList.Find((entity) => entity.IDComponent.EntityID == weaponId);
+            Debug.Assert(weaponEntity != null, $"武器{weaponId}不存在，weaponList：{weaponList.Count}");
+            return weaponEntity;
+        }
+
+        public List<WeaponEntity> TryGetByMasterWRid(int masterWRid)
         {
             List<WeaponEntity> weaponEntityList = new List<WeaponEntity>();
             weaponList.ForEach((weapon) =>
             {
-                if (weapon.MasterEntityID == masterWRid) weaponEntityList.Add(weapon);
+                if (weapon.MasterID == masterWRid) weaponEntityList.Add(weapon);
             });
 
             return weaponEntityList;

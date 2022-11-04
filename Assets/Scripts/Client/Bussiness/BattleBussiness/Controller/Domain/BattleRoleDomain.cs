@@ -54,8 +54,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 var roleLogic = prefab.GetComponent<BattleRoleLogicEntity>();
                 roleLogic.Ctor();
-                roleLogic.IDComponent.SetEntityId(entityId);
-                roleLogic.IDComponent.SetLeagueId(entityId);
+                roleLogic.SetEntityID(entityId);
+                roleLogic.SetLeagueID(entityId);
                 Reborn(roleLogic);
 
                 var roleRepo = battleFacades.Repo.RoleLogicRepo;

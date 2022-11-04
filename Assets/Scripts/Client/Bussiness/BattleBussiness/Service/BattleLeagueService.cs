@@ -38,8 +38,8 @@ namespace Game.Client.Bussiness.BattleBussiness
             league.members.Add(ally1);
             league.members.Add(ally2);
 
-            ally1.SetLeagueId(autoId);
-            ally2.SetLeagueId(autoId);
+            ally1.SetLeagueID(autoId);
+            ally2.SetLeagueID(autoId);
 
             leagueList.Add(league);
 

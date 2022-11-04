@@ -10,6 +10,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
+        public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
+        public void SetEntityID(int v) => idComponent.SetEntityID(v);
 
         [SerializeField]
         WeaponType weaponType;

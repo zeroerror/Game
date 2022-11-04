@@ -28,7 +28,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return all.Remove(entity);
         }
 
-        public bool TryGet(ushort entityId, out BattleArmorItemEntity entity)
+        public bool TryGet(int entityId, out BattleArmorItemEntity entity)
         {
             entity = all.Find((entity) => entity.IDComponent.EntityID == entityId);
             Debug.Assert(entity != null, $"护甲ITEM {entityId} 不存在");

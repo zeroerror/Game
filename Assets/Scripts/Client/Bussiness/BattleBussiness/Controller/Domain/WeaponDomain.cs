@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public WeaponEntity SpawnWeapon(WeaponType weaponType, int entityID)
+        public WeaponEntity SpawnWeapon(WeaponType weaponType, int weaponID, int masterID)
         {
             string prefabName = $"Weapon_{weaponType.ToString()}";
 
@@ -29,7 +29,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var go = GameObject.Instantiate(prefab);
                 var weapon = go.GetComponent<WeaponEntity>();
                 weapon.Ctor();
-                weapon.IDComponent.SetEntityId(entityID);
+                weapon.SetEntityID(weaponID);
+                weapon.SetMaster(masterID);
+                weapon.SetLeagueID(masterID);
 
                 var repo = battleFacades.Repo;
                 var weaponRepo = repo.WeaponRepo;

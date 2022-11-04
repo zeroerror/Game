@@ -16,11 +16,11 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         int entityId;
         public int EntityID => entityId;
-        public void SetEntityId(int entityId) => this.entityId = entityId;
+        public void SetEntityID(int entityId) => this.entityId = entityId;
 
         int leagueId;
         public int LeagueId => leagueId;
-        public void SetLeagueId(int leagueId) => this.leagueId = leagueId;
+        public void SetLeagueID(int leagueId) => this.leagueId = leagueId;
 
         public IDComponent()
         {

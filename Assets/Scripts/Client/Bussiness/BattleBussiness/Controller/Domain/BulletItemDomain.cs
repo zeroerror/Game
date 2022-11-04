@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var repo = battleFacades.Repo;
             var bulletItemRepo = repo.BulletItemRepo;
-            bulletItem.IDComponent.SetEntityId(entityID);
+            bulletItem.SetEntityID(entityID);
             bulletItemRepo.Add(bulletItem);
             
             return bulletItem;
@@ -44,7 +44,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var weapon = go.GetComponent<BulletItemEntity>();
                 var repo = battleFacades.Repo;
                 var bulletItemRepo = repo.BulletItemRepo;
-                weapon.IDComponent.SetEntityId(entityID);
+                weapon.SetEntityID(entityID);
                 bulletItemRepo.Add(weapon);
                 return weapon;
             }

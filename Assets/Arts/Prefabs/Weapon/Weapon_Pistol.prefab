@@ -138,6 +138,7 @@ MonoBehaviour:
   bulletCapacity: 12
   firePoint: {fileID: 2140167003263957955}
   bulletType: 0
+  damageCoefficient: 2
 --- !u!1 &3160420142573990592
 GameObject:
   m_ObjectHideFlags: 0

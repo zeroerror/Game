@@ -54,7 +54,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var bulletItem = entityGo.GetComponent<BulletItemEntity>();
                 bulletItem.Ctor();
-                bulletItem.IDComponent.SetEntityId(entityID);
+                bulletItem.SetEntityID(entityID);
 
                 var repo = battleFacades.Repo;
                 var bulletItemRepo = repo.BulletItemRepo;
@@ -66,7 +66,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var armorItem = entityGo.GetComponent<BattleArmorItemEntity>();
                 armorItem.Ctor();
-                armorItem.IDComponent.SetEntityId(entityID);
+                armorItem.SetEntityID(entityID);
 
                 var repo = battleFacades.Repo;
                 var armorItemRepo = repo.ArmorItemRepo;
@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 var evolveItem = entityGo.GetComponent<BattleEvolveItemEntity>();
                 evolveItem.Ctor();
-                evolveItem.IDComponent.SetEntityId(entityID);
+                evolveItem.SetEntityID(entityID);
 
                 var repo = battleFacades.Repo;
                 var evolveItemRepo = repo.EvolveItemRepo;
@@ -89,7 +89,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             Debug.LogError($"没有处理的情况 {entityType.ToString()}");
         }
 
-        public bool TryPickUpItem(EntityType entityType, ushort entityID, int masterEntityID, Transform hangPoint = null)
+        public bool TryPickUpItem(EntityType entityType, int weaponID, int masterEntityID, Transform hangPoint = null)
         {
             var repo = battleFacades.Repo;
             var roleRepo = repo.RoleLogicRepo;
@@ -98,11 +98,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (entityType == EntityType.WeaponItem)
             {
                 var weaponItemRepo = repo.WeaponItemRepo;
-                if (weaponItemRepo.TryGetByEntityId(entityID, out var weaponItem))
+                if (weaponItemRepo.TryGetByEntityId(weaponID, out var weaponItem))
                 {
                     if (master.WeaponComponent.CanPickUpWeapon())
                     {
-                        PickItemToWeapon(entityID, hangPoint, master, weaponItem);
+                        PickItemToWeapon(weaponID, hangPoint, master, weaponItem);
                         return true;
                     }
                 }
@@ -114,7 +114,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 // TODO: 背包容量判断
                 var bulletItemRepo = repo.BulletItemRepo;
-                if (bulletItemRepo.TryGet(entityID, out BulletItemEntity bulletItem))
+                if (bulletItemRepo.TryGet(weaponID, out BulletItemEntity bulletItem))
                 {
                     master.ItemComponent.TryCollectItem_Bullet(bulletItem);
 
@@ -128,10 +128,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (entityType == EntityType.ArmorItem)
             {
                 var armorItemRepo = repo.ArmorItemRepo;
-                if (armorItemRepo.TryGet(entityID, out var armorItem))
+                if (armorItemRepo.TryGet(weaponID, out var armorItem))
                 {
                     var armorDomain = battleFacades.Domain.ArmorDomain;
-                    var armor = armorDomain.SpawnArmor(armorItem.GetArmorPrefabName(), entityID);
+                    var armor = armorDomain.SpawnArmor(armorItem.GetArmorPrefabName(), weaponID);
 
                     master.WearArmro(armor);
 
@@ -144,7 +144,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (entityType == EntityType.EvolveItem)
             {
                 var evolveItemRepo = repo.EvolveItemRepo;
-                if (evolveItemRepo.TryGet(entityID, out var evolveItem))
+                if (evolveItemRepo.TryGet(weaponID, out var evolveItem))
                 {
                     var armorDomain = battleFacades.Domain.ArmorDomain;
 
@@ -185,12 +185,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         #region [Weapon]
 
-        public void PickItemToWeapon(ushort entityID, Transform hangPoint, BattleRoleLogicEntity master, WeaponItemEntity weaponItem)
+        public void PickItemToWeapon(int weaponID, Transform hangPoint, BattleRoleLogicEntity master, WeaponItemEntity weaponItem)
         {
             var weaponDomain = battleFacades.Domain.WeaponDomain;
-            var weapon = weaponDomain.SpawnWeapon(weaponItem.WeaponType, entityID);
+            var weapon = weaponDomain.SpawnWeapon(weaponItem.WeaponType, weaponID, master.IDComponent.EntityID);
 
-            weapon.SetMaster(master.IDComponent.EntityID);
             master.WeaponComponent.PickUpWeapon(weapon, hangPoint);
 
             var weaponItemDomain = battleFacades.Domain.WeaponItemDomain;
@@ -204,7 +203,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var weaponItem = weaponItemDomain.SpawnWeaponItem(weapon.WeaponType, weapon.IDComponent.EntityID);
             weaponItem.Ctor();
 
-            var master = battleFacades.Repo.RoleLogicRepo.Get(weapon.MasterEntityID);
+            var master = battleFacades.Repo.RoleLogicRepo.Get(weapon.MasterID);
             weaponItem.transform.position = master.transform.position;
 
             var weaponDomain = domain.WeaponDomain;
