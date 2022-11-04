@@ -40,8 +40,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         int masterEntityID;
         public int MasterID => masterEntityID;
 
-        public int bulletNum { get; private set; }
-        public void LoadBullet(int bulletNum) => this.bulletNum += bulletNum;
+        int bulletNum;
+        public int BulletNum => bulletNum;
+        public void SetBulletNum(int v) => bulletNum = v;
 
         bool hasMaster;
         public bool HasMaster => hasMaster;
@@ -59,22 +60,20 @@ namespace Game.Client.Bussiness.BattleBussiness
             shootAudioClip = transform.Find("audio_clip_shoot").GetComponent<AudioSource>().clip;
         }
 
+        public void Clear()
+        {
+            hasMaster = false;
+        }
+
         public void SetMaster(int masterWRid)
         {
             this.masterEntityID = masterWRid;
             hasMaster = true;
         }
 
-        public void Clear()
+        public void LoadBullet(int v)
         {
-            var colliders = transform.GetComponentsInChildren<Collider>();
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                var c = colliders[i];
-                c.enabled = true;
-                c.isTrigger = true;
-            }
-            hasMaster = false;
+            bulletNum += v;
         }
 
         public int TryShootBullet(int num)

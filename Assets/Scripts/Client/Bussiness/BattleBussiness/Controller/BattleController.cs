@@ -202,16 +202,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 itemPickQueue.Dequeue();
 
-                var masterEntityID = msg.masterEntityID;
-                var entityType = (EntityType)msg.itemType;
-                var itemEntityId = msg.itemEntityID;
+                var masterEntityID = msg.roleID;
+                var entityType = (EntityType)msg.entityType;
+                var itemEntityId = msg.itemID;
 
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleLogicRepo;
                 var role = roleRepo.Get(masterEntityID);
 
                 var itemDomain = battleFacades.Domain.ItemDomain;
-                if (itemDomain.TryPickUpItem(entityType, itemEntityId, masterEntityID, role.roleRenderer.handPoint))
+                if (itemDomain.TryPickUpItem(masterEntityID, entityType, itemEntityId, role.roleRenderer.handPoint))
                 {
                     Debug.Log($"[MasterEntityID:{masterEntityID}] 拾取 {entityType.ToString()} [EntityID:{itemEntityId}]");
                 }

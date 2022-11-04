@@ -237,14 +237,13 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                     // TODO:Add judgement like 'Can He Pick It Up?'
                     EntityType entityType = (EntityType)msg.entityType;
-
                     var itemDomain = serverFacades.BattleFacades.Domain.ItemDomain;
-                    if (itemDomain.TryPickUpItem(entityType, msg.entityId, msg.entityID))
+                    if (itemDomain.TryPickUpItem(msg.roleID, entityType, msg.itemID))
                     {
                         var rqs = serverFacades.Network.ItemReqAndRes;
                         ConnIDList.ForEach((connId) =>
                         {
-                            rqs.SendRes_ItemPickUp(connId, ServerFrame, msg.entityID, entityType, msg.entityId);
+                            rqs.SendRes_ItemPickUp(connId, ServerFrame, msg.roleID, entityType, msg.itemID);
                         });
                     }
                     else

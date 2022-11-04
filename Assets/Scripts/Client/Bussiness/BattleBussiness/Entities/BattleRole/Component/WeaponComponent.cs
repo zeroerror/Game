@@ -39,7 +39,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public bool IsFullReloaded()
         {
-            return CurrentWeapon.bulletNum == CurrentWeapon.BulletCapacity;
+            return CurrentWeapon.BulletNum == CurrentWeapon.BulletCapacity;
         }
 
         public bool TryWeaponShoot()

@@ -20,6 +20,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         EntityType IPickable.EntityType => idComponent.EntityType;
         int IPickable.EntityID => idComponent.EntityID;
 
+        int bulletNum;
+        public int BulletNum => bulletNum;
+        public void SetBulletNum(int v) => bulletNum = v;
+
         public void Ctor()
         {
             idComponent = new IDComponent();
