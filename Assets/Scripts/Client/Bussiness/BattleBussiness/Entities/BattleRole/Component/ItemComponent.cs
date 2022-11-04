@@ -20,19 +20,21 @@ namespace Game.Client.Bussiness.BattleBussiness
         }
 
         // 拾取
-        public void TryCollectItem_Bullet(BulletItemEntity bulletItemEntity)
+        public bool TryCollectItem_Bullet(BulletItemEntity bulletItemEntity)
         {
             // TODO: 根据配置表获取物件单位占用容量
             // TODO: 只收集最大可收集数量
             if (CurrentCapacity >= ITEM_CAPACITY)
             {
                 Debug.LogWarning("背包容量已满！ 暂未作处理");
+                return false;
             }
 
             CurrentCapacity += bulletItemEntity.bulletNum * 1;
             Debug.LogWarning($"收集了子弹包[类型:{bulletItemEntity.bulletType.ToString()} 数量:{bulletItemEntity.bulletNum}]");
             Debug.LogWarning($"当前背包容量 占用 {CurrentCapacity}  剩余 {ITEM_CAPACITY - CurrentCapacity}");
             bulletItemList.Add(bulletItemEntity);
+            return true;
         }
 
         // 使用

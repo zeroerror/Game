@@ -97,85 +97,99 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             if (entityType == EntityType.WeaponItem)
             {
-                var weaponItemRepo = repo.WeaponItemRepo;
-                if (weaponItemRepo.TryGetByEntityId(weaponID, out var weaponItem))
+
+                if (!master.WeaponComponent.CanPickUpWeapon())
                 {
-                    if (master.WeaponComponent.CanPickUpWeapon())
-                    {
-                        PickItemToWeapon(weaponID, hangPoint, master, weaponItem);
-                        return true;
-                    }
+                    return false;
                 }
 
-                return false;
+                var weaponItemRepo = repo.WeaponItemRepo;
+                if (!weaponItemRepo.TryGetByEntityId(weaponID, out var weaponItem))
+                {
+                    return false;
+                }
+
+                PickItemToWeapon(weaponID, hangPoint, master, weaponItem);
+                return true;
             }
 
             if (entityType == EntityType.BulletItem)
             {
-                // TODO: 背包容量判断
                 var bulletItemRepo = repo.BulletItemRepo;
-                if (bulletItemRepo.TryGet(weaponID, out BulletItemEntity bulletItem))
+                if (!bulletItemRepo.TryGet(weaponID, out BulletItemEntity bulletItem))
                 {
-                    master.ItemComponent.TryCollectItem_Bullet(bulletItem);
-
-                    var domain = battleFacades.Domain;
-                    var bulletItemDomain = domain.BulletItemDomain;
-                    bulletItemDomain.TearDownBulletItem(bulletItem);
-                    return true;
+                    return false;
                 }
+
+                if (!master.ItemComponent.TryCollectItem_Bullet(bulletItem))
+                {
+                    return false;
+                }
+
+                var domain = battleFacades.Domain;
+                var bulletItemDomain = domain.BulletItemDomain;
+                bulletItemDomain.TearDownBulletItem(bulletItem);
+                return true;
             }
 
             if (entityType == EntityType.ArmorItem)
             {
                 var armorItemRepo = repo.ArmorItemRepo;
-                if (armorItemRepo.TryGet(weaponID, out var armorItem))
+                if (!armorItemRepo.TryGet(weaponID, out var armorItem))
                 {
-                    var armorDomain = battleFacades.Domain.ArmorDomain;
-                    var armor = armorDomain.SpawnArmor(armorItem.GetArmorPrefabName(), weaponID);
-
-                    master.WearArmro(armor);
-
-                    var armorItemDomain = battleFacades.Domain.ArmorItemDomain;
-                    armorItemDomain.TearDownWeaponItem(armorItem);
-                    return true;
+                    return false;
                 }
+
+                var domain = battleFacades.Domain;
+
+                var armorDomain = domain.ArmorDomain;
+                var armor = armorDomain.SpawnArmor(armorItem.GetArmorPrefabName(), weaponID);
+                if (!master.TryWearArmro(armor))
+                {
+                    return false;
+                }
+
+                var armorItemDomain = domain.ArmorItemDomain;
+                armorItemDomain.TearDownWeaponItem(armorItem);
+                return true;
             }
 
             if (entityType == EntityType.EvolveItem)
             {
                 var evolveItemRepo = repo.EvolveItemRepo;
-                if (evolveItemRepo.TryGet(weaponID, out var evolveItem))
+                if (!evolveItemRepo.TryGet(weaponID, out var evolveItem))
                 {
-                    var armorDomain = battleFacades.Domain.ArmorDomain;
+                    return false;
+                }
 
-                    var evolveType = evolveItem.evolveEntityType;
-
-                    if (evolveType == EntityType.Armor)
+                var evolveType = evolveItem.evolveEntityType;
+                
+                if (evolveType == EntityType.Armor)
+                {
+                    if (!master.HasArmor())
                     {
-                        if (!master.HasArmor())
-                        {
-                            return false;
-                        }
-
-                        var evolveTM = evolveItem.evolveTM;
-                        var armor = master.Armor;
-                        armor.EvolveFrom(evolveTM);
-
-                        var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                        armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
-                        return true;
+                        return false;
                     }
 
-                    if (evolveType == EntityType.BattleRole)
-                    {
-                        var evolveTM = evolveItem.evolveTM;
-                        master.EvolveFrom(evolveTM);
+                    Debug.Log($"护甲进化------");
+                    var evolveTM = evolveItem.evolveTM;
+                    var armor = master.Armor;
+                    armor.EvolveFrom(evolveTM);
 
-                        var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                        armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
-                        return true;
-                    }
+                    var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                    armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                    return true;
+                }
 
+                if (evolveType == EntityType.BattleRole)
+                {
+                    Debug.Log($"人物进化------");
+                    var evolveTM = evolveItem.evolveTM;
+                    master.EvolveFrom(evolveTM);
+
+                    var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
+                    armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                    return true;
                 }
             }
 

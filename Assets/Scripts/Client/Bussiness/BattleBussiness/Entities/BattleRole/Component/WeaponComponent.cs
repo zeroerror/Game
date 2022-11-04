@@ -11,20 +11,16 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         readonly int WEAPON_CAPICY = 1;
 
-        public WeaponEntity[] AllWeapon;    //所有武器
+        public WeaponEntity[] AllWeapons;    //所有武器
         public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
         public int CurrentNum { get; private set; }    //当前武器数量
-
-        float damageCoefficient;
-        public float DamageCoefficient => damageCoefficient;
 
         public bool isReloading;
         public bool IsReloading => isReloading;
 
         public void Reset()
         {
-            damageCoefficient = 1f;
-            AllWeapon = new WeaponEntity[WEAPON_CAPICY];
+            AllWeapons = new WeaponEntity[WEAPON_CAPICY];
         }
 
         public void BeginReloading()
@@ -65,9 +61,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void PickUpWeapon(WeaponEntity weaponEntity, Transform hangPoint = null)
         {
-            for (int i = 0; i < AllWeapon.Length; i++)
+            for (int i = 0; i < AllWeapons.Length; i++)
             {
-                if (AllWeapon[i] == null)
+                if (AllWeapons[i] == null)
                 {
                     var colliders = weaponEntity.GetComponentsInChildren<Collider>();
                     for (int j = 0; j < colliders.Length; j++)
@@ -86,7 +82,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                     CurrentWeapon = weaponEntity;
                     CurrentWeapon.gameObject.SetActive(true);
 
-                    AllWeapon[i] = CurrentWeapon;
+                    AllWeapons[i] = CurrentWeapon;
                     CurrentNum++;
                     return;
                 }
@@ -99,7 +95,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (index < 0 || index >= 4) return;
             //原来武器隐藏,显示新武器
             CurrentWeapon.gameObject.SetActive(false);
-            CurrentWeapon = AllWeapon[index];
+            CurrentWeapon = AllWeapons[index];
             CurrentWeapon.gameObject.SetActive(true);
             Debug.Log($"切换至武器{index}:{CurrentWeapon.WeaponType.ToString()}");
         }
@@ -108,9 +104,9 @@ namespace Game.Client.Bussiness.BattleBussiness
         public bool TryDropWeapon(ushort entityId, out WeaponEntity weapon)
         {
             weapon = null;
-            for (int i = 0; i < AllWeapon.Length; i++)
+            for (int i = 0; i < AllWeapons.Length; i++)
             {
-                var w = AllWeapon[i];
+                var w = AllWeapons[i];
                 if (w == null) continue;
 
                 var entityID = w.IDComponent.EntityID;
@@ -119,7 +115,7 @@ namespace Game.Client.Bussiness.BattleBussiness
                     weapon = w;
                     weapon.Clear();
 
-                    AllWeapon[i] = null;
+                    AllWeapons[i] = null;
                     CurrentNum--;
 
                     //是否为丢弃当前武器
@@ -134,9 +130,9 @@ namespace Game.Client.Bussiness.BattleBussiness
                         Debug.Log($"丢弃其他武器 {w.WeaponType.ToString()}");
                     }
 
-                    for (int j = 0; j < AllWeapon.Length; j++)
+                    for (int j = 0; j < AllWeapons.Length; j++)
                     {
-                        var curWeapon = AllWeapon[j];
+                        var curWeapon = AllWeapons[j];
                         if (curWeapon != null)
                         {
                             CurrentWeapon = curWeapon;
@@ -155,13 +151,13 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void DropWeapon(ushort entityId)
         {
-            for (int i = 0; i < AllWeapon.Length; i++)
+            for (int i = 0; i < AllWeapons.Length; i++)
             {
-                var w = AllWeapon[i];
+                var w = AllWeapons[i];
                 var entityID = w.IDComponent.EntityID;
                 if (entityID == entityId)
                 {
-                    AllWeapon[i] = null;
+                    AllWeapons[i] = null;
                     w.Clear();
                     return;
                 }
@@ -171,9 +167,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public WeaponEntity GetWeapon(ushort entityID)
         {
-            for (int i = 0; i < AllWeapon.Length; i++)
+            for (int i = 0; i < AllWeapons.Length; i++)
             {
-                var w = AllWeapon[i];
+                var w = AllWeapons[i];
                 var id = w.IDComponent.EntityID;
                 if (id == entityID)
                 {
@@ -182,11 +178,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             }
 
             return null;
-        }
-
-        public void AddDamageCoefficient(float v)
-        {
-            damageCoefficient += v;
         }
 
     }

@@ -164,19 +164,25 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             // - WeaponComponent
             var wc = weaponComponent;
-            wc.AddDamageCoefficient(evolveTM.addDamageCoefficient);
+            var allWeapons = wc.AllWeapons;
+            for (int i = 0; i < allWeapons.Length; i++)
+            {
+                var weapon = allWeapons[i];
+                weapon.AddDamageCoefficient(evolveTM.addDamageCoefficient);
+            }
         }
 
         // - Armor
-        public void WearArmro(BattleArmorEntity v)
+        public bool TryWearArmro(BattleArmorEntity v)
         {
             if (HasArmor())
             {
-                return;
+                return false;
             }
 
             SetLeagueID(idComponent.LeagueId);
             armor = v;
+            return true;
         }
 
         public float TryReceiveDamage(float damage)
