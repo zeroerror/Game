@@ -30,27 +30,27 @@ namespace Game.Client.Bussiness.BattleBussiness
             settlementMod = new GameStateBattleSettlementMod();
         }
 
-        public void EnterGameStage_BattleLoading()
+        public void EnterGameState_BattleLoading()
         {
             loadingMod.isFirstEnter = true;
             gameState = BattleGameState.Loading;
         }
 
-        public void EnterGameStage_BattlePreparing(int maintainFrame)
+        public void EnterGameState_BattlePreparing(int maintainFrame)
         {
             preparingMod.isFirstEnter = true;
             preparingMod.maintainFrame = maintainFrame;
             gameState = BattleGameState.Preparing;
         }
 
-        public void EnterGameStage_BattleFighting(int maintainFrame)
+        public void EnterGameState_BattleFighting(int maintainFrame)
         {
             fightingMod.isFirstEnter = true;
             fightingMod.maintainFrame = maintainFrame;
             gameState = BattleGameState.Fighting;
         }
 
-        public void EnterGameStage_BattleSettlement(int maintainFrame)
+        public void EnterGameState_BattleSettlement(int maintainFrame)
         {
             settlementMod.isFirstEnter = true;
             settlementMod.maintainFrame = maintainFrame;

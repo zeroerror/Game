@@ -12,7 +12,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
     public static class BattleGameStageExtensions
     {
 
-        public static bool HasStageOn(this BattleGameStage self, BattleGameStage tar)
+        public static bool HasStage(this BattleGameStage self, BattleGameStage tar)
         {
             return (self & tar) != 0;
         }
@@ -29,13 +29,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
 
         public static int CompareStageFlag(this BattleGameStage self, BattleGameStage tar, BattleGameStage flag)
         {
-            if (!self.HasStageOn(flag) && tar.HasStageOn(flag))
+            if (!self.HasStage(flag) && tar.HasStage(flag))
             {
                 // - Off -> On
                 return 1;
             }
 
-            if (self.HasStageOn(flag) && !tar.HasStageOn(flag))
+            if (self.HasStage(flag) && !tar.HasStage(flag))
             {
                 // - On -> Off
                 return -1;

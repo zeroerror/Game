@@ -92,12 +92,14 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 var battleFacades = serverFacades.BattleFacades;
                 var gameEntity = battleFacades.GameEntity;
-                var gameStage = gameEntity.GameStage;
+                var gameStage = gameEntity.ClientStage;
                 var fsm = gameEntity.FSMComponent;
                 var gameState = fsm.GameState;
-                if (!gameStage.HasStageOn(BattleGameStage.Loaded) && gameState != BattleGameState.Loading)
+                if (!gameStage.HasStage(BattleGameStage.Loaded) && gameState != BattleGameState.Loading)
                 {
-                    fsm.EnterGameStage_BattleLoading();
+                    fsm.EnterGameState_BattleLoading();
+                    var battleRqs = serverFacades.Network.BattleReqAndRes;
+                    battleRqs.SendRes_BattleGameStateChange(connID, BattleGameState.Loading);
                 }
             };
         }

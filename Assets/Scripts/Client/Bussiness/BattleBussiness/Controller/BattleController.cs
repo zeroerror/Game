@@ -59,7 +59,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick(float fixedDeltaTime)
         {
-            if (battleFacades.Repo.FiledRepo.CurFieldEntity == null)
+            // - Game State Apply
+            var gameStateDomain = battleFacades.Domain.GameStateDomain;
+            gameStateDomain.ApplyGameState();
+
+            // - Game Stage Check
+            var gameEntity = battleFacades.GameEntity;
+            var gameStage = gameEntity.ClientStage;
+            if (!gameStage.HasStage(BattleGameStage.Loaded))
             {
                 return;
             }
@@ -272,27 +279,36 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #endregion
 
-        void OnGameStageUpdate(BattleGameStageUpdateResMsg msg)
+        void OnGameStageUpdate(BattleGameStateEnterResMsg msg)
         {
+            BattleGameState serState = (BattleGameState)msg.gameState;
             var gameEntity = battleFacades.GameEntity;
-            var clientGameStageFlag = gameEntity.GameStage;
-
-            BattleGameStage serGameStageFlag = (BattleGameStage)msg.gameStage;
-            gameEntity.SetGameStageFlag(serGameStageFlag);
-
-            BattleLoadChecking(clientGameStageFlag, serGameStageFlag);
-
-        }
-
-        void BattleLoadChecking(BattleGameStage clientGameStageFlag, BattleGameStage serGameStageFlag)
-        {
-            var needLoaded = clientGameStageFlag.CompareStageFlag(serGameStageFlag, BattleGameStage.Loaded);
-            if (needLoaded == 1)
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.GameState;
+            if (state == serState)
             {
-                GameFightSpawn();
                 return;
             }
+
+            BattleGameStage serStage = (BattleGameStage)msg.gameStage;
+            gameEntity.SetSerStage(serStage);
+
+            // - Load Check
+            var clientStage = gameEntity.ClientStage;
+            if (serStage != clientStage)
+            {
+                if (!clientStage.HasStage(BattleGameStage.Loaded) && state != BattleGameState.Loading)
+                {
+                    fsm.EnterGameState_BattleLoading();
+                }
+                return;
+            }
+
+            // - Enter State
+        
+
         }
+
     }
 
 }

@@ -48,7 +48,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         // ====== Send ======
         // ====== Regist ======
-        public void RegistRes_BattleGameStageUpdate(Action<BattleGameStageUpdateResMsg> action)
+        public void RegistRes_BattleGameStageUpdate(Action<BattleGameStateEnterResMsg> action)
         {
             AddRegister(action);
         }

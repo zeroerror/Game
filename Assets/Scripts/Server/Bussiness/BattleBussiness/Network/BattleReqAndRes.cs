@@ -45,10 +45,11 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendRes_BattleGameStageFlagUpdate(int connID, BattleGameStage flag)
+        public void SendRes_BattleGameStateChange(int connID, BattleGameState state, BattleGameStage stage)
         {
-            BattleGameStageUpdateResMsg msg = new BattleGameStageUpdateResMsg();
-            msg.gameStage = (int)flag;
+            BattleGameStateEnterResMsg msg = new BattleGameStateEnterResMsg();
+            msg.gameState = (int)state;
+            msg.gameStage = (int)stage;
 
             battleServer.SendMsg(connID, msg);
 

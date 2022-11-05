@@ -64,7 +64,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             // Domain Handler
             var gameStateDomain = serverFacades.BattleFacades.Domain.GameStateDomain;
-            gameStateDomain.gameStageChangeHandler += (OnGameStageChange);
+            gameStateDomain.gameStateChangeHandler += (OnGameStageChange);
 
         }
 
@@ -75,8 +75,8 @@ namespace Game.Server.Bussiness.BattleBussiness
             gameStateDomain.ApplyGameState();
 
             var gameEntity = serverFacades.BattleFacades.GameEntity;
-            var gamestage = gameEntity.GameStage;
-            if (!gamestage.HasStageOn(BattleGameStage.Loaded))
+            var gamestage = gameEntity.ClientStage;
+            if (!gamestage.HasStage(BattleGameStage.Loaded))
             {
                 return;
             }
@@ -344,11 +344,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnGameStageChange()
         {
-            var gameStage = serverFacades.BattleFacades.GameEntity.GameStage;
+            var gameState = serverFacades.BattleFacades.GameEntity.FSMComponent.GameState;
             var battleRqs = serverFacades.Network.BattleReqAndRes;
             ConnIDList.ForEach((connID) =>
             {
-                battleRqs.SendRes_BattleGameStageFlagUpdate(connID, gameStage);
+                battleRqs.SendRes_BattleGameStateChange(connID, gameState);
             });
         }
 

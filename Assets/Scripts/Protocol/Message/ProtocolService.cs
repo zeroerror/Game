@@ -12,7 +12,7 @@ Dictionary<Type, ushort> messageInfoDic;
         public ProtocolService()
         {
             this.messageInfoDic = new Dictionary<Type, ushort>();
-            messageInfoDic.Add(typeof(BattleGameStageUpdateResMsg), 0);
+            messageInfoDic.Add(typeof(BattleGameStateEnterResMsg), 0);
             messageInfoDic.Add(typeof(BattleRoleSyncMsg), 1);
             messageInfoDic.Add(typeof(FrameBattleRoleSpawnReqMsg), 2);
             messageInfoDic.Add(typeof(FrameBattleRoleSpawnResMsg), 3);

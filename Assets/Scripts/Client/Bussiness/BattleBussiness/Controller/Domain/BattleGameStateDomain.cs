@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
     {
         BattleFacades battleFacades;
 
-        public Action gameStageChangeHandler;
+        public Action gameStateChangeHandler;
 
         public BattleGameStateDomain()
         {
@@ -32,15 +32,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         void ApplyGameState_Any()
         {
-            // var gameEntity = battleFacades.GameEntity;
-            // var gameStage = gameEntity.GameStage;
-            // var fsm = gameEntity.FSMComponent;
-            // var gameState = fsm.GameState;
-            // if (!gameStage.HasStageOn(BattleGameStage.Loaded) && gameState != BattleGameState.Loading)
-            // {
-            //     fsm.EnterGameStage_BattleLoading();
-            // }
-
         }
 
         void ApplyGameState_Loading()
@@ -67,9 +58,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (field != null)
             {
                 // - Stage
-                var gameStage = gameEntity.GameStage;
+                var gameStage = gameEntity.ClientStage;
                 gameStage.AddStage(BattleGameStage.Loaded);
-                fsm.EnterGameStage_BattlePreparing(300);
+
+                // State
+                fsm.EnterGameState_BattlePreparing(300);
+                gameStateChangeHandler.Invoke();
             }
         }
 
@@ -98,11 +92,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             else
             {
                 // - Stage
-                var gameStage = gameEntity.GameStage;
+                var gameStage = gameEntity.ClientStage;
                 gameStage.AddStage(BattleGameStage.Prepared);
 
-                // - Enter 
-                fsm.EnterGameStage_BattleFighting(300);
+                // - State 
+                fsm.EnterGameState_BattleFighting(300);
+                gameStateChangeHandler.Invoke();
             }
 
         }
@@ -132,11 +127,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             else
             {
                 // - Stage
-                var gameStage = gameEntity.GameStage;
+                var gameStage = gameEntity.ClientStage;
                 gameStage.AddStage(BattleGameStage.GameOver);
 
-                // - Enter 
-                fsm.EnterGameStage_BattleSettlement(150);
+                // - State 
+                fsm.EnterGameState_BattleSettlement(150);
+                gameStateChangeHandler.Invoke();
             }
         }
 
@@ -165,11 +161,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             else
             {
                 // - Stage
-                var gameStage = gameEntity.GameStage;
+                var gameStage = gameEntity.ClientStage;
                 gameStage.RemoveStage(BattleGameStage.GameOver);
 
-                // - Enter 
-                fsm.EnterGameStage_BattlePreparing(300);
+                // - State 
+                fsm.EnterGameState_BattlePreparing(300);
+                gameStateChangeHandler.Invoke();
             }
         }
 
