@@ -63,14 +63,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 Debug.Log($"进入 加载阶段");
             }
 
-            // var field = battleFacades.Repo.FiledRepo.CurFieldEntity;
-            // if (field != null)
-            // {
-            //     // - Stage
-            //     var gameStage = gameEntity.GameStage;
-            //     gameStage.AddStage(BattleGameStage.Loaded);
-            //     fsm.EnterGameStage_BattlePreparing(900);
-            // }
+            var field = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            if (field != null)
+            {
+                // - Stage
+                var gameStage = gameEntity.GameStage;
+                gameStage.AddStage(BattleGameStage.Loaded);
+                fsm.EnterGameStage_BattlePreparing(300);
+            }
         }
 
         void ApplyGameState_Preparing()
@@ -102,7 +102,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 gameStage.AddStage(BattleGameStage.Prepared);
 
                 // - Enter 
-                fsm.EnterGameStage_BattleFighting(600);
+                fsm.EnterGameStage_BattleFighting(300);
             }
 
         }
@@ -169,7 +169,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 gameStage.RemoveStage(BattleGameStage.GameOver);
 
                 // - Enter 
-                fsm.EnterGameStage_BattlePreparing(900);
+                fsm.EnterGameStage_BattlePreparing(300);
             }
         }
 
