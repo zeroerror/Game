@@ -1,6 +1,5 @@
 using System;
 using Game.Protocol.Login;
-using Game.Protocol.World;
 
 namespace Game.Client.Bussiness.EventCenter
 {
@@ -24,7 +23,6 @@ namespace Game.Client.Bussiness.EventCenter
         static Action battleSerConnectHandler;
         public static void Regist_BattleSerConnectHandler(Action action) => battleSerConnectHandler += action;
         public static void Invoke_BattleSerConnectHandler() => battleSerConnectHandler.Invoke();
-
 
         public static void Ctor()
         {

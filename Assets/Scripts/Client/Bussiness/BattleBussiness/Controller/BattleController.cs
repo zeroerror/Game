@@ -22,9 +22,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         // 服务器下发的资源拾取队列
         Queue<FrameItemPickResMsg> itemPickQueue;
 
-        bool hasBattleBegin;
-        bool hasSpawnBegin;
-
         public BattleController()
         {
 
@@ -41,13 +38,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             });
             NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
             {
-                hasBattleBegin = true;
             });
         }
 
         public void Inject(BattleFacades battleFacades)
         {
             this.battleFacades = battleFacades;
+
+            var battleRqs = battleFacades.Network.BattleReqAndRes;
+            battleRqs.RegistRes_BattleGameStageUpdate(OnGameStageUpdate);
 
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
@@ -60,12 +59,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick(float fixedDeltaTime)
         {
-            if (hasBattleBegin && !hasSpawnBegin)
-            {
-                hasSpawnBegin = true;
-                GameFightSpawn();
-            }
-
             if (battleFacades.Repo.FiledRepo.CurFieldEntity == null)
             {
                 return;
@@ -83,6 +76,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
 
         #region [Role Tick]
+
         void Tick_RoleSync()
         {
             while (roleQueue.TryPeek(out var msg))
@@ -278,6 +272,27 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #endregion
 
+        void OnGameStageUpdate(BattleGameStageUpdateResMsg msg)
+        {
+            var gameEntity = battleFacades.GameEntity;
+            var clientGameStageFlag = gameEntity.GameStage;
+
+            BattleGameStage serGameStageFlag = (BattleGameStage)msg.gameStage;
+            gameEntity.SetGameStageFlag(serGameStageFlag);
+
+            BattleLoadChecking(clientGameStageFlag, serGameStageFlag);
+
+        }
+
+        void BattleLoadChecking(BattleGameStage clientGameStageFlag, BattleGameStage serGameStageFlag)
+        {
+            var needLoaded = clientGameStageFlag.CompareStageFlag(serGameStageFlag, BattleGameStage.Loaded);
+            if (needLoaded == 1)
+            {
+                GameFightSpawn();
+                return;
+            }
+        }
     }
 
 }

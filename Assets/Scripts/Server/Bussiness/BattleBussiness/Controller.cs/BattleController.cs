@@ -15,9 +15,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleServerFacades serverFacades;
 
         // Scene Spawn Trigger
-        bool hasBattleBegin;
-        bool hasSpawnBegin;
-        bool hasSpawnFinished;
 
         // NetWork Info
         public int ServerFrame => serverFacades.Network.ServeFrame;
@@ -41,7 +38,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             ServerNetworkEventCenter.battleSerConnect += ((connId) =>
             {
                 ConnIDList.Add(connId); //添加至连接名单
-                hasBattleBegin = true;
             });
 
             roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
@@ -52,35 +48,35 @@ namespace Game.Server.Bussiness.BattleBussiness
             itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
         }
 
-        public void Inject(BattleServerFacades battleFacades)
+        public void Inject(BattleServerFacades v)
         {
-            this.serverFacades = battleFacades;
+            serverFacades = v;
 
-            var roleRqs = battleFacades.Network.RoleReqAndRes;
+            // - Network
+            var roleRqs = v.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMove);
             roleRqs.RegistReq_RoleRotate(OnRoleRotate);
             roleRqs.RegistReq_Jump(OnRoleJump);
             roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawn);
 
-            var itemRqs = battleFacades.Network.ItemReqAndRes;
+            var itemRqs = v.Network.ItemReqAndRes;
             itemRqs.RegistReq_ItemPickUp(OnItemPickUp);
+
+            // Domain Handler
+            var gameStateDomain = serverFacades.BattleFacades.Domain.GameStateDomain;
+            gameStateDomain.gameStageChangeHandler += (OnGameStageChange);
 
         }
 
         public void Tick(float fixedDeltaTime)
         {
-            if (!hasBattleBegin)
-            {
-                return;
-            }
+            // - Game State
+            var gameStateDomain = serverFacades.BattleFacades.Domain.GameStateDomain;
+            gameStateDomain.ApplyGameState();
 
-            if (hasBattleBegin)
-            {
-                SpawBattleScene();
-            }
-
-            var curFieldEntity = serverFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
-            if (curFieldEntity == null)
+            var gameEntity = serverFacades.BattleFacades.GameEntity;
+            var gamestage = gameEntity.GameStage;
+            if (!gamestage.HasStageOn(BattleGameStage.Loaded))
             {
                 return;
             }
@@ -131,19 +127,17 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleSpawnMsgDic[key] = null;
 
                     var battleFacades = serverFacades.BattleFacades;
-                    var weaponRepo = battleFacades.Repo.WeaponRepo;
                     var roleRepo = battleFacades.Repo.RoleLogicRepo;
                     var entityID = roleRepo.Size;
-
-                    // 服务器逻辑
                     var roleEntity = battleFacades.Domain.RoleDomain.SpawnRoleLogic(entityID);
                     roleEntity.SetConnId(connId);
-                    var rqs = serverFacades.Network.RoleReqAndRes;
-                    rqs.SendRes_BattleRoleSpawn(connId, entityID, msg.controlType);
-                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServerFrame} entityId:{entityID} controlType {((ControlType)msg.controlType).ToString()}");
 
-                    var itemRqs = serverFacades.Network.ItemReqAndRes;
-                    itemRqs.SendRes_ItemSpawn(connId, ServerFrame, serverFacades.ItemTypeByteList, serverFacades.SubTypeList, serverFacades.EntityIDList);
+                    var serNetwork = serverFacades.Network;
+                    var roleRqs = serNetwork.RoleReqAndRes;
+                    roleRqs.SendRes_BattleRoleSpawn(connId, entityID, msg.controlType);
+                    var itemRqs = serNetwork.ItemReqAndRes;
+                    itemRqs.SendRes_ItemSpawn(connId, ServerFrame, battleFacades.ItemTypeByteList, battleFacades.SubTypeList, battleFacades.EntityIDList);
+                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServerFrame} entityId:{entityID} controlType {((ControlType)msg.controlType).ToString()}");
                 }
             });
         }
@@ -335,92 +329,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         }
         #endregion
 
-        #region [Scene Spawn Method]
-
-        async void SpawBattleScene()
-        {
-            if (hasSpawnBegin)
-            {
-                return;
-            }
-            hasSpawnBegin = true;
-
-            // Load Scene And Spawn Field
-            var domain = serverFacades.BattleFacades.Domain;
-            var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
-            fieldEntity.SetEntityId(1);
-            var fieldEntityRepo = serverFacades.BattleFacades.Repo.FiledRepo;
-            fieldEntityRepo.Add(fieldEntity);
-            fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
-
-            // 生成资源
-            GenerateRandomAssetData(fieldEntity, out var assetPointEntities);
-            InitAllAssetRepo(assetPointEntities);
-
-        }
-
-        void InitAllAssetRepo(AssetPointEntity[] assetPointEntities)
-        {
-            var entityTypeList = serverFacades.EntityTypeList;
-            var entityIDList = serverFacades.EntityIDList;
-            var itemTypeByteList = serverFacades.ItemTypeByteList;
-            var subTypeList = serverFacades.SubTypeList;
-
-            int count = entityTypeList.Count;
-            Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
-
-            var battleFacades = serverFacades.BattleFacades;
-            for (int i = 0; i < entityTypeList.Count; i++)
-            {
-                var entityType = entityTypeList[i];
-                var subtype = subTypeList[i];
-                var parent = assetPointEntities[i];
-
-                // - 获取资源ID
-                var idService = battleFacades.IDService;
-                var entityID = idService.GetAutoIDByEntityType(entityType);
-
-                // - 生成资源
-                var itemDomain = battleFacades.Domain.ItemDomain;
-                itemDomain.SpawnItem(entityType, subtype, entityID, parent.transform);
-
-                // - 记录
-                entityIDList.Add(entityID);
-                itemTypeByteList.Add((byte)entityType);
-            }
-
-            Debug.Log($"物件资源生成完毕******************************************************");
-        }
-
-        void GenerateRandomAssetData(FieldEntity fieldEntity, out AssetPointEntity[] assetPointEntities)
-        {
-            assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
-            for (int i = 0; i < assetPointEntities.Length; i++)
-            {
-                var assetPoint = assetPointEntities[i];
-                AssetGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
-                float totalWeight = 0;
-                for (int j = 0; j < itemGenProbabilities.Length; j++) totalWeight += itemGenProbabilities[j].weight;
-                float lRange = 0;
-                float rRange = 0;
-                float randomNumber = Random.Range(0f, 1f);
-                for (int j = 0; j < itemGenProbabilities.Length; j++)
-                {
-                    AssetGenProbability igp = itemGenProbabilities[j];
-                    if (igp.weight <= 0) continue;
-                    rRange = lRange + igp.weight / totalWeight;
-                    if (randomNumber >= lRange && randomNumber < rRange)
-                    {
-                        serverFacades.EntityTypeList.Add(igp.entityType);
-                        serverFacades.SubTypeList.Add(igp.subType);
-                        break;
-                    }
-                    lRange = rRange;
-                }
-            }
-        }
-        #endregion
-
         #endregion
 
         #region [Private Func]
@@ -433,6 +341,16 @@ namespace Game.Server.Bussiness.BattleBussiness
         }
 
         #endregion
+
+        void OnGameStageChange()
+        {
+            var gameStage = serverFacades.BattleFacades.GameEntity.GameStage;
+            var battleRqs = serverFacades.Network.BattleReqAndRes;
+            ConnIDList.ForEach((connID) =>
+            {
+                battleRqs.SendRes_BattleGameStageFlagUpdate(connID, gameStage);
+            });
+        }
 
     }
 

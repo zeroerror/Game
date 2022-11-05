@@ -1,10 +1,11 @@
 
 
 using System;
-using UnityEngine;
-using Game.Infrastructure.Network.Client;
-using ZeroFrame.Protocol;
 using System.Collections.Generic;
+using UnityEngine;
+using ZeroFrame.Protocol;
+using Game.Infrastructure.Network.Client;
+using Game.Protocol.Battle;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
@@ -47,6 +48,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         // ====== Send ======
         // ====== Regist ======
+        public void RegistRes_BattleGameStageUpdate(Action<BattleGameStageUpdateResMsg> action)
+        {
+            AddRegister(action);
+        }
 
         void AddRegister<T>(Action<T> action) where T : IZeroMessage<T>, new()
         {

@@ -32,6 +32,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleHitDomain HitDomain { get; private set; }
 
+        public BattleGameStateDomain GameStateDomain { get; private set; }
+
+        public BattleFieldDomain FieldDomain { get; private set; }
+
         public AllDomains()
         {
             SceneDomain = new BattleSceneDomain();
@@ -60,6 +64,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             ArmorEvolveItemDomain = new BattleArmorEvolveItemDomain();
 
             HitDomain = new BattleHitDomain();
+
+            GameStateDomain = new BattleGameStateDomain();
+
+            FieldDomain = new BattleFieldDomain();
+
         }
 
         // todo: obsolete
@@ -90,6 +99,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             ArmorEvolveItemDomain.Inject(facades);
 
             HitDomain.Inject(facades);
+
+            GameStateDomain.Inject(facades);
+
+            FieldDomain.Inject(facades);
+
         }
     }
 

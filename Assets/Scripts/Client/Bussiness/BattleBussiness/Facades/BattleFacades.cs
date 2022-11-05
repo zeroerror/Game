@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Game.Infrastructure.Network.Client;
 using Game.Client.Bussiness.BattleBussiness.API;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Facades
 {
@@ -26,6 +28,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         // - API
         public LogicTriggerAPI LogicTriggerAPI { get; private set; }
 
+        // - Game Stage
+        public BattleGameEntity GameEntity { get; private set; }
+
+        // ====== 地图生成资源数据 ======
+        public List<int> EntityIDList { get; private set; }
+        public List<byte> ItemTypeByteList { get; private set; }
+        public List<byte> SubTypeList { get; private set; }
+        public List<EntityType> EntityTypeList { get; private set; }
+
         public BattleFacades()
         {
             Network = new AllBattleNetwork();
@@ -33,6 +44,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             Repo = new AllBattleRepo();
 
             Assets = new AllBattleAssets();
+            Assets.LoadAll();
 
             Domain = new AllDomains();
             Domain.Inject(this);
@@ -45,7 +57,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             LogicTriggerAPI = new LogicTriggerAPI();
 
-            Assets.LoadAll();
+            GameEntity = new BattleGameEntity();
+
+            EntityIDList = new List<int>();
+            ItemTypeByteList = new List<byte>();
+            SubTypeList = new List<byte>();
+            EntityTypeList = new List<EntityType>();
         }
 
         public void Inject(NetworkClient client, PlayerInputComponent inputComponent)

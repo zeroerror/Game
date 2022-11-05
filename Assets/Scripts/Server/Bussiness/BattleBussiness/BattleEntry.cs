@@ -1,9 +1,10 @@
 using System.Threading;
+using UnityEngine;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Server;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Server.Bussiness.EventCenter;
-using UnityEngine;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -88,6 +89,16 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 Debug.Log($"[战斗服]: connID:{connID} 客户端连接成功-------------------------");
                 ServerNetworkEventCenter.battleSerConnect.Invoke(connID);
+
+                var battleFacades = serverFacades.BattleFacades;
+                var gameEntity = battleFacades.GameEntity;
+                var gameStage = gameEntity.GameStage;
+                var fsm = gameEntity.FSMComponent;
+                var gameState = fsm.GameState;
+                if (!gameStage.HasStageOn(BattleGameStage.Loaded) && gameState != BattleGameState.Loading)
+                {
+                    fsm.EnterGameStage_BattleLoading();
+                }
             };
         }
 

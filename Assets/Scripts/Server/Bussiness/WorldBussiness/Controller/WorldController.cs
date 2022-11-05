@@ -115,7 +115,6 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
 
             roomRepo.Add(roomEntity);
 
-            Debug.Log($"[世界服]: connID:{connId} 玩家{roleEntity.Account} 创建了房间 id:{roomEntity.EntityId} 名称:{roomEntity.RoomName}------------------------");
             connIdList.ForEach((broadcastConnId) =>
             {
                 rqs.SendRes_WorldRoomCreate(broadcastConnId,
