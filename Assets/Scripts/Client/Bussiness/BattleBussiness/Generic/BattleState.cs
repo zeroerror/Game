@@ -4,7 +4,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
     public enum BattleState : byte
     {
         None,
-        Loading,
+        SpawningField,
+        SpawningItem,
         Preparing,
         Fighting,
         Settlement
@@ -14,7 +15,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
     {
         public static bool CanBattleLoop(this BattleState state)
         {
-            return state != BattleState.None && state != BattleState.Loading;
+            return state != BattleState.None && state != BattleState.SpawningField;
         }
     }
 

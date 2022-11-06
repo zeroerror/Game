@@ -35,9 +35,21 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public BattleController()
         {
-            ServerNetworkEventCenter.battleSerConnect += ((connId) =>
+            ServerNetworkEventCenter.Regist_BattleServerConnHandler((connId) =>
             {
-                ConnIDList.Add(connId); //添加至连接名单
+                // - 添加至连接名单
+                ConnIDList.Add(connId);
+
+                // - Battle Load
+                var battleFacades = serverFacades.BattleFacades;
+                var gameEntity = battleFacades.GameEntity;
+                var gameStage = gameEntity.Stage;
+                var fsm = gameEntity.FSMComponent;
+                var gameState = fsm.State;
+                if (!gameStage.HasStage(BattleStage.Level1) && gameState != BattleState.SpawningField)
+                {
+                    fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
+                }
             });
 
             roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
@@ -360,6 +372,20 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
 
             Debug.Log($"OnGameStageChange state {state.ToString()} stage {stage}");
+
+            if (state == BattleState.Preparing)
+            {
+                ConnIDList.ForEach((connID) =>
+                {
+                    var curField = serverFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
+                    var fieldDomain = serverFacades.BattleFacades.Domain.FieldDomain;
+                    fieldDomain.GenerateRandomItemDataFromField(curField, out var entityTypeList, out var subTypeList);
+                    fieldDomain.SpawnAllItemToField(curField, entityTypeList, subTypeList, out var entityIDList);
+
+                    var itemRqs = serverFacades.Network.ItemReqAndRes;
+                    itemRqs.SendRes_ItemSpawn(connID, entityTypeList, subTypeList, entityIDList);
+                });
+            }
         }
 
         void OnBattleStateAndStageReqMsg(int connID, BattleStateAndStageReqMsg msg)

@@ -88,18 +88,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleServer.OnConnectedHandle += (connID) =>
             {
                 Debug.Log($"[战斗服]: connID:{connID} 客户端连接成功-------------------------");
-                ServerNetworkEventCenter.battleSerConnect.Invoke(connID);
-
-                // - Server Battle Load
-                var battleFacades = serverFacades.BattleFacades;
-                var gameEntity = battleFacades.GameEntity;
-                var gameStage = gameEntity.Stage;
-                var fsm = gameEntity.FSMComponent;
-                var gameState = fsm.State;
-                if (!gameStage.HasStage(BattleStage.LoadedLevel1) && gameState != BattleState.Loading)
-                {
-                    fsm.EnterGameState_BattleLoading(BattleStage.LoadedLevel1);
-                }
+                ServerNetworkEventCenter.Invoke_BattleServerConnect(connID);
             };
         }
 

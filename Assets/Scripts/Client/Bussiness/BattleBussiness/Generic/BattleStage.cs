@@ -4,9 +4,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
     public enum BattleStage
     {
         None = 0,
-        LoadedLevel1 = 1 << 0,
-        LoadedLevel2 = 1 << 1,
-        LoadedLevel3 = 1 << 2,
+        Level1 = 1 << 0,
+        Level2 = 1 << 1,
+        Level3 = 1 << 2,
         Prepared = 1 << 3,
         GameOver = 1 << 4,
     }

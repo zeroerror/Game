@@ -57,14 +57,20 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_ItemSpawn(int connId, int frameIndex, List<byte> itemTypeList, List<byte> subtypeList, List<int> entityIdList)
+        public void SendRes_ItemSpawn(int connId, List<EntityType> entityTypeList, List<byte> subtypeList, List<int> entityIDList)
         {
+            byte[] entityTypeByteArray = new byte[entityTypeList.Count];
+            for (int i = 0; i < entityTypeByteArray.Length; i++)
+            {
+                entityTypeByteArray[i] = (byte)entityTypeList[i];
+            }
+
             FrameItemSpawnResMsg msg = new FrameItemSpawnResMsg
             {
-                serverFrame = frameIndex,
-                entityTypeArray = itemTypeList.ToArray(),
+                serverFrame = serverFrame,
+                entityTypeArray = entityTypeByteArray,
                 subtypeArray = subtypeList.ToArray(),
-                entityIDArray = entityIdList.ToArray()
+                entityIDArray = entityIDList.ToArray()
             };
 
             battleServer.SendMsg(connId, msg);

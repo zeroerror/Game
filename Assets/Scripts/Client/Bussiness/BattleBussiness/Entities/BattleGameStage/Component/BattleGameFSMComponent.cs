@@ -1,4 +1,4 @@
-using UnityEngine;
+using System.Collections.Generic;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness
@@ -10,8 +10,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         BattleState state;
         public BattleState State => state;
 
-        BattleStateLoadingMod loadingMod;
-        public BattleStateLoadingMod LoadingMod => loadingMod;
+        BattleStateSpawningFieldMod spawningFieldMod;
+        public BattleStateSpawningFieldMod SpawningFieldMod => spawningFieldMod;
 
         BattleStatePreparingMod preparingMod;
         public BattleStatePreparingMod PreparingMod => preparingMod;
@@ -24,17 +24,17 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public BattleGameFSMComponent()
         {
-            loadingMod = new BattleStateLoadingMod();
+            spawningFieldMod = new BattleStateSpawningFieldMod();
             preparingMod = new BattleStatePreparingMod();
             fightingMod = new BattleStateFightingMod();
             settlementMod = new BattleStateSettlementMod();
         }
 
-        public void EnterGameState_BattleLoading(BattleStage stage)
+        public void EnterGameState_BattleSpawningField(BattleStage stage)
         {
-            loadingMod.isFirstEnter = true;
-            loadingMod.stage = stage;
-            state = BattleState.Loading;
+            spawningFieldMod.isFirstEnter = true;
+            spawningFieldMod.stage = stage;
+            state = BattleState.SpawningField;
         }
 
         public void EnterGameState_BattlePreparing(int maintainFrame)

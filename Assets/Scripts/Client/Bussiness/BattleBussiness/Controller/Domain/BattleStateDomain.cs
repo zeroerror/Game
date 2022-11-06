@@ -10,7 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
     {
         BattleFacades battleFacades;
 
-        public Action stateAndStageChangeHandler;
+        Action stateAndStageChangeHandler;
         public void RegistStateAndStageChangeHandler(Action action) => stateAndStageChangeHandler += action;
 
         public BattleStateDomain()
@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void ApplyGameState()
         {
             ApplyGameState_Any();
-            ApplyGameState_Loading();
+            ApplyGameState_SpawningField();
             ApplyGameState_Preparing();
             ApplyGameState_Fighting();
             ApplyGameState_BattleSettlement();
@@ -57,25 +57,26 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
         }
 
-        void ApplyGameState_Loading()
+        void ApplyGameState_SpawningField()
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
             var gameState = fsm.State;
 
-            if (gameState != BattleState.Loading)
+            if (gameState != BattleState.SpawningField)
             {
                 return;
             }
 
-            var stateMod = fsm.LoadingMod;
+            var stateMod = fsm.SpawningFieldMod;
             var stage = stateMod.stage;
             if (stateMod.isFirstEnter)
             {
                 stateMod.isFirstEnter = false;
                 var fieldDomain = battleFacades.Domain.FieldDomain;
-                fieldDomain.SpawBattleScene(stage);
-                Debug.Log($"进入 加载阶段 stage {stage}");
+                var fieldName = stage.ToString().ToLower();
+                fieldDomain.SpawBattleScene(fieldName);
+                Debug.Log($"进入 加载阶段 {stage}");
             }
 
             var field = battleFacades.Repo.FiledRepo.CurFieldEntity;
@@ -83,11 +84,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 // - Stage
                 gameEntity.AddStage(stage);
-                
+
                 // State
                 fsm.EnterGameState_BattlePreparing(300);
                 stateAndStageChangeHandler.Invoke();
             }
+        }
+
+        void ApplyGameState_SpawningItem()
+        {
+            var gameEntity = battleFacades.GameEntity;
+            var fsm = gameEntity.FSMComponent;
+            var gameState = fsm.State;
+
+            if (gameState != BattleState.SpawningItem)
+            {
+                return;
+            }
+
+
         }
 
         void ApplyGameState_Preparing()

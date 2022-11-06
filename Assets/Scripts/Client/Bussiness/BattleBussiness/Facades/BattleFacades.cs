@@ -31,12 +31,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         // - Game Stage
         public BattleGameEntity GameEntity { get; private set; }
 
-        // ====== 地图生成资源数据 ======
-        public List<int> EntityIDList { get; private set; }
-        public List<byte> ItemTypeByteList { get; private set; }
-        public List<byte> SubTypeList { get; private set; }
-        public List<EntityType> EntityTypeList { get; private set; }
-
         public BattleFacades()
         {
             Network = new AllBattleNetwork();
@@ -59,10 +53,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             GameEntity = new BattleGameEntity();
 
-            EntityIDList = new List<int>();
-            ItemTypeByteList = new List<byte>();
-            SubTypeList = new List<byte>();
-            EntityTypeList = new List<EntityType>();
         }
 
         public void Inject(NetworkClient client, PlayerInputComponent inputComponent)

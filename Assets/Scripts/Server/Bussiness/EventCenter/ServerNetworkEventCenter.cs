@@ -23,7 +23,10 @@ namespace Game.Server.Bussiness.EventCenter
         public static void Regist_BattleServerNeedCreate(Action action) => battleServerCreateHandler += action;
         public static void Invoke_BattleServerNeedCreate() => battleServerCreateHandler.Invoke();
 
-        public static Action<int> battleSerConnect;
+        static Action<int> battleServerConnHandler;
+        public static Action<int> Regist_BattleServerConnHandler(Action<int> action) => battleServerConnHandler += action;
+        public static void Invoke_BattleServerConnect(int connID) => battleServerConnHandler.Invoke(connID);
+
 
     }
 

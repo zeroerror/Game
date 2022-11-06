@@ -70,7 +70,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
             var state = fsm.State;
-            if (state.CanBattleLoop())
+            if (!state.CanBattleLoop())
             {
                 return;
             }
@@ -290,13 +290,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             BattleState serState = (BattleState)msg.state;
             int curMaintainFrame = msg.curMaintainFrame;
 
-            var comResult = stage.CompareStage(serStage, BattleStage.LoadedLevel1);
-            Debug.Log($"OnBattleStateAndStageResMsg comResult {comResult}");
-            if (comResult == 1)
+            bool isFieldSpawned = stage.CompareStage(serStage, BattleStage.Level1) == 0;
+            if (!isFieldSpawned)
             {
-                if (state != BattleState.Loading)
+                if (state != BattleState.SpawningField)
                 {
-                    fsm.EnterGameState_BattleLoading(BattleStage.LoadedLevel1);
+                    fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
                 }
                 return;
             }

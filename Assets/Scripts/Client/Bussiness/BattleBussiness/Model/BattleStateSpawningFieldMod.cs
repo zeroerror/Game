@@ -4,7 +4,7 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BattleStateLoadingMod
+    public class BattleStateSpawningFieldMod
     {
 
         public bool isFirstEnter;
