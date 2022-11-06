@@ -55,6 +55,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
                 action.Invoke(role);
             });
         }
+        
+        public void ForAll(Action<BattleRoleLogicEntity> action)
+        {
+            if (action == null) return;
+            var array = all.ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                action.Invoke(array[i]);
+            }
+        }
 
         public bool IsOwner(int entityID)
         {

@@ -69,7 +69,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.State;
+            var state = fsm.BattleState;
             if (!state.CanBattleLoop())
             {
                 return;
@@ -272,7 +272,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
 
             var rqs = battleFacades.Network.RoleReqAndRes;
-            rqs.SendReq_BattleRoleSpawn(1000, ControlType.Owner);
+            rqs.SendReq_RoleSpawn(1000, ControlType.Owner);
 
             Debug.Log($"加载战斗场景结束---------------------------------------------------");
         }
@@ -284,14 +284,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var gameEntity = battleFacades.GameEntity;
             var stage = gameEntity.Stage;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.State;
+            var state = fsm.BattleState;
 
             BattleStage serStage = (BattleStage)msg.stage;
             BattleState serState = (BattleState)msg.state;
             int curMaintainFrame = msg.curMaintainFrame;
 
-            bool isFieldSpawned = stage.CompareStage(serStage, BattleStage.Level1) == 0;
-            if (!isFieldSpawned)
+            var curSerStageLevel = serStage.GetCurLevelStage();
+            bool isClientFieldSpawned = stage.CompareStage(serStage, curSerStageLevel) == 0;
+            if (!isClientFieldSpawned)
             {
                 if (state != BattleState.SpawningField)
                 {
@@ -300,9 +301,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 return;
             }
 
+            if (serState == BattleState.SpawningField)
+            {
+                fsm.EnterGameState_BattleSpawningField(curSerStageLevel);
+                return;
+            }
+
             if (serState == BattleState.Preparing)
             {
                 fsm.EnterGameState_BattlePreparing(curMaintainFrame);
+                return;
+            }
+
+            if (serState == BattleState.Fighting)
+            {
+                fsm.EnterGameState_BattleFighting(curMaintainFrame);
+                return;
+            }
+
+            if (serState == BattleState.Settlement)
+            {
+                fsm.EnterGameState_BattleSettlement(curMaintainFrame);
+                return;
             }
 
             Debug.LogWarning("None Taken");
@@ -315,6 +335,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             // - Sync With Server
             var battleRqs = battleFacades.Network.BattleReqAndRes;
             battleRqs.SendReq_BattleGameStateAndStage();
+
+            var gameEntity = battleFacades.GameEntity;
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.BattleState;
+            if (state == BattleState.Preparing)
+            {
+                var rqs = battleFacades.Network.RoleReqAndRes;
+                rqs.SendReq_RoleSpawn(1000, ControlType.Owner);
+            }
         }
 
     }

@@ -47,6 +47,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
                 action.Invoke(bullet);
             });
         }
+        
+        public void ForAll(Action<BattleEvolveItemEntity> action)
+        {
+            if (action == null) return;
+            var array = all.ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                action.Invoke(array[i]);
+            }
+        }
 
     }
 

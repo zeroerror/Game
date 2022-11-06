@@ -150,7 +150,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 }
 
                 var armorItemDomain = domain.ArmorItemDomain;
-                armorItemDomain.TearDownWeaponItem(armorItem);
+                armorItemDomain.TearDownArmorItem(armorItem);
                 return true;
             }
 
@@ -176,8 +176,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var armor = master.Armor;
                     armor.EvolveFrom(evolveTM);
 
-                    var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                    armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                    var armorEvolveItemDomain = battleFacades.Domain.EvolveItemDomain;
+                    armorEvolveItemDomain.TearDownEvolveItem(evolveItem);
                     return true;
                 }
 
@@ -187,14 +187,54 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     var evolveTM = evolveItem.evolveTM;
                     master.EvolveFrom(evolveTM);
 
-                    var armorEvolveItemDomain = battleFacades.Domain.ArmorEvolveItemDomain;
-                    armorEvolveItemDomain.TearDownArmorEvolveItem(evolveItem);
+                    var armorEvolveItemDomain = battleFacades.Domain.EvolveItemDomain;
+                    armorEvolveItemDomain.TearDownEvolveItem(evolveItem);
                     return true;
                 }
             }
 
             Debug.LogError($"尚未处理的情况 entityType {entityType.ToString()}");
             return false;
+        }
+
+        public void ClearAllItem()
+        {
+            Debug.Log("ClearAllItem");
+            var repo = battleFacades.Repo;
+            var domain = battleFacades.Domain;
+            var idService = battleFacades.IDService;
+
+            var weaponItemDomain = domain.WeaponItemDomain;
+            var weaponItemRepo = repo.WeaponItemRepo;
+            weaponItemRepo.ForAll((weaponItem) =>
+            {
+                weaponItemDomain.TearDownWeaponItem(weaponItem);
+            });
+            idService.ClearAutoIDByEntityType(EntityType.WeaponItem);
+
+            var bulletItemDomain = domain.BulletItemDomain;
+            var bulletItemRepo = repo.BulletItemRepo;
+            bulletItemRepo.ForAll((bulletItem) =>
+            {
+                bulletItemDomain.TearDownBulletItem(bulletItem);
+            });
+            idService.ClearAutoIDByEntityType(EntityType.BulletItem);
+
+            var armorItemDomain = domain.ArmorItemDomain;
+            var armorItemRepo = repo.ArmorItemRepo;
+            armorItemRepo.ForAll((armorItem) =>
+            {
+                armorItemDomain.TearDownArmorItem(armorItem);
+            });
+            idService.ClearAutoIDByEntityType(EntityType.ArmorItem);
+
+            var evolveItemDomain = domain.EvolveItemDomain;
+            var evolveItemRepo = repo.EvolveItemRepo;
+            evolveItemRepo.ForAll((evolveItem) =>
+            {
+                evolveItemDomain.TearDownEvolveItem(evolveItem);
+            });
+            idService.ClearAutoIDByEntityType(EntityType.EvolveItem);
         }
 
         #region [Weapon]

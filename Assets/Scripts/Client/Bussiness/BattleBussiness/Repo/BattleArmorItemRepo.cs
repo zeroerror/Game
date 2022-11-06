@@ -21,7 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             Debug.Log($"添加护甲ITEM [entityId:{entity.IDComponent.EntityID}]");
             all.Add(entity);
         }
-        
+
         public bool TryRemove(BattleArmorItemEntity entity)
         {
             Debug.Log($"移除护甲ITEM {entity.IDComponent.EntityID}");
@@ -43,10 +43,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public void Foreach(Action<BattleArmorItemEntity> action)
         {
             if (action == null) return;
-            all.ForEach((bullet) =>
+            all.ForEach((entity) =>
             {
-                action.Invoke(bullet);
+                action.Invoke(entity);
             });
+        }
+
+        public void ForAll(Action<BattleArmorItemEntity> action)
+        {
+            if (action == null) return;
+            var array = all.ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                action.Invoke(array[i]);
+            }
         }
 
     }

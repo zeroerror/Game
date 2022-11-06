@@ -5,12 +5,12 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
-    public class BattleArmorEvolveItemDomain
+    public class BattleEvolveItemDomain
     {
 
         BattleFacades battleFacades;
 
-        public BattleArmorEvolveItemDomain()
+        public BattleEvolveItemDomain()
         {
         }
 
@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleEvolveItemEntity SpawnBattleArmorEvolveItem(GameObject entityGo, int entityID)
+        public BattleEvolveItemEntity SpawnEvolveItem(GameObject entityGo, int entityID)
         {
             var armorItem = entityGo.GetComponent<BattleEvolveItemEntity>();
             armorItem.Ctor();
@@ -32,7 +32,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return armorItem;
         }
 
-        public void TearDownArmorEvolveItem(BattleEvolveItemEntity weaponItem)
+        public void TearDownEvolveItem(BattleEvolveItemEntity weaponItem)
         {
             var repo = battleFacades.Repo;
             var armorEvolveItemRepo = repo.EvolveItemRepo;

@@ -45,7 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 var gameEntity = battleFacades.GameEntity;
                 var gameStage = gameEntity.Stage;
                 var fsm = gameEntity.FSMComponent;
-                var gameState = fsm.State;
+                var gameState = fsm.BattleState;
                 if (!gameStage.HasStage(BattleStage.Level1) && gameState != BattleState.SpawningField)
                 {
                     fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
@@ -91,8 +91,8 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             var gameEntity = serverFacades.BattleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.State;
-            if (state.CanBattleLoop())
+            var state = fsm.BattleState;
+            if (!state.CanBattleLoop())
             {
                 return;
             }
@@ -360,7 +360,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             var gameEntity = serverFacades.BattleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.State;
+            var state = fsm.BattleState;
             var stage = gameEntity.Stage;
             var battleStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
             int curMaintainFrame = battleStateDomain.GetCurMainTainFrame();
@@ -373,6 +373,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             Debug.Log($"OnGameStageChange state {state.ToString()} stage {stage}");
 
+            // - 场景物件同步
             if (state == BattleState.Preparing)
             {
                 ConnIDList.ForEach((connID) =>
@@ -385,14 +386,23 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var itemRqs = serverFacades.Network.ItemReqAndRes;
                     itemRqs.SendRes_ItemSpawn(connID, entityTypeList, subTypeList, entityIDList);
                 });
+
+                // - 场景角色重生
+                var roleDomain = serverFacades.BattleFacades.Domain.RoleDomain;
+                var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
+                roleRepo.Foreach((role) =>
+                {
+                    roleDomain.Reborn(role);
+                });
             }
+
         }
 
         void OnBattleStateAndStageReqMsg(int connID, BattleStateAndStageReqMsg msg)
         {
             var gameEntity = serverFacades.BattleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.State;
+            var state = fsm.BattleState;
             var stage = gameEntity.Stage;
             var battleStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
             int curMaintainFrame = battleStateDomain.GetCurMainTainFrame();

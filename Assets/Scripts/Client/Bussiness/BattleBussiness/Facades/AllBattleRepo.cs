@@ -17,7 +17,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleArmorRepo ArmorRepo { get; private set; }
         public BattleArmorItemRepo ArmorItemRepo { get; private set; }
+
         public BattleEvolveItemRepo EvolveItemRepo { get; private set; }
+        
         public BulletRepo BulletRepo { get; private set; }
         public BulletRendererRepo BulletRendererRepo { get; private set; }
         public BulletItemRepo BulletItemRepo { get; private set; }

@@ -16,7 +16,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int weaponAutoID;
         public int weaponItemAutoID;
         public int evolveItemAutoID;
-        
+
         public IDService()
         {
         }
@@ -60,6 +60,51 @@ namespace Game.Client.Bussiness.BattleBussiness
             return -1;
         }
 
+        public void ClearAutoIDByEntityType(EntityType entityType)
+        {
+            if (entityType == EntityType.BattleRole)
+            {
+                roleAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.Bullet)
+            {
+                bulletAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.BulletItem)
+            {
+                bulletItemAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.Weapon)
+            {
+                weaponAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.WeaponItem)
+            {
+                weaponItemAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.Armor)
+            {
+                armorAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.ArmorItem)
+            {
+                armorItemAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.EvolveItem)
+            {
+                evolveItemAutoID = 0;
+                return;
+            }
+
+            Debug.LogWarning("未处理情况");
+        }
     }
 
 }

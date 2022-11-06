@@ -28,7 +28,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleArmorDomain ArmorDomain { get; private set; }
         public BattleArmorItemDomain ArmorItemDomain { get; private set; }
-        public BattleArmorEvolveItemDomain ArmorEvolveItemDomain { get; private set; }
+
+        public BattleEvolveItemDomain EvolveItemDomain { get; private set; }
 
         public BattleHitDomain HitDomain { get; private set; }
 
@@ -61,7 +62,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             ArmorDomain = new BattleArmorDomain();
             ArmorItemDomain = new BattleArmorItemDomain();
-            ArmorEvolveItemDomain = new BattleArmorEvolveItemDomain();
+
+            EvolveItemDomain = new BattleEvolveItemDomain();
 
             HitDomain = new BattleHitDomain();
 
@@ -96,7 +98,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             ArmorDomain.Inject(facades);
             ArmorItemDomain.Inject(facades);
-            ArmorEvolveItemDomain.Inject(facades);
+            EvolveItemDomain.Inject(facades);
 
             HitDomain.Inject(facades);
 

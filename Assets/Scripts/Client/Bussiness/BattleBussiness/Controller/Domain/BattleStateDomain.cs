@@ -35,7 +35,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.State;
+            var state = fsm.BattleState;
             int curMaintainFrame = 0;
             if (state == BattleState.Preparing)
             {
@@ -61,9 +61,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var gameState = fsm.State;
+            var battleState = fsm.BattleState;
 
-            if (gameState != BattleState.SpawningField)
+            if (battleState != BattleState.SpawningField)
             {
                 return;
             }
@@ -73,9 +73,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (stateMod.isFirstEnter)
             {
                 stateMod.isFirstEnter = false;
-                var fieldDomain = battleFacades.Domain.FieldDomain;
-                var fieldName = stage.ToString().ToLower();
-                fieldDomain.SpawBattleScene(fieldName);
+
+                var domain = battleFacades.Domain;
+                var itemDomain = domain.ItemDomain;
+                itemDomain.ClearAllItem();
+
+                if (!gameEntity.Stage.HasStage(stage))
+                {
+                    var fieldDomain = domain.FieldDomain;
+                    var fieldName = stage.ToString().ToLower();
+                    fieldDomain.SpawBattleField(fieldName);
+                }
+
                 Debug.Log($"进入 加载阶段 {stage}");
             }
 
@@ -95,7 +104,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var gameState = fsm.State;
+            var gameState = fsm.BattleState;
 
             if (gameState != BattleState.SpawningItem)
             {
@@ -109,7 +118,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var gameState = fsm.State;
+            var gameState = fsm.BattleState;
 
             if (gameState != BattleState.Preparing)
             {
@@ -143,7 +152,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var gameState = fsm.State;
+            var gameState = fsm.BattleState;
 
             if (gameState != BattleState.Fighting)
             {
@@ -176,7 +185,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var gameEntity = battleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;
-            var gameState = fsm.State;
+            var gameState = fsm.BattleState;
 
             if (gameState != BattleState.Settlement)
             {
@@ -200,7 +209,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 gameEntity.RemoveStage(BattleStage.GameOver);
 
                 // - State 
-                fsm.EnterGameState_BattlePreparing(300);
+                fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
                 stateAndStageChangeHandler.Invoke();
             }
         }

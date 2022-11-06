@@ -44,6 +44,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             });
         }
 
+        public void ForAll(Action<BattleRoleRendererEntity> action)
+        {
+            if (action == null) return;
+            var array = all.ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                action.Invoke(array[i]);
+            }
+        }
+
     }
 
 }

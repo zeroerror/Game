@@ -22,7 +22,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public async void SpawBattleScene(string fieldName)
+        public async void SpawBattleField(string fieldName)
         {
             // TODO: By fieldName
             var domain = battleFacades.Domain;

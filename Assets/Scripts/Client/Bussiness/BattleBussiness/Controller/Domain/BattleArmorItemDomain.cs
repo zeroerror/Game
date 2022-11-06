@@ -53,13 +53,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void TearDownWeaponItem(BattleArmorItemEntity weaponItem)
+        public void TearDownArmorItem(BattleArmorItemEntity armorItem)
         {
             var repo = battleFacades.Repo;
             var armorItemRepo = repo.ArmorItemRepo;
-            armorItemRepo.TryRemove(weaponItem);
-            GameObject.Destroy(weaponItem.gameObject);
-            GameObject.Destroy(weaponItem);
+            armorItemRepo.TryRemove(armorItem);
+            GameObject.Destroy(armorItem.gameObject);
+            GameObject.Destroy(armorItem);
         }
 
     }

@@ -93,11 +93,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             Debug.Log($"SendReq_RoleRoll dir:{dir} ");
         }
 
-        public void SendReq_BattleRoleSpawn(int typeID, ControlType controlType)
+        public void SendReq_RoleSpawn(int typeID, ControlType controlType)
         {
             FrameBattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameBattleRoleSpawnReqMsg
             {
-                typeID = 1000,
+                typeID = typeID,
                 controlType = (byte)controlType,
             };
             battleClient.SendMsg(frameReqWRoleSpawnMsg);

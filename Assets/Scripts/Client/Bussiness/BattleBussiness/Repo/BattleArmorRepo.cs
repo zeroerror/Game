@@ -42,10 +42,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
         public void Foreach(Action<BattleArmorEntity> action)
         {
             if (action == null) return;
-            all.ForEach((bullet) =>
+            all.ForEach((entity) =>
             {
-                action.Invoke(bullet);
+                action.Invoke(entity);
             });
+        }
+
+        public void ForAll(Action<BattleArmorEntity> action)
+        {
+            if (action == null) return;
+            var array = all.ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                action.Invoke(array[i]);
+            }
         }
 
     }

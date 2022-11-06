@@ -8,47 +8,58 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     public class BulletItemRepo
     {
 
-        List<BulletItemEntity> bulletPackList;
-        public int BulletPackCount => (int)bulletPackList.Count;
+        List<BulletItemEntity> all;
 
         public BulletItemRepo()
         {
-            bulletPackList = new List<BulletItemEntity>();
+            all = new List<BulletItemEntity>();
         }
 
         public bool TryGet(int bulletId, out BulletItemEntity bulletEntity)
         {
-            bulletEntity = bulletPackList.Find((entity) => entity.IDComponent.EntityID == bulletId);
+            bulletEntity = all.Find((entity) => entity.IDComponent.EntityID == bulletId);
             return bulletEntity != null;
         }
 
         public BulletItemEntity Get(int masterID)
         {
-            return bulletPackList.Find((entity) => entity.MasterID == masterID);
+            return all.Find((entity) => entity.MasterID == masterID);
         }
 
         public BulletItemEntity[] GetAll()
         {
-            return bulletPackList.ToArray();
+            return all.ToArray();
         }
 
         public void Add(BulletItemEntity entity)
         {
-            bulletPackList.Add(entity);
+            Debug.Log($"添加子弹ITEM {entity.IDComponent.EntityID}");
+            all.Add(entity);
         }
 
         public bool TryRemove(BulletItemEntity entity)
         {
-            return bulletPackList.Remove(entity);
+            Debug.Log($"移除子弹ITEM {entity.IDComponent.EntityID}");
+            return all.Remove(entity);
         }
 
         public void Foreach(Action<BulletItemEntity> action)
         {
             if (action == null) return;
-            bulletPackList.ForEach((bulletPack) =>
+            all.ForEach((bulletPack) =>
             {
                 action.Invoke(bulletPack);
             });
+        }
+        
+        public void ForAll(Action<BulletItemEntity> action)
+        {
+            if (action == null) return;
+            var array = all.ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                action.Invoke(array[i]);
+            }
         }
 
     }
