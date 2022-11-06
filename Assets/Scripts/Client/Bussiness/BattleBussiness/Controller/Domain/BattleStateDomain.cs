@@ -74,10 +74,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 stateMod.isFirstEnter = false;
 
+                // - 场景清理
                 var domain = battleFacades.Domain;
                 var itemDomain = domain.ItemDomain;
                 itemDomain.ClearAllItem();
 
+                // - 场景角色重生
+                var roleDomain = battleFacades.Domain.RoleDomain;
+                var roleRepo = battleFacades.Repo.RoleLogicRepo;
+                roleRepo.Foreach((role) =>
+                {
+                    roleDomain.Reborn(role);
+                });
+
+                // - 场景加载
                 if (!gameEntity.Stage.HasStage(stage))
                 {
                     var fieldDomain = domain.FieldDomain;

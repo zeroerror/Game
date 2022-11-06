@@ -383,14 +383,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var itemRqs = serverFacades.Network.ItemReqAndRes;
                     itemRqs.SendRes_ItemSpawn(connID, entityTypeList, subTypeList, entityIDList);
                 });
-
-                // - 场景角色重生
-                var roleDomain = serverFacades.BattleFacades.Domain.RoleDomain;
-                var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
-                roleRepo.Foreach((role) =>
-                {
-                    roleDomain.Reborn(role);
-                });
             }
 
         }

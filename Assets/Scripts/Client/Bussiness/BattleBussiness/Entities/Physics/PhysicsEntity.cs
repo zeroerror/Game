@@ -62,7 +62,7 @@ namespace Game.Client.Bussiness
             ce.layerName = LayerMask.LayerToName(collider.gameObject.layer);
             ce.fieldType = FieldType.Ground;
             hitCollisionList.Add(ce);
-            DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layerName:{ce.layerName}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"Trigger接触:{collider.name} layerName:{ce.layerName}", "#48D1CC");
         }
 
         void OnTriggerStay(Collider collider)
@@ -78,7 +78,7 @@ namespace Game.Client.Bussiness
             }
 
             ce.status = CollisionStatus.Exit;
-            DebugExtensions.LogWithColor($"Trigger离开:{collider.name} layer:{LayerMask.LayerToName(collider.gameObject.layer)}", "#48D1CC");
+            // DebugExtensions.LogWithColor($"Trigger离开:{collider.name} layer:{LayerMask.LayerToName(collider.gameObject.layer)}", "#48D1CC");
         }
 
         void OnCollisionEnter(Collision collision)

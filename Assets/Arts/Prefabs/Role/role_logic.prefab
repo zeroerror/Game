@@ -84,14 +84,13 @@ MonoBehaviour:
     gravity: 150
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
-    frictionReduce: 10
+    frictionReduce: 30
     isGrounded: 0
     isHitWall: 0
   healthComponent:
     maxHealth: 1000
   weaponComponent:
-    AllWeapon:
-    - {fileID: 0}
+    AllWeapons: []
     isReloading: 0
   stateComponent:
     roleState: 0
@@ -120,7 +119,7 @@ MonoBehaviour:
     roleStateSwitchingMod:
       isFirstEnter: 0
       maintainFrame: 0
-  rollSpeed: 15
+  rollSpeed: 7
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0
