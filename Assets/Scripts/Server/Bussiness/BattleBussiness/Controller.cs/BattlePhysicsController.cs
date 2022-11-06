@@ -32,25 +32,23 @@ namespace Game.Server.Bussiness.BattleBussiness
             physicsScene.Simulate(fixedDeltaTime);
 
             // Physcis Collision
-            Tick_Physics_Collision_Role();
-            Tick_Physics_Collision_Bullet();
+            Tick_Physics_Collision();
         }
 
         #region [Physics]
 
-        void Tick_Physics_Collision_Role()
+        void Tick_Physics_Collision()
         {
             var physicsDomain = battleFacades.BattleFacades.Domain.PhysicsDomain;
             physicsDomain.Tick_RoleHitField();
+            var hitFieldList = physicsDomain.Tick_BulletHitField();
+            SendBulletHitFieldRes(hitFieldList);
         }
 
         void Tick_Physics_Collision_Bullet()
         {
             var physicsDomain = battleFacades.BattleFacades.Domain.PhysicsDomain;
-            var hitFieldList = physicsDomain.Tick_BulletHitField();
 
-            // - Send To Client
-            SendBulletHitFieldRes(hitFieldList);
         }
 
         void Tick_Physics_Movement_Role(float fixedDeltaTime)

@@ -182,9 +182,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             else if (bullet is GrenadeEntity grenadeEntity)
             {
                 var moveComponent = grenadeEntity.LocomotionComponent;
-                moveComponent.Reset();
-                moveComponent.SetPersistentMove(false);
-                moveComponent.SetIsGrounded(true);
+                moveComponent.SetStatic();
 
                 var tf = grenadeEntity.transform;
                 var collider = tf.GetComponent<Collider>();

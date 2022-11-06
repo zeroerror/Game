@@ -50,6 +50,13 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
         }
 
+        public void SetStatic()
+        {
+            Reset();
+            SetGravity(0);
+            SetPersistentMove(false);
+        }
+
         #endregion
 
         #region [序列化变量]
@@ -64,6 +71,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void SetPersistentMove(bool flag) => isPersistentMove = flag;
 
         [SerializeField][Header("所受重力")] float gravity;
+        public void SetGravity(float v) => gravity = v;
 
         // == 重力速度
         [SerializeField][Header("当前重力速度")] float gravityVelocity;

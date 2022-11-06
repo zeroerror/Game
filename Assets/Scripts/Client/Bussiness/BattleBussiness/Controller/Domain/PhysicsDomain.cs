@@ -50,6 +50,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     {
                         return;
                     }
+                    ce.status = CollisionStatus.Stay;
 
                     HitFieldModel hitFieldModel = new HitFieldModel();
                     hitFieldModel.hitter = bullet.IDComponent;

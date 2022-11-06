@@ -67,13 +67,6 @@ namespace Game.Client.Bussiness
 
         void OnTriggerStay(Collider collider)
         {
-            var ce = Find(collider);
-            if (ce == null)
-            {
-                return;
-            }
-
-            ce.status = CollisionStatus.Stay;
         }
 
         void OnTriggerExit(Collider collider)
@@ -148,13 +141,6 @@ namespace Game.Client.Bussiness
 
         void OnCollisionStay(Collision collision)
         {
-            var ce = Find(collision.collider);
-            if (ce == null)
-            {
-                return;
-            }
-
-            ce.status = CollisionStatus.Stay;
         }
 
         void OnCollisionExit(Collision collision)

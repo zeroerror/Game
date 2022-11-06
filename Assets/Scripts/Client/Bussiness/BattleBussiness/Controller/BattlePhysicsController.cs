@@ -20,20 +20,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick(float fixedDeltaTime)
         {
-            // == Physics Movement
-            if (battleFacades.Repo.FiledRepo.CurFieldEntity != null)
-            {
-                Tick_Physics_Movement_Role(fixedDeltaTime);
-                Tick_Physics_Movement_Bullet(fixedDeltaTime);
-            }
-
             // == Physics Simulation
+            Tick_Physics_Movement_Role(fixedDeltaTime);
+            Tick_Physics_Movement_Bullet(fixedDeltaTime);
             var physicsScene = battleFacades.Repo.FiledRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
 
             // == Physics Collision(Only For Client Performances Like Hit Effect,etc.)
             Tick_Physics_Collision(fixedDeltaTime);
-
         }
 
         void Tick_Physics_Collision(float fixedDeltaTime)
