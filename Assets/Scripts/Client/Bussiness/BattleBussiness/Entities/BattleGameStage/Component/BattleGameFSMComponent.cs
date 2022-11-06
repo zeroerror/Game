@@ -7,54 +7,55 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BattleGameFSMComponent
     {
 
-        BattleGameState gameState;
-        public BattleGameState GameState => gameState;
+        BattleState state;
+        public BattleState State => state;
 
-        GameStateBattleLoadingMod loadingMod;
-        public GameStateBattleLoadingMod LoadingMod => loadingMod;
+        BattleStateLoadingMod loadingMod;
+        public BattleStateLoadingMod LoadingMod => loadingMod;
 
-        GameStateBattlePreparingMod preparingMod;
-        public GameStateBattlePreparingMod PreparingMod => preparingMod;
+        BattleStatePreparingMod preparingMod;
+        public BattleStatePreparingMod PreparingMod => preparingMod;
 
-        GameStateBattleFightingMod fightingMod;
-        public GameStateBattleFightingMod FightingMod => fightingMod;
+        BattleStateFightingMod fightingMod;
+        public BattleStateFightingMod FightingMod => fightingMod;
 
-        GameStateBattleSettlementMod settlementMod;
-        public GameStateBattleSettlementMod SettlementMod => settlementMod;
+        BattleStateSettlementMod settlementMod;
+        public BattleStateSettlementMod SettlementMod => settlementMod;
 
         public BattleGameFSMComponent()
         {
-            loadingMod = new GameStateBattleLoadingMod();
-            preparingMod = new GameStateBattlePreparingMod();
-            fightingMod = new GameStateBattleFightingMod();
-            settlementMod = new GameStateBattleSettlementMod();
+            loadingMod = new BattleStateLoadingMod();
+            preparingMod = new BattleStatePreparingMod();
+            fightingMod = new BattleStateFightingMod();
+            settlementMod = new BattleStateSettlementMod();
         }
 
-        public void EnterGameState_BattleLoading()
+        public void EnterGameState_BattleLoading(BattleStage stage)
         {
             loadingMod.isFirstEnter = true;
-            gameState = BattleGameState.Loading;
+            loadingMod.stage = stage;
+            state = BattleState.Loading;
         }
 
         public void EnterGameState_BattlePreparing(int maintainFrame)
         {
             preparingMod.isFirstEnter = true;
             preparingMod.maintainFrame = maintainFrame;
-            gameState = BattleGameState.Preparing;
+            state = BattleState.Preparing;
         }
 
         public void EnterGameState_BattleFighting(int maintainFrame)
         {
             fightingMod.isFirstEnter = true;
             fightingMod.maintainFrame = maintainFrame;
-            gameState = BattleGameState.Fighting;
+            state = BattleState.Fighting;
         }
 
         public void EnterGameState_BattleSettlement(int maintainFrame)
         {
             settlementMod.isFirstEnter = true;
             settlementMod.maintainFrame = maintainFrame;
-            gameState = BattleGameState.Settlement;
+            state = BattleState.Settlement;
         }
 
     }

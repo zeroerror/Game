@@ -53,30 +53,34 @@ namespace Game.Server.Bussiness.BattleBussiness
             serverFacades = v;
 
             // - Network
+            var battleRqs = serverFacades.Network.BattleReqAndRes;
+            battleRqs.RegistReq_BattleGameStateAndStage(OnBattleStateAndStageReqMsg);
+
             var roleRqs = v.Network.RoleReqAndRes;
-            roleRqs.RegistReq_RoleMove(OnRoleMove);
-            roleRqs.RegistReq_RoleRotate(OnRoleRotate);
-            roleRqs.RegistReq_Jump(OnRoleJump);
-            roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawn);
+            roleRqs.RegistReq_RoleMove(OnRoleMoveReqMsg);
+            roleRqs.RegistReq_RoleRotate(OnRoleRotateReqMsg);
+            roleRqs.RegistReq_Jump(OnRoleJumpReqMsg);
+            roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawnReqMsg);
 
             var itemRqs = v.Network.ItemReqAndRes;
-            itemRqs.RegistReq_ItemPickUp(OnItemPickUp);
+            itemRqs.RegistReq_ItemPickUp(OnItemPickUpReqMsg);
 
             // Domain Handler
-            var gameStateDomain = serverFacades.BattleFacades.Domain.GameStateDomain;
-            gameStateDomain.gameStateChangeHandler += (OnGameStageChange);
+            var gameStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
+            gameStateDomain.RegistStateAndStageChangeHandler(OnGameStageChange);
 
         }
 
         public void Tick(float fixedDeltaTime)
         {
             // - Game State
-            var gameStateDomain = serverFacades.BattleFacades.Domain.GameStateDomain;
+            var gameStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
             gameStateDomain.ApplyGameState();
 
             var gameEntity = serverFacades.BattleFacades.GameEntity;
-            var gamestage = gameEntity.ClientStage;
-            if (!gamestage.HasStage(BattleGameStage.Loaded))
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.State;
+            if (state.CanBattleLoop())
             {
                 return;
             }
@@ -135,8 +139,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var serNetwork = serverFacades.Network;
                     var roleRqs = serNetwork.RoleReqAndRes;
                     roleRqs.SendRes_BattleRoleSpawn(connId, entityID, msg.controlType);
-                    var itemRqs = serNetwork.ItemReqAndRes;
-                    itemRqs.SendRes_ItemSpawn(connId, ServerFrame, battleFacades.ItemTypeByteList, battleFacades.SubTypeList, battleFacades.EntityIDList);
                     Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServerFrame} entityId:{entityID} controlType {((ControlType)msg.controlType).ToString()}");
                 }
             });
@@ -257,7 +259,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Role]
 
-        void OnRoleMove(int connId, FrameRoleMoveReqMsg msg)
+        void OnRoleMoveReqMsg(int connId, FrameRoleMoveReqMsg msg)
         {
             lock (roleMoveMsgDic)
             {
@@ -271,7 +273,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleJump(int connId, FrameRollReqMsg msg)
+        void OnRoleJumpReqMsg(int connId, FrameRollReqMsg msg)
         {
             lock (rollOptMsgDic)
             {
@@ -285,7 +287,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleRotate(int connId, FrameRoleRotateReqMsg msg)
+        void OnRoleRotateReqMsg(int connId, FrameRoleRotateReqMsg msg)
         {
             lock (roleRotateMsgDic)
             {
@@ -298,7 +300,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleSpawn(int connId, FrameBattleRoleSpawnReqMsg msg)
+        void OnRoleSpawnReqMsg(int connId, FrameBattleRoleSpawnReqMsg msg)
         {
             lock (roleSpawnMsgDic)
             {
@@ -315,7 +317,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Item]
 
-        void OnItemPickUp(int connId, FrameItemPickReqMsg msg)
+        void OnItemPickUpReqMsg(int connId, FrameItemPickReqMsg msg)
         {
             lock (itemPickUpMsgDic)
             {
@@ -344,12 +346,33 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void OnGameStageChange()
         {
-            var gameState = serverFacades.BattleFacades.GameEntity.FSMComponent.GameState;
-            var battleRqs = serverFacades.Network.BattleReqAndRes;
+            var gameEntity = serverFacades.BattleFacades.GameEntity;
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.State;
+            var stage = gameEntity.Stage;
+            var battleStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
+            int curMaintainFrame = battleStateDomain.GetCurMainTainFrame();
+
             ConnIDList.ForEach((connID) =>
             {
-                battleRqs.SendRes_BattleGameStateChange(connID, gameState);
+                var battleRqs = serverFacades.Network.BattleReqAndRes;
+                battleRqs.SendRes_BattleGameStateAndStage(connID, state, stage, curMaintainFrame);
             });
+
+            Debug.Log($"OnGameStageChange state {state.ToString()} stage {stage}");
+        }
+
+        void OnBattleStateAndStageReqMsg(int connID, BattleStateAndStageReqMsg msg)
+        {
+            var gameEntity = serverFacades.BattleFacades.GameEntity;
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.State;
+            var stage = gameEntity.Stage;
+            var battleStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
+            int curMaintainFrame = battleStateDomain.GetCurMainTainFrame();
+
+            var battleRqs = serverFacades.Network.BattleReqAndRes;
+            battleRqs.SendRes_BattleGameStateAndStage(connID, state, stage, curMaintainFrame);
         }
 
     }

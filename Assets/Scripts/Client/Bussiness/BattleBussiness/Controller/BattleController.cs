@@ -24,21 +24,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public BattleController()
         {
-
-            roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
-            itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
-
             roleQueue = new Queue<BattleRoleSyncMsg>();
+            roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
 
+            itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
             itemPickQueue = new Queue<FrameItemPickResMsg>();
-
-            UIEventCenter.WorldRoomEnter += ((host, port) =>
-            {
-                battleFacades.Network.BattleReqAndRes.ConnBattleServer(host, port);
-            });
-            NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
-            {
-            });
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -46,7 +36,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             this.battleFacades = battleFacades;
 
             var battleRqs = battleFacades.Network.BattleReqAndRes;
-            battleRqs.RegistRes_BattleGameStageUpdate(OnGameStageUpdate);
+            battleRqs.RegistRes_BattleGameStateAndStage(OnBattleStateAndStageResMsg);
 
             var roleRqs = battleFacades.Network.RoleReqAndRes;
             roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
@@ -55,23 +45,35 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var ItemReqAndRes = battleFacades.Network.ItemReqAndRes;
             ItemReqAndRes.RegistRes_ItemSpawn(OnItemSpawn);
             ItemReqAndRes.RegistRes_ItemPickUp(OnItemPickUp);
+
+            var BattleStateDomain = battleFacades.Domain.BattleStateDomain;
+            BattleStateDomain.RegistStateAndStageChangeHandler(OnBattleStateAndStageChange);
+
+            UIEventCenter.WorldRoomEnter += ((host, port) =>
+            {
+                var battleRqs = battleFacades.Network.BattleReqAndRes;
+                battleRqs.ConnBattleServer(host, port);
+            });
+            NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
+            {
+                var battleRqs = battleFacades.Network.BattleReqAndRes;
+                battleRqs.SendReq_BattleGameStateAndStage();
+            });
         }
 
         public void Tick(float fixedDeltaTime)
         {
             // - Game State Apply
-            var gameStateDomain = battleFacades.Domain.GameStateDomain;
+            var gameStateDomain = battleFacades.Domain.BattleStateDomain;
             gameStateDomain.ApplyGameState();
 
-            // - Game Stage Check
             var gameEntity = battleFacades.GameEntity;
-            var gameStage = gameEntity.ClientStage;
-            if (!gameStage.HasStage(BattleGameStage.Loaded))
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.State;
+            if (state.CanBattleLoop())
             {
                 return;
             }
-
-            float deltaTime = UnityEngine.Time.deltaTime;
 
             // == Server Response
             Tick_RoleSpawn();
@@ -255,10 +257,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             Debug.Log($"开始加载战斗场景---------------------------------------------------");
 
-            // Load Scene And Spawn Field
             var domain = battleFacades.Domain;
             var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
-            // Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = true;
 
             fieldEntity.SetEntityId(1);
@@ -279,34 +279,43 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #endregion
 
-        void OnGameStageUpdate(BattleGameStateEnterResMsg msg)
+        void OnBattleStateAndStageResMsg(BattleStateAndStageResMsg msg)
         {
-            BattleGameState serState = (BattleGameState)msg.gameState;
             var gameEntity = battleFacades.GameEntity;
+            var stage = gameEntity.Stage;
             var fsm = gameEntity.FSMComponent;
-            var state = fsm.GameState;
-            if (state == serState)
-            {
-                return;
-            }
+            var state = fsm.State;
 
-            BattleGameStage serStage = (BattleGameStage)msg.gameStage;
-            gameEntity.SetSerStage(serStage);
+            BattleStage serStage = (BattleStage)msg.stage;
+            BattleState serState = (BattleState)msg.state;
+            int curMaintainFrame = msg.curMaintainFrame;
 
-            // - Load Check
-            var clientStage = gameEntity.ClientStage;
-            if (serStage != clientStage)
+            var comResult = stage.CompareStage(serStage, BattleStage.LoadedLevel1);
+            Debug.Log($"OnBattleStateAndStageResMsg comResult {comResult}");
+            if (comResult == 1)
             {
-                if (!clientStage.HasStage(BattleGameStage.Loaded) && state != BattleGameState.Loading)
+                if (state != BattleState.Loading)
                 {
-                    fsm.EnterGameState_BattleLoading();
+                    fsm.EnterGameState_BattleLoading(BattleStage.LoadedLevel1);
                 }
                 return;
             }
 
-            // - Enter State
-        
+            if (serState == BattleState.Preparing)
+            {
+                fsm.EnterGameState_BattlePreparing(curMaintainFrame);
+            }
 
+            Debug.LogWarning("None Taken");
+            return;
+        }
+
+        void OnBattleStateAndStageChange()
+        {
+            Debug.Log("Sync With Server");
+            // - Sync With Server
+            var battleRqs = battleFacades.Network.BattleReqAndRes;
+            battleRqs.SendReq_BattleGameStateAndStage();
         }
 
     }

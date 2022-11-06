@@ -32,7 +32,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleHitDomain HitDomain { get; private set; }
 
-        public BattleGameStateDomain GameStateDomain { get; private set; }
+        public BattleStateDomain BattleStateDomain { get; private set; }
 
         public BattleFieldDomain FieldDomain { get; private set; }
 
@@ -65,7 +65,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             HitDomain = new BattleHitDomain();
 
-            GameStateDomain = new BattleGameStateDomain();
+            BattleStateDomain = new BattleStateDomain();
 
             FieldDomain = new BattleFieldDomain();
 
@@ -100,7 +100,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             HitDomain.Inject(facades);
 
-            GameStateDomain.Inject(facades);
+            BattleStateDomain.Inject(facades);
 
             FieldDomain.Inject(facades);
 

@@ -21,9 +21,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public async void SpawBattleScene()
+        public async void SpawBattleScene(BattleStage stage)
         {
-            // Load Scene And Spawn Field
+            Debug.Log($"SpawBattleScene stage {stage.ToString()}");
+            // TODO: By BattleStage
             var domain = battleFacades.Domain;
             var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
             fieldEntity.SetEntityId(1);

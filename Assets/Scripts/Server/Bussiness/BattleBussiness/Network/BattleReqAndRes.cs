@@ -45,18 +45,22 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
-        public void SendRes_BattleGameStateChange(int connID, BattleGameState state, BattleGameStage stage)
+        public void SendRes_BattleGameStateAndStage(int connID, BattleState state, BattleStage stage, int curMaintainFrame)
         {
-            BattleGameStateEnterResMsg msg = new BattleGameStateEnterResMsg();
-            msg.gameState = (int)state;
-            msg.gameStage = (int)stage;
+            BattleStateAndStageResMsg msg = new BattleStateAndStageResMsg();
+            msg.state = (byte)state;
+            msg.curMaintainFrame = curMaintainFrame;
+            msg.stage = (int)stage;
 
             battleServer.SendMsg(connID, msg);
-
             sendCount++;
         }
 
         // ====== Regist ======
+        public void RegistReq_BattleGameStateAndStage(Action<int, BattleStateAndStageReqMsg> action)
+        {
+            AddRegister(action);
+        }
 
         void AddRegister<T>(Action<int, T> action) where T : IZeroMessage<T>, new()
         {

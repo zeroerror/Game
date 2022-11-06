@@ -169,7 +169,6 @@ namespace Game.Client
            };
         }
 
-
         async Task LoadAllAsset()
         {
             await UIPanelAssets.LoadAll();

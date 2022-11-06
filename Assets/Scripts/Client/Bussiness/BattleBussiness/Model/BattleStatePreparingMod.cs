@@ -1,7 +1,7 @@
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class GameStateBattlePreparingMod
+    public class BattleStatePreparingMod
     {
 
         public bool isFirstEnter;

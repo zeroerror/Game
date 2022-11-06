@@ -6,18 +6,24 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BattleGameEntity
     {
 
-        BattleGameStage clientStage;
-        public BattleGameStage ClientStage => clientStage;
-        public void SetClientStage(BattleGameStage v) => clientStage = v;
-
-        BattleGameStage serStage;
-        public BattleGameStage SerStage => serStage;
-        public void SetSerStage(BattleGameStage v) => serStage = v;
+        BattleStage stage;
+        public BattleStage Stage => stage;
 
         public BattleGameFSMComponent FSMComponent { get; private set; }
+
         public BattleGameEntity()
         {
             FSMComponent = new BattleGameFSMComponent();
+        }
+
+        public void AddStage(BattleStage v)
+        {
+            stage = stage.AddStage(v);
+        }
+
+        public void RemoveStage(BattleStage v)
+        {
+            stage = stage.RemoveStage(v);
         }
 
     }

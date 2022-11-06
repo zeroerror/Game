@@ -90,16 +90,15 @@ namespace Game.Server.Bussiness.BattleBussiness
                 Debug.Log($"[战斗服]: connID:{connID} 客户端连接成功-------------------------");
                 ServerNetworkEventCenter.battleSerConnect.Invoke(connID);
 
+                // - Server Battle Load
                 var battleFacades = serverFacades.BattleFacades;
                 var gameEntity = battleFacades.GameEntity;
-                var gameStage = gameEntity.ClientStage;
+                var gameStage = gameEntity.Stage;
                 var fsm = gameEntity.FSMComponent;
-                var gameState = fsm.GameState;
-                if (!gameStage.HasStage(BattleGameStage.Loaded) && gameState != BattleGameState.Loading)
+                var gameState = fsm.State;
+                if (!gameStage.HasStage(BattleStage.LoadedLevel1) && gameState != BattleState.Loading)
                 {
-                    fsm.EnterGameState_BattleLoading();
-                    var battleRqs = serverFacades.Network.BattleReqAndRes;
-                    battleRqs.SendRes_BattleGameStateChange(connID, BattleGameState.Loading);
+                    fsm.EnterGameState_BattleLoading(BattleStage.LoadedLevel1);
                 }
             };
         }

@@ -1,11 +1,10 @@
-
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.Protocol;
 using Game.Infrastructure.Network.Client;
 using Game.Protocol.Battle;
+using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Network
 {
@@ -47,8 +46,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
+        public void SendReq_BattleGameStateAndStage()
+        {
+            BattleStateAndStageReqMsg msg = new BattleStateAndStageReqMsg();
+            battleClient.SendMsg(msg);
+        }
+
         // ====== Regist ======
-        public void RegistRes_BattleGameStageUpdate(Action<BattleGameStateEnterResMsg> action)
+        public void RegistRes_BattleGameStateAndStage(Action<BattleStateAndStageResMsg> action)
         {
             AddRegister(action);
         }
