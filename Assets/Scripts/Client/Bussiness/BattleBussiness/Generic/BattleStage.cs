@@ -14,6 +14,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
     public static class BattleStageExtensions
     {
 
+        public static BattleStage GetCurLevelStage(this BattleStage self)
+        {
+            if (self.HasStage(BattleStage.Level3))
+            {
+                return BattleStage.Level3;
+            }
+            if (self.HasStage(BattleStage.Level2))
+            {
+                return BattleStage.Level2;
+            }
+
+            return BattleStage.Level1;
+        }
+
         public static bool HasStage(this BattleStage self, BattleStage tar)
         {
             return (self & tar) != 0;

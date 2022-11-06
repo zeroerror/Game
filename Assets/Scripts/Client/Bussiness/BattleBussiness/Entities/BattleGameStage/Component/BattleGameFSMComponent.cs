@@ -7,8 +7,8 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class BattleGameFSMComponent
     {
 
-        BattleState state;
-        public BattleState State => state;
+        BattleState battleState;
+        public BattleState BattleState => battleState;
 
         BattleStateSpawningFieldMod spawningFieldMod;
         public BattleStateSpawningFieldMod SpawningFieldMod => spawningFieldMod;
@@ -34,28 +34,28 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             spawningFieldMod.isFirstEnter = true;
             spawningFieldMod.stage = stage;
-            state = BattleState.SpawningField;
+            battleState = BattleState.SpawningField;
         }
 
         public void EnterGameState_BattlePreparing(int maintainFrame)
         {
             preparingMod.isFirstEnter = true;
             preparingMod.maintainFrame = maintainFrame;
-            state = BattleState.Preparing;
+            battleState = BattleState.Preparing;
         }
 
         public void EnterGameState_BattleFighting(int maintainFrame)
         {
             fightingMod.isFirstEnter = true;
             fightingMod.maintainFrame = maintainFrame;
-            state = BattleState.Fighting;
+            battleState = BattleState.Fighting;
         }
 
         public void EnterGameState_BattleSettlement(int maintainFrame)
         {
             settlementMod.isFirstEnter = true;
             settlementMod.maintainFrame = maintainFrame;
-            state = BattleState.Settlement;
+            battleState = BattleState.Settlement;
         }
 
     }
