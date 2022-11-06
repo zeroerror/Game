@@ -76,7 +76,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 if (!animatorComponent.IsInState("Idle") && !IsMoving(role))
                 {
-                    Debug.Log("PlayIdle Idle ");
                     animatorComponent.PlayIdle();
                 }
                 return;
@@ -86,7 +85,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             {
                 if (!animatorComponent.IsInState("Run"))
                 {
-                    Debug.Log("PlayRun Run ");
                     animatorComponent.PlayRun();
                 }
                 return;

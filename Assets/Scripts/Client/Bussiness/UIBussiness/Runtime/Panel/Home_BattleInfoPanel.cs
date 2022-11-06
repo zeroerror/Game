@@ -11,6 +11,8 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
 
         TMP_Text killText;
         TMP_Text damageText;
+        int killNum = 0;
+        int damageNum = 0;
 
         void Awake()
         {
@@ -25,9 +27,10 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
 
         void KillAndDamageInfoUpdate(int kill, int damage)
         {
-            Debug.Log($"kill {kill}  damage {damage}");
-            killText.text = kill.ToString();
-            damageText.text = damage.ToString();
+            killNum += kill;
+            damageNum += damage;
+            killText.text = killNum.ToString();
+            damageText.text = damageNum.ToString();
         }
 
     }

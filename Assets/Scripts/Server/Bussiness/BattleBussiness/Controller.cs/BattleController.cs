@@ -38,8 +38,11 @@ namespace Game.Server.Bussiness.BattleBussiness
             ServerNetworkEventCenter.Regist_BattleServerConnHandler((connID) =>
             {
                 // - 添加至连接名单
-                ConnIDList.Add(connID);
-                Debug.Log($"添加至连接名单 connID {connID}");
+                lock (ConnIDList)
+                {
+                    ConnIDList.Add(connID);
+                    Debug.Log($"添加至连接名单 connID {connID}");
+                }
 
                 // - Battle Load
                 var battleFacades = serverFacades.BattleFacades;

@@ -275,6 +275,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 fsm.EnterGameState_BattlePreparing(curMaintainFrame);
                 UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
+                UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleInfoPanel" });
                 return;
             }
 

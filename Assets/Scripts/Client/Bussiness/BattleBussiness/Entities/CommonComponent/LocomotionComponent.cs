@@ -201,7 +201,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (isGrounded) return;
 
-            DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
+            // DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
             isGrounded = true;
         }
 
@@ -209,7 +209,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (!isGrounded) return;
 
-            DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
+            // DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
             isGrounded = false;
         }
 

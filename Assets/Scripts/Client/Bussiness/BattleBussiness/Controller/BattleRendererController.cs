@@ -72,16 +72,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 vicRenderer.SetDamageText(damage.ToString());
 
                 // - UI
-                var roleLogicRepo = repo.RoleLogicRepo;
-                if (roleLogicRepo.IsOwner(atkEntityID))
+                var BulletRepo = repo.BulletRepo;
+                var bullet = BulletRepo.Get(atkEntityID);
+                var WeaponRepo = repo.WeaponRepo;
+                var roleRepo = repo.RoleLogicRepo;
+                if (WeaponRepo.TryGet(bullet.WeaponID, out var weapon)
+                && roleRepo.TryGet(weapon.MasterID, out var atkRole)
+                && roleRepo.IsOwner(atkRole.IDComponent.EntityID))
                 {
                     var arbitService = battleFacades.ArbitrationService; ;
                     var totalDamage = arbitService.GetAtkerTotalCauseDamage(atkEntityType, atkEntityID);
-                    int kill = 1;
-
+                    int kill = 1; // - test
                     UIEventCenter.KillAndDamageInfoUpdateAction.Invoke(kill, (int)totalDamage);
                 }
-
                 return;
             }
 
