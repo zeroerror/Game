@@ -135,7 +135,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var roleRepo = serverFacades.BattleFacades.Repo.RoleLogicRepo;
                     var masterId = msg.masterId;
 
-                    if (roleRepo.TryGetByEntityId(masterId, out var master) && master.CanWeaponReload())
+                    if (roleRepo.TryGet(masterId, out var master) && master.CanWeaponReload())
                     {
                         master.InputComponent.pressReload = true;
                     }
@@ -181,7 +181,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var rqs = serverFacades.Network.WeaponReqAndRes;
                     var entityID = msg.entityID;
                     var masterId = msg.masterId;
-                    if (roleRepo.TryGetByEntityId(masterId, out var master)
+                    if (roleRepo.TryGet(masterId, out var master)
                         && master.WeaponComponent.TryDropWeapon(entityID, out var weapon))
                     {
                         var itemDomain = serverFacades.BattleFacades.Domain.ItemDomain;

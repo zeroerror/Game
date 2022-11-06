@@ -1,3 +1,4 @@
+using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Server.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Server.Bussiness.BattleBussiness
@@ -6,16 +7,16 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleNetworkController
     {
 
-        BattleServerFacades battleFacades;
+        BattleServerFacades serverFacades;
 
-        public void Inject(BattleServerFacades battleFacades)
+        public void Inject(BattleServerFacades v)
         {
-            this.battleFacades = battleFacades;
+            this.serverFacades = v;
         }
 
         public void Tick()
         {
-            battleFacades.Network.Tick();
+            serverFacades.Network.Tick();
         }
 
     }

@@ -54,8 +54,19 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick(float fixedDeltaTime)
         {
-            battleNetworkController.Tick();
+            // - Game State
+            var gameStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
+            gameStateDomain.ApplyGameState();
 
+            var gameEntity = serverFacades.BattleFacades.GameEntity;
+            var fsm = gameEntity.FSMComponent;
+            var state = fsm.BattleState;
+            if (!state.CanBattleLoop())
+            {
+                return;
+            }
+
+            battleNetworkController.Tick();
             battleController.Tick(fixedDeltaTime);
             battlePhysicsController.Tick(fixedDeltaTime);
             battleWeaponController.Tick(fixedDeltaTime);

@@ -35,10 +35,11 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public BattleController()
         {
-            ServerNetworkEventCenter.Regist_BattleServerConnHandler((connId) =>
+            ServerNetworkEventCenter.Regist_BattleServerConnHandler((connID) =>
             {
                 // - 添加至连接名单
-                ConnIDList.Add(connId);
+                ConnIDList.Add(connID);
+                Debug.Log($"添加至连接名单 connID {connID}");
 
                 // - Battle Load
                 var battleFacades = serverFacades.BattleFacades;
@@ -85,18 +86,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public void Tick(float fixedDeltaTime)
         {
-            // - Game State
-            var gameStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
-            gameStateDomain.ApplyGameState();
-
-            var gameEntity = serverFacades.BattleFacades.GameEntity;
-            var fsm = gameEntity.FSMComponent;
-            var state = fsm.BattleState;
-            if (!state.CanBattleLoop())
-            {
-                return;
-            }
-
             // - Role
             Tick_RoleSpawn();
             Tick_RoleRollOpt();
@@ -129,9 +118,9 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_RoleSpawn()
         {
-            ConnIDList.ForEach((connId) =>
+            ConnIDList.ForEach((connID) =>
             {
-                long key = GetCurFrameKey(connId);
+                long key = GetCurFrameKey(connID);
 
                 if (roleSpawnMsgDic.TryGetValue(key, out var msg))
                 {
@@ -143,15 +132,20 @@ namespace Game.Server.Bussiness.BattleBussiness
                     roleSpawnMsgDic[key] = null;
 
                     var battleFacades = serverFacades.BattleFacades;
-                    var roleRepo = battleFacades.Repo.RoleLogicRepo;
-                    var entityID = roleRepo.Size;
-                    var roleEntity = battleFacades.Domain.RoleDomain.SpawnRoleLogic(entityID);
-                    roleEntity.SetConnId(connId);
+                    var repo = battleFacades.Repo;
+                    var roleRepo = repo.RoleLogicRepo;
+                    if (!roleRepo.TryGetByConnID(connID, out var role))
+                    {
+                        var idService = battleFacades.IDService;
+                        var entityID = idService.GetAutoIDByEntityType(EntityType.BattleRole);
+                        role = battleFacades.Domain.RoleDomain.SpawnRoleLogic(entityID);
+                        role.SetConnID(connID);
+                        Debug.Log($"服务器逻辑[生成角色] ServerFrame:{ServerFrame} EntityID:{entityID} ControlType {((ControlType)msg.controlType).ToString()}");
+                    }
 
                     var serNetwork = serverFacades.Network;
                     var roleRqs = serNetwork.RoleReqAndRes;
-                    roleRqs.SendRes_BattleRoleSpawn(connId, entityID, msg.controlType);
-                    Debug.Log($"服务器逻辑[生成角色] serveFrame:{ServerFrame} entityId:{entityID} controlType {((ControlType)msg.controlType).ToString()}");
+                    roleRqs.SendRes_BattleRoleSpawn(connID, role.IDComponent.EntityID, msg.controlType);
                 }
             });
         }
@@ -312,13 +306,13 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleSpawnReqMsg(int connId, FrameBattleRoleSpawnReqMsg msg)
+        void OnRoleSpawnReqMsg(int connID, FrameBattleRoleSpawnReqMsg msg)
         {
             lock (roleSpawnMsgDic)
             {
-                long key = GetCurFrameKey(connId);
+                long key = GetCurFrameKey(connID);
+                Debug.Log($"OnRoleSpawnReqMsg connID {connID} key{key}");
 
-                Debug.Log($"[战斗Controller] 战斗角色生成请求 key:{key}");
                 if (!roleSpawnMsgDic.TryGetValue(key, out var _))
                 {
                     roleSpawnMsgDic[key] = msg;

@@ -95,7 +95,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 controlType = controlType
             };
             battleServer.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
-            Debug.Log($"服务端回复帧消息 serverFrame:{serverFrame} connId:{connId} ---->确认人物生成");
+            Debug.Log($"SendRes_BattleRoleSpawn entityID:{entityID} controlType:{controlType} ---->人物生成");
             sendCount++;
         }
 

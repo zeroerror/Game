@@ -58,6 +58,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 var battleRqs = battleFacades.Network.BattleReqAndRes;
                 battleRqs.SendReq_BattleGameStateAndStage();
+
+                var rqs = battleFacades.Network.RoleReqAndRes;
+                rqs.SendReq_RoleSpawn(ControlType.Owner);
             });
         }
 
@@ -111,21 +114,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var roleRepo = repo.RoleLogicRepo;
                 var fieldRepo = repo.FiledRepo;
                 var entityID = msg.entityId;
-                var roleLogic = battleFacades.Repo.RoleLogicRepo.Get(entityID);
 
-                if (roleLogic == null)
+                if (!battleFacades.Repo.RoleLogicRepo.TryGet(entityID, out var roleLogic))
                 {
-                    var roleLogicRepo = repo.RoleLogicRepo;
-                    bool HasOwner = roleLogicRepo.HasOwner();
                     var roleDoamin = battleFacades.Domain.RoleDomain;
-                    if (!HasOwner)
-                    {
-                        roleLogic = roleDoamin.SpawnRoleWithRenderer(msg.entityId, ControlType.Owner);
-                    }
-                    else
-                    {
-                        roleLogic = roleDoamin.SpawnRoleWithRenderer(msg.entityId, ControlType.Other);
-                    }
+                    roleLogic = roleDoamin.SpawnRoleWithRenderer(msg.entityId, ControlType.Other);
                 }
 
                 var moveComponent = roleLogic.LocomotionComponent;
@@ -150,10 +143,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_RoleSpawn()
         {
-            if (roleSpawnQueue.TryPeek(out var msg))
+            while (roleSpawnQueue.TryPeek(out var msg))
             {
                 roleSpawnQueue.Dequeue();
-                Debug.Log($"生成人物帧 : {msg.serverFrame}");
 
                 var entityId = msg.entityId;
                 var repo = battleFacades.Repo;
@@ -272,7 +264,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
 
             var rqs = battleFacades.Network.RoleReqAndRes;
-            rqs.SendReq_RoleSpawn(1000, ControlType.Owner);
+            rqs.SendReq_RoleSpawn(ControlType.Owner);
 
             Debug.Log($"加载战斗场景结束---------------------------------------------------");
         }
@@ -331,19 +323,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void OnBattleStateAndStageChange()
         {
-            Debug.Log("Sync With Server");
             // - Sync With Server
             var battleRqs = battleFacades.Network.BattleReqAndRes;
             battleRqs.SendReq_BattleGameStateAndStage();
-
-            var gameEntity = battleFacades.GameEntity;
-            var fsm = gameEntity.FSMComponent;
-            var state = fsm.BattleState;
-            if (state == BattleState.Preparing)
-            {
-                var rqs = battleFacades.Network.RoleReqAndRes;
-                rqs.SendReq_RoleSpawn(1000, ControlType.Owner);
-            }
         }
 
     }

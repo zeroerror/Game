@@ -35,9 +35,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return all.Find((entity) => entity.IDComponent.EntityID == entityID);
         }
 
-        public bool TryGetByEntityId(int entityID, out BattleRoleLogicEntity entity)
+        public bool TryGet(int entityID, out BattleRoleLogicEntity entity)
         {
             entity = all.Find((entity) => entity.IDComponent.EntityID == entityID);
+            return entity != null;
+        }
+
+        public bool TryGetByConnID(int connID, out BattleRoleLogicEntity entity)
+        {
+            entity = all.Find((entity) => entity.ConnID == connID);
             return entity != null;
         }
 
@@ -55,7 +61,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
                 action.Invoke(role);
             });
         }
-        
+
         public void ForAll(Action<BattleRoleLogicEntity> action)
         {
             if (action == null) return;

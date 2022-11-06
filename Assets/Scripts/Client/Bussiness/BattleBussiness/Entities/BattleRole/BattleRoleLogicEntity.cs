@@ -43,8 +43,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         // - Connection Info
         int connId;
-        public int ConnId => connId;
-        public void SetConnId(int connId) => this.connId = connId;
+        public int ConnID => connId;
+        public void SetConnID(int connId) => this.connId = connId;
 
         // - Renderer
         public BattleRoleRendererEntity roleRenderer { get; private set; }
