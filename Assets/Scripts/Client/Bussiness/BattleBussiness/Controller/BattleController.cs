@@ -243,34 +243,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         }
         #endregion
 
-        #region [Network Event Center]
-
-        async void GameFightSpawn()
-        {
-            Debug.Log($"开始加载战斗场景---------------------------------------------------");
-
-            var domain = battleFacades.Domain;
-            var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
-            Cursor.visible = true;
-
-            fieldEntity.SetEntityId(1);
-
-            var fieldEntityRepo = battleFacades.Repo.FiledRepo;
-            fieldEntityRepo.Add(fieldEntity);
-
-            var physicsScene = fieldEntity.gameObject.scene.GetPhysicsScene();
-            fieldEntityRepo.SetPhysicsScene(physicsScene);
-
-            UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
-
-            var rqs = battleFacades.Network.RoleReqAndRes;
-            rqs.SendReq_RoleSpawn(ControlType.Owner);
-
-            Debug.Log($"加载战斗场景结束---------------------------------------------------");
-        }
-
-        #endregion
-
         void OnBattleStateAndStageResMsg(BattleStateAndStageResMsg msg)
         {
             var gameEntity = battleFacades.GameEntity;
@@ -302,6 +274,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             if (serState == BattleState.Preparing)
             {
                 fsm.EnterGameState_BattlePreparing(curMaintainFrame);
+                UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_BattleOptPanel" });
                 return;
             }
 
