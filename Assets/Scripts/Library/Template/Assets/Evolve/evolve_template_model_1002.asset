@@ -16,4 +16,4 @@ MonoBehaviour:
   modelName: "\u8FDB\u5316\u7C7B\u578B_Speed"
   addHealth: 0
   addDamageCoefficient: 0
-  addSpeed: 5
+  addSpeed: 1

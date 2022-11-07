@@ -49,12 +49,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         // - Renderer
         public BattleRoleRendererEntity roleRenderer { get; private set; }
 
-        // - Roll
-        [SerializeField]
-        [Header("前滚翻速度")]
-        float rollSpeed;
-        public float RollSpeed => rollSpeed;
-
         bool isDead;
         public bool IsDead => isDead;
 
@@ -102,16 +96,20 @@ namespace Game.Client.Bussiness.BattleBussiness
                 return false;
             }
 
-            var mc = locomotionComponent;
-            if (!mc.IsGrounded)
+            var lc = locomotionComponent;
+            if (!lc.IsGrounded)
             {
                 return false;
             }
 
+            var rollSpeed = lc.BasicMoveSpeed * 3;
+            var maxVelocity = lc.MaxVelocity;
+            rollSpeed = rollSpeed > maxVelocity ? maxVelocity : rollSpeed;
+
             dir.Normalize();
             var addVelocity = dir * rollSpeed;
-            addVelocity.y = 3f;
-            mc.AddExtraVelocity(addVelocity);
+            addVelocity.y = 5f;
+            lc.AddExtraVelocity(addVelocity);
             stateComponent.EnterRolling(30);
 
             Debug.Log($"前滚翻 dir {dir} rollSpeed {rollSpeed} addVelocity:{addVelocity}");
@@ -172,7 +170,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             for (int i = 0; i < allWeapons.Length; i++)
             {
                 var weapon = allWeapons[i];
-                weapon.AddDamageCoefficient(evolveTM.addDamageCoefficient);
+                if (weapon != null)
+                {
+                    weapon.AddDamageCoefficient(evolveTM.addDamageCoefficient);
+                }
             }
         }
 

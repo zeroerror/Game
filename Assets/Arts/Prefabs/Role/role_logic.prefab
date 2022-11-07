@@ -78,14 +78,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locomotionComponent:
-    maximumVelocity: 30
+    maxVelocity: 20
     basicMoveSpeed: 5
     moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 0
     gravity: 150
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
-    frictionReduce: 30
+    frictionReduce: 20
     isGrounded: 0
     isHitWall: 0
   healthComponent:
@@ -120,7 +120,6 @@ MonoBehaviour:
     roleStateSwitchingMod:
       isFirstEnter: 0
       maintainFrame: 0
-  rollSpeed: 7
 --- !u!1 &7431829818199942413
 GameObject:
   m_ObjectHideFlags: 0

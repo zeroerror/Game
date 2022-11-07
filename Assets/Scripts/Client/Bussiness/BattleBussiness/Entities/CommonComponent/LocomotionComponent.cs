@@ -29,7 +29,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 Velocity => rb.velocity;
         public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
 
-        [SerializeField] float maximumVelocity = float.MaxValue;
+        [SerializeField] float maxVelocity = float.MaxValue;
+        public float MaxVelocity => maxVelocity;
 
         public void Inject(Rigidbody rb)
         {
@@ -65,6 +66,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         #region [序列化变量]
 
         [SerializeField][Header("基础移动速度")] float basicMoveSpeed;
+        public float BasicMoveSpeed => basicMoveSpeed;
 
         [SerializeField][Header("当前移动速度")] Vector3 moveVelocity;
         public Vector3 MoveVelocity => moveVelocity;
@@ -256,7 +258,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             // - Y轴
             if (!isGrounded)
             {
-                vel.y = rb.velocity.y + extraVelocity.y + gravityVelocity * fixedDeltaTime;   
+                vel.y = rb.velocity.y + extraVelocity.y + gravityVelocity * fixedDeltaTime;
             }
             else
             {
@@ -265,9 +267,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.velocity = vel;
 
             //限制'最大速度'
-            if (rb.velocity.magnitude > maximumVelocity)
+            if (rb.velocity.magnitude > maxVelocity)
             {
-                rb.velocity = rb.velocity.normalized * maximumVelocity;
+                rb.velocity = rb.velocity.normalized * maxVelocity;
             }
 
             // 重置 ‘一次性速度’
