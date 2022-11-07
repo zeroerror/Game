@@ -31,6 +31,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 roleDomain.Reborn(role);
             });
+            // - Field
+            var fieldRepo = repo.FieldRepo;
+            var curField = fieldRepo.CurFieldEntity;
+            curField.Reset();
             // - Item
             var itemDomain = domain.ItemDomain;
             itemDomain.TearDownAllItems();

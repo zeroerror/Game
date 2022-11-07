@@ -83,8 +83,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void Reborn(BattleRoleLogicEntity role)
         {
-            role.TearDown();
-            role.Reborn(battleFacades.Repo.FieldRepo.CurFieldEntity.BornPos);
+            var repo = battleFacades.Repo;
+            var fieldRepo = repo.FieldRepo;
+            var curField = fieldRepo.CurFieldEntity;
+            var pos = curField.GetRandomBornPos();
+            role.Reborn(pos);
         }
 
         public float TryReceiveDamage(BattleRoleLogicEntity role, float damage)

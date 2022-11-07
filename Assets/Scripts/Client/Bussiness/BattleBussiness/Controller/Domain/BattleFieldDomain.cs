@@ -1,7 +1,11 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
-using Game.Client.Bussiness.BattleBussiness.Facades;
+using UnityEngine.AddressableAssets;
+using UnityEngine.SceneManagement;
+using Game.Infrastructure.Input;
 using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -11,11 +15,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         BattleFacades battleFacades;
 
-        byte tempRidIndex;
-
-        public BattleFieldDomain()
-        {
-        }
+        public BattleFieldDomain() { }
 
         public void Inject(BattleFacades facades)
         {
@@ -25,12 +25,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public async void SpawBattleField(string fieldName)
         {
             // TODO: By fieldName
-            var domain = battleFacades.Domain;
-            var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
-            fieldEntity.SetEntityId(1);
-            var fieldEntityRepo = battleFacades.Repo.FieldRepo;
-            fieldEntityRepo.Add(fieldEntity);
-            fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
+            var field = await SpawnField("scene_arena");
+            field.SetEntityId(1);
+            var fieldRepo = battleFacades.Repo.FieldRepo;
+            fieldRepo.Add(field);
+            fieldRepo.SetCurPhysicsScene(field.GetPhysicsScene());
         }
 
         public void RandomSpawnAllItemToField(FieldEntity fieldEntity, out List<EntityType> entityTypeList, out List<byte> subTypeList, out List<int> entityIDList)
@@ -94,6 +93,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     lRange = rRange;
                 }
             }
+        }
+
+        async Task<FieldEntity> SpawnField(string sceneName)
+        {
+            var result = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).Task;
+
+            var scene = result.Scene;
+            var sceneObjs = scene.GetRootGameObjects();
+            var fieldTF = sceneObjs[0].transform;
+            var field = fieldTF.GetComponent<FieldEntity>();
+            field.Ctor();
+
+            var cameraAsset = battleFacades.Assets.CameraAsset;
+            cameraAsset.TryGetByName("FirstViewCam", out GameObject firstViewCamPrefab);
+            cameraAsset.TryGetByName("ThirdViewCam", out GameObject thirdViewCamPrefab);
+            var firstCam = GameObject.Instantiate(firstViewCamPrefab).GetComponent<CinemachineExtra>();
+            var thirdCam = GameObject.Instantiate(thirdViewCamPrefab).GetComponent<CinemachineExtra>();
+            field.CameraComponent.SetFirstViewCam(firstCam);
+            field.CameraComponent.SetThirdViewCam(thirdCam);
+
+            // LocalEventCenter.Invoke_SceneLoadedHandler(scene.name);
+            return field;
         }
 
     }

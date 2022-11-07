@@ -11,7 +11,7 @@ namespace Game.Client.Bussiness.Repo
 
         PhysicsScene curPhysicsScene;
         public PhysicsScene CurPhysicsScene => curPhysicsScene;
-        public void SetPhysicsScene(PhysicsScene scene) => this.curPhysicsScene = scene;
+        public void SetCurPhysicsScene(PhysicsScene v) => this.curPhysicsScene = v;
 
         public FieldEntity CurFieldEntity { get; private set; }
 

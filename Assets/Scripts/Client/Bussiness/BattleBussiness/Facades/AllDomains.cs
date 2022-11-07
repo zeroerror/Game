@@ -6,8 +6,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     public class AllDomains
     {
 
-        public BattleSceneDomain SceneDomain { get; private set; }
-
         public BattleRoleDomain RoleDomain { get; private set; }
         public BattleRoleRendererDomain RoleRendererDomain { get; private set; }
         public BattleRoleStateDomain RoleStateDomain { get; private set; }
@@ -41,8 +39,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public AllDomains()
         {
-            SceneDomain = new BattleSceneDomain();
-
             RoleDomain = new BattleRoleDomain();
             RoleRendererDomain = new BattleRoleRendererDomain();
             RoleStateDomain = new BattleRoleStateDomain();
@@ -77,11 +73,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         }
 
-        // todo: obsolete
         public void Inject(BattleFacades facades)
         {
-            SceneDomain.Inject(facades);
-
             RoleDomain.Inject(facades);
             RoleRendererDomain.Inject(facades);
             RoleStateDomain.Inject(facades);
@@ -111,7 +104,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             FieldDomain.Inject(facades);
 
             CommonDomain.Inject(facades);
-
         }
     }
 

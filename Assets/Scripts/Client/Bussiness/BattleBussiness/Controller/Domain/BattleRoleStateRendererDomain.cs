@@ -1,8 +1,7 @@
 
 
-using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Generic;
-using UnityEngine;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -12,10 +11,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         BattleFacades battleFacades;
 
-        public BattleRoleStateRendererDomain()
-        {
-
-        }
+        public BattleRoleStateRendererDomain(){}
 
         public void Inject(BattleFacades battleFacades)
         {
