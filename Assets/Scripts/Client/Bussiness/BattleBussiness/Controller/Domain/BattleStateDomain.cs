@@ -13,6 +13,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         Action stateAndStageChangeHandler;
         public void RegistStateAndStageChangeHandler(Action action) => stateAndStageChangeHandler += action;
 
+        Action airDropHandler;
+        public void RegistAirDropHandler(Action action) => airDropHandler += action;
+
         public BattleStateDomain()
         {
         }
@@ -74,14 +77,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 stateMod.isFirstEnter = false;
 
-                // --- 清场
-                var domain = battleFacades.Domain;
-                var commonDomain = domain.CommonDomain;
-                commonDomain.ClearBattleField();
-
                 // - 场景加载
                 if (!gameEntity.Stage.HasStage(stage))
                 {
+                    var domain = battleFacades.Domain;
                     var fieldDomain = domain.FieldDomain;
                     var fieldName = stage.ToString().ToLower();
                     fieldDomain.SpawBattleField(fieldName);
@@ -99,6 +98,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 // State
                 fsm.EnterGameState_BattlePreparing(300);
                 stateAndStageChangeHandler.Invoke();
+
+                // --- 清场
+                var domain = battleFacades.Domain;
+                var commonDomain = domain.CommonDomain;
+                commonDomain.ClearBattleField();
             }
         }
 
@@ -130,7 +134,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 gameEntity.AddStage(BattleStage.Prepared);
 
                 // - State 
-                fsm.EnterGameState_BattleFighting(300);
+                fsm.EnterGameState_BattleFighting(18000);
                 stateAndStageChangeHandler.Invoke();
             }
 
@@ -156,7 +160,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             if (stateMod.maintainFrame > 0)
             {
+                // - Loop
                 stateMod.maintainFrame--;
+                if (stateMod.maintainFrame % 300 == 0)
+                {
+                    airDropHandler?.Invoke();
+                }
             }
             else
             {

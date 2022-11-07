@@ -77,7 +77,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             var rb = transform.GetComponentInParent<Rigidbody>();
             locomotionComponent.Inject(rb);
             locomotionComponent.Ctor();
-            locomotionComponent.SetMaximumVelocity(30f);
 
             healthComponent.Ctor();
 

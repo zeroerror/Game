@@ -82,6 +82,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item
+  - m_GUID: 2df77a89a89ac0641aac6b6905334f8a
+    m_Address: Item_Airdrop_Level1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b9c7270654a9abe4980cbe583e7fed31, type: 2}
   m_SchemaSet:

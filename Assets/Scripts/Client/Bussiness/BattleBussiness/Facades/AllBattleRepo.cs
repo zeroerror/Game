@@ -24,6 +24,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public BulletRendererRepo BulletRendererRepo { get; private set; }
         public BulletItemRepo BulletItemRepo { get; private set; }
 
+        public BattleAirdropRepo AirdropRepo { get; private set; }
 
         public AllBattleRepo()
         {
@@ -44,6 +45,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             BulletItemRepo = new BulletItemRepo();
 
             EvolveItemRepo = new BattleEvolveItemRepo();
+
+            AirdropRepo = new BattleAirdropRepo();
         }
 
     }

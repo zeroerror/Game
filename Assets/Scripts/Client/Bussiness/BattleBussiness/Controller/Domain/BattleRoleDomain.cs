@@ -86,7 +86,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var repo = battleFacades.Repo;
             var fieldRepo = repo.FieldRepo;
             var curField = fieldRepo.CurFieldEntity;
-            var pos = curField.GetRandomBornPos();
+            var pos = curField.UseRandomBornPos();
             role.Reborn(pos);
         }
 

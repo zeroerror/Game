@@ -37,6 +37,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleCommonDomain CommonDomain { get; private set; }
 
+        public BattleAirdropDomain AirdropDomain { get; private set; }
+
         public AllDomains()
         {
             RoleDomain = new BattleRoleDomain();
@@ -71,6 +73,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             CommonDomain = new BattleCommonDomain();
 
+            AirdropDomain = new BattleAirdropDomain();
         }
 
         public void Inject(BattleFacades facades)
@@ -104,6 +107,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             FieldDomain.Inject(facades);
 
             CommonDomain.Inject(facades);
+
+            AirdropDomain.Inject(facades);
         }
     }
 

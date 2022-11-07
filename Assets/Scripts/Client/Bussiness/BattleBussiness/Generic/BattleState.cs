@@ -19,5 +19,4 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
         }
     }
 
-
 }

@@ -73,21 +73,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             for (int i = 0; i < assetPointEntities.Length; i++)
             {
                 var assetPoint = assetPointEntities[i];
-                AssetGenProbability[] itemGenProbabilities = assetPoint.itemGenProbabilityArray;
+                BattleAssetGenProbability[] probabilities = assetPoint.itemGenProbabilityArray;
                 float totalWeight = 0;
-                for (int j = 0; j < itemGenProbabilities.Length; j++) totalWeight += itemGenProbabilities[j].weight;
+                for (int j = 0; j < probabilities.Length; j++) totalWeight += probabilities[j].weight;
                 float lRange = 0;
                 float rRange = 0;
                 float randomNumber = Random.Range(0f, 1f);
-                for (int j = 0; j < itemGenProbabilities.Length; j++)
+                for (int j = 0; j < probabilities.Length; j++)
                 {
-                    AssetGenProbability igp = itemGenProbabilities[j];
-                    if (igp.weight <= 0) continue;
-                    rRange = lRange + igp.weight / totalWeight;
+                    BattleAssetGenProbability probability = probabilities[j];
+                    if (probability.weight <= 0) continue;
+                    rRange = lRange + probability.weight / totalWeight;
                     if (randomNumber >= lRange && randomNumber < rRange)
                     {
-                        entityTypeList.Add(igp.entityType);
-                        subTypeList.Add(igp.subType);
+                        entityTypeList.Add(probability.entityType);
+                        subTypeList.Add(probability.subType);
                         break;
                     }
                     lRange = rRange;

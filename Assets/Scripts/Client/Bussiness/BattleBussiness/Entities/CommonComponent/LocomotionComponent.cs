@@ -29,8 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public Vector3 Velocity => rb.velocity;
         public void SetVelocity(Vector3 velocity) => rb.velocity = velocity;
 
-        float maximumVelocity = float.MaxValue;
-        public void SetMaximumVelocity(float velocity) => this.maximumVelocity = velocity;
+        [SerializeField] float maximumVelocity = float.MaxValue;
 
         public void Inject(Rigidbody rb)
         {

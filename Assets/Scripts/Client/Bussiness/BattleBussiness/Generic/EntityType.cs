@@ -12,6 +12,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Generic
         Armor,
         ArmorItem,
         EvolveItem,
+        Aridrop
     }
 
 }

@@ -14,15 +14,19 @@ namespace Game.Client.Bussiness
         public Transform Role_Group_Logic { get; private set; }
         public Transform Role_Group_Renderer { get; private set; }
 
-        [SerializeField]
-        Transform[] bornPoints;
+        [SerializeField] Transform[] bornPoints;
+
+        [SerializeField] Transform[] airdropPoints;
 
         byte[] bornPointFlags;
+
+        byte[] airdropPointFlags;
 
         public void Ctor()
         {
             CameraComponent = new CinemachineComponent();
             bornPointFlags = new byte[bornPoints.Length];
+            airdropPointFlags = new byte[airdropPoints.Length];
 
             Role_Group_Logic = this.transform.Find("Role_Group_Logic");
             Role_Group_Renderer = this.transform.Find("Role_Group_Renderer");
@@ -30,7 +34,7 @@ namespace Game.Client.Bussiness
             Debug.Assert(Role_Group_Renderer != null);
         }
 
-        public void Reset()
+        public void ResetBornPointFlags()
         {
             for (int i = 0; i < bornPointFlags.Length; i++)
             {
@@ -38,7 +42,15 @@ namespace Game.Client.Bussiness
             }
         }
 
-        public Vector3 GetRandomBornPos()
+        public void ResetAirdropPointFlags()
+        {
+            for (int i = 0; i < airdropPointFlags.Length; i++)
+            {
+                airdropPointFlags[i] = 0;
+            }
+        }
+
+        public Vector3 UseRandomBornPos()
         {
             int randomIndex = Random.Range(0, bornPoints.Length);
             int count = 0;
@@ -56,6 +68,27 @@ namespace Game.Client.Bussiness
             bornPointFlags[randomIndex]++;
 
             return bornPoints[randomIndex].position;
+        }
+
+        public Vector3 UseRandomAirdropPos()
+        {
+            var length = airdropPoints.Length;
+            int randomIndex = Random.Range(0, length);
+            int count = 0;
+            while (airdropPointFlags[randomIndex] != 0)
+            {
+                randomIndex = Random.Range(0, length);
+                count++;
+                if (count > 10000)
+                {
+                    // - Temporary Way: Invoid Dead Loop
+                    break;
+                }
+            }
+
+            airdropPointFlags[randomIndex]++;
+
+            return airdropPoints[randomIndex].position;
         }
 
         public PhysicsScene GetPhysicsScene()

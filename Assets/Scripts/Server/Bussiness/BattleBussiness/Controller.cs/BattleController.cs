@@ -84,7 +84,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             // Domain Handler
             var gameStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
             gameStateDomain.RegistStateAndStageChangeHandler(OnGameStageChange);
-
+            gameStateDomain.RegistAirDropHandler(OnBattleAirdrop);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -352,6 +352,14 @@ namespace Game.Server.Bussiness.BattleBussiness
         }
 
         #endregion
+
+        void OnBattleAirdrop()
+        {
+            var battleFacades = serverFacades.BattleFacades;
+            var curField = battleFacades.Repo.FieldRepo.CurFieldEntity;
+            var airdropDomain = battleFacades.Domain.AirdropDomain;
+            var airdrop = airdropDomain.SpawnBattleAirDrop(curField.UseRandomAirdropPos());
+        }
 
         void OnGameStageChange()
         {

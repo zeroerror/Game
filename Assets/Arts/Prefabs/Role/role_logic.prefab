@@ -78,6 +78,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locomotionComponent:
+    maximumVelocity: 30
     basicMoveSpeed: 5
     moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 0

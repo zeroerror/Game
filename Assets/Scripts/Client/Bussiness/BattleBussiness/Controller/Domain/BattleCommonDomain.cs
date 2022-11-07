@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             // - Field
             var fieldRepo = repo.FieldRepo;
             var curField = fieldRepo.CurFieldEntity;
-            curField.Reset();
+            curField.ResetBornPointFlags();
             // - Item
             var itemDomain = domain.ItemDomain;
             itemDomain.TearDownAllItems();
