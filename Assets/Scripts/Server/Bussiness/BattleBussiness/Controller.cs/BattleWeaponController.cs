@@ -100,7 +100,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                             Vector3 fireDir = new Vector3(fireDirX / 100f, 0, fireDirZ / 100f);
                             master.InputComponent.SetShootDir(fireDir);
 
-                            var curWeapon = weaponComponent.CurrentWeapon;
+                            var curWeapon = weaponComponent.CurWeapon;
                             master.StateComponent.EnterShooting(curWeapon.FreezeMaintainFrame, curWeapon.BreakFrame);
 
                             var bulletType = curWeapon.BulletType;
@@ -151,7 +151,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 if (role.WeaponComponent.IsReloading)
                 {
-                    var curWeapon = role.WeaponComponent.CurrentWeapon;
+                    var curWeapon = role.WeaponComponent.CurWeapon;
                     if (curWeapon.CurReloadingFrame > 0)
                     {
                         curWeapon.ReduceCurReloadingFrame();

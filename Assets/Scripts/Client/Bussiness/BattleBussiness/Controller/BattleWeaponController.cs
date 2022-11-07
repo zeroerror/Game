@@ -60,7 +60,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var master = roleRepo.Get(weapon.MasterID);
 
                 var weaponComponent = master.WeaponComponent;
-                if (weapon != weaponComponent.CurrentWeapon)
+                if (weapon != weaponComponent.CurWeapon)
                 {
                     Debug.LogError("客服不一致!");
                 }
@@ -68,7 +68,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 if (weaponComponent.TryWeaponShoot())
                 {
                     Debug.Log($"角色:{master.IDComponent.EntityID} 射击");
-                    var curWeapon = weaponComponent.CurrentWeapon;
+                    var curWeapon = weaponComponent.CurWeapon;
                     curWeapon.PlayShootAudio();
                 }
             }

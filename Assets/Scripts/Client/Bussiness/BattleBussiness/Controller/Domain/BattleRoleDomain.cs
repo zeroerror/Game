@@ -24,7 +24,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public BattleRoleLogicEntity SpawnRoleWithRenderer(int entityId, ControlType controlType)
         {
             var repo = battleFacades.Repo;
-            var fieldEntity = repo.FiledRepo.CurFieldEntity;
+            var fieldEntity = repo.FieldRepo.CurFieldEntity;
             var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
 
             var roleRenderer = roleRendererDomain.SpawnRoleRenderer(entityId, fieldEntity.Role_Group_Renderer);
@@ -46,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public BattleRoleLogicEntity SpawnRoleLogic(int entityId)
         {
-            var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            var fieldEntity = battleFacades.Repo.FieldRepo.CurFieldEntity;
             string prefabName = "role_logic";
             if (battleFacades.Assets.BattleRoleAssets.TryGetByName(prefabName, out GameObject prefab))
             {
@@ -68,12 +68,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void Tick_RoleRigidbody(float fixedTime)
+        public void Tick_Physics_AllRoles(float fixedTime)
         {
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
-                role.LocomotionComponent.SimulatePhysics(fixedTime);
+                role.LocomotionComponent.Tick_AllPhysics(fixedTime);
             });
         }
 
@@ -84,7 +84,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void Reborn(BattleRoleLogicEntity role)
         {
             role.TearDown();
-            role.Reborn(battleFacades.Repo.FiledRepo.CurFieldEntity.BornPos);
+            role.Reborn(battleFacades.Repo.FieldRepo.CurFieldEntity.BornPos);
         }
 
         public float TryReceiveDamage(BattleRoleLogicEntity role, float damage)
@@ -92,6 +92,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return role.TryReceiveDamage(damage);
         }
 
+        // --- State
         public void RoleState_EnterReloading(BattleRoleLogicEntity role)
         {
             role.StateComponent.EnterReloading(40);

@@ -25,7 +25,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var owner = battleFacades.Repo.RoleLogicRepo.Owner;
             if (owner == null) return;
 
-            var curFieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            var curFieldEntity = battleFacades.Repo.FieldRepo.CurFieldEntity;
             if (curFieldEntity == null) return;
 
             var cameraComponent = curFieldEntity.CameraComponent;

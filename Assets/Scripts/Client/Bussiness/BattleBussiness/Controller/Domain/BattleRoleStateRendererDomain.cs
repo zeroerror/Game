@@ -70,7 +70,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             var roleState = role.StateComponent.RoleState;
 
             // 1. Idle 2. Running 3. IdleWithGun 4. RunningWithGun
-            bool isHoldingGun = weaponComponent.CurrentWeapon != null;
+            bool isHoldingGun = weaponComponent.CurWeapon != null;
 
             if (!IsMoving(role) && !isHoldingGun)
             {

@@ -37,6 +37,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleFieldDomain FieldDomain { get; private set; }
 
+        public BattleCommonDomain CommonDomain { get; private set; }
+
         public AllDomains()
         {
             SceneDomain = new BattleSceneDomain();
@@ -70,6 +72,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             BattleStateDomain = new BattleStateDomain();
 
             FieldDomain = new BattleFieldDomain();
+
+            CommonDomain = new BattleCommonDomain();
 
         }
 
@@ -105,6 +109,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             BattleStateDomain.Inject(facades);
 
             FieldDomain.Inject(facades);
+
+            CommonDomain.Inject(facades);
 
         }
     }

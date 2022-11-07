@@ -20,7 +20,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public void Update_BulletRenderer(float deltaTime)
+        public void Update_AllBulletRenderer(float deltaTime)
         {
             var repo = battleFacades.Repo;
             var bulletLogicRepo = repo.BulletRepo;
@@ -41,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
                 var repo = battleFacades.Repo;
-                var parent = repo.FiledRepo.CurFieldEntity.transform;
+                var parent = repo.FieldRepo.CurFieldEntity.transform;
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
 
                 var bulletRenderer = prefabAsset.GetComponent<BulletRendererEntity>();

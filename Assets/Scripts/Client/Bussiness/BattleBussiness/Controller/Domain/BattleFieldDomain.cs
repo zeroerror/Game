@@ -28,9 +28,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var domain = battleFacades.Domain;
             var fieldEntity = await domain.SceneDomain.SpawnGameFightScene();
             fieldEntity.SetEntityId(1);
-            var fieldEntityRepo = battleFacades.Repo.FiledRepo;
+            var fieldEntityRepo = battleFacades.Repo.FieldRepo;
             fieldEntityRepo.Add(fieldEntity);
             fieldEntityRepo.SetPhysicsScene(fieldEntity.gameObject.scene.GetPhysicsScene());
+        }
+
+        public void RandomSpawnAllItemToField(FieldEntity fieldEntity, out List<EntityType> entityTypeList, out List<byte> subTypeList, out List<int> entityIDList)
+        {
+            GenerateRandomItemDataFromField(fieldEntity, out entityTypeList, out subTypeList);
+            SpawnAllItemToField(fieldEntity, entityTypeList, subTypeList, out entityIDList);
         }
 
         public void SpawnAllItemToField(FieldEntity field, List<EntityType> entityTypeList, List<byte> subTypeList, out List<int> entityIDList)

@@ -48,7 +48,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         RoleStateSwitchingMod roleStateSwitchingMod;
         public RoleStateSwitchingMod RoleStateSwitchingMod => roleStateSwitchingMod;
 
-        public void Reset()
+        public void Ctor()
         {
             roleState = RoleState.Normal;
 
@@ -61,7 +61,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             deadMod = new RoleStateDeadMod();
             rebornMod = new RoleStateRebornMod();
         }
-
 
         #region [STATE ENTER]
 

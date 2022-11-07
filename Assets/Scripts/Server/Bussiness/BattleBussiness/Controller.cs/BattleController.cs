@@ -370,16 +370,20 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             Debug.Log($"OnGameStageChange state {state.ToString()} stage {stage}");
 
-            // - 场景物件同步
             if (state == BattleState.Preparing)
             {
+                var battleFacades = serverFacades.BattleFacades;
+                var repo = battleFacades.Repo;
+                var domain = battleFacades.Domain;
+
+                // --- 生成
+                var fieldDomain = domain.FieldDomain;
+                var fieldRepo = repo.FieldRepo;
+                var curField = repo.FieldRepo.CurFieldEntity;
+                fieldDomain.RandomSpawnAllItemToField(curField, out var entityTypeList, out var subTypeList, out var entityIDList);
+
                 ConnIDList.ForEach((connID) =>
                 {
-                    var curField = serverFacades.BattleFacades.Repo.FiledRepo.CurFieldEntity;
-                    var fieldDomain = serverFacades.BattleFacades.Domain.FieldDomain;
-                    fieldDomain.GenerateRandomItemDataFromField(curField, out var entityTypeList, out var subTypeList);
-                    fieldDomain.SpawnAllItemToField(curField, entityTypeList, subTypeList, out var entityIDList);
-
                     var itemRqs = serverFacades.Network.ItemReqAndRes;
                     itemRqs.SendRes_ItemSpawn(connID, entityTypeList, subTypeList, entityIDList);
                 });

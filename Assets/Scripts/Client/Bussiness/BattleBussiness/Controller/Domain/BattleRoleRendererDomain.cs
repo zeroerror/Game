@@ -21,7 +21,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public void Update_RoleRenderer(float deltaTime)
+        public void Update_AllRenderer(float deltaTime)
+        {
+            Update_RoleRenderer(deltaTime);
+            Update_RoleWorldUI(deltaTime);
+        }
+
+        void Update_RoleRenderer(float deltaTime)
         {
             var roleStateRendererDomain = battleFacades.Domain.RoleStateRendererDomain;
             roleStateRendererDomain.ApplyRoleState(deltaTime);
@@ -41,7 +47,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public void Update_WorldUI()
+        void Update_RoleWorldUI(float deltaTime)
         {
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>

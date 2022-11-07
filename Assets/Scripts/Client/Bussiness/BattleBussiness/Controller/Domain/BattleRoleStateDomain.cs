@@ -76,7 +76,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 if (role.CanWeaponReload())
                 {
                     weaponComponent.BeginReloading();
-                    stateComponent.EnterReloading(weaponComponent.CurrentWeapon.ReloadFrame);
+                    stateComponent.EnterReloading(weaponComponent.CurWeapon.ReloadFrame);
                 }
 
                 return;

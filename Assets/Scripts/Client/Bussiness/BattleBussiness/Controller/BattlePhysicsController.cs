@@ -1,9 +1,4 @@
-using System.Collections.Generic;
-using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Protocol.Battle;
-using Game.Client.Bussiness.EventCenter;
-using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller
 {
@@ -13,6 +8,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         BattleFacades battleFacades;
 
+        public BattlePhysicsController() { }
+
         public void Inject(BattleFacades battleFacades)
         {
             this.battleFacades = battleFacades;
@@ -21,36 +18,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public void Tick(float fixedDeltaTime)
         {
             // == Physics Simulation
-            Tick_Physics_Movement_Role(fixedDeltaTime);
-            Tick_Physics_Movement_Bullet(fixedDeltaTime);
-            var physicsScene = battleFacades.Repo.FiledRepo.CurPhysicsScene;
+            Tick_Physics_AllPhysicsEntity(fixedDeltaTime);
+            var physicsScene = battleFacades.Repo.FieldRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
 
             // == Physics Collision(Only For Client Performances Like Hit Effect,etc.)
-            Tick_Physics_Collision(fixedDeltaTime);
+            Tick_Physics_AllCollisions(fixedDeltaTime);
         }
 
-        void Tick_Physics_Collision(float fixedDeltaTime)
+        void Tick_Physics_AllPhysicsEntity(float fixedDeltaTime)
+        {
+            var roleDomain = battleFacades.Domain.RoleDomain;
+            roleDomain.Tick_Physics_AllRoles(fixedDeltaTime);
+
+            var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+            bulletLogicDomain.Tick_Physics_AllBullets(fixedDeltaTime);
+        }
+
+        void Tick_Physics_AllCollisions(float fixedDeltaTime)
         {
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
-            physicsDomain.Tick_RoleHitField();
-            physicsDomain.Tick_BulletHitField();
-        }
-
-        void Tick_Physics_Movement_Role(float deltaTime)
-        {
-            var domain = battleFacades.Domain.RoleDomain;
-            domain.Tick_RoleRigidbody(deltaTime);
-
-            Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            var inputDomain = battleFacades.Domain.InputDomain;
-            inputDomain.UpdateCameraByCameraView(inputAxis);
-        }
-
-        void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
-        {
-            var domain = battleFacades.Domain.BulletLogicDomain;
-            domain.Tick_BulletMovement(fixedDeltaTime);
+            physicsDomain.Tick_Physics_Collections_Role_Field();
+            physicsDomain.Tick_Physics_Collections_Bullet_Field();
         }
 
     }

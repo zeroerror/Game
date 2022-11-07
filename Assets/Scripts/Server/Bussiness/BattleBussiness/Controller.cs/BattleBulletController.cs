@@ -76,7 +76,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             var bulletDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
             var bulletRqs = serverFacades.Network.BulletReqAndRes;
-            var hitRoleList = bulletDomain.Tick_BulletHitRoleHitModel(fixedDeltaTime);
+            var hitRoleList = bulletDomain.Tick_And_Get_BulletHitRoleHitModel(fixedDeltaTime);
 
             ConnIDList.ForEach((connId) =>
             {

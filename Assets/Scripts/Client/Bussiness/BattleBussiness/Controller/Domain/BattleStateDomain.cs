@@ -74,18 +74,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 stateMod.isFirstEnter = false;
 
-                // - 场景清理
+                // --- 清场
                 var domain = battleFacades.Domain;
-                var itemDomain = domain.ItemDomain;
-                itemDomain.ClearAllItem();
+                var commonDomain = domain.CommonDomain;
+                commonDomain.ClearBattleField();
 
-                // - 场景角色重生
-                var roleDomain = battleFacades.Domain.RoleDomain;
-                var roleRepo = battleFacades.Repo.RoleLogicRepo;
-                roleRepo.Foreach((role) =>
-                {
-                    roleDomain.Reborn(role);
-                });
 
                 // - 场景加载
                 if (!gameEntity.Stage.HasStage(stage))
@@ -98,7 +91,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 Debug.Log($"进入 加载阶段 {stage}");
             }
 
-            var field = battleFacades.Repo.FiledRepo.CurFieldEntity;
+            var field = battleFacades.Repo.FieldRepo.CurFieldEntity;
             if (field != null)
             {
                 // - Stage
@@ -108,20 +101,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 fsm.EnterGameState_BattlePreparing(300);
                 stateAndStageChangeHandler.Invoke();
             }
-        }
-
-        void ApplyGameState_SpawningItem()
-        {
-            var gameEntity = battleFacades.GameEntity;
-            var fsm = gameEntity.FSMComponent;
-            var gameState = fsm.BattleState;
-
-            if (gameState != BattleState.SpawningItem)
-            {
-                return;
-            }
-
-
         }
 
         void ApplyGameState_Preparing()

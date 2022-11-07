@@ -1,6 +1,6 @@
-using UnityEngine;
-using Game.Generic;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Client.Bussiness.BattleBussiness
 {
@@ -12,45 +12,67 @@ namespace Game.Client.Bussiness.BattleBussiness
         readonly int WEAPON_CAPICY = 1;
 
         public WeaponEntity[] AllWeapons;    //所有武器
-        public WeaponEntity CurrentWeapon { get; private set; }  //当前武器
-        public int CurrentNum { get; private set; }    //当前武器数量
+
+        WeaponEntity curWeapon; //当前武器
+        public WeaponEntity CurWeapon => curWeapon;  //当前武器
+
+        int curWeaponHoldNum;    //当前武器数量
+        public int CurWeaponHoldNum => curWeaponHoldNum;  //当前武器数量
 
         public bool isReloading;
         public bool IsReloading => isReloading;
 
-        public void Reset()
+        public void Ctor()
         {
             AllWeapons = new WeaponEntity[WEAPON_CAPICY];
+        }
+
+        public void Reset()
+        {
+            for (int i = 0; i < AllWeapons.Length; i++)
+            {
+                var w = AllWeapons[i];
+                if (w == null)
+                {
+                    continue;
+                }
+                AllWeapons[i] = null;
+
+                w.Drop();
+            }
+
+            curWeaponHoldNum = 0;
+            curWeapon = null;
         }
 
         public void BeginReloading()
         {
             isReloading = true;
-            CurrentWeapon.ResetCurrentReloadingFrame();
+            curWeapon.ResetCurrentReloadingFrame();
         }
 
         public void FinishReloading(int reloadBulletNum)
         {
             isReloading = false;
-            CurrentWeapon.LoadBullet(reloadBulletNum);
+            curWeapon.LoadBullet(reloadBulletNum);
             Debug.Log($"武器装弹：{reloadBulletNum}");
             return;
         }
 
         public bool IsFullReloaded()
         {
-            return CurrentWeapon.BulletNum == CurrentWeapon.BulletCapacity;
+            return curWeapon.BulletNum == curWeapon.BulletCapacity;
         }
 
         public bool TryWeaponShoot()
         {
-            return CurrentWeapon.TryShootBullet(1) == 1;
+            return curWeapon.TryShootBullet(1) == 1;
         }
 
         // 拾取武器
         public bool CanPickUpWeapon()
         {
-            if (CurrentNum >= WEAPON_CAPICY)
+            if (curWeaponHoldNum >= WEAPON_CAPICY)
             {
                 Debug.LogWarning($"达到武器持有上限{WEAPON_CAPICY}!");
                 return false;
@@ -79,11 +101,11 @@ namespace Game.Client.Bussiness.BattleBussiness
                         weaponEntity.transform.localRotation = Quaternion.identity;
                     }
 
-                    CurrentWeapon = weaponEntity;
-                    CurrentWeapon.gameObject.SetActive(true);
+                    curWeapon = weaponEntity;
+                    curWeapon.gameObject.SetActive(true);
 
-                    AllWeapons[i] = CurrentWeapon;
-                    CurrentNum++;
+                    AllWeapons[i] = curWeapon;
+                    curWeaponHoldNum++;
                     return;
                 }
             }
@@ -94,10 +116,10 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (index < 0 || index >= 4) return;
             //原来武器隐藏,显示新武器
-            CurrentWeapon.gameObject.SetActive(false);
-            CurrentWeapon = AllWeapons[index];
-            CurrentWeapon.gameObject.SetActive(true);
-            Debug.Log($"切换至武器{index}:{CurrentWeapon.WeaponType.ToString()}");
+            curWeapon.gameObject.SetActive(false);
+            curWeapon = AllWeapons[index];
+            curWeapon.gameObject.SetActive(true);
+            Debug.Log($"切换至武器{index}:{curWeapon.WeaponType.ToString()}");
         }
 
         //丢弃武器
@@ -113,16 +135,16 @@ namespace Game.Client.Bussiness.BattleBussiness
                 if (entityID == entityId)
                 {
                     weapon = w;
-                    weapon.Clear();
+                    weapon.Drop();
 
                     AllWeapons[i] = null;
-                    CurrentNum--;
+                    curWeaponHoldNum--;
 
                     //是否为丢弃当前武器
-                    if (CurrentWeapon == weapon)
+                    if (curWeapon == weapon)
                     {
                         isReloading = false;
-                        CurrentWeapon = null;
+                        curWeapon = null;
                         Debug.Log($"丢弃当前武器 {w.WeaponType.ToString()}");
                     }
                     else
@@ -130,39 +152,12 @@ namespace Game.Client.Bussiness.BattleBussiness
                         Debug.Log($"丢弃其他武器 {w.WeaponType.ToString()}");
                     }
 
-                    for (int j = 0; j < AllWeapons.Length; j++)
-                    {
-                        var curWeapon = AllWeapons[j];
-                        if (curWeapon != null)
-                        {
-                            CurrentWeapon = curWeapon;
-                            Debug.Log($"当前武器:{entityId}");
-                            break;
-                        }
-                    }
-
                     return true;
                 }
             }
 
-            Debug.LogWarning($"CurrentNum:{CurrentNum} 丢弃武器失败 entityId:{entityId}");
+            Debug.LogWarning($"丢弃武器失败");
             return false;
-        }
-
-        public void DropWeapon(ushort entityId)
-        {
-            for (int i = 0; i < AllWeapons.Length; i++)
-            {
-                var w = AllWeapons[i];
-                var entityID = w.IDComponent.EntityID;
-                if (entityID == entityId)
-                {
-                    AllWeapons[i] = null;
-                    w.Clear();
-                    return;
-                }
-            }
-            return;
         }
 
         public WeaponEntity GetWeapon(ushort entityID)

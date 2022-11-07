@@ -16,6 +16,17 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float CurHealth => curHealth;
         public void SetCurHealth(float v) => curHealth = v > maxHealth ? maxHealth : v;
 
+        public void Ctor()
+        {
+            curHealth = maxHealth;
+        }
+
+        public void Reset()
+        {
+            curHealth = maxHealth;
+        }
+
+
         public bool CheckIsDead() => curHealth <= 0;
 
         public float TryReiveDamage(float damage)
@@ -38,11 +49,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             curHealth += v;
             curHealth = curHealth > maxHealth ? maxHealth : curHealth;
-        }
-
-        public void Reset()
-        {
-            curHealth = maxHealth;
         }
 
     }

@@ -39,6 +39,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             rb.useGravity = false;  //关闭地球引力
         }
 
+        public void Ctor()
+        {
+            Reset();
+        }
+
         public void Reset()
         {
             LeaveGround();
@@ -46,7 +51,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             extraVelocity = Vector3.zero;
             moveVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;
-
             rb.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
         }
 
@@ -169,7 +173,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         #region  [物理模拟]
 
-        public void SimulatePhysics(float fixedDeltaTime)
+        public void Tick_AllPhysics(float fixedDeltaTime)
         {
             Tick_Friction(fixedDeltaTime);
             Tick_Gravity(fixedDeltaTime);

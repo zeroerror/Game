@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Client.Bussiness.Repo
 {
 
-    public class FiledEntityRepo
+    public class BattleFieldRepo
     {
 
         Dictionary<byte, FieldEntity> dic;
@@ -15,7 +15,7 @@ namespace Game.Client.Bussiness.Repo
 
         public FieldEntity CurFieldEntity { get; private set; }
 
-        public FiledEntityRepo()
+        public BattleFieldRepo()
         {
             dic = new Dictionary<byte, FieldEntity>();
         }

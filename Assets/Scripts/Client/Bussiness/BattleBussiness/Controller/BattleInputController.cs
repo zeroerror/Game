@@ -64,7 +64,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 var moveAxis = input.moveAxis;
 
-                var cameraView = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
+                var cameraView = battleFacades.Repo.FieldRepo.CurFieldEntity.CameraComponent.CurrentCameraView;
                 Vector3 moveDir = battleFacades.Domain.InputDomain.GetMoveDirByCameraView(owner, moveAxis, cameraView);
                 owner.LocomotionComponent.FaceTo(moveDir);
 
@@ -98,7 +98,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 //打开第一人称视角
                 // TODO: 加切换视角的判定条件
-                var fieldCameraComponent = battleFacades.Repo.FiledRepo.CurFieldEntity.CameraComponent;
+                var fieldCameraComponent = battleFacades.Repo.FieldRepo.CurFieldEntity.CameraComponent;
                 if (fieldCameraComponent.CurrentCameraView == CameraView.ThirdView) fieldCameraComponent.OpenFirstViewCam(owner.roleRenderer);
                 else if (fieldCameraComponent.CurrentCameraView == CameraView.FirstView) fieldCameraComponent.OpenThirdViewCam(owner.roleRenderer);
             }
@@ -175,7 +175,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 }
 
                 var wc = owner.WeaponComponent;
-                var curWeapon = wc.CurrentWeapon;
+                var curWeapon = wc.CurWeapon;
                 var weaponEntityID = curWeapon.IDComponent.EntityID;
                 var rqs = battleFacades.Network.WeaponReqAndRes;
                 rqs.SendReq_WeaponShoot(weaponEntityID, curWeapon.ShootPointPos, input.fireDir);

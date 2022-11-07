@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Server.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -10,67 +8,53 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattlePhysicsController
     {
 
-        BattleServerFacades battleFacades;
+        BattleServerFacades serverFacades;
 
-        List<int> ConnIDList => battleFacades.Network.connIdList;
+        List<int> ConnIDList => serverFacades.Network.connIdList;
 
-        public BattlePhysicsController()
+        public BattlePhysicsController() { }
+
+        public void Inject(BattleServerFacades facades)
         {
-        }
-
-        public void Inject(BattleServerFacades battleFacades)
-        {
-            this.battleFacades = battleFacades;
+            serverFacades = facades;
         }
 
         public void Tick(float fixedDeltaTime)
         {
             // Physics Simulation
-            Tick_Physics_Movement_Bullet(fixedDeltaTime);
-            Tick_Physics_Movement_Role(fixedDeltaTime);
-            var physicsScene = battleFacades.BattleFacades.Repo.FiledRepo.CurPhysicsScene;
+            Tick_Physics_AllPhysicsEntity(fixedDeltaTime);
+            var physicsScene = serverFacades.BattleFacades.Repo.FieldRepo.CurPhysicsScene;
             physicsScene.Simulate(fixedDeltaTime);
 
             // Physcis Collision
-            Tick_Physics_Collision();
+            Tick_Physics_AllCollisions();
         }
 
-        #region [Physics]
-
-        void Tick_Physics_Collision()
+        void Tick_Physics_AllPhysicsEntity(float fixedDeltaTime)
         {
-            var physicsDomain = battleFacades.BattleFacades.Domain.PhysicsDomain;
-            physicsDomain.Tick_RoleHitField();
-            var hitFieldList = physicsDomain.Tick_BulletHitField();
+            var battleFacades = serverFacades.BattleFacades;
+            var roleDomain = battleFacades.Domain.RoleDomain;
+            roleDomain.Tick_Physics_AllRoles(fixedDeltaTime);
+
+            var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+            bulletLogicDomain.Tick_Physics_AllBullets(fixedDeltaTime);
+        }
+
+        void Tick_Physics_AllCollisions()
+        {
+            // - Role Field
+            var physicsDomain = serverFacades.BattleFacades.Domain.PhysicsDomain;
+            physicsDomain.Tick_Physics_Collections_Role_Field();
+
+            // - Bullet Field
+            var hitFieldList = physicsDomain.Tick_Physics_Collections_Bullet_Field();
             SendBulletHitFieldRes(hitFieldList);
         }
 
-        void Tick_Physics_Collision_Bullet()
-        {
-            var physicsDomain = battleFacades.BattleFacades.Domain.PhysicsDomain;
-
-        }
-
-        void Tick_Physics_Movement_Role(float fixedDeltaTime)
-        {
-            var physicsDomain = battleFacades.BattleFacades.Domain.PhysicsDomain;
-            // physicsDomain.Tick_RoleMoveHitErase();   //Unity's Collision Will Auto Erase 有BUG!!!!!!!!
-            var domain = battleFacades.BattleFacades.Domain.RoleDomain;
-            domain.Tick_RoleRigidbody(fixedDeltaTime);
-        }
-
-        void Tick_Physics_Movement_Bullet(float fixedDeltaTime)
-        {
-            var domain = battleFacades.BattleFacades.Domain.BulletLogicDomain;
-            domain.Tick_BulletMovement(fixedDeltaTime);
-        }
-
-        #endregion
-
         void SendBulletHitFieldRes(List<HitFieldModel> hitFieldList)
         {
-            var bulletRepo = battleFacades.BattleFacades.Repo.BulletRepo;
-            var bulletRqs = battleFacades.Network.BulletReqAndRes;
+            var bulletRepo = serverFacades.BattleFacades.Repo.BulletRepo;
+            var bulletRqs = serverFacades.Network.BulletReqAndRes;
             hitFieldList.ForEach((hitFieldModel) =>
             {
                 var bulletIDC = hitFieldModel.hitter;

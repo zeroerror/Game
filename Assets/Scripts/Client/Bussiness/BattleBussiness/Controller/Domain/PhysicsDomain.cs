@@ -23,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Item");
         public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Role");
 
-        public void Tick_RoleHitField()
+        public void Tick_Physics_Collections_Role_Field()
         {
             // - Role
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
@@ -33,7 +33,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public List<HitFieldModel> Tick_BulletHitField()
+        public List<HitFieldModel> Tick_Physics_Collections_Bullet_Field()
         {
             List<HitFieldModel> list = new List<HitFieldModel>();
             Transform hitTrans = null;

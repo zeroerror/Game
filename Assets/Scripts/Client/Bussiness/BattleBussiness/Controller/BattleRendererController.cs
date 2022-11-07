@@ -28,27 +28,26 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Update(float deltaTime)
         {
-            Update_RoleRenderer(deltaTime);
-            Update_BulletRenderer(deltaTime);
-            Update_Camera();
+            Update_AllRoleRenderer(deltaTime);
+            Update_AllBulletRenderer(deltaTime);
+            Update_CameraRenderer();
         }
 
         #region [Renderer Update]
 
-        void Update_RoleRenderer(float deltaTime)
+        void Update_AllRoleRenderer(float deltaTime)
         {
             var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
-            roleRendererDomain.Update_WorldUI();
-            roleRendererDomain.Update_RoleRenderer(deltaTime);
+            roleRendererDomain.Update_AllRenderer(deltaTime);
         }
 
-        void Update_BulletRenderer(float deltaTime)
+        void Update_AllBulletRenderer(float deltaTime)
         {
             var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
-            bulletRendererDomain.Update_BulletRenderer(deltaTime);
+            bulletRendererDomain.Update_AllBulletRenderer(deltaTime);
         }
 
-        void Update_Camera()
+        void Update_CameraRenderer()
         {
             Vector2 inputAxis = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             var inputDomain = battleFacades.Domain.InputDomain;

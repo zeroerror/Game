@@ -7,7 +7,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     public class AllBattleRepo
     {
 
-        public FiledEntityRepo FiledRepo { get; private set; }
+        public BattleFieldRepo FieldRepo { get; private set; }
 
         public BattleRoleRepo RoleLogicRepo { get; private set; }
         public BattleRoleRendererRepo RoleRendererRepo { get; private set; }
@@ -27,7 +27,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public AllBattleRepo()
         {
-            FiledRepo = new FiledEntityRepo();
+            FieldRepo = new BattleFieldRepo();
 
             RoleLogicRepo = new BattleRoleRepo();
             RoleRendererRepo = new BattleRoleRendererRepo();

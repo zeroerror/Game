@@ -60,9 +60,16 @@ namespace Game.Client.Bussiness.BattleBussiness
             shootAudioClip = transform.Find("audio_clip_shoot").GetComponent<AudioSource>().clip;
         }
 
-        public void Clear()
+        public void Drop()
         {
             hasMaster = false;
+        }
+
+        public int UnloadBullet()
+        {
+            var unloadBullet = bulletNum;
+            bulletNum = 0;
+            return unloadBullet;
         }
 
         public void SetMaster(int masterWRid)

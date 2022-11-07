@@ -52,6 +52,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             GameObject.Destroy(weapon);
         }
 
+        public void TearDownAllWeapons()
+        {
+            var repo = battleFacades.Repo;
+            var weaponRepo = repo.WeaponRepo;
+            weaponRepo.ForAll((w) =>
+            {
+                TearDownWeapon(w);
+            });
+        }
+
     }
 
 }

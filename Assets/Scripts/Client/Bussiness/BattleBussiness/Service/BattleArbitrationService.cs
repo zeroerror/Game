@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness
             hitModel.victimIDC = victimIDC;
             hitModel.damage = damage;
             hitModel.hasCausedDeath = hasCausedDeath;
-            Debug.Log($"ADD HIT RECORD:damage {damage} hasCausedDeath {hasCausedDeath}");
+            Debug.Log($"ADD HIT RECORD: damage {damage} hasCausedDeath {hasCausedDeath}");
 
             var key = GetKey(attackerIDC, victimIDC);
 
@@ -106,33 +106,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             totalKill = kill;
             totalDamage = damage;
-        }
-
-        public int GetAtkerTotalKill(EntityType entityType, int entityID)
-        {
-            int totalDamage = 0;
-
-            int key1 = 0;
-            key1 |= (int)entityType << 16;
-            key1 |= (int)entityID;
-
-            foreach (var obj in all)
-            {
-                var key2 = (int)(obj.Key >> 32);
-                if (key1 == key2)
-                {
-                    var list = obj.Value;
-                    list.ForEach((hitModel) =>
-                    {
-                        if (hitModel.hasCausedDeath)
-                        {
-                            totalDamage++;
-                        }
-                    });
-                }
-            }
-
-            return totalDamage;
         }
 
         bool CanDamage(IDComponent victim)

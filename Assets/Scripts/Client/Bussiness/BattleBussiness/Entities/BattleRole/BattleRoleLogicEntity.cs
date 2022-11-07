@@ -75,21 +75,22 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             // == Component
             var rb = transform.GetComponentInParent<Rigidbody>();
+            locomotionComponent.Ctor();
             locomotionComponent.Inject(rb);
             locomotionComponent.SetMaximumVelocity(30f);
 
-            idComponent = new IDComponent();
-            idComponent.SetEntityType(EntityType.BattleRole);
+            healthComponent.Ctor();
+
+            weaponComponent.Ctor();
+
+            stateComponent.Ctor();
 
             roleInputComponent = new RoleInputComponent();
 
             itemComponent = new ItemComponent();
 
-            locomotionComponent.Reset();
-            healthComponent.Reset();
-            weaponComponent.Reset();
-            stateComponent.Reset();
-
+            idComponent = new IDComponent();
+            idComponent.SetEntityType(EntityType.BattleRole);
         }
 
         public void TearDown()
@@ -143,10 +144,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             Debug.Log($" ENTITYID:{idComponent.EntityID} 重生----------------------------------");
 
+            // - Locomotion
             var mc = locomotionComponent;
             mc.SetPosition(pos);
             mc.Reset();
 
+            // - Health
             healthComponent.Reset();
 
             isDead = false;
@@ -218,7 +221,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public bool CanWeaponShoot()
         {
             var wc = weaponComponent;
-            var curWeapon = wc.CurrentWeapon;
+            var curWeapon = wc.CurWeapon;
 
             if (curWeapon == null)
             {
@@ -247,7 +250,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             var wc = weaponComponent;
 
-            var curWeapon = wc.CurrentWeapon;
+            var curWeapon = wc.CurWeapon;
             if (curWeapon == null)
             {
                 Debug.LogWarning("当前尚未持有武器!");

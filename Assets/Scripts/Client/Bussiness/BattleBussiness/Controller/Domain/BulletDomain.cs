@@ -34,7 +34,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
             {
                 var repo = battleFacades.Repo;
-                var parent = repo.FiledRepo.CurFieldEntity.transform;
+                var parent = repo.FieldRepo.CurFieldEntity.transform;
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
 
                 var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
@@ -100,16 +100,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return removeList;
         }
 
-        public void Tick_BulletMovement(float fixedDeltaTime)
+        public void Tick_Physics_AllBullets(float fixedDeltaTime)
         {
             var bulletRepo = battleFacades.Repo.BulletRepo;
             bulletRepo.Foreach((bullet) =>
             {
-                bullet.LocomotionComponent.SimulatePhysics(fixedDeltaTime);
+                bullet.LocomotionComponent.Tick_AllPhysics(fixedDeltaTime);
             });
         }
 
-        public List<HitModel> Tick_BulletHitRoleHitModel(float fixedDeltaTime)
+        public List<HitModel> Tick_And_Get_BulletHitRoleHitModel(float fixedDeltaTime)
         {
             List<HitModel> attackList = new List<HitModel>();
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
@@ -124,7 +124,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 hitRoleList.ForEach((ce) =>
                 {
                     if (bullet.BulletType == BulletType.Grenade)
-                    {
+                    { 
+                        // - Grenade Ignore
                         return;
                     }
 

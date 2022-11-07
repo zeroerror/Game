@@ -197,9 +197,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return false;
         }
 
-        public void ClearAllItem()
+        public void TearDownAllItems()
         {
-            Debug.Log("ClearAllItem");
             var repo = battleFacades.Repo;
             var domain = battleFacades.Domain;
             var idService = battleFacades.IDService;
@@ -262,8 +261,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var weaponItem = weaponItemDomain.SpawnWeaponItem(weapon.WeaponType, weapon.IDComponent.EntityID);
             weaponItem.Ctor();
 
-            var bulletNum = weapon.BulletNum;
-            weaponItem.SetBulletNum(bulletNum);
+            var unloadBullet = weapon.UnloadBullet();
+            weaponItem.SetBulletNum(unloadBullet);
 
             var master = battleFacades.Repo.RoleLogicRepo.Get(weapon.MasterID);
             weaponItem.transform.position = master.transform.position;

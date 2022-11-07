@@ -70,11 +70,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void SendReq_WeaponDrop(BattleRoleLogicEntity role)
         {
-            if (role.WeaponComponent.CurrentWeapon == null) return;
+            if (role.WeaponComponent.CurWeapon == null) return;
 
             FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
             {
-                entityID = (ushort)role.WeaponComponent.CurrentWeapon.IDComponent.EntityID,
+                entityID = (ushort)role.WeaponComponent.CurWeapon.IDComponent.EntityID,
                 masterId = role.IDComponent.EntityID
             };
             battleClient.SendMsg(frameWeaponDropReqMsg);

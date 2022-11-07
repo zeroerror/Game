@@ -112,7 +112,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleLogicRepo;
-                var fieldRepo = repo.FiledRepo;
+                var fieldRepo = repo.FieldRepo;
                 var entityID = msg.entityId;
 
                 if (!battleFacades.Repo.RoleLogicRepo.TryGet(entityID, out var roleLogic))
@@ -150,7 +150,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var entityId = msg.entityId;
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleLogicRepo;
-                var fieldEntity = repo.FiledRepo.CurFieldEntity;
+                var fieldEntity = repo.FieldRepo.CurFieldEntity;
                 var domain = battleFacades.Domain.RoleDomain;
                 var controlType = (ControlType)msg.controlType;
                 domain.SpawnRoleWithRenderer(entityId, controlType);
@@ -170,7 +170,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var entityTypeArray = itemSpawnMsg.entityTypeArray;
                 var subtypeArray = itemSpawnMsg.subtypeArray;
                 var entityIDArray = itemSpawnMsg.entityIDArray;
-                var fieldEntity = battleFacades.Repo.FiledRepo.CurFieldEntity;
+                var fieldEntity = battleFacades.Repo.FieldRepo.CurFieldEntity;
                 AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
 
                 for (int index = 0; index < assetPointEntities.Length; index++)
