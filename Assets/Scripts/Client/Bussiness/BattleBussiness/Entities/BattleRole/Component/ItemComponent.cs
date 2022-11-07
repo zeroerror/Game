@@ -8,9 +8,9 @@ namespace Game.Client.Bussiness.BattleBussiness
     public class ItemComponent
     {
 
-        readonly int ITEM_CAPACITY = 9999999;
+        readonly int CAPACITY = 9999999;
 
-        public int CurrentCapacity;    //当前武器数量
+        public int takenCapacity;
 
         List<BulletItemEntity> bulletItemList;
 
@@ -19,21 +19,27 @@ namespace Game.Client.Bussiness.BattleBussiness
             bulletItemList = new List<BulletItemEntity>();
         }
 
+        public void Reset()
+        {
+            bulletItemList.Clear();
+            takenCapacity = 0;
+        }
+
         // 拾取
-        public bool TryCollectItem_Bullet(BulletItemEntity bulletItemEntity)
+        public bool TryCollectItem_Bullet(BulletItemEntity bulletItem)
         {
             // TODO: 根据配置表获取物件单位占用容量
             // TODO: 只收集最大可收集数量
-            if (CurrentCapacity >= ITEM_CAPACITY)
+            if (takenCapacity >= CAPACITY)
             {
                 Debug.LogWarning("背包容量已满！ 暂未作处理");
                 return false;
             }
 
-            CurrentCapacity += bulletItemEntity.bulletNum * 1;
-            Debug.LogWarning($"收集了子弹包[类型:{bulletItemEntity.BulletType.ToString()} 数量:{bulletItemEntity.bulletNum}]");
-            Debug.LogWarning($"当前背包容量 占用 {CurrentCapacity}  剩余 {ITEM_CAPACITY - CurrentCapacity}");
-            bulletItemList.Add(bulletItemEntity);
+            takenCapacity += bulletItem.bulletNum * 1;
+            Debug.LogWarning($"收集了子弹包[类型:{bulletItem.BulletType.ToString()} 数量:{bulletItem.bulletNum}]");
+            Debug.LogWarning($"当前背包容量 占用 {takenCapacity}  剩余 {CAPACITY - takenCapacity}");
+            bulletItemList.Add(bulletItem);
             return true;
         }
 

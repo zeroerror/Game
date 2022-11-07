@@ -79,7 +79,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var commonDomain = domain.CommonDomain;
                 commonDomain.ClearBattleField();
 
-
                 // - 场景加载
                 if (!gameEntity.Stage.HasStage(stage))
                 {

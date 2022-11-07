@@ -155,6 +155,9 @@ namespace Game.Client.Bussiness.BattleBussiness
             // - Weapon
             weaponComponent.Reset();
 
+            // - Item
+            itemComponent.Reset();
+
             isDead = false;
         }
 

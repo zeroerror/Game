@@ -52,13 +52,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void TearDownBulletItem(BulletItemEntity BulletItem)
+        public void TearDownBulletItem(BulletItemEntity bulletItem)
         {
             var repo = battleFacades.Repo;
             var bulletItemRepo = repo.BulletItemRepo;
-            bulletItemRepo.TryRemove(BulletItem);
-            GameObject.Destroy(BulletItem.gameObject);
-            GameObject.Destroy(BulletItem);
+            bulletItemRepo.TryRemove(bulletItem);
+            GameObject.Destroy(bulletItem.gameObject);
+            GameObject.Destroy(bulletItem);
         }
 
     }

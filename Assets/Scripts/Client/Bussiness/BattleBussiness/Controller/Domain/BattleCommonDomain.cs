@@ -31,6 +31,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 roleDomain.Reborn(role);
             });
+            // - Item
+            var itemDomain = domain.ItemDomain;
+            itemDomain.TearDownAllItems();
             // - Bullet
             var bulletLogicRepo = repo.BulletRepo;
             bulletLogicRepo.ForAll((bulletLogic) =>
@@ -51,9 +54,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var WeaponDomain = domain.WeaponDomain;
                 WeaponDomain.TearDownWeapon(weapon);
             });
-            // - Item
-            var itemDomain = domain.ItemDomain;
-            itemDomain.TearDownAllItems();
 
         }
 
