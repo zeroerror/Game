@@ -56,6 +56,21 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
+        public void SendRes_BattleAirdrop(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage battleStage)
+        {
+            BattleAirdropSpawnResMsg msg = new BattleAirdropSpawnResMsg();
+            msg.airdropEntityType = (byte)airdropEntityType;
+            msg.subType = subType;
+            msg.entityID = entityID;
+            msg.posX = (int)(pos.x * 10000f);
+            msg.posY = (int)(pos.y * 10000f);
+            msg.posZ = (int)(pos.z * 10000f);
+            msg.battleStage = (int)battleStage;
+
+            battleServer.SendMsg(connID, msg);
+            sendCount++;
+        }
+
         // ====== Regist ======
         public void RegistReq_BattleGameStateAndStage(Action<int, BattleStateAndStageReqMsg> action)
         {

@@ -58,6 +58,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
+        public void RegistRes_BattleAirdrop(Action<BattleAirdropSpawnResMsg> action)
+        {
+            AddRegister(action);
+        }
+
         void AddRegister<T>(Action<T> action) where T : IZeroMessage<T>, new()
         {
             lock (lockObj)

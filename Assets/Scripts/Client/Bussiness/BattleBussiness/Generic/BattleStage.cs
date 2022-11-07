@@ -1,7 +1,7 @@
 namespace Game.Client.Bussiness.BattleBussiness.Generic
 {
 
-    public enum BattleStage
+    public enum BattleStage : int
     {
         None = 0,
         Level1 = 1 << 0,

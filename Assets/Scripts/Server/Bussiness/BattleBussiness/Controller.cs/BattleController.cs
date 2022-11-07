@@ -356,9 +356,24 @@ namespace Game.Server.Bussiness.BattleBussiness
         void OnBattleAirdrop()
         {
             var battleFacades = serverFacades.BattleFacades;
+
             var curField = battleFacades.Repo.FieldRepo.CurFieldEntity;
+            var spawnPos = curField.UseRandomAirdropPos();
+
+            var idService = battleFacades.IDService;
+            var entityID = idService.GetAutoIDByEntityType(EntityType.Aridrop);
+
+            var battleStage = battleFacades.GameEntity.Stage;
+            var curStage = battleStage.GetCurLevelStage();
+
             var airdropDomain = battleFacades.Domain.AirdropDomain;
-            var airdrop = airdropDomain.SpawnBattleAirDrop(curField.UseRandomAirdropPos());
+            var airdrop = airdropDomain.SpawnBattleAirDrop(spawnPos, entityID, curStage);
+
+            var battleRqs = serverFacades.Network.BattleReqAndRes;
+            ConnIDList.ForEach((connID) =>
+            {
+                battleRqs.SendRes_BattleAirdrop(connID, airdrop.EntityType, airdrop.SubType, airdrop.EntityID, spawnPos, curStage);
+            });
         }
 
         void OnGameStageChange()

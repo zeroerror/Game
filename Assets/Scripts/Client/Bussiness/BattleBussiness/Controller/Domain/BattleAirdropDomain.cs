@@ -19,9 +19,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleAirdropEntity SpawnBattleAirDrop(Vector3 spawnPos)
+        public BattleAirdropEntity SpawnBattleAirDrop(Vector3 spawnPos, int entityID, BattleStage stage)
         {
-            string prefabName = "Item_Airdrop_Level1";
+            string prefabName = $"Item_Airdrop_{stage.ToString()}";
             var itemAsset = battleFacades.Assets.ItemAsset;
             if (!itemAsset.TryGetByName(prefabName, out var prefab))
             {
@@ -30,13 +30,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var airdropEntity = GameObject.Instantiate(prefab).GetComponent<BattleAirdropEntity>();
             airdropEntity.Ctor();
+            airdropEntity.SetEntityID(entityID);
             airdropEntity.LocomotionComponent.SetPosition(spawnPos);
 
             var repo = battleFacades.Repo;
             var airDropRepo = repo.AirdropRepo;
             airDropRepo.Add(airdropEntity);
 
-            Debug.Log($"生辰空投 prefabName {prefabName}  spawnPos {spawnPos}");
+            Debug.Log($"生成空投 {prefabName} 位置 {spawnPos}");
             return airdropEntity;
         }
 
