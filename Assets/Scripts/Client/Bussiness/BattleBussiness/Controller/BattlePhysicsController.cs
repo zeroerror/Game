@@ -33,6 +33,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
             bulletLogicDomain.Tick_Physics_AllBullets(fixedDeltaTime);
+
+            var airdropDomain = battleFacades.Domain.AirdropDomain;
+            airdropDomain.Tick_Physics_AllAirdrops(fixedDeltaTime);
         }
 
         void Tick_Physics_AllCollisions(float fixedDeltaTime)
@@ -40,6 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
             physicsDomain.Tick_Physics_Collections_Role_Field();
             physicsDomain.Tick_Physics_Collections_Bullet_Field();
+            physicsDomain.Tick_Physics_Collections_Airdrop_Field();
         }
 
     }

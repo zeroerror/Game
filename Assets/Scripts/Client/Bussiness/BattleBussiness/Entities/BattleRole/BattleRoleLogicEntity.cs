@@ -7,7 +7,7 @@ using Game.Client.Bussiness.BattleBussiness.Interface;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BattleRoleLogicEntity : PhysicsEntity, IPickable
+    public class BattleRoleLogicEntity : PhysicsEntity
     {
 
         #region [Component]
@@ -61,10 +61,6 @@ namespace Game.Client.Bussiness.BattleBussiness
         // - Armor
         BattleArmorEntity armor;
         public BattleArmorEntity Armor => armor;
-
-        // - Interface
-        EntityType IPickable.EntityType => idComponent.EntityType;
-        int IPickable.EntityID => idComponent.EntityID;
 
         public void Inject(BattleRoleRendererEntity roleRendererEntity)
         {

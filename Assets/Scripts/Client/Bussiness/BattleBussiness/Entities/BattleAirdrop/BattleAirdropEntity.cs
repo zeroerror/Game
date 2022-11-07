@@ -5,7 +5,7 @@ using Game.Library;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BattleAirdropEntity : MonoBehaviour
+    public class BattleAirdropEntity : PhysicsEntity
     {
 
         int entityID;
@@ -28,6 +28,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             RB = transform.GetComponent<Rigidbody>();
             locomotionComponent.Inject(RB);
+            locomotionComponent.Ctor();
         }
 
         public void Reset()

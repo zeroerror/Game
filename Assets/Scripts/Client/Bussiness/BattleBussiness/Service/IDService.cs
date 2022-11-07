@@ -16,6 +16,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int weaponAutoID;
         public int weaponItemAutoID;
         public int evolveItemAutoID;
+        public int airdropAutoID;
 
         public IDService()
         {
@@ -54,6 +55,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (entityType == EntityType.EvolveItem)
             {
                 return ++evolveItemAutoID;
+            }
+            if (entityType == EntityType.Aridrop)
+            {
+                return ++airdropAutoID;
             }
 
             Debug.LogWarning("未处理情况");
@@ -100,6 +105,11 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (entityType == EntityType.EvolveItem)
             {
                 evolveItemAutoID = 0;
+                return;
+            }
+            if (entityType == EntityType.Aridrop)
+            {
+                airdropAutoID = 0;
                 return;
             }
 

@@ -38,15 +38,17 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
             bulletLogicDomain.Tick_Physics_AllBullets(fixedDeltaTime);
+
+            var airdropDomain = battleFacades.Domain.AirdropDomain;
+            airdropDomain.Tick_Physics_AllAirdrops(fixedDeltaTime);
         }
 
         void Tick_Physics_AllCollisions()
         {
-            // - Role Field
             var physicsDomain = serverFacades.BattleFacades.Domain.PhysicsDomain;
             physicsDomain.Tick_Physics_Collections_Role_Field();
+            physicsDomain.Tick_Physics_Collections_Airdrop_Field();
 
-            // - Bullet Field
             var hitFieldList = physicsDomain.Tick_Physics_Collections_Bullet_Field();
             SendBulletHitFieldRes(hitFieldList);
         }

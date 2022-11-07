@@ -41,6 +41,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return airdropEntity;
         }
 
+        public void Tick_Physics_AllAirdrops(float fixedDeltaTime)
+        {
+            var airdropRepo = battleFacades.Repo.AirdropRepo;
+            airdropRepo.Foreach((airdrop) =>
+            {
+                airdrop.LocomotionComponent.Tick_AllPhysics(fixedDeltaTime);
+            });
+        }
+
     }
 
 }

@@ -25,7 +25,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void Tick_Physics_Collections_Role_Field()
         {
-            // - Role
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
@@ -70,7 +69,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return list;
         }
 
-        void PhysicsEntityHitField(PhysicsEntity entity, LocomotionComponent moveComponent)
+        public void Tick_Physics_Collections_Airdrop_Field()
+        {
+            var airdropRepo = battleFacades.Repo.AirdropRepo;
+            airdropRepo.Foreach((airdrop) =>
+            {
+                PhysicsEntityHitField(airdrop, airdrop.LocomotionComponent);
+            });
+        }
+
+        void PhysicsEntityHitField(PhysicsEntity entity, LocomotionComponent locomotionComponent)
         {
             var entityPos = entity.Position;
 
@@ -93,7 +101,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     collisionExtra.status = CollisionStatus.Stay;
                     if (go.tag == "Jumpboard")
                     {
-                        moveComponent.JumpboardSpeedUp();
+                        locomotionComponent.JumpboardSpeedUp();
                     }
                 }
                 else if (collisionExtra.status == CollisionStatus.Stay)
@@ -112,20 +120,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             // 撞击状态管理
             if (enterGroundCount <= 0)
             {
-                moveComponent.LeaveGround();
+                locomotionComponent.LeaveGround();
             }
             else
             {
-                moveComponent.EnterGound();
+                locomotionComponent.EnterGound();
             }
 
             if (hitWallCount <= 0)
             {
-                moveComponent.LeaveWall();
+                locomotionComponent.LeaveWall();
             }
             else
             {
-                moveComponent.EnterWall();
+                locomotionComponent.EnterWall();
             }
         }
 

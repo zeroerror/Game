@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4189852820060267662}
   - component: {fileID: -1527521374207388331}
   - component: {fileID: 9130572561452523841}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Item_Airdrop_Level1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ MonoBehaviour:
   entityType: 6
   subType: 2
   locomotionComponent:
-    maximumVelocity: 3.4028235e+38
+    maximumVelocity: 15
     basicMoveSpeed: 0
     moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 0

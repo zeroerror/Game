@@ -211,16 +211,16 @@ namespace Game.Client.Bussiness.BattleBussiness
         public void EnterGound()
         {
             if (isGrounded) return;
-
             // DebugExtensions.LogWithColor($"{rb.gameObject.name}接触地面------------------------", "#48D1CC");
+
             isGrounded = true;
         }
 
         public void LeaveGround()
         {
             if (!isGrounded) return;
-
             // DebugExtensions.LogWithColor($"{rb.gameObject.name}离开地面-----------------------", "#48D1CC");
+
             isGrounded = false;
         }
 
@@ -251,8 +251,17 @@ namespace Game.Client.Bussiness.BattleBussiness
             // 移动速度可以抵消extraVelocity
             EraseVelocity(ref extraVelocity, moveVelocity);
 
+            // - XZ轴
             vel = moveVelocity + extraVelocity;
-            vel.y = rb.velocity.y + extraVelocity.y + gravityVelocity * fixedDeltaTime;   //Y轴
+            // - Y轴
+            if (!isGrounded)
+            {
+                vel.y = rb.velocity.y + extraVelocity.y + gravityVelocity * fixedDeltaTime;   
+            }
+            else
+            {
+                vel.y = 0;
+            }
             rb.velocity = vel;
 
             //限制'最大速度'

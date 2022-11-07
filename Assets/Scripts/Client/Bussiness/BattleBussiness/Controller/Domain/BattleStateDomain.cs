@@ -92,17 +92,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var field = battleFacades.Repo.FieldRepo.CurFieldEntity;
             if (field != null)
             {
+                // --- 清场
+                var domain = battleFacades.Domain;
+                var commonDomain = domain.CommonDomain;
+                commonDomain.ClearBattleField();
+
                 // - Stage
                 gameEntity.AddStage(stage);
 
                 // State
                 fsm.EnterGameState_BattlePreparing(300);
                 stateAndStageChangeHandler.Invoke();
-
-                // --- 清场
-                var domain = battleFacades.Domain;
-                var commonDomain = domain.CommonDomain;
-                commonDomain.ClearBattleField();
             }
         }
 

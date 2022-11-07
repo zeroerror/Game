@@ -27,10 +27,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return all.Remove(entity);
         }
 
-        public bool TryGetByEntityId(int weaponId, out WeaponItemEntity weaponEntity)
+        public bool TryGetByEntityId(int weaponId, out WeaponItemEntity weaponItem)
         {
-            weaponEntity = all.Find((entity) => entity.IDComponent.EntityID == weaponId);
-            return weaponEntity != null;
+            weaponItem = all.Find((entity) => entity.IDComponent.EntityID == weaponId);
+            return weaponItem != null;
         }
 
         public WeaponItemEntity[] GetAll()
