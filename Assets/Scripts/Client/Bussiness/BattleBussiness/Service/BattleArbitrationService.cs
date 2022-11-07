@@ -56,13 +56,14 @@ namespace Game.Client.Bussiness.BattleBussiness
             return true;
         }
 
-        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC, float damage)
+        public void AddHitRecord(IDComponent attackerIDC, IDComponent victimIDC, float damage, bool hasCausedDeath)
         {
             HitModel hitModel = new HitModel();
             hitModel.attackerIDC = attackerIDC;
             hitModel.victimIDC = victimIDC;
             hitModel.damage = damage;
-            Debug.Log($"ADD HIT RECORD:damage {damage}");
+            hitModel.hasCausedDeath = hasCausedDeath;
+            Debug.Log($"ADD HIT RECORD:damage {damage} hasCausedDeath {hasCausedDeath}");
 
             var key = GetKey(attackerIDC, victimIDC);
 
@@ -77,9 +78,10 @@ namespace Game.Client.Bussiness.BattleBussiness
             all[key] = list;
         }
 
-        public float GetAtkerTotalCauseDamage(EntityType entityType, int entityID)
+        public void GetAtkerTotalKillAndCauseDamage(EntityType entityType, int entityID, out int totalKill, out float totalDamage)
         {
-            float totalDamage = 0;
+            float damage = 0;
+            int kill = 0;
 
             int key1 = 0;
             key1 |= (int)entityType << 16;
@@ -93,7 +95,39 @@ namespace Game.Client.Bussiness.BattleBussiness
                     var list = obj.Value;
                     list.ForEach((hitModel) =>
                     {
-                        totalDamage += hitModel.damage;
+                        damage += hitModel.damage;
+                        if (hitModel.hasCausedDeath)
+                        {
+                            kill++;
+                        }
+                    });
+                }
+            }
+
+            totalKill = kill;
+            totalDamage = damage;
+        }
+
+        public int GetAtkerTotalKill(EntityType entityType, int entityID)
+        {
+            int totalDamage = 0;
+
+            int key1 = 0;
+            key1 |= (int)entityType << 16;
+            key1 |= (int)entityID;
+
+            foreach (var obj in all)
+            {
+                var key2 = (int)(obj.Key >> 32);
+                if (key1 == key2)
+                {
+                    var list = obj.Value;
+                    list.ForEach((hitModel) =>
+                    {
+                        if (hitModel.hasCausedDeath)
+                        {
+                            totalDamage++;
+                        }
                     });
                 }
             }

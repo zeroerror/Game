@@ -211,6 +211,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     {
                         var roleDomain = battleFacades.Domain.RoleDomain;
                         roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
+                        if (role.HealthComponent.CheckIsDead())
+                        {
+                            roleDomain.RoleState_EnterDead(role);
+                        }
                     }
                 }
             });

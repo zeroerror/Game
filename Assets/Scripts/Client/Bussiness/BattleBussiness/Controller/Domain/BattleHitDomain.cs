@@ -71,9 +71,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         void CauseAndRecordDamage(IDComponent attackerIDC, IDComponent victimIDC, float damage, BattleRoleLogicEntity role)
         {
             var arbitService = battleFacades.ArbitrationService;
-            var domain = battleFacades.Domain.RoleDomain;
-            float receivedDamage = domain.TryReceiveDamage(role, damage);
-            arbitService.AddHitRecord(attackerIDC, victimIDC, receivedDamage);
+            var roleDomain = battleFacades.Domain.RoleDomain;
+            float receivedDamage = roleDomain.TryReceiveDamage(role, damage);
+            bool hasCausedDeath = role.HealthComponent.CheckIsDead();
+            arbitService.AddHitRecord(attackerIDC, victimIDC, receivedDamage,hasCausedDeath);
 
             // -  Logic Trigger
             var logicTriggerAPI = battleFacades.LogicTriggerAPI;

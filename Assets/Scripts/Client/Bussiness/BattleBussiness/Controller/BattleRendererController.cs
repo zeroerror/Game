@@ -81,9 +81,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 && roleRepo.IsOwner(atkRole.IDComponent.EntityID))
                 {
                     var arbitService = battleFacades.ArbitrationService; ;
-                    var totalDamage = arbitService.GetAtkerTotalCauseDamage(atkEntityType, atkEntityID);
-                    int kill = 1; // - test
-                    UIEventCenter.KillAndDamageInfoUpdateAction.Invoke(kill, (int)totalDamage);
+                    arbitService.GetAtkerTotalKillAndCauseDamage(atkEntityType, atkEntityID, out var totalKill, out var totalDamage);
+                    UIEventCenter.KillAndDamageInfoUpdateAction.Invoke(totalKill, (int)totalDamage);
                 }
                 return;
             }

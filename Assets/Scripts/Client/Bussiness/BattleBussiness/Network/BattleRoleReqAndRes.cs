@@ -94,7 +94,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void SendReq_RoleSpawn(ControlType controlType)
         {
-            Debug.Log("SendReq_RoleSpawn");
             FrameBattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameBattleRoleSpawnReqMsg
             {
                 controlType = (byte)controlType,
