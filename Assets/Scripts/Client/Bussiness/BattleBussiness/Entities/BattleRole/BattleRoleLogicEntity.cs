@@ -75,8 +75,8 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             // == Component
             var rb = transform.GetComponentInParent<Rigidbody>();
-            locomotionComponent.Ctor();
             locomotionComponent.Inject(rb);
+            locomotionComponent.Ctor();
             locomotionComponent.SetMaximumVelocity(30f);
 
             healthComponent.Ctor();
@@ -151,6 +151,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
             // - Health
             healthComponent.Reset();
+
+            // - Weapon
+            weaponComponent.Reset();
 
             isDead = false;
         }

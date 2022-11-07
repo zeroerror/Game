@@ -41,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Ctor()
         {
-            Reset();
+
         }
 
         public void Reset()
