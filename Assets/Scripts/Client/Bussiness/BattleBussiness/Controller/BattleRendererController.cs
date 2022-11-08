@@ -110,7 +110,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var repo = battleFacades.Repo;
             if (atkEntityType == EntityType.Bullet)
             {
-                var bulletRepo = repo.BulletRepo;
+                var bulletRepo = repo.BulletLogicRepo;
                 var bullet = bulletRepo.Get(atkEntityID);
                 var WeaponRepo = repo.WeaponRepo;
                 var roleRepo = repo.RoleLogicRepo;

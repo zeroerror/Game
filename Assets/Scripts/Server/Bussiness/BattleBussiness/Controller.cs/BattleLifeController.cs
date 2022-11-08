@@ -50,6 +50,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var battleFacades = serverFacades.BattleFacades;
             var airdropRepo = battleFacades.Repo.AirdropLogicRepo;
             var airdropDomain = battleFacades.Domain.AirdropLogicDomain;
+            var idService = battleFacades.IDService;
             List<BattleAirdropEntity> tearDownList = new List<BattleAirdropEntity>();
             airdropRepo.ForAll((airdrop) =>
             {
@@ -67,12 +68,20 @@ namespace Game.Server.Bussiness.BattleBussiness
             {
                 tearDownList.ForEach((airdrop) =>
                 {
-                    EntityType entityType = EntityType.Aridrop;
+                    var spawnEntityType = airdrop.SpawnEntityType;
+                    var spawnSubType = airdrop.SpawnSubType;
+                    var spawnEntityID = idService.GetAutoIDByEntityType(spawnEntityType);
+                    var airdropPos = airdrop.transform.position;
+
+                    var itemDomain = battleFacades.Domain.ItemDomain;
+                    var spawnGo = itemDomain.SpawnItem(spawnEntityType, spawnSubType, spawnEntityID);
+                    spawnGo.transform.position = airdropPos;
+
+                    battleRqs.SendRes_EntitySpawn(connID, spawnEntityType, spawnSubType, spawnEntityID, airdropPos);
+
                     var idc = airdrop.IDComponent;
-                    byte subType = idc.SubType;
-                    int entityID = idc.EntityID;
-                    Vector3 pos = airdrop.LocomotionComponent.Position;
-                    battleRqs.SendRes_EntityTearDown(connID, entityType, entityID, pos);
+                    int airdropEntityID = idc.EntityID;
+                    battleRqs.SendRes_EntityTearDown(connID, EntityType.Aridrop, airdropEntityID, airdropPos);
                 });
             });
 

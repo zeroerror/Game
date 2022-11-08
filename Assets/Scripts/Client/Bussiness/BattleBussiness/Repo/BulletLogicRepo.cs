@@ -5,12 +5,12 @@ using UnityEngine;
 namespace Game.Client.Bussiness.BattleBussiness.Repo
 {
 
-    public class BulletRepo
+    public class BulletLogicRepo
     {
 
         List<BulletEntity> all;
 
-        public BulletRepo()
+        public BulletLogicRepo()
         {
             all = new List<BulletEntity>();
         }

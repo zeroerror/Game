@@ -57,7 +57,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_ItemSpawn(int connId, List<EntityType> entityTypeList, List<byte> subtypeList, List<int> entityIDList)
+        public void SendRes_BattleAssetPointItemsSpawn(int connId, List<EntityType> entityTypeList, List<byte> subtypeList, List<int> entityIDList)
         {
             byte[] entityTypeByteArray = new byte[entityTypeList.Count];
             for (int i = 0; i < entityTypeByteArray.Length; i++)
@@ -65,7 +65,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
                 entityTypeByteArray[i] = (byte)entityTypeList[i];
             }
 
-            FrameItemSpawnResMsg msg = new FrameItemSpawnResMsg
+            BattleAssetPointItemsSpawnResMsg msg = new BattleAssetPointItemsSpawnResMsg
             {
                 serverFrame = serverFrame,
                 entityTypeArray = entityTypeByteArray,

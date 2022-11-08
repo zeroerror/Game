@@ -59,7 +59,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 Vector3 startPos = new Vector3(msg.startPosX / 10000f, msg.startPosY / 10000f, msg.startPosZ / 10000f);
                 Vector3 fireDir = new Vector3(msg.fireDirX / 100f, 0, msg.fireDirZ / 100f);
 
-                var bulletRepo = battleFacades.Repo.BulletRepo;
+                var bulletRepo = battleFacades.Repo.BulletLogicRepo;
 
                 var bulletLogic = battleFacades.Domain.BulletLogicDomain.Spawn(bulletType, msg.bulletID, msg.weaponID, startPos, fireDir);
                 var bulletRenderer = battleFacades.Domain.BulletRendererDomain.SpawnBulletRenderer(bulletLogic.BulletType, bulletLogic.IDComponent.EntityID);
@@ -79,7 +79,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             while (bulletHitEntityQueue.TryDequeue(out var msg))
             {
-                var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityID);
+                var bullet = battleFacades.Repo.BulletLogicRepo.Get(msg.bulletEntityID);
                 var atkIDC = bullet.IDComponent;
                 var hitPowerModel = bullet.HitPowerModel;
 
@@ -110,7 +110,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 // - 同步子弹位置
                 Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                var bullet = battleFacades.Repo.BulletRepo.Get(msg.bulletEntityID);
+                var bullet = battleFacades.Repo.BulletLogicRepo.Get(msg.bulletEntityID);
                 bullet.LocomotionComponent.SetPosition(pos);
             }
         }

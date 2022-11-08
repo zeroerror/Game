@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             List<HitFieldModel> list = new List<HitFieldModel>();
             Transform hitTrans = null;
-            var bulletRepo = battleFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             var bulletDomain = battleFacades.Domain.BulletLogicDomain;
 
             bulletRepo.ForAll((bullet) =>

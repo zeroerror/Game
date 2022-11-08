@@ -39,7 +39,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var itemDomain = domain.ItemDomain;
             itemDomain.TearDownAllItems();
             // - Bullet
-            var bulletLogicRepo = repo.BulletRepo;
+            var bulletLogicRepo = repo.BulletLogicRepo;
             bulletLogicRepo.ForAll((bulletLogic) =>
             {
                 var bulletDomain = domain.BulletLogicDomain;
@@ -61,21 +61,60 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         }
 
+        public void SpawnEntityLogicAndRenderer(Vector3 pos, EntityType entityType, byte subType, int entityID)
+        {
+            SpawnEntityLogic(pos, entityType, subType, entityID);
+            SpawnEntityRenderer(pos, entityType, subType, entityID);
+        }
+
+        public void SpawnEntityLogic(Vector3 pos, EntityType entityType, byte subType, int entityID)
+        {
+            var domain = battleFacades.Domain;
+
+            if (entityType == EntityType.Aridrop)
+            {
+                var airdropLogicDomain = domain.AirdropLogicDomain;
+                var curLevelStage = battleFacades.GameEntity.Stage.GetCurLevelStage();
+                airdropLogicDomain.SpawnLogic(entityID, curLevelStage, pos);
+                return;
+            }
+
+            Debug.LogError("未处理");
+        }
+
+        public void SpawnEntityRenderer(Vector3 pos, EntityType entityType, byte subType, int entityID)
+        {
+            var domain = battleFacades.Domain;
+            if (entityType == EntityType.Aridrop)
+            {
+                var airdropRendererDomain = domain.AirdropRendererDomain;
+                var curLevelStage = battleFacades.GameEntity.Stage.GetCurLevelStage();
+                airdropRendererDomain.SpawnRenderer(entityID, curLevelStage, pos);
+                return;
+            }
+
+            Debug.LogError("未处理");
+        }
+
+
         public void TearDownEntityLogicAndRenderer(Vector3 pos, EntityType entityType, int entityID)
         {
+            TearDownEntityLogic(pos, entityType, entityID);
+            TearDownEntityRenderer(pos, entityType, entityID);
+        }
 
+        public void TearDownEntityLogic(Vector3 pos, EntityType entityType, int entityID)
+        {
             var repo = battleFacades.Repo;
             var domain = battleFacades.Domain;
 
             if (entityType == EntityType.Bullet)
             {
-                var bullerRepo = repo.BulletRepo;
-                var bulletLogic = bullerRepo.Get(entityID);
+                var bulletLogicRepo = repo.BulletLogicRepo;
+                var bulletLogic = bulletLogicRepo.Get(entityID);
                 bulletLogic.LocomotionComponent.SetPosition(pos);
                 var bulletLogicDomain = domain.BulletLogicDomain;
                 bulletLogicDomain.TearDown(bulletLogic);
-                var bulletRendererDomain = domain.BulletRendererDomain;
-                bulletRendererDomain.TearDownBulletRenderer(bulletLogic.IDComponent.EntityID);
                 return;
             }
 
@@ -85,8 +124,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var airdropLogic = airdropLogicRepo.Get(entityID);
                 var airdropLogicDomain = domain.AirdropLogicDomain;
                 airdropLogicDomain.TearDownLogic(airdropLogic);
+                return;
+            }
+
+            Debug.LogError("未处理");
+        }
+
+        public void TearDownEntityRenderer(Vector3 pos, EntityType entityType, int entityID)
+        {
+            var repo = battleFacades.Repo;
+            var domain = battleFacades.Domain;
+
+            if (entityType == EntityType.Bullet)
+            {
+                var bulletRendererDomain = domain.BulletRendererDomain;
+                bulletRendererDomain.TearDownBulletRenderer(entityID);
+                return;
+            }
+
+            if (entityType == EntityType.Aridrop)
+            {
                 var airdropRendererDomain = domain.AirdropRendererDomain;
-                airdropRendererDomain.TearDownRenderer(airdropLogic.IDComponent.EntityID);
+                airdropRendererDomain.TearDownRenderer(entityID);
                 return;
             }
 

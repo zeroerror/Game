@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 bulletEntity.FaceTo(fireDir);
                 bulletEntity.LocomotionComponent.ApplyMoveVelocity(fireDir);
 
-                battleFacades.Repo.BulletRepo.Add(bulletEntity);
+                battleFacades.Repo.BulletLogicRepo.Add(bulletEntity);
 
                 if (bulletEntity is HookerEntity hookerEntity)
                 {
@@ -74,13 +74,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 hookerEntity.TearDown();
             }
 
-            battleFacades.Repo.BulletRepo.TryRemove(bullet);
+            battleFacades.Repo.BulletLogicRepo.TryRemove(bullet);
         }
 
         public void Tick_Physics_All(float fixedDeltaTime)
         {
             // - Normal Physics
-            var bulletRepo = battleFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 bullet.LocomotionComponent.Tick_AllPhysics(fixedDeltaTime);
@@ -92,7 +92,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public List<BulletEntity> Tick_LifeTime_All(float deltaTime)
         {
-            var bulletRepo = battleFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             List<BulletEntity> removeList = new List<BulletEntity>();
             bulletRepo.Foreach((bulletEntity) =>
             {
@@ -110,7 +110,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             List<HitModel> hitModelList = new List<HitModel>();
             var physicsDomain = battleFacades.Domain.PhysicsDomain;
-            var bulletRepo = battleFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
 
             bulletRepo.ForAll((bullet) =>
             {
@@ -266,7 +266,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         List<HookerEntity> GetActivatedHookerList()
         {
             List<HookerEntity> hookerEntities = new List<HookerEntity>();
-            var bulletRepo = battleFacades.Repo.BulletRepo;
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             bulletRepo.Foreach((bullet) =>
             {
                 if (bullet is HookerEntity hookerEntity && hookerEntity.GrabPoint != null)

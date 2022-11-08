@@ -20,7 +20,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleEvolveItemRepo EvolveItemRepo { get; private set; }
         
-        public BulletRepo BulletRepo { get; private set; }
+        public BulletLogicRepo BulletLogicRepo { get; private set; }
         public BulletRendererRepo BulletRendererRepo { get; private set; }
         public BulletItemRepo BulletItemRepo { get; private set; }
 
@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             ArmorRepo = new BattleArmorRepo();
             ArmorItemRepo = new BattleArmorItemRepo();
 
-            BulletRepo = new BulletRepo();
+            BulletLogicRepo = new BulletLogicRepo();
             BulletRendererRepo = new BulletRendererRepo();
             BulletItemRepo = new BulletItemRepo();
 

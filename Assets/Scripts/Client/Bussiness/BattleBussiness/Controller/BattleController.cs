@@ -17,12 +17,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             battleRoleSyncQueue = new Queue<BattleRoleSyncMsg>();
             roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
 
-            itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
+            itemSpawnQueue = new Queue<BattleAssetPointItemsSpawnResMsg>();
             itemPickQueue = new Queue<FrameItemPickResMsg>();
 
             airdropSpawnQueue = new Queue<BattleAirdropSpawnResMsg>();
 
             entityTearDownQueue = new Queue<BattleEntityTearDownResMsg>();
+            entitySpawnQueue = new Queue<BattleEntitySpawnResMsg>();
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -42,6 +43,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             battleRqs.RegistRes_BattleGameStateAndStage(OnRes_BattleStateAndStageMsg);
             battleRqs.RegistRes_BattleAirdrop(OnRes_BattleAirdrop);
             battleRqs.RegistRes_EntityTearDown(OnEntityTearDownResMsg);
+            battleRqs.RegistRes_EntitySpawn(OnEntitySpawnResMsg);
 
             // - Role
             var roleRqs = battleFacades.Network.RoleReqAndRes;
@@ -88,6 +90,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Tick_Airdrop();
 
             Tick_EntityTearDown(fixedDeltaTime);
+            Tick_EntitySpawn(fixedDeltaTime);
 
         }
 
@@ -181,17 +184,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Item]
 
         Queue<FrameItemPickResMsg> itemPickQueue;
-        Queue<FrameItemSpawnResMsg> itemSpawnQueue;
+        Queue<BattleAssetPointItemsSpawnResMsg> itemSpawnQueue;
 
         void Tick_ItemAssetsSpawn()
         {
-            if (itemSpawnQueue.TryPeek(out var itemSpawnMsg))
+            while (itemSpawnQueue.TryPeek(out var msg))
             {
                 itemSpawnQueue.Dequeue();
 
-                var entityTypeArray = itemSpawnMsg.entityTypeArray;
-                var subtypeArray = itemSpawnMsg.subtypeArray;
-                var entityIDArray = itemSpawnMsg.entityIDArray;
+                var entityTypeArray = msg.entityTypeArray;
+                var subtypeArray = msg.subtypeArray;
+                var entityIDArray = msg.entityIDArray;
                 var fieldEntity = battleFacades.Repo.FieldRepo.CurFieldEntity;
                 AssetPointEntity[] assetPointEntities = fieldEntity.transform.GetComponentsInChildren<AssetPointEntity>();
 
@@ -236,7 +239,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void OnItemSpawn(FrameItemSpawnResMsg msg)
+        void OnItemSpawn(BattleAssetPointItemsSpawnResMsg msg)
         {
             Debug.Log($"收到物件生成消息");
             itemSpawnQueue.Enqueue(msg);
@@ -324,13 +327,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 byte subType = msg.subType;
                 int entityID = msg.entityID;
                 Vector3 spawnPos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                BattleStage stage = (BattleStage)msg.battleStage;
+                BattleStage curLvStage = (BattleStage)msg.curLvStage;
 
                 var domain = battleFacades.Domain;
                 var airdropLogicDomain = domain.AirdropLogicDomain;
-                airdropLogicDomain.SpawnLogic(entityID, spawnPos, stage);
+                airdropLogicDomain.SpawnLogic(entityID, curLvStage, spawnPos);
                 var airdropRendererDomain = domain.AirdropRendererDomain;
-                airdropRendererDomain.SpawnRenderer(entityID, stage, spawnPos);
+                airdropRendererDomain.SpawnRenderer(entityID, curLvStage, spawnPos);
             }
         }
 
@@ -345,6 +348,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Battle Entity TearDown]
 
         Queue<BattleEntityTearDownResMsg> entityTearDownQueue;
+        Queue<BattleEntitySpawnResMsg> entitySpawnQueue;
 
         void Tick_EntityTearDown(float fixedDeltaTime)
         {
@@ -365,6 +369,28 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             Debug.Log($"加入实体销毁队列");
             entityTearDownQueue.Enqueue(msg);
+        }
+
+        void Tick_EntitySpawn(float fixedDeltaTime)
+        {
+            while (entitySpawnQueue.TryDequeue(out var msg))
+            {
+                EntityType entityType = (EntityType)msg.entityType;
+                byte subType = msg.subType;
+                int entityID = msg.entityID;
+                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+
+                var repo = battleFacades.Repo;
+                var domain = battleFacades.Domain;
+                var commonDomain = domain.CommonDomain;
+                commonDomain.SpawnEntityLogicAndRenderer(pos, entityType, subType, entityID);
+            }
+        }
+
+        void OnEntitySpawnResMsg(BattleEntitySpawnResMsg msg)
+        {
+            Debug.Log($"加入实体生成队列");
+            entitySpawnQueue.Enqueue(msg);
         }
 
         #endregion

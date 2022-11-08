@@ -4,8 +4,8 @@ using ZeroFrame.Buffer;namespace Game.Protocol.Battle
 {
 
     [ZeroMessage]
-    public class FrameItemSpawnResMsg
-:IZeroMessage<FrameItemSpawnResMsg>{
+    public class BattleAssetPointItemsSpawnResMsg
+:IZeroMessage<BattleAssetPointItemsSpawnResMsg>{
         public int serverFrame;
         public byte[] entityTypeArray;    // 武器、子弹
         public byte[] subtypeArray;  //武器：手枪、步枪、榴弹枪  子弹：。。。。

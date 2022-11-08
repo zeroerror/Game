@@ -58,7 +58,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
-        public void RegistRes_ItemSpawn(Action<FrameItemSpawnResMsg> action)
+        public void RegistRes_ItemSpawn(Action<BattleAssetPointItemsSpawnResMsg> action)
         {
             AddRegister(action);
         }

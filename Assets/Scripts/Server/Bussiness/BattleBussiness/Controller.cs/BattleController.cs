@@ -365,15 +365,15 @@ namespace Game.Server.Bussiness.BattleBussiness
             var entityID = idService.GetAutoIDByEntityType(EntityType.Aridrop);
 
             var battleStage = battleFacades.GameEntity.Stage;
-            var curStage = battleStage.GetCurLevelStage();
+            var curLvStage = battleStage.GetCurLevelStage();
 
             var airdropDomain = battleFacades.Domain.AirdropLogicDomain;
-            var airdrop = airdropDomain.SpawnLogic(entityID, spawnPos, curStage);
+            var airdrop = airdropDomain.SpawnLogic(entityID, curLvStage, spawnPos);
 
             var battleRqs = serverFacades.Network.BattleReqAndRes;
             ConnIDList.ForEach((connID) =>
             {
-                battleRqs.SendRes_BattleAirdropSpawn(connID, airdrop.SpawnEntityType, airdrop.SpawnSubType, airdrop.IDComponent.EntityID, spawnPos, curStage);
+                battleRqs.SendRes_BattleAirdropSpawn(connID, airdrop.SpawnEntityType, airdrop.SpawnSubType, airdrop.IDComponent.EntityID, spawnPos, curLvStage);
             });
         }
 
@@ -409,7 +409,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 ConnIDList.ForEach((connID) =>
                 {
                     var itemRqs = serverFacades.Network.ItemReqAndRes;
-                    itemRqs.SendRes_ItemSpawn(connID, entityTypeList, subTypeList, entityIDList);
+                    itemRqs.SendRes_BattleAssetPointItemsSpawn(connID, entityTypeList, subTypeList, entityIDList);
                 });
             }
 

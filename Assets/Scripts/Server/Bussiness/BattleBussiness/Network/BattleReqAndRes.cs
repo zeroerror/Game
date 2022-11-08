@@ -45,17 +45,32 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
+
+        public void SendRes_EntitySpawn(int connID, EntityType entityType, byte subType, int entityID, Vector3 pos)
+        {
+            BattleEntitySpawnResMsg msg = new BattleEntitySpawnResMsg();
+            msg.serverFrame = serverFrame;
+            msg.entityType = (byte)entityType;
+            msg.subType = subType;
+            msg.entityID = entityID;
+            msg.posX = (int)(pos.x * 10000f);
+            msg.posY = (int)(pos.y * 10000f);
+            msg.posZ = (int)(pos.z * 10000f);
+
+            battleServer.SendMsg(connID, msg);
+            sendCount++;
+            Debug.Log($"实体[{entityType.ToString()}]生成消息发送");
+        }
+
         public void SendRes_EntityTearDown(int connId, EntityType entityType, int entityID, Vector3 pos)
         {
-            BattleEntityTearDownResMsg msg = new BattleEntityTearDownResMsg
-            {
-                serverFrame = serverFrame,
-                entityType = (byte)entityType,
-                entityID = entityID,
-                posX = (int)(pos.x * 10000f),
-                posY = (int)(pos.y * 10000f),
-                posZ = (int)(pos.z * 10000f)
-            };
+            BattleEntityTearDownResMsg msg = new BattleEntityTearDownResMsg();
+            msg.serverFrame = serverFrame;
+            msg.entityType = (byte)entityType;
+            msg.entityID = entityID;
+            msg.posX = (int)(pos.x * 10000f);
+            msg.posY = (int)(pos.y * 10000f);
+            msg.posZ = (int)(pos.z * 10000f);
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
@@ -73,7 +88,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BattleAirdropSpawn(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage battleStage)
+        public void SendRes_BattleAirdropSpawn(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage curLvStage)
         {
             BattleAirdropSpawnResMsg msg = new BattleAirdropSpawnResMsg();
             msg.airdropEntityType = (byte)airdropEntityType;
@@ -82,7 +97,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             msg.posX = (int)(pos.x * 10000f);
             msg.posY = (int)(pos.y * 10000f);
             msg.posZ = (int)(pos.z * 10000f);
-            msg.battleStage = (int)battleStage;
+            msg.curLvStage = (int)curLvStage;
 
             battleServer.SendMsg(connID, msg);
             sendCount++;

@@ -59,7 +59,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     hookerEntity.TearDown();
                 }
 
-                var bulletRepo = serverFacades.BattleFacades.Repo.BulletRepo;
+                var bulletRepo = serverFacades.BattleFacades.Repo.BulletLogicRepo;
                 bulletRepo.TryRemove(bullet);
 
                 var bulletRqs = serverFacades.Network.BattleReqAndRes;

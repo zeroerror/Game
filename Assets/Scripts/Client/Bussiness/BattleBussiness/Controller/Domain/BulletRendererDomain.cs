@@ -23,7 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public void Update_AllBulletRenderer(float deltaTime)
         {
             var repo = battleFacades.Repo;
-            var bulletLogicRepo = repo.BulletRepo;
+            var bulletLogicRepo = repo.BulletLogicRepo;
             var bulletRendererRepo = repo.BulletRendererRepo;
 
             bulletLogicRepo.Foreach((bulletLogic) =>

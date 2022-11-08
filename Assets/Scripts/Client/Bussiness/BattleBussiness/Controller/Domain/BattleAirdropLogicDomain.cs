@@ -19,9 +19,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleAirdropEntity SpawnLogic(int entityID, Vector3 spawnPos, BattleStage stage, Transform root = null)
+        public BattleAirdropEntity SpawnLogic(int entityID,  BattleStage curLevelStage, Vector3 spawnPos,Transform root = null)
         {
-            string prefabName = $"Airdrop_Logic_{stage.ToString()}";
+            string prefabName = $"Airdrop_Logic_{curLevelStage.ToString()}";
             var itemAsset = battleFacades.Assets.ItemAsset;
             if (!itemAsset.TryGetByName(prefabName, out var prefab))
             {
@@ -44,15 +44,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void TearDownLogic(BattleAirdropEntity airdrop)
         {
-            var spawnEntityType = airdrop.SpawnEntityType;
-            var spawnSubType = airdrop.SpawnSubType;
-            var idService = battleFacades.IDService;
-            var spawnEntityID = idService.GetAutoIDByEntityType(spawnEntityType);
-
-            var itemDomain = battleFacades.Domain.ItemDomain;
-            var spawnGo = itemDomain.SpawnItem(spawnEntityType, spawnSubType, spawnEntityID);
-            spawnGo.transform.position = spawnGo.transform.position;
-
             var repo = battleFacades.Repo;
             var airDropRepo = repo.AirdropLogicRepo;
             airDropRepo.Remove(airdrop);

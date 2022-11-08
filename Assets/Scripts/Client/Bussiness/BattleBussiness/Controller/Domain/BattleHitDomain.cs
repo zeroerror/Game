@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 victimLC = airdrop.LocomotionComponent;
             }
 
-            var bullet = battleFacades.Repo.BulletRepo.Get(atkEntityID);
+            var bullet = battleFacades.Repo.BulletLogicRepo.Get(atkEntityID);
 
             // - Physics
             var bulletLC = bullet.LocomotionComponent;

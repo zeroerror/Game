@@ -55,7 +55,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void SendBulletHitFieldRes(List<HitFieldModel> hitFieldList)
         {
-            var bulletRepo = serverFacades.BattleFacades.Repo.BulletRepo;
+            var bulletRepo = serverFacades.BattleFacades.Repo.BulletLogicRepo;
             var bulletRqs = serverFacades.Network.BulletReqAndRes;
             hitFieldList.ForEach((hitFieldModel) =>
             {

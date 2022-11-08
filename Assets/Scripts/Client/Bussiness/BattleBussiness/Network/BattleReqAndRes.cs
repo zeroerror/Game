@@ -53,7 +53,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Regist ======
-        
+
+        public void RegistRes_EntitySpawn(Action<BattleEntitySpawnResMsg> action)
+        {
+            AddRegister(action);
+        }
+
         public void RegistRes_EntityTearDown(Action<BattleEntityTearDownResMsg> action)
         {
             AddRegister(action);
