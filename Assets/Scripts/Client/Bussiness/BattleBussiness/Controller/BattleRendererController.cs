@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public void Inject(BattleFacades facades)
         {
             battleFacades = facades;
-            battleFacades.LogicTriggerAPI.damageRecordAction += DamageRecord;
+            battleFacades.LogicTriggerAPI.Regist_BattleDamageRecordAction(DamageRecord);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -29,6 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public void Update(float deltaTime)
         {
             Update_AllRoleRenderer(deltaTime);
+            Update_AllAirdropRenderer(deltaTime);
             Update_AllBulletRenderer(deltaTime);
             Update_CameraRenderer();
         }
@@ -38,7 +39,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         void Update_AllRoleRenderer(float deltaTime)
         {
             var roleRendererDomain = battleFacades.Domain.RoleRendererDomain;
-            roleRendererDomain.Update_AllRenderer(deltaTime);
+            roleRendererDomain.Update_AllRolesRendererAndHUD(deltaTime);
+        }
+
+        void Update_AllAirdropRenderer(float deltaTime)
+        {
+            var airdropRendererDomain = battleFacades.Domain.AirdropRendererDomain;
+            airdropRendererDomain.Update_AllAirdropsRendererAndHUD(deltaTime);
         }
 
         void Update_AllBulletRenderer(float deltaTime)
@@ -61,32 +68,63 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var vicEntityType = args.vicEntityType;
             var vicEntityID = args.vicEntityID;
             var damage = args.damage;
-            Debug.Log($"args {atkEntityType.ToString()} {atkEntityID.ToString()} {vicEntityType.ToString()} {vicEntityID.ToString()}");
+            Debug.Log($"DamageRecord {atkEntityType.ToString()} {atkEntityID.ToString()} {vicEntityType.ToString()} {vicEntityID.ToString()}");
 
-            if (atkEntityType == EntityType.Bullet)
+            // - HUD 
+            ShowVictimHUD(vicEntityType, vicEntityID, damage);
+
+            // - UI
+            if (IsAtkByOwner(atkEntityType, atkEntityID))
             {
-                var repo = battleFacades.Repo;
+                var arbitService = battleFacades.ArbitrationService; ;
+                arbitService.GetAtkerTotalKillAndCauseDamage(atkEntityType, atkEntityID, out var totalKill, out var totalDamage);
+                UIEventCenter.KillAndDamageInfoUpdateAction.Invoke(totalKill, (int)totalDamage);
+            }
+
+        }
+
+        void ShowVictimHUD(EntityType vicEntityType, int vicEntityID, float damage)
+        {
+            var repo = battleFacades.Repo;
+            if (vicEntityType == EntityType.BattleRole)
+            {
                 var roleRendererRepo = repo.RoleRendererRepo;
                 var vicRenderer = roleRendererRepo.Get(vicEntityID);
                 vicRenderer.SetDamageText(damage.ToString());
+                return;
+            }
 
-                // - UI
-                var BulletRepo = repo.BulletRepo;
-                var bullet = BulletRepo.Get(atkEntityID);
+            if (vicEntityType == EntityType.Aridrop)
+            {
+                var airdropRendererRepo = repo.AirdropRendererRepo;
+                var airdropRenderer = airdropRendererRepo.Get(vicEntityID);
+                airdropRenderer.SetDamageText(damage.ToString());
+                return;
+            }
+
+            Debug.LogError("Not Handle");
+        }
+
+        bool IsAtkByOwner(EntityType atkEntityType, int atkEntityID)
+        {
+            var repo = battleFacades.Repo;
+            if (atkEntityType == EntityType.Bullet)
+            {
+                var bulletRepo = repo.BulletRepo;
+                var bullet = bulletRepo.Get(atkEntityID);
                 var WeaponRepo = repo.WeaponRepo;
                 var roleRepo = repo.RoleLogicRepo;
                 if (WeaponRepo.TryGet(bullet.WeaponID, out var weapon)
                 && roleRepo.TryGet(weapon.MasterID, out var atkRole)
                 && roleRepo.IsOwner(atkRole.IDComponent.EntityID))
                 {
-                    var arbitService = battleFacades.ArbitrationService; ;
-                    arbitService.GetAtkerTotalKillAndCauseDamage(atkEntityType, atkEntityID, out var totalKill, out var totalDamage);
-                    UIEventCenter.KillAndDamageInfoUpdateAction.Invoke(totalKill, (int)totalDamage);
+                    return true;
                 }
-                return;
+                return false;
             }
 
-            Debug.LogError("未处理情况 DamageRecord ");
+            Debug.LogError("未处理情况");
+            return false;
         }
 
         #endregion

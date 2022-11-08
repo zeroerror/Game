@@ -28,13 +28,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void Tick_Physics_AllPhysicsEntity(float fixedDeltaTime)
         {
-            var roleDomain = battleFacades.Domain.RoleDomain;
+            var roleDomain = battleFacades.Domain.RoleLogicDomain;
             roleDomain.Tick_Physics_AllRoles(fixedDeltaTime);
 
             var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
-            bulletLogicDomain.Tick_Physics_AllBullets(fixedDeltaTime);
+            bulletLogicDomain.Tick_Physics_All(fixedDeltaTime);
 
-            var airdropDomain = battleFacades.Domain.AirdropDomain;
+            var airdropDomain = battleFacades.Domain.AirdropLogicDomain;
             airdropDomain.Tick_Physics_AllAirdrops(fixedDeltaTime);
         }
 

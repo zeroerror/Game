@@ -12,61 +12,56 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
     {
         BattleFacades battleFacades;
 
-        // 生成消息
-        Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
-        Queue<FrameItemSpawnResMsg> itemSpawnQueue;
-        Queue<BattleAirdropSpawnResMsg> airdropSpawnQueue;
-
-        // 人物状态同步消息
-        Queue<BattleRoleSyncMsg> roleQueue;
-
-        // 资源拾取消息
-        Queue<FrameItemPickResMsg> itemPickQueue;
-
         public BattleController()
         {
-            roleQueue = new Queue<BattleRoleSyncMsg>();
+            battleRoleSyncQueue = new Queue<BattleRoleSyncMsg>();
             roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
 
             itemSpawnQueue = new Queue<FrameItemSpawnResMsg>();
             itemPickQueue = new Queue<FrameItemPickResMsg>();
 
             airdropSpawnQueue = new Queue<BattleAirdropSpawnResMsg>();
+
+            entityTearDownQueue = new Queue<BattleEntityTearDownResMsg>();
         }
 
         public void Inject(BattleFacades battleFacades)
         {
             this.battleFacades = battleFacades;
 
+            // --- Network Events3
+            // - Battle
             var battleRqs = battleFacades.Network.BattleReqAndRes;
-            battleRqs.RegistRes_BattleGameStateAndStage(OnRes_BattleStateAndStageMsg);
-            battleRqs.RegistRes_BattleAirdrop(OnRes_BattleAirdrop);
-
-
-            var roleRqs = battleFacades.Network.RoleReqAndRes;
-            roleRqs.RegistRes_BattleRoleSpawn(OnBattleRoleSpawn);
-            roleRqs.RegistUpdate_WRole(OnRoleSync);
-
-            var ItemReqAndRes = battleFacades.Network.ItemReqAndRes;
-            ItemReqAndRes.RegistRes_ItemSpawn(OnItemSpawn);
-            ItemReqAndRes.RegistRes_ItemPickUp(OnItemPickUp);
-
-            var BattleStateDomain = battleFacades.Domain.BattleStateDomain;
-            BattleStateDomain.RegistStateAndStageChangeHandler(OnBattleStateAndStageChange);
-
-            UIEventCenter.WorldRoomEnter += ((host, port) =>
-            {
-                var battleRqs = battleFacades.Network.BattleReqAndRes;
-                battleRqs.ConnBattleServer(host, port);
-            });
             NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
             {
-                var battleRqs = battleFacades.Network.BattleReqAndRes;
                 battleRqs.SendReq_BattleGameStateAndStage();
 
                 var rqs = battleFacades.Network.RoleReqAndRes;
                 rqs.SendReq_RoleSpawn(ControlType.Owner);
             });
+            battleRqs.RegistRes_BattleGameStateAndStage(OnRes_BattleStateAndStageMsg);
+            battleRqs.RegistRes_BattleAirdrop(OnRes_BattleAirdrop);
+            battleRqs.RegistRes_EntityTearDown(OnEntityTearDownResMsg);
+
+            // - Role
+            var roleRqs = battleFacades.Network.RoleReqAndRes;
+            roleRqs.RegistRes_BattleRoleSpawn(OnRoleSpawn);
+            roleRqs.RegistUpdate_WRole(OnRoleSync);
+
+            // - Item
+            var ItemReqAndRes = battleFacades.Network.ItemReqAndRes;
+            ItemReqAndRes.RegistRes_ItemSpawn(OnItemSpawn);
+            ItemReqAndRes.RegistRes_ItemPickUp(OnItemPickUp);
+
+            // --- Local Events
+            UIEventCenter.WorldRoomEnter += ((host, port) =>
+            {
+                var battleRqs = battleFacades.Network.BattleReqAndRes;
+                battleRqs.ConnBattleServer(host, port);
+            });
+
+            var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+            logicTriggerAPI.Regist_BattleStateAndStageChangeHandler(OnBattleStateAndStageChange);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -92,15 +87,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             Tick_Airdrop();
 
+            Tick_EntityTearDown(fixedDeltaTime);
+
         }
 
-        #region [Role Tick]
+        #region [Battle Role] 
+
+        Queue<BattleRoleSyncMsg> battleRoleSyncQueue;
+        Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
 
         void Tick_RoleSync()
         {
-            while (roleQueue.TryPeek(out var msg))
+            while (battleRoleSyncQueue.TryPeek(out var msg))
             {
-                roleQueue.Dequeue();
+                battleRoleSyncQueue.Dequeue();
 
                 RoleState roleState = (RoleState)msg.roleState;
                 float x = msg.posX / 10000f;
@@ -124,7 +124,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 if (!battleFacades.Repo.RoleLogicRepo.TryGet(entityID, out var roleLogic))
                 {
-                    var roleDoamin = battleFacades.Domain.RoleDomain;
+                    var roleDoamin = battleFacades.Domain.RoleLogicDomain;
                     roleLogic = roleDoamin.SpawnRoleWithRenderer(msg.entityId, ControlType.Other);
                 }
 
@@ -141,7 +141,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var stateComponent = roleLogic.StateComponent;
                 if (stateComponent.RoleState == RoleState.Reborning && roleState == RoleState.Normal)
                 {
-                    battleFacades.Domain.RoleDomain.Reborn(roleLogic);
+                    battleFacades.Domain.RoleLogicDomain.Reborn(roleLogic);
                 }
 
                 stateComponent.SetRoleState(roleState);
@@ -158,16 +158,31 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 var repo = battleFacades.Repo;
                 var roleRepo = repo.RoleLogicRepo;
                 var fieldEntity = repo.FieldRepo.CurFieldEntity;
-                var roleDomain = battleFacades.Domain.RoleDomain;
+                var roleDomain = battleFacades.Domain.RoleLogicDomain;
                 var controlType = (ControlType)msg.controlType;
                 roleDomain.SpawnRoleWithRenderer(entityId, controlType);
                 Debug.Log($"生成自身角色  ControlType {controlType}");
             }
         }
 
+        void OnRoleSync(BattleRoleSyncMsg msg)
+        {
+            battleRoleSyncQueue.Enqueue(msg);
+            // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
+        }
+
+        void OnRoleSpawn(FrameBattleRoleSpawnResMsg msg)
+        {
+            Debug.Log("收到角色生成消息");
+            roleSpawnQueue.Enqueue(msg);
+        }
         #endregion
 
-        #region [Item Tick]
+        #region [Item]
+
+        Queue<FrameItemPickResMsg> itemPickQueue;
+        Queue<FrameItemSpawnResMsg> itemSpawnQueue;
+
         void Tick_ItemAssetsSpawn()
         {
             if (itemSpawnQueue.TryPeek(out var itemSpawnMsg))
@@ -220,41 +235,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             }
         }
-        #endregion
 
-        void Tick_Airdrop()
-        {
-            while (airdropSpawnQueue.TryDequeue(out var msg))
-            {
-                EntityType airdropEntityType = (EntityType)msg.airdropEntityType;
-                byte subType = msg.subType;
-                int entityID = msg.entityID;
-                Vector3 spawnPos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                BattleStage stage = (BattleStage)msg.battleStage;
-
-                var airdropDomain = battleFacades.Domain.AirdropDomain;
-                var airdrop = airdropDomain.SpawnBattleAirDrop(spawnPos, entityID, stage);
-            }
-        }
-
-        #region [Role Ser Res] 
-        void OnRoleSync(BattleRoleSyncMsg msg)
-        {
-            roleQueue.Enqueue(msg);
-            // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
-        }
-
-        void OnBattleRoleSpawn(FrameBattleRoleSpawnResMsg msg)
-        {
-            Debug.Log("收到角色生成消息");
-            roleSpawnQueue.Enqueue(msg);
-        }
-        #endregion
-
-        #region [Item Ser Res]
         void OnItemSpawn(FrameItemSpawnResMsg msg)
         {
-            Debug.Log($"收到武器生成消息");
+            Debug.Log($"收到物件生成消息");
             itemSpawnQueue.Enqueue(msg);
         }
 
@@ -264,6 +248,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             itemPickQueue.Enqueue(msg);
         }
         #endregion
+
+        #region [Battle State]
 
         void OnBattleStateAndStageChange()
         {
@@ -324,11 +310,64 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             return;
         }
 
+        #endregion
+
+        #region [Battle Airdrop]
+
+        Queue<BattleAirdropSpawnResMsg> airdropSpawnQueue;
+
+        void Tick_Airdrop()
+        {
+            while (airdropSpawnQueue.TryDequeue(out var msg))
+            {
+                EntityType airdropEntityType = (EntityType)msg.airdropEntityType;
+                byte subType = msg.subType;
+                int entityID = msg.entityID;
+                Vector3 spawnPos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+                BattleStage stage = (BattleStage)msg.battleStage;
+
+                var domain = battleFacades.Domain;
+                var airdropLogicDomain = domain.AirdropLogicDomain;
+                airdropLogicDomain.SpawnLogic(entityID, spawnPos, stage);
+                var airdropRendererDomain = domain.AirdropRendererDomain;
+                airdropRendererDomain.SpawnRenderer(entityID, stage, spawnPos);
+            }
+        }
+
         void OnRes_BattleAirdrop(BattleAirdropSpawnResMsg msg)
         {
             Debug.Log($"收到空投生成消息");
             airdropSpawnQueue.Enqueue(msg);
         }
+
+        #endregion
+
+        #region [Battle Entity TearDown]
+
+        Queue<BattleEntityTearDownResMsg> entityTearDownQueue;
+
+        void Tick_EntityTearDown(float fixedDeltaTime)
+        {
+            while (entityTearDownQueue.TryDequeue(out var msg))
+            {
+                EntityType entityType = (EntityType)msg.entityType;
+                int entityID = msg.entityID;
+                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+
+                var repo = battleFacades.Repo;
+                var domain = battleFacades.Domain;
+                var commonDomain = domain.CommonDomain;
+                commonDomain.TearDownEntityLogicAndRenderer(pos, entityType, entityID);
+            }
+        }
+
+        void OnEntityTearDownResMsg(BattleEntityTearDownResMsg msg)
+        {
+            Debug.Log($"加入实体销毁队列");
+            entityTearDownQueue.Enqueue(msg);
+        }
+
+        #endregion
 
     }
 

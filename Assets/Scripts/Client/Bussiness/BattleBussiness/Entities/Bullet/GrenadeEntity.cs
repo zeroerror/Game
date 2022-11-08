@@ -17,11 +17,6 @@ namespace Game.Client.Bussiness.BattleBussiness
             base.Init();
         }
 
-        public override void TearDown()
-        {
-            Destroy(gameObject);
-        }
-
     }
 
 }

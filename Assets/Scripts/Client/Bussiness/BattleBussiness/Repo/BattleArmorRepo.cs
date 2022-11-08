@@ -15,10 +15,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             all = new List<BattleArmorEntity>();
         }
 
-        public bool TryGet(ushort entityId, out BattleArmorEntity entity)
+        public BattleArmorEntity Get(int entityID)
         {
-            entity = all.Find((entity) => entity.IDComponent.EntityID == entityId);
-            Debug.Assert(entity != null, $"护甲 {entityId} 不存在");
+            BattleArmorEntity entity = all.Find((entity) => entity.IDComponent.EntityID == entityID);
+            return entity;
+        }
+
+        public bool TryGet(int entityID, out BattleArmorEntity entity)
+        {
+            entity = all.Find((entity) => entity.IDComponent.EntityID == entityID);
+            Debug.Assert(entity != null, $"护甲 {entityID} 不存在");
             return entity != null;
         }
 
@@ -35,7 +41,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
 
         public void Add(BattleArmorEntity entity)
         {
-            Debug.Log($"添加护甲 [entityId:{entity.IDComponent.EntityID}]");
+            Debug.Log($"添加护甲 [entityID:{entity.IDComponent.EntityID}]");
             all.Add(entity);
         }
 

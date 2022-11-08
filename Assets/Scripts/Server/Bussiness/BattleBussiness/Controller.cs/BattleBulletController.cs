@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 using Game.Infrastructure.Generic;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Client.Bussiness.BattleBussiness.Generic;
@@ -28,69 +29,72 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         void Tick_BulletLifeCycle(float fixedDeltaTime)
         {
-            Tick_BulletHitRole(fixedDeltaTime);
-            Tick_ActiveHookerDraging(fixedDeltaTime);
+            Tick_BulletHitEntity(fixedDeltaTime);
             Tick_BulletLifeTime(fixedDeltaTime);
         }
 
         void Tick_BulletLifeTime(float fixedDeltaTime)
         {
             var bulletDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
-            var lifeOverList = bulletDomain.Tick_BulletLifeTime(NetworkConfig.FIXED_DELTA_TIME);
+            var lifeOverList = bulletDomain.Tick_LifeTime_All(NetworkConfig.FIXED_DELTA_TIME);
 
-            lifeOverList.ForEach((bulletEntity) =>
+            lifeOverList.ForEach((bullet) =>
             {
 
-                var bulletType = bulletEntity.BulletType;
+                var bulletType = bullet.BulletType;
 
                 if (bulletType == BulletType.DefaultBullet)
                 {
-                    bulletEntity.TearDown();
+                    bullet.TearDown();
                 }
 
-                if (bulletEntity is GrenadeEntity grenadeEntity)
+                if (bullet is GrenadeEntity grenadeEntity)
                 {
                     var bulletDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
                     bulletDomain.GrenadeExplode(grenadeEntity);
                 }
 
-                if (bulletEntity is HookerEntity hookerEntity)
+                if (bullet is HookerEntity hookerEntity)
                 {
                     hookerEntity.TearDown();
                 }
 
                 var bulletRepo = serverFacades.BattleFacades.Repo.BulletRepo;
-                bulletRepo.TryRemove(bulletEntity);
+                bulletRepo.TryRemove(bullet);
 
-                var bulletRqs = serverFacades.Network.BulletReqAndRes;
+                var bulletRqs = serverFacades.Network.BattleReqAndRes;
                 ConnIDList.ForEach((connId) =>
                 {
-                    // 广播子弹销毁消息
-                    bulletRqs.SendRes_BulletLifeFrameOver(connId, bulletEntity);
+                    var entityType = EntityType.Bullet;
+                    int entityID = bullet.IDComponent.EntityID;
+                    Vector3 pos = bullet.LocomotionComponent.Position;
+                    bulletRqs.SendRes_EntityTearDown(connId, entityType, entityID, pos);
                 });
 
             });
         }
 
-        void Tick_BulletHitRole(float fixedDeltaTime)
+        void Tick_BulletHitEntity(float fixedDeltaTime)
         {
             var bulletDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
             var bulletRqs = serverFacades.Network.BulletReqAndRes;
-            var hitRoleList = bulletDomain.Tick_And_Get_BulletHitRoleHitModel(fixedDeltaTime);
-
+            var hitRoleList = bulletDomain.Tick_HitModels_All(EntityType.BattleRole, fixedDeltaTime);
+            var hitAirdropList = bulletDomain.Tick_HitModels_All(EntityType.Aridrop, fixedDeltaTime);
             ConnIDList.ForEach((connId) =>
             {
-                hitRoleList.ForEach((attackModel) =>
+                hitRoleList.ForEach((hitModel) =>
                 {
-                    bulletRqs.SendRes_BulletHitRole(connId, attackModel.attackerIDC.EntityID, attackModel.victimIDC.EntityID);
+                    var victimIDC = hitModel.victimIDC;
+                    var attackerIDC = hitModel.attackerIDC;
+                    bulletRqs.SendRes_BulletHitEntity(connId, attackerIDC.EntityID, victimIDC.EntityID, victimIDC.EntityType);
+                });
+                hitAirdropList.ForEach((hitModel) =>
+                {
+                    var victimIDC = hitModel.victimIDC;
+                    var attackerIDC = hitModel.attackerIDC;
+                    bulletRqs.SendRes_BulletHitEntity(connId, attackerIDC.EntityID, victimIDC.EntityID, victimIDC.EntityType);
                 });
             });
-        }
-
-        void Tick_ActiveHookerDraging(float fixedDeltaTime)
-        {
-            var bulletDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
-            bulletDomain.Tick_ActiveHookerDraging(fixedDeltaTime);
         }
 
     }

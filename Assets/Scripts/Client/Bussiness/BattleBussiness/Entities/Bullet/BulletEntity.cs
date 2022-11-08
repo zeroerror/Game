@@ -56,8 +56,9 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public virtual void TearDown()
         {
-            Debug.Log($"摧毁子弹  {bulletType.ToString()} {idComponent.EntityID}");
+            Debug.Log($"摧毁子弹Logic  {bulletType.ToString()} {idComponent.EntityID}");
             Destroy(gameObject);
+            Destroy(this);
         }
 
         public void SetPosition(Vector3 pos)

@@ -21,13 +21,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public void Update_AllRenderer(float deltaTime)
+        public void Update_AllRolesRendererAndHUD(float deltaTime)
         {
-            Update_RoleRenderer(deltaTime);
-            Update_RoleWorldUI(deltaTime);
+            Update_AllRolesRenderer(deltaTime);
+            Update_AllRolesHUD(deltaTime);
         }
 
-        void Update_RoleRenderer(float deltaTime)
+        void Update_AllRolesRenderer(float deltaTime)
         {
             var roleStateRendererDomain = battleFacades.Domain.RoleStateRendererDomain;
             roleStateRendererDomain.ApplyRoleState(deltaTime);
@@ -47,7 +47,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        void Update_RoleWorldUI(float deltaTime)
+        void Update_AllRolesHUD(float deltaTime)
         {
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
@@ -83,11 +83,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public BattleRoleRendererEntity SpawnRoleRenderer(int entityId, Transform parent)
+        public BattleRoleRendererEntity SpawnRenderer(int entityId, Transform parent)
         {
-            string rolePrefabName = "role_renderer";
-            Debug.Log("生成" + rolePrefabName);
-            if (battleFacades.Assets.BattleRoleAssets.TryGetByName(rolePrefabName, out GameObject prefabAsset))
+            string prefabName = "role_renderer";
+            Debug.Log($"生成 {prefabName}");
+            if (battleFacades.Assets.BattleRoleAssets.TryGetByName(prefabName, out GameObject prefabAsset))
             {
                 prefabAsset = GameObject.Instantiate(prefabAsset, parent);
                 var roleRenderer = prefabAsset.GetComponentInChildren<BattleRoleRendererEntity>();
@@ -101,7 +101,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return roleRenderer;
             }
 
-            Debug.Log("生成Renderer角色失败");
+            Debug.Log($"生成失败 {prefabName}");
             return null;
         }
 

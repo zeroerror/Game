@@ -84,6 +84,8 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public override void TearDown()
         {
+            Destroy(gameObject);
+            Destroy(this);
             Destroy(shootEnd);
             Destroy(masterGrabEnd);
             Destroy(GrabPoint);

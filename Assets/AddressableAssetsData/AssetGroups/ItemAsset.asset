@@ -83,7 +83,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - Item
   - m_GUID: 2df77a89a89ac0641aac6b6905334f8a
-    m_Address: Item_Airdrop_Level1
+    m_Address: Airdrop_Renderer_Level1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Item
+  - m_GUID: 04fb83c15479abb46806397d6bd7487c
+    m_Address: Airdrop_Logic_Level1
     m_ReadOnly: 0
     m_SerializedLabels:
     - Item

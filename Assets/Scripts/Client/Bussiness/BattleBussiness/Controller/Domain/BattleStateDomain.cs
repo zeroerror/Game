@@ -10,12 +10,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
     {
         BattleFacades battleFacades;
 
-        Action stateAndStageChangeHandler;
-        public void RegistStateAndStageChangeHandler(Action action) => stateAndStageChangeHandler += action;
-
-        Action airDropHandler;
-        public void RegistAirDropHandler(Action action) => airDropHandler += action;
-
         public BattleStateDomain()
         {
         }
@@ -102,7 +96,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // State
                 fsm.EnterGameState_BattlePreparing(300);
-                stateAndStageChangeHandler.Invoke();
+
+                // -  Logic Trigger
+                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
         }
 
@@ -135,7 +132,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // - State 
                 fsm.EnterGameState_BattleFighting(18000);
-                stateAndStageChangeHandler.Invoke();
+
+                // -  Logic Trigger
+                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
 
         }
@@ -164,7 +164,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 stateMod.maintainFrame--;
                 if (stateMod.maintainFrame % 300 == 0)
                 {
-                    airDropHandler?.Invoke();
+                    // -  Logic Trigger
+                    var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                    logicTriggerAPI.Invoke_BattleAirDropAction();
                 }
             }
             else
@@ -174,7 +176,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // - State 
                 fsm.EnterGameState_BattleSettlement(150);
-                stateAndStageChangeHandler.Invoke();
+
+                // -  Logic Trigger
+                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
         }
 
@@ -207,7 +212,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // - State 
                 fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
-                stateAndStageChangeHandler.Invoke();
+
+                // -  Logic Trigger
+                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
         }
 

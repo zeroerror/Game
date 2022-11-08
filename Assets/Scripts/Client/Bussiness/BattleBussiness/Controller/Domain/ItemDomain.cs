@@ -273,23 +273,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         #endregion
 
-        string GetPrefabName(EntityType entityType, byte sortType)
+        string GetPrefabName(EntityType entityType, byte subType)
         {
             if (entityType == EntityType.WeaponItem)
             {
-                return $"Item_Weapon_{((WeaponType)sortType).ToString()}";
+                return $"Item_Weapon_{((WeaponType)subType).ToString()}";
             }
             if (entityType == EntityType.BulletItem)
             {
-                return $"Item_Bullet_{((BulletType)sortType).ToString()}";
+                return $"Item_Bullet_{((BulletType)subType).ToString()}";
             }
             if (entityType == EntityType.ArmorItem)
             {
-                return $"Item_Armor_{((ArmorType)sortType).ToString()}";
+                return $"Item_Armor_{((ArmorType)subType).ToString()}";
             }
             if (entityType == EntityType.EvolveItem)
             {
-                return $"Item_Evolve_{(1000 + sortType).ToString()}";
+                return $"Item_Evolve_{(1000 + subType).ToString()}";
             }
 
             return null;

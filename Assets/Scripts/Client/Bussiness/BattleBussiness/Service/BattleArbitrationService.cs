@@ -113,10 +113,24 @@ namespace Game.Client.Bussiness.BattleBussiness
             if (victim.EntityType == EntityType.BattleRole)
             {
                 var role = battleFacades.Repo.RoleLogicRepo.Get(victim.EntityID);
-                var stateComponent = role.StateComponent;
-                return stateComponent.RoleState != RoleState.Reborning && stateComponent.RoleState != RoleState.Dying;
+                var hc = role.HealthComponent;
+                if (hc.CheckIsDead())
+                {
+                    return false;
+                }
+
+                var sc = role.StateComponent;
+                return sc.RoleState != RoleState.Reborning && sc.RoleState != RoleState.Dying;
             }
 
+            if (victim.EntityType == EntityType.Aridrop)
+            {
+                var airdrop = battleFacades.Repo.AirdropLogicRepo.Get(victim.EntityID);
+                var hc = airdrop.HealthComponent;
+                return !hc.CheckIsDead();
+            }
+
+            Debug.LogError("未作处理情况");
             return false;
         }
 
@@ -148,6 +162,12 @@ namespace Game.Client.Bussiness.BattleBussiness
         {
             if (attacker.LeagueId != victim.LeagueId)
             {
+                return true;
+            }
+
+            if (attacker.LeagueId == -1 || victim.LeagueId == -1)
+            {
+                // - 中立者和任何人都是敌对
                 return true;
             }
 

@@ -45,6 +45,23 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         }
 
         // ====== Send ======
+        public void SendRes_EntityTearDown(int connId, EntityType entityType, int entityID, Vector3 pos)
+        {
+            BattleEntityTearDownResMsg msg = new BattleEntityTearDownResMsg
+            {
+                serverFrame = serverFrame,
+                entityType = (byte)entityType,
+                entityID = entityID,
+                posX = (int)(pos.x * 10000f),
+                posY = (int)(pos.y * 10000f),
+                posZ = (int)(pos.z * 10000f)
+            };
+
+            battleServer.SendMsg(connId, msg);
+            sendCount++;
+            Debug.Log($"实体[{entityType.ToString()}]销毁消息发送");
+        }
+
         public void SendRes_BattleGameStateAndStage(int connID, BattleState state, BattleStage stage, int curMaintainFrame)
         {
             BattleStateAndStageResMsg msg = new BattleStateAndStageResMsg();
@@ -56,7 +73,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BattleAirdrop(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage battleStage)
+        public void SendRes_BattleAirdropSpawn(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage battleStage)
         {
             BattleAirdropSpawnResMsg msg = new BattleAirdropSpawnResMsg();
             msg.airdropEntityType = (byte)airdropEntityType;
@@ -66,6 +83,16 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             msg.posY = (int)(pos.y * 10000f);
             msg.posZ = (int)(pos.z * 10000f);
             msg.battleStage = (int)battleStage;
+
+            battleServer.SendMsg(connID, msg);
+            sendCount++;
+        }
+
+        public void SendRes_BattleAirdropTearDown(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage battleStage)
+        {
+            BattleAirdropTearDownResMsg msg = new BattleAirdropTearDownResMsg();
+            msg.subType = subType;
+            msg.entityID = entityID;
 
             battleServer.SendMsg(connID, msg);
             sendCount++;

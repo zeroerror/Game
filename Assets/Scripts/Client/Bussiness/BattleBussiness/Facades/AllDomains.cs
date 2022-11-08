@@ -6,7 +6,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
     public class AllDomains
     {
 
-        public BattleRoleDomain RoleDomain { get; private set; }
+        public BattleRoleLogicDomain RoleLogicDomain { get; private set; }
         public BattleRoleRendererDomain RoleRendererDomain { get; private set; }
         public BattleRoleStateDomain RoleStateDomain { get; private set; }
         public BattleRoleStateRendererDomain RoleStateRendererDomain { get; private set; }
@@ -17,7 +17,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public ItemDomain ItemDomain { get; private set; }
 
-        public BulletDomain BulletLogicDomain { get; private set; }
+        public BulletLogicDomain BulletLogicDomain { get; private set; }
         public BulletRendererDomain BulletRendererDomain { get; private set; }
         public BulletItemDomain BulletItemDomain { get; private set; }
 
@@ -37,11 +37,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleCommonDomain CommonDomain { get; private set; }
 
-        public BattleAirdropDomain AirdropDomain { get; private set; }
+        public BattleAirdropLogicDomain AirdropLogicDomain { get; private set; }
+
+        public BattleAirdropRendererDomain AirdropRendererDomain { get; private set; }
 
         public AllDomains()
         {
-            RoleDomain = new BattleRoleDomain();
+            RoleLogicDomain = new BattleRoleLogicDomain();
             RoleRendererDomain = new BattleRoleRendererDomain();
             RoleStateDomain = new BattleRoleStateDomain();
             RoleStateRendererDomain = new BattleRoleStateRendererDomain();
@@ -52,7 +54,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             ItemDomain = new ItemDomain();
 
-            BulletLogicDomain = new BulletDomain();
+            BulletLogicDomain = new BulletLogicDomain();
 
             BulletRendererDomain = new BulletRendererDomain();
             BulletItemDomain = new BulletItemDomain();
@@ -73,12 +75,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             CommonDomain = new BattleCommonDomain();
 
-            AirdropDomain = new BattleAirdropDomain();
+            AirdropLogicDomain = new BattleAirdropLogicDomain();
+
+            AirdropRendererDomain = new BattleAirdropRendererDomain();
         }
 
         public void Inject(BattleFacades facades)
         {
-            RoleDomain.Inject(facades);
+            RoleLogicDomain.Inject(facades);
             RoleRendererDomain.Inject(facades);
             RoleStateDomain.Inject(facades);
             RoleStateRendererDomain.Inject(facades);
@@ -102,13 +106,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             HitDomain.Inject(facades);
 
+            AirdropRendererDomain.Inject(facades);
+
             BattleStateDomain.Inject(facades);
 
             FieldDomain.Inject(facades);
 
             CommonDomain.Inject(facades);
 
-            AirdropDomain.Inject(facades);
+            AirdropLogicDomain.Inject(facades);
         }
     }
 

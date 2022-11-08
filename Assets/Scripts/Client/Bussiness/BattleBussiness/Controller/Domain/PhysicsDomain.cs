@@ -21,6 +21,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public List<CollisionExtra> GetHitField_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Field");
         public List<CollisionExtra> GetHitItem_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Item");
+        public List<CollisionExtra> GetHitAirdrop_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Airdrop");
         public List<CollisionExtra> GetHitRole_ColliderList(PhysicsEntity physicsEntity) => GetCollisionExtraList(physicsEntity, "Role");
 
         public void Tick_Physics_Collections_Role_Field()
@@ -39,7 +40,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var bulletRepo = battleFacades.Repo.BulletRepo;
             var bulletDomain = battleFacades.Domain.BulletLogicDomain;
 
-            bulletRepo.Foreach((bullet) =>
+            bulletRepo.ForAll((bullet) =>
             {
                 bool hashit = false;
                 var hitFieldList = GetHitField_ColliderList(bullet);
@@ -62,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 if (hashit)
                 {
-                    bulletDomain.ApplyBulletHitEffector(bullet, hitTrans);
+                    bulletDomain.ApplyHitEffector(bullet, hitTrans);
                 }
             });
 
@@ -71,7 +72,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void Tick_Physics_Collections_Airdrop_Field()
         {
-            var airdropRepo = battleFacades.Repo.AirdropRepo;
+            var airdropRepo = battleFacades.Repo.AirdropLogicRepo;
             airdropRepo.Foreach((airdrop) =>
             {
                 PhysicsEntityHitField(airdrop, airdrop.LocomotionComponent);

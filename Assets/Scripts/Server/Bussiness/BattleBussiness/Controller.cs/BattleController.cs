@@ -82,9 +82,10 @@ namespace Game.Server.Bussiness.BattleBussiness
             itemRqs.RegistReq_ItemPickUp(OnItemPickUpReqMsg);
 
             // Domain Handler
-            var gameStateDomain = serverFacades.BattleFacades.Domain.BattleStateDomain;
-            gameStateDomain.RegistStateAndStageChangeHandler(OnGameStageChange);
-            gameStateDomain.RegistAirDropHandler(OnBattleAirdrop);
+            var battleFacades = serverFacades.BattleFacades;
+            var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+            logicTriggerAPI.Regist_BattleStateAndStageChangeHandler(OnBattleStateAndStageChange);
+            logicTriggerAPI.Regist_BattleAirDropAction(OnBattleAirdrop);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -141,7 +142,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     {
                         var idService = battleFacades.IDService;
                         var entityID = idService.GetAutoIDByEntityType(EntityType.BattleRole);
-                        role = battleFacades.Domain.RoleDomain.SpawnRoleLogic(entityID);
+                        role = battleFacades.Domain.RoleLogicDomain.SpawnRoleLogic(entityID);
                         role.SetConnID(connID);
                         Debug.Log($"服务器逻辑[生成角色] ServerFrame:{ServerFrame} EntityID:{entityID} ControlType {((ControlType)msg.controlType).ToString()}");
                     }
@@ -366,17 +367,17 @@ namespace Game.Server.Bussiness.BattleBussiness
             var battleStage = battleFacades.GameEntity.Stage;
             var curStage = battleStage.GetCurLevelStage();
 
-            var airdropDomain = battleFacades.Domain.AirdropDomain;
-            var airdrop = airdropDomain.SpawnBattleAirDrop(spawnPos, entityID, curStage);
+            var airdropDomain = battleFacades.Domain.AirdropLogicDomain;
+            var airdrop = airdropDomain.SpawnLogic(entityID, spawnPos, curStage);
 
             var battleRqs = serverFacades.Network.BattleReqAndRes;
             ConnIDList.ForEach((connID) =>
             {
-                battleRqs.SendRes_BattleAirdrop(connID, airdrop.EntityType, airdrop.SubType, airdrop.EntityID, spawnPos, curStage);
+                battleRqs.SendRes_BattleAirdropSpawn(connID, airdrop.SpawnEntityType, airdrop.SpawnSubType, airdrop.IDComponent.EntityID, spawnPos, curStage);
             });
         }
 
-        void OnGameStageChange()
+        void OnBattleStateAndStageChange()
         {
             var gameEntity = serverFacades.BattleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;

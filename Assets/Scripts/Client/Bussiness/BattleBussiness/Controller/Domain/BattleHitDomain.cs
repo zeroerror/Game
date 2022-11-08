@@ -28,63 +28,102 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             // - Hit Apply
-            TryApplyBulletHitRole(attackerIDC, victimIDC, hitPowerModel);
+            ApplyBulletHit(attackerIDC, victimIDC, hitPowerModel);
 
             return true;
         }
 
-        void TryApplyBulletHitRole(IDComponent attackerIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel)
+        void ApplyBulletHit(IDComponent atkIDC, IDComponent victimIDC, in HitPowerModel hitPowerModel)
         {
-            if (attackerIDC.EntityType != EntityType.Bullet
-            || victimIDC.EntityType != EntityType.BattleRole)
+            var atkEntityType = atkIDC.EntityType;
+            var atkEntityID = atkIDC.EntityID;
+            if (atkEntityType != EntityType.Bullet)
             {
                 return;
             }
 
-            // - Damage Coefficient
-            var bullet = battleFacades.Repo.BulletRepo.Get(attackerIDC.EntityID);
-            var role = battleFacades.Repo.RoleLogicRepo.Get(victimIDC.EntityID);
+            EntityType victimEntityType = victimIDC.EntityType;
+            int victimEntityID = victimIDC.EntityID;
+            LocomotionComponent victimLC = null;
 
-            CausePhysics(role, bullet, hitPowerModel.knockBackSpeed, hitPowerModel.blowUpSpeed);
+            if (victimEntityType == EntityType.BattleRole)
+            {
+                var role = battleFacades.Repo.RoleLogicRepo.Get(victimEntityID);
+                victimLC = role.LocomotionComponent;
+            }
+            else if (victimEntityType == EntityType.Aridrop)
+            {
+                var airdrop = battleFacades.Repo.AirdropLogicRepo.Get(victimEntityID);
+                victimLC = airdrop.LocomotionComponent;
+            }
 
+            var bullet = battleFacades.Repo.BulletRepo.Get(atkEntityID);
+
+            // - Physics
+            var bulletLC = bullet.LocomotionComponent;
+            CausePhysics(bulletLC, victimLC, hitPowerModel.knockBackSpeed, hitPowerModel.blowUpSpeed);
+
+            // - Damage
             var repo = battleFacades.Repo;
             var weaponRepo = repo.WeaponRepo;
             var weapon = weaponRepo.Get(bullet.WeaponID);
             var bulletDamage = bullet.GetDamageByCoefficient(weapon.DamageCoefficient);
-            CauseAndRecordDamage(attackerIDC, victimIDC, bulletDamage, role);
+            CauseDamage(atkIDC, victimIDC, bulletDamage, out float receivedDamage, out bool hasCausedDeath);
 
-            // - State
-            role.StateComponent.EnterBeHit(hitPowerModel.freezeMaintainFrame);
-
-            return;
-        }
-
-        void CausePhysics(BattleRoleLogicEntity role, BulletEntity bullet, float knockBackSpeed, float blowUpSpeed)
-        {
-            // - Physics
-            var dir = role.LocomotionComponent.Position - bullet.LocomotionComponent.Position;
-            var addV = dir.normalized * knockBackSpeed;
-            addV.y += blowUpSpeed;
-            role.LocomotionComponent.AddExtraVelocity(addV);
-        }
-
-        void CauseAndRecordDamage(IDComponent attackerIDC, IDComponent victimIDC, float damage, BattleRoleLogicEntity role)
-        {
+            // - Recording
             var arbitService = battleFacades.ArbitrationService;
-            var roleDomain = battleFacades.Domain.RoleDomain;
-            float receivedDamage = roleDomain.TryReceiveDamage(role, damage);
-            bool hasCausedDeath = role.HealthComponent.CheckIsDead();
-            arbitService.AddHitRecord(attackerIDC, victimIDC, receivedDamage,hasCausedDeath);
+            arbitService.AddHitRecord(atkIDC, victimIDC, receivedDamage, hasCausedDeath);
 
             // -  Logic Trigger
             var logicTriggerAPI = battleFacades.LogicTriggerAPI;
             DamageRecordArgs args;
-            args.atkEntityType = attackerIDC.EntityType;
-            args.atkEntityID = attackerIDC.EntityID;
-            args.vicEntityType = victimIDC.EntityType;
-            args.vicEntityID = victimIDC.EntityID;
+            args.atkEntityType = atkEntityType;
+            args.atkEntityID = atkEntityID;
+            args.vicEntityType = victimEntityType;
+            args.vicEntityID = victimEntityID;
             args.damage = receivedDamage;
-            logicTriggerAPI.Invoke_DamageRecordAction(args);
+            logicTriggerAPI.Invoke_BattleDamageRecordAction(args);
+
+            return;
+        }
+
+        void CausePhysics(LocomotionComponent atkLC, LocomotionComponent victimLC, float knockBackSpeed, float blowUpSpeed)
+        {
+            // - Physics
+            var dir = victimLC.Position - atkLC.Position;
+            var addV = dir.normalized * knockBackSpeed;
+            addV.y += blowUpSpeed;
+            victimLC.AddExtraVelocity(addV);
+        }
+
+        void CauseDamage(IDComponent attackerIDC, IDComponent victimIDC, float damage, out float receivedDamage, out bool hasCausedDeath)
+        {
+            receivedDamage = 0;
+            hasCausedDeath = false;
+
+            var repo = battleFacades.Repo;
+
+            if (victimIDC.EntityType == EntityType.BattleRole)
+            {
+                var roleRepo = repo.RoleLogicRepo;
+                var role = roleRepo.Get(victimIDC.EntityID);
+                var roleDomain = battleFacades.Domain.RoleLogicDomain;
+                receivedDamage = roleDomain.TryReceiveDamage(role, damage);
+                hasCausedDeath = role.HealthComponent.CheckIsDead();
+                return;
+            }
+
+            if (victimIDC.EntityType == EntityType.Aridrop)
+            {
+                var airdropLogicRepo = repo.AirdropLogicRepo;
+                var airdropLogic = airdropLogicRepo.Get(victimIDC.EntityID);
+                var airdropLogicDomain = battleFacades.Domain.AirdropLogicDomain;
+                receivedDamage = airdropLogicDomain.TryReceiveDamage(airdropLogic, damage);
+                hasCausedDeath = airdropLogic.HealthComponent.CheckIsDead();
+                return;
+            }
+
+            Debug.LogError("未处理");
         }
 
     }

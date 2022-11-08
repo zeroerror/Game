@@ -46,12 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
-        public void RegistRes_BulletTearDown(Action<FrameBulletLifeOverResMsg> action)
-        {
-            AddRegister(action);
-        }
-
-        public void RegistRes_BulletHitRole(Action<FrameBulletHitRoleResMsg> action)
+        public void RegistRes_BulletHitEntity(Action<FrameBulletHitEntityResMsg> action)
         {
             AddRegister(action);
         }

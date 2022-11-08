@@ -1,7 +1,5 @@
 using UnityEngine;
-using Game.Client.Bussiness.BattleBussiness.Network;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.EventCenter;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -48,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         void ApplyAnyState(BattleRoleLogicEntity role)
         {
             var inputComponent = role.InputComponent;
-            var roleDomain = battleFacades.Domain.RoleDomain;
+            var roleDomain = battleFacades.Domain.RoleLogicDomain;
 
             // Locomotion
             role.LocomotionComponent.ApplyMoveVelocity(inputComponent.MoveDir);
@@ -166,7 +164,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             // Locomotion
-            var roleDomain = battleFacades.Domain.RoleDomain;
+            var roleDomain = battleFacades.Domain.RoleLogicDomain;
             var moveComponent = role.LocomotionComponent;
             moveComponent.SetMoveVelocity(moveComponent.MoveVelocity * 0.7f);
 
@@ -231,7 +229,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            var roleDomain = battleFacades.Domain.RoleDomain;
+            var roleDomain = battleFacades.Domain.RoleLogicDomain;
             var stateMod = stateComponent.DeadMod;
             if (stateMod.maintainFrame <= 0)
             {

@@ -68,18 +68,19 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         }
 
-        public void SendRes_BulletHitRole(int connId, int bulletEntityId, int roleEntityId)
+        public void SendRes_BulletHitEntity(int connId, int bulletEntityId, int entityID, EntityType entityType)
         {
-            FrameBulletHitRoleResMsg msg = new FrameBulletHitRoleResMsg
+            FrameBulletHitEntityResMsg msg = new FrameBulletHitEntityResMsg
             {
                 serverFrame = serverFrame,
-                bulletEntityId = (ushort)bulletEntityId,
-                roleEntityId = (byte)roleEntityId
+                bulletEntityID = (ushort)bulletEntityId,
+                entityID = (byte)entityID,
+                entityType = (byte)entityType
             };
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
-            Debug.Log($"发送子弹击中角色消息 wRid {roleEntityId}");
+            Debug.Log($"发送子弹击中{entityType} {entityID} 消息");
         }
 
         public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)
@@ -98,28 +99,6 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             battleServer.SendMsg(connId, msg);
             sendCount++;
             Debug.Log($"发送子弹击中墙壁消息 ");
-        }
-
-        public void SendRes_BulletLifeFrameOver(int connId, BulletEntity bulletEntity)
-        {
-            BulletType bulletType = bulletEntity.BulletType;
-            int masterEntityID = bulletEntity.WeaponID;
-            int bulletEntityID = bulletEntity.IDComponent.EntityID;
-            Vector3 pos = bulletEntity.LocomotionComponent.Position;
-            Debug.Log($"子弹销毁消息发送: serverFrame：{serverFrame} wRid：{masterEntityID}");
-            FrameBulletLifeOverResMsg msg = new FrameBulletLifeOverResMsg
-            {
-                serverFrame = serverFrame,
-                bulletType = (byte)bulletType,
-                wRid = (byte)masterEntityID,
-                bulletEntityID = (ushort)bulletEntityID,
-                posX = (int)(pos.x * 10000f),  // (16 16) 整数部16位 short -32768 --- +32767 小数部分16位 ushort(0 --- +65535) 0.0000到0.9999
-                posY = (int)(pos.y * 10000f),
-                posZ = (int)(pos.z * 10000f)
-            };
-
-            battleServer.SendMsg(connId, msg);
-            sendCount++;
         }
 
         #endregion
