@@ -19,38 +19,29 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleArmorItemEntity SpawnBattleArmorItem(GameObject entityGo, int entityID)
-        {
-            var armorItem = entityGo.GetComponent<BattleArmorItemEntity>();
-            armorItem.Ctor();
-            armorItem.SetEntityID(entityID);
-
-            var repo = battleFacades.Repo;
-            var armorItemRepo = repo.ArmorItemRepo;
-            armorItemRepo.Add(armorItem);
-
-            return armorItem;
-        }
-
-        public BattleArmorItemEntity SpawnBattleArmorItem(ArmorType armorType, int entityID)
+        public BattleArmorItemEntity Spawn(ArmorType armorType, int entityID, Vector3 pos)
         {
             string prefabName = $"Item_Armor_{armorType.ToString()}";
 
             var asset = battleFacades.Assets.ItemAsset;
-            if (asset.TryGetByName(prefabName, out var prefab))
+            if (!asset.TryGetByName(prefabName, out var prefab))
             {
-                var go = GameObject.Instantiate(prefab);
-                var armorItem = go.GetComponent<BattleArmorItemEntity>();
-                armorItem.SetEntityID(entityID);
-
-                var repo = battleFacades.Repo;
-                var armorItemRepo = repo.ArmorItemRepo;
-                armorItemRepo.Add(armorItem);
-
-                return armorItem;
+                Debug.LogError($"{prefabName} Spawn Failed!");
+                return null;
             }
+            
+            var go = GameObject.Instantiate(prefab);
+            var entity = go.GetComponent<BattleArmorItemEntity>();
+            entity.Ctor();
+            entity.SetEntityID(entityID);
+            entity.transform.position = pos;
 
-            return null;
+            var repo = battleFacades.Repo;
+            var armorItemRepo = repo.ArmorItemRepo;
+            armorItemRepo.Add(entity);
+
+            return entity;
+
         }
 
         public void TearDownArmorItem(BattleArmorItemEntity armorItem)

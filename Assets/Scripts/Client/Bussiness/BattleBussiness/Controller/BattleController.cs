@@ -10,6 +10,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
     public class BattleController
     {
+
         BattleFacades battleFacades;
 
         public BattleController()
@@ -206,11 +207,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     byte subtype = subtypeArray[index];
 
                     // 生成资源
-                    var itemDomain = battleFacades.Domain.ItemDomain;
-                    var itemGo = itemDomain.SpawnItem(entityType, subtype, entityID, parent);
-                    itemGo.transform.SetParent(parent);
-                    itemGo.transform.localPosition = Vector3.zero;
-                    itemGo.name += entityID;
+                    var commonDomain = battleFacades.Domain.CommonDomain;
+                    var entityObj = commonDomain.SpawnEntity_Logic(entityType, subtype, entityID, parent.position);
+                    Debug.Assert(entityObj != null);
+                    var entityGo = commonDomain.UnloadEntityObjToGO(entityObj, entityType);
+                    entityGo.transform.SetParent(parent);
+                    entityGo.transform.localPosition = Vector3.zero;
+                    entityGo.name += entityID;
                 }
                 Debug.Log($"地图资源生成完毕******************************************************");
             }
@@ -331,7 +334,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
                 var domain = battleFacades.Domain;
                 var airdropLogicDomain = domain.AirdropLogicDomain;
-                airdropLogicDomain.SpawnLogic(entityID, curLvStage, spawnPos);
+                airdropLogicDomain.SpawnLogic(curLvStage, entityID, spawnPos);
                 var airdropRendererDomain = domain.AirdropRendererDomain;
                 airdropRendererDomain.SpawnRenderer(entityID, curLvStage, spawnPos);
             }

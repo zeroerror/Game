@@ -98,22 +98,24 @@ namespace Game.Server.Bussiness.BattleBussiness
                         if (weaponComponent.TryWeaponShoot())    //TODO: 逻辑应该在状态机判断
                         {
                             Vector3 fireDir = new Vector3(fireDirX / 100f, 0, fireDirZ / 100f);
-                            master.InputComponent.SetShootDir(fireDir);
-
+                            var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
                             var curWeapon = weaponComponent.CurWeapon;
-                            master.StateComponent.EnterShooting(curWeapon.FreezeMaintainFrame, curWeapon.BreakFrame);
-
                             var bulletType = curWeapon.BulletType;
                             var idService = battleFacades.IDService;
                             var bulletEntityId = idService.GetAutoIDByEntityType(EntityType.Bullet);
                             var weaponEntityID = weapon.IDComponent.EntityID;
-                            var startPos = new Vector3(firePointPosX / 10000f, firePointPosY / 10000f, firePointPosZ / 10000f);
-                            var bulletEntity = battleFacades.Domain.BulletLogicDomain.Spawn(bulletType, bulletEntityId, weaponEntityID, startPos, fireDir);
+
+                            var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+                            var bulletLogic = bulletLogicDomain.SpawnLogic(bulletType, bulletEntityId, startPos);
+                            bulletLogicDomain.ShootByWeapon(bulletLogic, weaponID, fireDir);
+
+                            master.InputComponent.SetShootDir(fireDir);
+                            master.StateComponent.EnterShooting(curWeapon.FreezeMaintainFrame, curWeapon.BreakFrame);
 
                             ConnIdList.ForEach((connId) =>
                             {
                                 weaponRqs.SendRes_WeaponShoot(connId, weaponID);
-                                bulletRqs.SendRes_BulletSpawn(connId, bulletEntity);
+                                bulletRqs.SendRes_BulletSpawn(connId, bulletLogic);
                             });
                         }
                     }

@@ -20,40 +20,44 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletEntity Spawn(BulletType bulletType, int bulletEntityID, int weaponEntityID, Vector3 startPos, Vector3 fireDir)
+        public BulletEntity SpawnLogic(BulletType bulletType, int bulletEntityID, Vector3 pos)
         {
-            string bulletPrefabName = bulletType.ToString() + "_Logic";
-
-            if (battleFacades.Assets.BulletAsset.TryGetByName(bulletPrefabName, out GameObject prefabAsset))
+            string prefabName = bulletType.ToString() + "_Logic";
+            if (!battleFacades.Assets.BulletAsset.TryGetByName(prefabName, out GameObject go))
             {
-                var repo = battleFacades.Repo;
-                var parent = repo.FieldRepo.CurFieldEntity.transform;
-                prefabAsset = GameObject.Instantiate(prefabAsset, parent);
-
-                var bulletEntity = prefabAsset.GetComponent<BulletEntity>();
-
-                bulletEntity.Ctor();
-                bulletEntity.gameObject.SetActive(true);
-                bulletEntity.SetBulletType(bulletType);
-                bulletEntity.SetEntityID(bulletEntityID);
-                bulletEntity.SetWeaponID(weaponEntityID);
-                var weapon = repo.WeaponRepo.Get(weaponEntityID);
-                bulletEntity.SetLeagueID(weapon.IDComponent.LeagueId);
-                bulletEntity.SetPosition(startPos);
-                bulletEntity.FaceTo(fireDir);
-                bulletEntity.LocomotionComponent.ApplyMoveVelocity(fireDir);
-
-                battleFacades.Repo.BulletLogicRepo.Add(bulletEntity);
-
-                if (bulletEntity is HookerEntity hookerEntity)
-                {
-                    hookerEntity.SetMasterGrabPoint(weapon.transform);
-                }
-
-                return bulletEntity;
+                Debug.LogError($"{prefabName} Spawn Failed!");
+                return null;
             }
 
-            return null;
+            var repo = battleFacades.Repo;
+            var parent = repo.FieldRepo.CurFieldEntity.transform;
+            go = GameObject.Instantiate(go, parent);
+
+            var entity = go.GetComponent<BulletEntity>();
+            entity.Ctor();
+            entity.gameObject.SetActive(true);
+            entity.SetBulletType(bulletType);
+            entity.SetEntityID(bulletEntityID);
+            entity.SetPosition(pos);
+
+            repo.BulletLogicRepo.Add(entity);
+
+            return entity;
+
+        }
+
+        public void ShootByWeapon(BulletEntity bulletEntity, int weaponEntityID, Vector3 fireDir)
+        {
+            var repo = battleFacades.Repo;
+            bulletEntity.SetWeaponID(weaponEntityID);
+            var weapon = repo.WeaponRepo.Get(weaponEntityID);
+            bulletEntity.SetLeagueID(weapon.IDComponent.LeagueId);
+            bulletEntity.FaceTo(fireDir);
+            bulletEntity.LocomotionComponent.ApplyMoveVelocity(fireDir);
+            if (bulletEntity is HookerEntity hookerEntity)
+            {
+                hookerEntity.SetMasterGrabPoint(weapon.transform);
+            }
         }
 
         public void TearDown(BulletEntity bullet)

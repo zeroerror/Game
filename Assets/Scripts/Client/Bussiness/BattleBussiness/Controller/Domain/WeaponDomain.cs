@@ -19,28 +19,32 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public WeaponEntity SpawnWeapon(WeaponType weaponType, int weaponID, int masterID)
+        public WeaponEntity Spawn(WeaponType weaponType, int weaponID)
         {
             string prefabName = $"Weapon_{weaponType.ToString()}";
-
             var asset = battleFacades.Assets.WeaponAsset;
-            if (asset.TryGetByName(prefabName, out var prefab))
+            if (!asset.TryGetByName(prefabName, out var prefab))
             {
-                var go = GameObject.Instantiate(prefab);
-                var weapon = go.GetComponent<WeaponEntity>();
-                weapon.Ctor();
-                weapon.SetEntityID(weaponID);
-                weapon.SetMaster(masterID);
-                weapon.SetLeagueID(masterID);
-
-                var repo = battleFacades.Repo;
-                var weaponRepo = repo.WeaponRepo;
-                weaponRepo.Add(weapon);
-
-                return weapon;
+                Debug.LogError($"{prefabName} Spawn Failed!");
+                return null;
             }
 
-            return null;
+            var go = GameObject.Instantiate(prefab);
+            var entity = go.GetComponent<WeaponEntity>();
+            entity.Ctor();
+            entity.SetEntityID(weaponID);
+
+            var repo = battleFacades.Repo;
+            var weaponRepo = repo.WeaponRepo;
+            weaponRepo.Add(entity);
+
+            return entity;
+        }
+
+        public void SetMaster(WeaponEntity weapon, int masterEntityID)
+        {
+            weapon.SetMaster(masterEntityID);
+            weapon.SetLeagueID(masterEntityID);
         }
 
         public void TearDownWeapon(WeaponEntity weapon)

@@ -19,38 +19,26 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public WeaponItemEntity SpawnWeaponItem(GameObject entityGo, int entityID)
+        public WeaponItemEntity Spawn(WeaponType weaponType, int entityID, Vector3 pos)
         {
-            var weaponItem = entityGo.GetComponent<WeaponItemEntity>();
-            weaponItem.Ctor();
+            string prefabName = $"Item_Weapon_{weaponType.ToString()}";
+            var asset = battleFacades.Assets.ItemAsset;
+            if (!asset.TryGetByName(prefabName, out var prefab))
+            {
+                Debug.LogError($"{prefabName} Spawn Failed!");
+                return null;
+            }
+
+            var go = GameObject.Instantiate(prefab);
+            var entity = go.GetComponent<WeaponItemEntity>();
+            entity.Ctor();
+            entity.SetEntityID(entityID);
+            entity.transform.position = pos;
 
             var repo = battleFacades.Repo;
             var weaponItemRepo = repo.WeaponItemRepo;
-            weaponItem.SetEntityID(entityID);
-            weaponItemRepo.Add(weaponItem);
-
-            return weaponItem;
-        }
-
-        public WeaponItemEntity SpawnWeaponItem(WeaponType weaponType, int entityID)
-        {
-            string prefabName = $"Item_Weapon_{weaponType.ToString()}";
-
-            var asset = battleFacades.Assets.ItemAsset;
-            if (asset.TryGetByName(prefabName, out var prefab))
-            {
-                var go = GameObject.Instantiate(prefab);
-                var weaponItem = go.GetComponent<WeaponItemEntity>();
-                weaponItem.Ctor();
-                weaponItem.SetEntityID(entityID);
-
-                var repo = battleFacades.Repo;
-                var weaponItemRepo = repo.WeaponItemRepo;
-                weaponItemRepo.Add(weaponItem);
-                return weaponItem;
-            }
-
-            return null;
+            weaponItemRepo.Add(entity);
+            return entity;
         }
 
         public void TearDownWeaponItem(WeaponItemEntity weaponItem)

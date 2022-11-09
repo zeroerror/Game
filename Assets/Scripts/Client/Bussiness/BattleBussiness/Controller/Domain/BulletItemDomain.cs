@@ -19,37 +19,26 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletItemEntity SpawnBulletItem(GameObject entityGo, int entityID)
+        public BulletItemEntity Spawn(BulletType bulletType, int entityID, Vector3 pos)
         {
-            var bulletItem = entityGo.GetComponent<BulletItemEntity>();
-            bulletItem.Ctor();
+            string prefabName = $"Item_Bullet_{bulletType.ToString()}";
+            var asset = battleFacades.Assets.ItemAsset;
+            if (!asset.TryGetByName(prefabName, out var prefab))
+            {
+                Debug.LogError($"{prefabName} Spawn Failed!");
+                return null;
+            }
+
+            var go = GameObject.Instantiate(prefab);
+            var entity = go.GetComponent<BulletItemEntity>();
+            entity.Ctor();
+            entity.SetEntityID(entityID);
+            entity.transform.position = pos;
 
             var repo = battleFacades.Repo;
             var bulletItemRepo = repo.BulletItemRepo;
-            bulletItem.SetEntityID(entityID);
-            bulletItemRepo.Add(bulletItem);
-            
-            return bulletItem;
-        }
-
-
-        public BulletItemEntity SpawnBulletItem(WeaponType weaponType, int entityID)
-        {
-            string prefabName = $"Item_Weapon_{weaponType.ToString()}";
-
-            var asset = battleFacades.Assets.ItemAsset;
-            if (asset.TryGetByName(prefabName, out var prefab))
-            {
-                var go = GameObject.Instantiate(prefab);
-                var weapon = go.GetComponent<BulletItemEntity>();
-                var repo = battleFacades.Repo;
-                var bulletItemRepo = repo.BulletItemRepo;
-                weapon.SetEntityID(entityID);
-                bulletItemRepo.Add(weapon);
-                return weapon;
-            }
-
-            return null;
+            bulletItemRepo.Add(entity);
+            return entity;
         }
 
         public void TearDownBulletItem(BulletItemEntity bulletItem)

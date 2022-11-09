@@ -19,76 +19,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public GameObject SpawnItem(EntityType entityType, byte subType, int entityID, Transform parent = null)
-        {
-            string prefabName = GetPrefabName(entityType, subType);
-
-            var itemAssets = battleFacades.Assets.ItemAsset;
-            itemAssets.TryGetByName(prefabName, out GameObject prefab);
-            Debug.Assert(prefab != null, $"prefabName {prefabName} Asset Dont Exist");
-
-            var itemGo = GameObject.Instantiate(prefab);
-            itemGo.SetActive(true);
-            if (parent != null)
-            {
-                itemGo.transform.SetParent(parent.transform);
-            }
-            itemGo.transform.localPosition = Vector3.zero;
-
-            CreateEntity(entityType, entityID, itemGo);
-
-            Debug.Log($"生成物件：{prefabName}");
-            return itemGo;
-        }
-
-        public void CreateEntity(EntityType entityType, int entityID, GameObject entityGo)
-        {
-            if (entityType == EntityType.WeaponItem)
-            {
-                var doamin = battleFacades.Domain.WeaponItemDomain;
-                doamin.SpawnWeaponItem(entityGo, entityID);
-                return;
-            }
-
-            if (entityType == EntityType.BulletItem)
-            {
-                var bulletItem = entityGo.GetComponent<BulletItemEntity>();
-                bulletItem.Ctor();
-                bulletItem.SetEntityID(entityID);
-
-                var repo = battleFacades.Repo;
-                var bulletItemRepo = repo.BulletItemRepo;
-                bulletItemRepo.Add(bulletItem);
-                return;
-            }
-
-            if (entityType == EntityType.ArmorItem)
-            {
-                var armorItem = entityGo.GetComponent<BattleArmorItemEntity>();
-                armorItem.Ctor();
-                armorItem.SetEntityID(entityID);
-
-                var repo = battleFacades.Repo;
-                var armorItemRepo = repo.ArmorItemRepo;
-                armorItemRepo.Add(armorItem);
-                return;
-            }
-
-            if (entityType == EntityType.EvolveItem)
-            {
-                var evolveItem = entityGo.GetComponent<BattleEvolveItemEntity>();
-                evolveItem.Ctor();
-                evolveItem.SetEntityID(entityID);
-
-                var repo = battleFacades.Repo;
-                var evolveItemRepo = repo.EvolveItemRepo;
-                evolveItemRepo.Add(evolveItem);
-                return;
-            }
-
-            Debug.LogError($"没有处理的情况 {entityType.ToString()}");
-        }
-
         public bool TryPickUpItem(int masterID, EntityType entityType, int itemID, Transform hangPoint = null)
         {
             var repo = battleFacades.Repo;
@@ -162,7 +92,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     return false;
                 }
 
-                var evolveType = evolveItem.evolveEntityType;
+                var evolveType = evolveItem.EvolveEntityType;
 
                 if (evolveType == EntityType.Armor)
                 {
@@ -172,7 +102,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     }
 
                     Debug.Log($"护甲进化------");
-                    var evolveTM = evolveItem.evolveTM;
+                    var evolveTM = evolveItem.EvolveTM;
                     var armor = master.Armor;
                     armor.EvolveFrom(evolveTM);
 
@@ -184,7 +114,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 if (evolveType == EntityType.BattleRole)
                 {
                     Debug.Log($"人物进化------");
-                    var evolveTM = evolveItem.evolveTM;
+                    var evolveTM = evolveItem.EvolveTM;
                     master.EvolveFrom(evolveTM);
 
                     var armorEvolveItemDomain = battleFacades.Domain.EvolveItemDomain;
@@ -242,8 +172,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var weaponType = weaponItem.WeaponType;
             var weaponID = weaponItem.IDComponent.EntityID;
+            var masterEntityID = master.IDComponent.EntityID;
             var weaponDomain = battleFacades.Domain.WeaponDomain;
-            var weapon = weaponDomain.SpawnWeapon(weaponType, weaponID, master.IDComponent.EntityID);
+
+            var weapon = weaponDomain.Spawn(weaponType, weaponID);
+            weaponDomain.SetMaster(weapon, masterEntityID);
 
             var bulletNum = weaponItem.BulletNum;
             weapon.SetBulletNum(bulletNum);
@@ -258,7 +191,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         {
             var domain = battleFacades.Domain;
             var weaponItemDomain = domain.WeaponItemDomain;
-            var weaponItem = weaponItemDomain.SpawnWeaponItem(weapon.WeaponType, weapon.IDComponent.EntityID);
+            var weaponType = weapon.WeaponType;
+            var weaponID = weapon.IDComponent.EntityID;
+            var pos = weapon.transform.position;
+            var weaponItem = weaponItemDomain.Spawn(weaponType, weaponID, pos);
             weaponItem.Ctor();
 
             var unloadBullet = weapon.UnloadBullet();
@@ -272,28 +208,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         }
 
         #endregion
-
-        string GetPrefabName(EntityType entityType, byte subType)
-        {
-            if (entityType == EntityType.WeaponItem)
-            {
-                return $"Item_Weapon_{((WeaponType)subType).ToString()}";
-            }
-            if (entityType == EntityType.BulletItem)
-            {
-                return $"Item_Bullet_{((BulletType)subType).ToString()}";
-            }
-            if (entityType == EntityType.ArmorItem)
-            {
-                return $"Item_Armor_{((ArmorType)subType).ToString()}";
-            }
-            if (entityType == EntityType.EvolveItem)
-            {
-                return $"Item_Evolve_{(1000 + subType).ToString()}";
-            }
-
-            return null;
-        }
 
     }
 

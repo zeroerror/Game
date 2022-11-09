@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleAirdropEntity SpawnLogic(int entityID,  BattleStage curLevelStage, Vector3 spawnPos,Transform root = null)
+        public BattleAirdropEntity SpawnLogic(BattleStage curLevelStage, int entityID, Vector3 spawnPos, Transform root = null)
         {
             string prefabName = $"Airdrop_Logic_{curLevelStage.ToString()}";
             var itemAsset = battleFacades.Assets.ItemAsset;
@@ -28,18 +28,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return null;
             }
 
-            var airdrop = GameObject.Instantiate(prefab).GetComponent<BattleAirdropEntity>();
-            airdrop.Ctor();
-            airdrop.IDComponent.SetEntityID(entityID);
-            airdrop.IDComponent.SetLeagueID(-1);
-            airdrop.LocomotionComponent.SetPosition(spawnPos);
+            var go = GameObject.Instantiate(prefab);
+            var entity = go.GetComponent<BattleAirdropEntity>();
+            entity.Ctor();
+            entity.IDComponent.SetEntityID(entityID);
+            entity.IDComponent.SetLeagueID(-1);
+            entity.LocomotionComponent.SetPosition(spawnPos);
 
             var repo = battleFacades.Repo;
             var airDropRepo = repo.AirdropLogicRepo;
-            airDropRepo.Add(airdrop);
+            airDropRepo.Add(entity);
 
             Debug.Log($"生成空投 {prefabName} 位置 {spawnPos}");
-            return airdrop;
+            return entity;
         }
 
         public void TearDownLogic(BattleAirdropEntity airdrop)

@@ -1,6 +1,5 @@
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness.Facades;
-using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
@@ -19,26 +18,36 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BattleEvolveItemEntity SpawnEvolveItem(GameObject entityGo, int entityID)
+        public BattleEvolveItemEntity Spawn(byte subType, int entityID, Vector3 pos)
         {
-            var armorItem = entityGo.GetComponent<BattleEvolveItemEntity>();
-            armorItem.Ctor();
-            armorItem.SetEntityID(entityID);
+            var prefabName = $"Item_Evolve_{(1000 + subType).ToString()}";
+            var assets = battleFacades.Assets.ItemAsset;
+            if (!assets.TryGetByName(prefabName, out var prefab))
+            {
+                Debug.LogError($"{prefabName} 生成失败");
+                return null;
+            }
+
+            var go = GameObject.Instantiate(prefab);
+            var entity = go.GetComponent<BattleEvolveItemEntity>();
+            entity.Ctor();
+            entity.SetEntityID(entityID);
+            entity.transform.position = pos;
 
             var repo = battleFacades.Repo;
-            var armorEvolveItemRepo = repo.EvolveItemRepo;
-            armorEvolveItemRepo.Add(armorItem);
-            
-            return armorItem;
+            var evolveItemRepo = repo.EvolveItemRepo;
+            evolveItemRepo.Add(entity);
+
+            return entity;
         }
 
-        public void TearDownEvolveItem(BattleEvolveItemEntity weaponItem)
+        public void TearDownEvolveItem(BattleEvolveItemEntity evolveItem)
         {
             var repo = battleFacades.Repo;
             var armorEvolveItemRepo = repo.EvolveItemRepo;
-            armorEvolveItemRepo.TryRemove(weaponItem);
-            GameObject.Destroy(weaponItem.gameObject);
-            GameObject.Destroy(weaponItem);
+            armorEvolveItemRepo.TryRemove(evolveItem);
+            GameObject.Destroy(evolveItem.gameObject);
+            GameObject.Destroy(evolveItem);
         }
 
     }

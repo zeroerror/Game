@@ -52,22 +52,22 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             {
                 bulletSpawnQueue.Dequeue();
 
-                var bulletID = msg.bulletID;
-                var bulletTypeByte = msg.bulletType;
-                var bulletType = (BulletType)bulletTypeByte;
-
-                Vector3 startPos = new Vector3(msg.startPosX / 10000f, msg.startPosY / 10000f, msg.startPosZ / 10000f);
+                int bulletID = msg.bulletID;
+                BulletType bulletType = (BulletType)msg.bulletType;
+                int weaponID = msg.weaponID;
+                Vector3 pos = new Vector3(msg.startPosX / 10000f, msg.startPosY / 10000f, msg.startPosZ / 10000f);
                 Vector3 fireDir = new Vector3(msg.fireDirX / 100f, 0, msg.fireDirZ / 100f);
 
-                var bulletRepo = battleFacades.Repo.BulletLogicRepo;
+                var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+                var bulletLogic = bulletLogicDomain.SpawnLogic(bulletType, msg.bulletID, pos);
+                bulletLogicDomain.ShootByWeapon(bulletLogic, weaponID, fireDir);
 
-                var bulletLogic = battleFacades.Domain.BulletLogicDomain.Spawn(bulletType, msg.bulletID, msg.weaponID, startPos, fireDir);
-                var bulletRenderer = battleFacades.Domain.BulletRendererDomain.SpawnBulletRenderer(bulletLogic.BulletType, bulletLogic.IDComponent.EntityID);
+                var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
+                var bulletRenderer = bulletRendererDomain.SpawnBulletRenderer(bulletLogic.BulletType, bulletLogic.IDComponent.EntityID);
                 bulletRenderer.SetPosition(bulletLogic.Position);
                 bulletRenderer.SetRotation(bulletLogic.Rotation);
 
-                Debug.Log($"生成子弹帧 {msg.serverFrame}: MasterId:{bulletLogic.WeaponID} 起点位置：{startPos}  飞行方向{fireDir}");
-
+                Debug.Log($"生成子弹帧 {msg.serverFrame}: 起点位置：{pos}  飞行方向{fireDir}");
             }
         }
 

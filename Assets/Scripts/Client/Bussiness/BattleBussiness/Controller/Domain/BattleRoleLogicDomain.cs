@@ -29,7 +29,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
             var roleRenderer = roleRendererDomain.SpawnRenderer(entityId, fieldEntity.Role_Group_Renderer);
 
-            var roleLogic = SpawnRoleLogic(entityId);
+            var roleLogic = SpawnLogic(entityId);
             roleLogic.Inject(roleRenderer);
 
             var fieldCameraComponent = fieldEntity.CameraComponent;
@@ -44,28 +44,29 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return roleLogic;
         }
 
-        public BattleRoleLogicEntity SpawnRoleLogic(int entityId)
+        public BattleRoleLogicEntity SpawnLogic(int entityId)
         {
-            var fieldEntity = battleFacades.Repo.FieldRepo.CurFieldEntity;
             string prefabName = "role_logic";
-            if (battleFacades.Assets.BattleRoleAssets.TryGetByName(prefabName, out GameObject prefab))
+            if (!battleFacades.Assets.BattleRoleAssets.TryGetByName(prefabName, out GameObject prefab))
             {
-                prefab = GameObject.Instantiate(prefab, fieldEntity.transform);
-
-                var roleLogic = prefab.GetComponent<BattleRoleLogicEntity>();
-                roleLogic.Ctor();
-                roleLogic.SetEntityID(entityId);
-                roleLogic.SetLeagueID(entityId);
-                Reborn(roleLogic);
-
-                var roleRepo = battleFacades.Repo.RoleLogicRepo;
-                roleRepo.Add(roleLogic);
-
-                return roleLogic;
+                Debug.LogError($"{prefabName} Spawn Failed!");
+                return null;
             }
 
-            Debug.Log("生成Logic角色失败");
-            return null;
+            var repo = battleFacades.Repo;
+            var fieldEntity = repo.FieldRepo.CurFieldEntity;
+            var go = GameObject.Instantiate(prefab, fieldEntity.transform);
+            
+            var entity = prefab.GetComponent<BattleRoleLogicEntity>();
+            entity.Ctor();
+            entity.SetEntityID(entityId);
+            entity.SetLeagueID(entityId);
+            Reborn(entity);
+
+            var roleRepo = battleFacades.Repo.RoleLogicRepo;
+            roleRepo.Add(entity);
+
+            return entity;
         }
 
         public void Tick_Physics_AllRoles(float fixedTime)

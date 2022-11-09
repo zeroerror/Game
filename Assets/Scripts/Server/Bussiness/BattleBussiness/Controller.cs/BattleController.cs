@@ -142,7 +142,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     {
                         var idService = battleFacades.IDService;
                         var entityID = idService.GetAutoIDByEntityType(EntityType.BattleRole);
-                        role = battleFacades.Domain.RoleLogicDomain.SpawnRoleLogic(entityID);
+                        role = battleFacades.Domain.RoleLogicDomain.SpawnLogic(entityID);
                         role.SetConnID(connID);
                         Debug.Log($"服务器逻辑[生成角色] ServerFrame:{ServerFrame} EntityID:{entityID} ControlType {((ControlType)msg.controlType).ToString()}");
                     }
@@ -368,7 +368,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var curLvStage = battleStage.GetCurLevelStage();
 
             var airdropDomain = battleFacades.Domain.AirdropLogicDomain;
-            var airdrop = airdropDomain.SpawnLogic(entityID, curLvStage, spawnPos);
+            var airdrop = airdropDomain.SpawnLogic(curLvStage, entityID, spawnPos);
 
             var battleRqs = serverFacades.Network.BattleReqAndRes;
             ConnIDList.ForEach((connID) =>

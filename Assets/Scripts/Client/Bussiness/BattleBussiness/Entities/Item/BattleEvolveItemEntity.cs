@@ -14,12 +14,14 @@ namespace Game.Client.Bussiness.BattleBussiness
         public IDComponent IDComponent => idComponent;
         public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
         public void SetEntityID(int v) => idComponent.SetEntityID(v);
-        
-        public EntityType evolveEntityType;
-        public EvolveTM evolveTM;
+
+        [SerializeField] EntityType evolveEntityType;
+        public EntityType EvolveEntityType => evolveEntityType;
+
+        [SerializeField] EvolveTM evolveTM;
+        public EvolveTM EvolveTM => evolveTM;
 
         EntityType IPickable.EntityType => idComponent.EntityType;
-
         int IPickable.EntityID => idComponent.EntityID;
 
         public void Ctor()

@@ -43,12 +43,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             entityIDList = new List<int>();
             AssetPointEntity[] assetPointEntities = field.transform.GetComponentsInChildren<AssetPointEntity>();
             int count = entityTypeList.Count;
-            Debug.Log($"物件资源开始生成[数量:{count}]----------------------------------------------------");
+            Debug.Log($"field {field.EntityId} 物件资源开始生成[数量:{count}]----------------------------------------------------");
             for (int i = 0; i < entityTypeList.Count; i++)
             {
                 var entityType = entityTypeList[i];
                 var subtype = subTypeList[i];
-                var parent = assetPointEntities[i];
+                var parentTF = assetPointEntities[i].transform;
+                var spawnPos = parentTF.position;
 
                 // - 获取资源ID
                 var idService = battleFacades.IDService;
@@ -56,9 +57,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 entityIDList.Add(entityID);
 
                 // - 生成资源
-                var itemDomain = battleFacades.Domain.ItemDomain;
-                itemDomain.SpawnItem(entityType, subtype, entityID, parent.transform);
-
+                var commonDomain = battleFacades.Domain.CommonDomain;
+                commonDomain.SpawnEntity_Logic(entityType, subtype, entityID, spawnPos);
             }
 
             Debug.Log($"field {field.EntityId} 物件资源生成完毕******************************************************");
