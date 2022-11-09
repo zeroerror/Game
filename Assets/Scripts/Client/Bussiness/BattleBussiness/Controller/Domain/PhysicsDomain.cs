@@ -33,16 +33,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        public List<HitFieldModel> Tick_Physics_Collections_Bullet_Field()
+        public void Tick_Physics_Collections_Bullet_Field()
         {
-            List<HitFieldModel> list = new List<HitFieldModel>();
             Transform hitTrans = null;
             var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             var bulletDomain = battleFacades.Domain.BulletLogicDomain;
 
             bulletRepo.ForAll((bullet) =>
             {
-                bool hashit = false;
                 var hitFieldList = GetHitField_ColliderList(bullet);
                 hitFieldList.ForEach((ce) =>
                 {
@@ -55,19 +53,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     HitFieldModel hitFieldModel = new HitFieldModel();
                     hitFieldModel.hitter = bullet.IDComponent;
                     hitFieldModel.fieldCE = ce;
-                    list.Add(hitFieldModel);
 
                     hitTrans = ce.GetCollider().transform;
-                    hashit = true;
+                    // - Logic Trigger
+                    var logicTriggerAPI = battleFacades.LogicTriggerEvent;
+                    logicTriggerAPI.Invoke_BulletHitFieldAction(bullet.IDComponent.EntityID, hitTrans);
                 });
 
-                if (hashit)
-                {
-                    bulletDomain.ApplyHitEffector(bullet, hitTrans);
-                }
             });
-
-            return list;
         }
 
         public void Tick_Physics_Collections_Airdrop_Field()

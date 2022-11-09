@@ -48,25 +48,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var physicsDomain = serverFacades.BattleFacades.Domain.PhysicsDomain;
             physicsDomain.Tick_Physics_Collections_Role_Field();
             physicsDomain.Tick_Physics_Collections_Airdrop_Field();
-
-            var hitFieldList = physicsDomain.Tick_Physics_Collections_Bullet_Field();
-            SendBulletHitFieldRes(hitFieldList);
-        }
-
-        void SendBulletHitFieldRes(List<HitFieldModel> hitFieldList)
-        {
-            var bulletRepo = serverFacades.BattleFacades.Repo.BulletLogicRepo;
-            var bulletRqs = serverFacades.Network.BulletReqAndRes;
-            hitFieldList.ForEach((hitFieldModel) =>
-            {
-                var bulletIDC = hitFieldModel.hitter;
-                var bullet = bulletRepo.Get(bulletIDC.EntityID);
-
-                ConnIDList.ForEach((connId) =>
-                {
-                    bulletRqs.SendRes_BulletHitField(connId, bullet);
-                });
-            });
+            physicsDomain.Tick_Physics_Collections_Bullet_Field();
         }
 
     }

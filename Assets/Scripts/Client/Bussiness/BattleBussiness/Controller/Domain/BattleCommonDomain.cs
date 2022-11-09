@@ -190,7 +190,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public GameObject UnloadEntityObjToGO(object obj, EntityType entityType)
+        public GameObject UnpackEntityObjToGO(object obj, EntityType entityType)
         {
             if (obj is BattleRoleLogicEntity roleLogic)
             {

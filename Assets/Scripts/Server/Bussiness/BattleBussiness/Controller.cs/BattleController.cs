@@ -83,7 +83,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             // Domain Handler
             var battleFacades = serverFacades.BattleFacades;
-            var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
             logicTriggerAPI.Regist_BattleStateAndStageChangeHandler(OnBattleStateAndStageChange);
             logicTriggerAPI.Regist_BattleAirDropAction(OnBattleAirdrop);
         }

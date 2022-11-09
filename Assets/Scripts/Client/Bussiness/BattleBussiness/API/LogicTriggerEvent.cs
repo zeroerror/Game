@@ -1,9 +1,10 @@
+using UnityEngine;
 using System;
 
 namespace Game.Client.Bussiness.BattleBussiness.API
 {
 
-    public class LogicTriggerAPI
+    public class LogicTriggerEvent
     {
 
         Action<DamageRecordArgs> damageRecordAction;
@@ -16,9 +17,13 @@ namespace Game.Client.Bussiness.BattleBussiness.API
 
         Action battleAirDropAction;
         public void Regist_BattleAirDropAction(Action action) => battleAirDropAction += action;
-        public void Invoke_BattleAirDropAction()=> battleAirDropAction?.Invoke();
+        public void Invoke_BattleAirDropAction() => battleAirDropAction?.Invoke();
 
-        public LogicTriggerAPI() { }
+        Action<int, Transform> bulletHitAction;
+        public void Regist_BulletHitFieldAction(Action<int, Transform> action) => bulletHitAction += action;
+        public void Invoke_BulletHitFieldAction(int bulleID, Transform hitTF) => bulletHitAction?.Invoke(bulleID, hitTF);
+
+        public LogicTriggerEvent() { }
 
     }
 

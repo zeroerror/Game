@@ -98,7 +98,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 fsm.EnterGameState_BattlePreparing(300);
 
                 // -  Logic Trigger
-                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                var logicTriggerAPI = battleFacades.LogicTriggerEvent;
                 logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
         }
@@ -134,7 +134,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 fsm.EnterGameState_BattleFighting(18000);
 
                 // -  Logic Trigger
-                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                var logicTriggerAPI = battleFacades.LogicTriggerEvent;
                 logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
 
@@ -165,7 +165,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 if (stateMod.maintainFrame % 300 == 0)
                 {
                     // -  Logic Trigger
-                    var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                    var logicTriggerAPI = battleFacades.LogicTriggerEvent;
                     logicTriggerAPI.Invoke_BattleAirDropAction();
                 }
             }
@@ -178,7 +178,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 fsm.EnterGameState_BattleSettlement(150);
 
                 // -  Logic Trigger
-                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                var logicTriggerAPI = battleFacades.LogicTriggerEvent;
                 logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
         }
@@ -214,7 +214,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
 
                 // -  Logic Trigger
-                var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+                var logicTriggerAPI = battleFacades.LogicTriggerEvent;
                 logicTriggerAPI.Invoke_BattleStateAndStageChangeHandler();
             }
         }

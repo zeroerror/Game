@@ -75,7 +75,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             arbitService.AddHitRecord(atkIDC, victimIDC, receivedDamage, hasCausedDeath);
 
             // -  Logic Trigger
-            var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
             DamageRecordArgs args;
             args.atkEntityType = atkEntityType;
             args.atkEntityID = atkEntityID;

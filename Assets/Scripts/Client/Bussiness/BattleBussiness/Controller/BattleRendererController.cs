@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public void Inject(BattleFacades facades)
         {
             battleFacades = facades;
-            battleFacades.LogicTriggerAPI.Regist_BattleDamageRecordAction(DamageRecord);
+            battleFacades.LogicTriggerEvent.Regist_BattleDamageRecordAction(DamageRecord);
         }
 
         public void Tick(float fixedDeltaTime)

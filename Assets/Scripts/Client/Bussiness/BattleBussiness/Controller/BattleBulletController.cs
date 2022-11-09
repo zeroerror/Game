@@ -30,6 +30,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletRqs.RegistRes_BulletSpawn(OnBulletSpawn);
             bulletRqs.RegistRes_BulletHitEntity(OnBulletHitEntity);
             bulletRqs.RegistRes_BulletHitField(OnBulletHitField);
+
+            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
+            logicTriggerAPI.Regist_BulletHitFieldAction(LogicTrigger_BulletHitField);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -137,8 +140,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletHitFieldQueue.Enqueue(msg);
         }
 
-
         #endregion
+
+        void LogicTrigger_BulletHitField(int bulletID, Transform hitTF)
+        {
+            var repo = battleFacades.Repo;
+            var bulletRendererRepo = repo.BulletRendererRepo;
+            var bulletRenderer = bulletRendererRepo.Get(bulletID);
+
+            var domain = battleFacades.Domain;
+            var bulletRendererDomain = domain.BulletRendererDomain;
+            bulletRendererDomain.TearDownBulletRenderer(bulletRenderer);
+        }
 
     }
 

@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var fieldEntity = repo.FieldRepo.CurFieldEntity;
             var go = GameObject.Instantiate(prefab, fieldEntity.transform);
             
-            var entity = prefab.GetComponent<BattleRoleLogicEntity>();
+            var entity = go.GetComponent<BattleRoleLogicEntity>();
             entity.Ctor();
             entity.SetEntityID(entityId);
             entity.SetLeagueID(entityId);

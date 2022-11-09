@@ -63,7 +63,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 battleRqs.ConnBattleServer(host, port);
             });
 
-            var logicTriggerAPI = battleFacades.LogicTriggerAPI;
+            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
             logicTriggerAPI.Regist_BattleStateAndStageChangeHandler(OnBattleStateAndStageChange);
         }
 
@@ -209,8 +209,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     // 生成资源
                     var commonDomain = battleFacades.Domain.CommonDomain;
                     var entityObj = commonDomain.SpawnEntity_Logic(entityType, subtype, entityID, parent.position);
-                    Debug.Assert(entityObj != null);
-                    var entityGo = commonDomain.UnloadEntityObjToGO(entityObj, entityType);
+                    var entityGo = commonDomain.UnpackEntityObjToGO(entityObj, entityType);
                     entityGo.transform.SetParent(parent);
                     entityGo.transform.localPosition = Vector3.zero;
                     entityGo.name += entityID;

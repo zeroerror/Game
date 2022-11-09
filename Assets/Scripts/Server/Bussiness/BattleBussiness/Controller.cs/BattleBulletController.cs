@@ -20,6 +20,10 @@ namespace Game.Server.Bussiness.BattleBussiness
         public void Inject(BattleServerFacades facades)
         {
             serverFacades = facades;
+
+            var battleFacades = serverFacades.BattleFacades;
+            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
+            logicTriggerAPI.Regist_BulletHitFieldAction(LogicTrigger_BulletHit);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -94,6 +98,22 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var attackerIDC = hitModel.attackerIDC;
                     bulletRqs.SendRes_BulletHitEntity(connId, attackerIDC.EntityID, victimIDC.EntityID, victimIDC.EntityType);
                 });
+            });
+        }
+
+        void LogicTrigger_BulletHit(int bulletID, Transform hitTF)
+        {
+            var battleFacades = serverFacades.BattleFacades;
+            var bulletDomain = battleFacades.Domain.BulletLogicDomain;
+            var bullet = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
+            bulletDomain.ApplyHitEffector(bullet, hitTF);
+
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
+            var bulletRqs = serverFacades.Network.BulletReqAndRes;
+
+            ConnIDList.ForEach((connId) =>
+            {
+                bulletRqs.SendRes_BulletHitField(connId, bullet);
             });
         }
 
