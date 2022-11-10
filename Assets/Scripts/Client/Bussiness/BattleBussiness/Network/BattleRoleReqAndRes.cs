@@ -81,7 +81,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             int dirY = (int)(dir.y * 10000f);
             int dirZ = (int)(dir.z * 10000f);
 
-            BattleRollReqMsg frameJumpReqMsg = new BattleRollReqMsg
+            BattleRoleRollReqMsg frameJumpReqMsg = new BattleRoleRollReqMsg
             {
                 entityId = (byte)role.IDComponent.EntityID,
                 dirX = dirX,
