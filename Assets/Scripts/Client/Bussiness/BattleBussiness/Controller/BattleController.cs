@@ -22,9 +22,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             itemPickQueue = new Queue<FrameItemPickResMsg>();
 
             airdropSpawnQueue = new Queue<BattleAirdropSpawnResMsg>();
+            airdropTearDownQueue = new Queue<BattleAirdropTearDownResMsg>();
 
-            entityTearDownQueue = new Queue<BattleEntityTearDownResMsg>();
-            entitySpawnQueue = new Queue<BattleEntitySpawnResMsg>();
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -42,9 +41,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 rqs.SendReq_RoleSpawn(ControlType.Owner);
             });
             battleRqs.RegistRes_BattleGameStateAndStage(OnRes_BattleStateAndStageMsg);
-            battleRqs.RegistRes_BattleAirdrop(OnRes_BattleAirdrop);
-            battleRqs.RegistRes_EntityTearDown(OnEntityTearDownResMsg);
-            battleRqs.RegistRes_EntitySpawn(OnEntitySpawnResMsg);
+            battleRqs.RegistRes_BattleAirdropSpawn(OnRes_BattleAirdropSpawn);
+            battleRqs.RegistRes_BattleAirdropTearDown(OnRes_BattleAirdropTearDown);
 
             // - Role
             var roleRqs = battleFacades.Network.RoleReqAndRes;
@@ -88,11 +86,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             Tick_ItemAssetsSpawn();
             Tick_ItemPick();
 
-            Tick_Airdrop();
-
-            Tick_EntityTearDown(fixedDeltaTime);
-            Tick_EntitySpawn(fixedDeltaTime);
-
+            Tick_AirdropSpawn();
+            Tick_AirdropTearDown();
         }
 
         #region [Battle Role] 
@@ -207,7 +202,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     byte subtype = subtypeArray[index];
 
                     // 生成资源
-                    var commonDomain = battleFacades.Domain.CommonDomain;
+                    var commonDomain = battleFacades.Domain.commonDomain;
                     var entityObj = commonDomain.SpawnEntity_Logic(entityType, subtype, entityID, parent.position);
                     var entityGo = commonDomain.UnpackEntityObjToGO(entityObj, entityType);
                     entityGo.transform.SetParent(parent);
@@ -318,8 +313,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Battle Airdrop]
 
         Queue<BattleAirdropSpawnResMsg> airdropSpawnQueue;
+        Queue<BattleAirdropTearDownResMsg> airdropTearDownQueue;
 
-        void Tick_Airdrop()
+        void Tick_AirdropSpawn()
         {
             while (airdropSpawnQueue.TryDequeue(out var msg))
             {
@@ -337,59 +333,36 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void OnRes_BattleAirdrop(BattleAirdropSpawnResMsg msg)
+        void OnRes_BattleAirdropSpawn(BattleAirdropSpawnResMsg msg)
         {
             airdropSpawnQueue.Enqueue(msg);
         }
 
-        #endregion
-
-        #region [Battle Entity TearDown]
-
-        Queue<BattleEntityTearDownResMsg> entityTearDownQueue;
-        Queue<BattleEntitySpawnResMsg> entitySpawnQueue;
-
-        void Tick_EntityTearDown(float fixedDeltaTime)
+        void Tick_AirdropTearDown()
         {
-            while (entityTearDownQueue.TryDequeue(out var msg))
+            while (airdropTearDownQueue.TryDequeue(out var msg))
             {
-                EntityType entityType = (EntityType)msg.entityType;
-                int entityID = msg.entityID;
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+                int airdropID = msg.airdropID;
+                EntityType spawnEntityType = (EntityType)msg.spawnEntityType;
+                byte spawnSubType = msg.spawnSubType;
+                int spawnEntityID = msg.spawnEntityID;
+                Vector3 spawnPos = new Vector3(msg.spawnPosX / 10000f, msg.spawnPosY / 10000f, msg.spawnPosZ / 10000f);
 
-                var repo = battleFacades.Repo;
                 var domain = battleFacades.Domain;
-                var commonDomain = domain.CommonDomain;
-                commonDomain.TearDownEntityLogicAndRenderer(pos, entityType, entityID);
+                var commonDomain = domain.commonDomain;
+                commonDomain.SpawnEntity_Logic(spawnEntityType, spawnSubType, spawnEntityID, spawnPos);
+                commonDomain.SpawnEntity_Renderer(spawnEntityType, spawnSubType, spawnEntityID, spawnPos);
+
+                var airdropLogicDomain = domain.AirdropLogicDomain;
+                airdropLogicDomain.TearDownLogic(airdropID);
+                var airdropRendererDomain = domain.AirdropRendererDomain;
+                airdropRendererDomain.TearDownRenderer(airdropID);
             }
         }
 
-        void OnEntityTearDownResMsg(BattleEntityTearDownResMsg msg)
+        void OnRes_BattleAirdropTearDown(BattleAirdropTearDownResMsg msg)
         {
-            Debug.Log($"加入实体销毁队列");
-            entityTearDownQueue.Enqueue(msg);
-        }
-
-        void Tick_EntitySpawn(float fixedDeltaTime)
-        {
-            while (entitySpawnQueue.TryDequeue(out var msg))
-            {
-                EntityType entityType = (EntityType)msg.entityType;
-                byte subType = msg.subType;
-                int entityID = msg.entityID;
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-
-                var repo = battleFacades.Repo;
-                var domain = battleFacades.Domain;
-                var commonDomain = domain.CommonDomain;
-                commonDomain.SpawnEntityLogicAndRenderer(pos, entityType, subType, entityID);
-            }
-        }
-
-        void OnEntitySpawnResMsg(BattleEntitySpawnResMsg msg)
-        {
-            Debug.Log($"加入实体生成队列");
-            entitySpawnQueue.Enqueue(msg);
+            airdropTearDownQueue.Enqueue(msg);
         }
 
         #endregion

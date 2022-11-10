@@ -88,8 +88,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var repo = battleFacades.Repo;
             var airdropRendererRepo = repo.AirdropRendererRepo;
             var airdropRenderer = airdropRendererRepo.Get(entityID);
+            TearDownRenderer(airdropRenderer);
+        }
+
+        public void TearDownRenderer(BattleAirdropRendererEntity airdropRenderer)
+        {
             airdropRenderer.TearDown();
-            airdropRendererRepo.Remove(airdropRenderer);
+            battleFacades.Repo.AirdropRendererRepo.Remove(airdropRenderer);
         }
 
     }

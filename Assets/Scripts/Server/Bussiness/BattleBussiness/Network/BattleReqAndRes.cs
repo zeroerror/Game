@@ -46,37 +46,6 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         // ====== Send ======
 
-        public void SendRes_EntitySpawn(int connID, EntityType entityType, byte subType, int entityID, Vector3 pos)
-        {
-            BattleEntitySpawnResMsg msg = new BattleEntitySpawnResMsg();
-            msg.serverFrame = serverFrame;
-            msg.entityType = (byte)entityType;
-            msg.subType = subType;
-            msg.entityID = entityID;
-            msg.posX = (int)(pos.x * 10000f);
-            msg.posY = (int)(pos.y * 10000f);
-            msg.posZ = (int)(pos.z * 10000f);
-
-            battleServer.SendMsg(connID, msg);
-            sendCount++;
-            Debug.Log($"实体[{entityType.ToString()}]生成消息发送");
-        }
-
-        public void SendRes_EntityTearDown(int connId, EntityType entityType, int entityID, Vector3 pos)
-        {
-            BattleEntityTearDownResMsg msg = new BattleEntityTearDownResMsg();
-            msg.serverFrame = serverFrame;
-            msg.entityType = (byte)entityType;
-            msg.entityID = entityID;
-            msg.posX = (int)(pos.x * 10000f);
-            msg.posY = (int)(pos.y * 10000f);
-            msg.posZ = (int)(pos.z * 10000f);
-
-            battleServer.SendMsg(connId, msg);
-            sendCount++;
-            Debug.Log($"实体[{entityType.ToString()}]销毁消息发送");
-        }
-
         public void SendRes_BattleGameStateAndStage(int connID, BattleState state, BattleStage stage, int curMaintainFrame)
         {
             BattleStateAndStageResMsg msg = new BattleStateAndStageResMsg();
@@ -103,11 +72,16 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             sendCount++;
         }
 
-        public void SendRes_BattleAirdropTearDown(int connID, EntityType airdropEntityType, byte subType, int entityID, Vector3 pos, BattleStage battleStage)
+        public void SendRes_BattleAirdropTearDown(int connID, int airdropID, EntityType spawnEntityType, byte spawnSubType, int spawnEntityID, Vector3 spawnPos)
         {
             BattleAirdropTearDownResMsg msg = new BattleAirdropTearDownResMsg();
-            msg.subType = subType;
-            msg.entityID = entityID;
+            msg.airdropID = airdropID;
+            msg.spawnEntityType = (byte)spawnEntityType;
+            msg.spawnSubType = spawnSubType;
+            msg.spawnEntityID = spawnEntityID;
+            msg.spawnPosX = (int)(spawnPos.x * 10000f);
+            msg.spawnPosY = (int)(spawnPos.y * 10000f);
+            msg.spawnPosZ = (int)(spawnPos.z * 10000f);
 
             battleServer.SendMsg(connID, msg);
             sendCount++;

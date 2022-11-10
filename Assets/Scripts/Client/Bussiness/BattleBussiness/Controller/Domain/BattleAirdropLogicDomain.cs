@@ -45,10 +45,23 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void TearDownLogic(BattleAirdropEntity airdrop)
         {
+            if (airdrop == null)
+            {
+                return;
+            }
+
             var repo = battleFacades.Repo;
             var airDropRepo = repo.AirdropLogicRepo;
             airDropRepo.Remove(airdrop);
             airdrop.TearDown();
+        }
+
+        public void TearDownLogic(int airdropID)
+        {
+            var repo = battleFacades.Repo;
+            var airDropRepo = repo.AirdropLogicRepo;
+            var aridrop = airDropRepo.Get(airdropID);
+            TearDownLogic(aridrop);
         }
 
         public float TryReceiveDamage(BattleAirdropEntity airdrop, float damage)

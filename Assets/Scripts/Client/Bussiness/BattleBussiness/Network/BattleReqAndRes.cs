@@ -53,23 +53,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Regist ======
-
-        public void RegistRes_EntitySpawn(Action<BattleEntitySpawnResMsg> action)
-        {
-            AddRegister(action);
-        }
-
-        public void RegistRes_EntityTearDown(Action<BattleEntityTearDownResMsg> action)
-        {
-            AddRegister(action);
-        }
-
         public void RegistRes_BattleGameStateAndStage(Action<BattleStateAndStageResMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistRes_BattleAirdrop(Action<BattleAirdropSpawnResMsg> action)
+        public void RegistRes_BattleAirdropSpawn(Action<BattleAirdropSpawnResMsg> action)
+        {
+            AddRegister(action);
+        }
+
+        public void RegistRes_BattleAirdropTearDown(Action<BattleAirdropTearDownResMsg> action)
         {
             AddRegister(action);
         }

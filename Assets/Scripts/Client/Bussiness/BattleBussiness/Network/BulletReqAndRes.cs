@@ -56,6 +56,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             AddRegister(action);
         }
 
+        public void RegistRes_BulletLifeOver(Action<BattleBulletLifeTimeOverResMsg> action)
+        {
+            AddRegister(action);
+        }
+
         #endregion
 
         // Private Func

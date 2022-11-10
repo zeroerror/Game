@@ -315,8 +315,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             lock (roleSpawnMsgDic)
             {
                 long key = GetCurFrameKey(connID);
-                Debug.Log($"OnRoleSpawnReqMsg connID {connID} key{key}");
-
                 if (!roleSpawnMsgDic.TryGetValue(key, out var _))
                 {
                     roleSpawnMsgDic[key] = msg;

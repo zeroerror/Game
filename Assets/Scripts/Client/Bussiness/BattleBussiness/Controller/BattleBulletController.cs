@@ -15,12 +15,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
         Queue<FrameBulletHitEntityResMsg> bulletHitEntityQueue;
         Queue<FrameBulletHitFieldResMsg> bulletHitFieldQueue;
+        Queue<BattleBulletLifeTimeOverResMsg> bulletLifeOverQueue;
 
         public BattleBulletController()
         {
             bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
             bulletHitEntityQueue = new Queue<FrameBulletHitEntityResMsg>();
             bulletHitFieldQueue = new Queue<FrameBulletHitFieldResMsg>();
+            bulletLifeOverQueue = new Queue<BattleBulletLifeTimeOverResMsg>();
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -30,6 +32,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletRqs.RegistRes_BulletSpawn(OnBulletSpawn);
             bulletRqs.RegistRes_BulletHitEntity(OnBulletHitEntity);
             bulletRqs.RegistRes_BulletHitField(OnBulletHitField);
+            bulletRqs.RegistRes_BulletLifeOver(OnBulletLifeOver);
 
             var logicEventCenter = battleFacades.LogicEventCenter;
             logicEventCenter.Regist_BulletHitFieldAction(LogicEvent_BulletHitField);
@@ -37,19 +40,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         public void Tick(float fixedDeltaTime)
         {
-            TickSerRes_All(fixedDeltaTime);
+            Tick_BulletSpawn();
+            Tick_BulletHitEntity();
+            Tick_BulletHitField();
+            Tick_BulletLifeOver();
         }
 
-        #region [Tick]
-
-        public void TickSerRes_All(float fixedDeltaTime)
-        {
-            Tick_BulletSpawn(fixedDeltaTime);
-            Tick_BulletHitEntity(fixedDeltaTime);
-            Tick_BulletHitField(fixedDeltaTime);
-        }
-
-        void Tick_BulletSpawn(float fixedDeltaTime)
+        void Tick_BulletSpawn()
         {
             while (bulletSpawnQueue.TryPeek(out var msg))
             {
@@ -74,7 +71,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void Tick_BulletHitEntity(float fixedDeltaTime)
+        void OnBulletSpawn(FrameBulletSpawnResMsg msg)
+        {
+            bulletSpawnQueue.Enqueue(msg);
+        }
+
+        void Tick_BulletHitEntity()
         {
             var domain = battleFacades.Domain;
             var roleDomain = domain.RoleLogicDomain;
@@ -107,7 +109,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void Tick_BulletHitField(float fixedDeltaTime)
+        void OnBulletHitEntity(FrameBulletHitEntityResMsg msg)
+        {
+            bulletHitEntityQueue.Enqueue(msg);
+        }
+
+        void Tick_BulletHitField()
         {
             while (bulletHitFieldQueue.TryDequeue(out var msg))
             {
@@ -119,29 +126,27 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        #endregion
-
-        #region [Regist]
-
-        void OnBulletSpawn(FrameBulletSpawnResMsg msg)
-        {
-            Debug.Log($"加入子弹生成队列");
-            bulletSpawnQueue.Enqueue(msg);
-        }
-
-        void OnBulletHitEntity(FrameBulletHitEntityResMsg msg)
-        {
-            Debug.Log("加入子弹击中实体队列");
-            bulletHitEntityQueue.Enqueue(msg);
-        }
-
         void OnBulletHitField(FrameBulletHitFieldResMsg msg)
         {
-            Debug.Log("加入子弹击中墙壁队列");
             bulletHitFieldQueue.Enqueue(msg);
         }
 
-        #endregion
+        void Tick_BulletLifeOver()
+        {
+            while (bulletLifeOverQueue.TryDequeue(out var msg))
+            {
+                var bulletID = msg.entityID;
+                var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+                bulletLogicDomain.LifeOver(bulletID);
+                var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
+                bulletRendererDomain.LifeOver(bulletID);
+            }
+        }
+
+        void OnBulletLifeOver(BattleBulletLifeTimeOverResMsg msg)
+        {
+            bulletLifeOverQueue.Enqueue(msg);
+        }
 
         void LogicEvent_BulletHitField(int bulletID, Transform hitTF)
         {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Client.Bussiness.BattleBussiness;
-using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Server.Bussiness.BattleBussiness.Facades;
+using Game.Infrastructure.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness
 {
@@ -11,6 +11,7 @@ namespace Game.Server.Bussiness.BattleBussiness
     {
 
         BattleServerFacades serverFacades;
+        public List<int> ConnIDList => serverFacades.Network.connIdList;
 
         public void Inject(BattleServerFacades battleFacades)
         {
@@ -21,6 +22,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         {
             Tick_Life_Role();
             Tick_Life_Airdrop();
+            Tick_LifeTime_Bullet(fixedDeltaTime);
         }
 
         void Tick_Life_Role()
@@ -64,7 +66,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
 
             var battleRqs = serverFacades.Network.BattleReqAndRes;
-            serverFacades.Network.connIdList.ForEach((connID) =>
+            ConnIDList.ForEach((connID) =>
             {
                 tearDownList.ForEach((airdrop) =>
                 {
@@ -73,20 +75,36 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var spawnEntityID = idService.GetAutoIDByEntityType(spawnEntityType);
                     var airdropPos = airdrop.transform.position;
 
-                    var commonDomain = battleFacades.Domain.CommonDomain;
+                    var commonDomain = battleFacades.Domain.commonDomain;
                     var spawnObj = commonDomain.SpawnEntity_Logic(spawnEntityType, spawnSubType, spawnEntityID, airdropPos);
-                    var spawnGo = spawnObj as GameObject;
-                    spawnGo.transform.position = airdropPos;
 
-                    battleRqs.SendRes_EntitySpawn(connID, spawnEntityType, spawnSubType, spawnEntityID, airdropPos);
+                    var airdropLogicDomain = battleFacades.Domain.AirdropLogicDomain;
+                    airdropLogicDomain.TearDownLogic(airdrop);
 
                     var idc = airdrop.IDComponent;
                     int airdropEntityID = idc.EntityID;
-                    battleRqs.SendRes_EntityTearDown(connID, EntityType.Aridrop, airdropEntityID, airdropPos);
+                    battleRqs.SendRes_BattleAirdropTearDown(connID, airdropEntityID, spawnEntityType, spawnSubType, spawnEntityID, airdropPos);
                 });
             });
 
 
+        }
+
+        void Tick_LifeTime_Bullet(float fixedDeltaTime)
+        {
+            var bulletLogicDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
+            var lifeOverList = bulletLogicDomain.Tick_LifeTime_All(fixedDeltaTime);
+
+            lifeOverList.ForEach((bullet) =>
+            {
+                bulletLogicDomain.LifeOver(bullet);
+                var bulletRqs = serverFacades.Network.BulletReqAndRes;
+                ConnIDList.ForEach((connId) =>
+                {
+                    int entityID = bullet.IDComponent.EntityID;
+                    bulletRqs.SendRes_BulletLifeTimeOver(connId, entityID);
+                });
+            });
         }
 
     }

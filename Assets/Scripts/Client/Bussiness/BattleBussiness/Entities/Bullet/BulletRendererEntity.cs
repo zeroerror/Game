@@ -30,7 +30,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public virtual void TearDown()
         {
-            Debug.Log($"摧毁子弹Renderer {entityID}");
+            Debug.Log($"摧毁子弹Renderer - {entityID}");
             Destroy(gameObject);
             Destroy(this);
         }

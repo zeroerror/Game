@@ -88,7 +88,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 // --- 清场
                 var domain = battleFacades.Domain;
-                var commonDomain = domain.CommonDomain;
+                var commonDomain = domain.commonDomain;
                 commonDomain.ClearBattleField();
 
                 // - Stage

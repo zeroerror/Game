@@ -80,6 +80,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             TearDown(bulletRenderer);
         }
 
+        public void LifeOver(BulletRendererEntity bullet)
+        {
+            if (bullet == null)
+            {
+                return;
+            }
+
+            bullet.TearDown();
+            var bulletRepo = battleFacades.Repo.BulletRendererRepo;
+            bulletRepo.TryRemove(bullet);
+            Debug.Log($"Bullet LifeOver: {bullet.EntityID}");
+        }
+
+        public void LifeOver(int bulletID)
+        {
+            var bullet = battleFacades.Repo.BulletRendererRepo.Get(bulletID);
+            LifeOver(bullet);
+        }
+
         public void ApplyEffector_BulletHitField(BulletRendererEntity bulletRenderer, Transform hitTF)
         {
             var bulletType = bulletRenderer.BulletType;
@@ -89,7 +108,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var vfxGo = GameObject.Instantiate(bulletRenderer.vfxPrefab_hitField);
                 vfxGo.transform.position = bulletRenderer.transform.position;
                 vfxGo.GetComponent<ParticleSystem>().Play();
-                
+
                 TearDown(bulletRenderer);
                 return;
             }

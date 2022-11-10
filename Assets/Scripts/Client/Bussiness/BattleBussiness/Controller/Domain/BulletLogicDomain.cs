@@ -88,6 +88,38 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             TearDown(bulletLogic);
         }
 
+        public void LifeOver(BulletEntity bullet)
+        {
+            if (bullet == null)
+            {
+                return;
+            }
+
+            var bulletType = bullet.BulletType;
+            if (bulletType == BulletType.DefaultBullet)
+            {
+                bullet.TearDown();
+            }
+            else if (bullet is GrenadeEntity grenadeEntity)
+            {
+                GrenadeExplodeTearDown(grenadeEntity);
+            }
+            else if (bullet is HookerEntity hookerEntity)
+            {
+                hookerEntity.TearDown();
+            }
+
+            var bulletRepo = battleFacades.Repo.BulletLogicRepo;
+            bulletRepo.TryRemove(bullet);
+            Debug.Log($"Bullet LifeOver: {bullet.IDComponent.EntityID}");
+        }
+
+        public void LifeOver(int bulletID)
+        {
+            var bullet = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
+            LifeOver(bullet);
+        }
+
         public void Tick_Physics_All(float fixedDeltaTime)
         {
             // - Normal Physics

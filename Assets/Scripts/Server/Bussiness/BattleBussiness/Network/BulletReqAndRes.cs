@@ -65,7 +65,6 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
-
         }
 
         public void SendRes_BulletHitEntity(int connId, int bulletEntityId, int entityID, EntityType entityType)
@@ -80,7 +79,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
-            Debug.Log($"发送子弹击中{entityType} {entityID} 消息");
+            Debug.Log($"发送: 子弹击中Entity {entityType},{entityID} 消息");
         }
 
         public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)
@@ -98,7 +97,17 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
             battleServer.SendMsg(connId, msg);
             sendCount++;
-            Debug.Log($"发送子弹击中墙壁消息 ");
+            Debug.Log($"发送: 子弹击中墙壁 ");
+        }
+
+        public void SendRes_BulletLifeTimeOver(int connId, int entityID)
+        {
+            BattleBulletLifeTimeOverResMsg msg = new BattleBulletLifeTimeOverResMsg();
+            msg.entityID = entityID;
+
+            battleServer.SendMsg(connId, msg);
+            sendCount++;
+            Debug.Log($"发送: 子弹生命周期结束");
         }
 
         #endregion

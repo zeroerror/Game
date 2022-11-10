@@ -213,4 +213,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   posAdjust: 15
   rotAdjust: 15
-  vfxPrefab_hitField: {fileID: 100000, guid: 118e3f56a5212e849882f9a2fccadda7, type: 3}
+  vfxPrefab_hitField: {fileID: 1804206099813350, guid: 4dd02b5f854b6c84990fbeb810abffe4,
+    type: 3}
