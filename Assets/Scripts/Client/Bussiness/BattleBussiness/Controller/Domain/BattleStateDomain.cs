@@ -162,7 +162,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 // - Loop
                 stateMod.maintainFrame--;
-                if (stateMod.maintainFrame % 300 == 0)
+                if (stateMod.maintainFrame % 150 == 0)
                 {
                     // -  Logic Trigger
                     var logicEventCenter = battleFacades.LogicEventCenter;
@@ -175,7 +175,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 gameEntity.AddStage(BattleStage.GameOver);
 
                 // - State 
-                fsm.EnterGameState_BattleSettlement(150);
+                fsm.EnterGameState_BattleSettlement(30);
 
                 // -  Logic Trigger
                 var logicEventCenter = battleFacades.LogicEventCenter;

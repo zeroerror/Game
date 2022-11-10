@@ -87,8 +87,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
-            bullet.transform.position = pos;
-            
             if (bullet.BulletType == BulletType.Grenade)
             {
                 // - vfx
@@ -115,8 +113,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             {
                 return;
             }
-
-            bulletRenderer.transform.position = hitPos;
 
             var bulletType = bulletRenderer.BulletType;
             if (bulletType == BulletType.DefaultBullet)

@@ -56,6 +56,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var airdrop = battleFacades.Repo.AirdropLogicRepo.Get(victimEntityID);
                 victimLC = airdrop.LocomotionComponent;
             }
+            else
+            {
+                Debug.LogError("Not Handler");
+            }
 
             var bullet = battleFacades.Repo.BulletLogicRepo.Get(atkEntityID);
 

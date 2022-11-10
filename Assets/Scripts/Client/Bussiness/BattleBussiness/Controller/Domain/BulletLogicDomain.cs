@@ -267,7 +267,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             Debug.Log("爆炸");
             grenadeEntity.SetIsExploded(true);
 
-            var roleRepo = battleFacades.Repo.RoleLogicRepo;
+            var allDomains = battleFacades.Domain;
+            var allRepo = battleFacades.Repo;
+            // - Role
+            var roleRepo = allRepo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
             {
                 // - 根据距离HitActor
@@ -276,15 +279,34 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 {
                     HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
 
-                    var hitDomain = battleFacades.Domain.HitDomain;
+                    var hitDomain = allDomains.HitDomain;
                     if (hitDomain.TryHitActor(grenadeEntity.IDComponent, role.IDComponent, hitPowerModel))
                     {
-                        var roleDomain = battleFacades.Domain.RoleLogicDomain;
+                        var roleDomain = allDomains.RoleLogicDomain;
                         roleDomain.TryReceiveDamage(role, hitPowerModel.damage);
                         if (role.HealthComponent.CheckIsDead())
                         {
                             roleDomain.RoleState_EnterDead(role);
                         }
+                    }
+                }
+            });
+
+            // - Airdrop
+            var airdropLogicRepo = battleFacades.Repo.AirdropLogicRepo;
+            airdropLogicRepo.Foreach((airdrop) =>
+            {
+                // - 根据距离HitActor
+                var dis = Vector3.Distance(airdrop.LocomotionComponent.Position, grenadeEntity.LocomotionComponent.Position);
+                if (dis < grenadeEntity.ExplosionRadius)
+                {
+                    HitPowerModel hitPowerModel = grenadeEntity.HitPowerModel;
+
+                    var hitDomain = allDomains.HitDomain;
+                    if (hitDomain.TryHitActor(grenadeEntity.IDComponent, airdrop.IDComponent, hitPowerModel))
+                    {
+                        var airdropLogicDomain = allDomains.AirdropLogicDomain;
+                        airdropLogicDomain.TryReceiveDamage(airdrop, hitPowerModel.damage);
                     }
                 }
             });
