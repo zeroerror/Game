@@ -26,7 +26,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         public IDService IDService { get; private set; }
 
         // - API
-        public LogicTriggerEvent LogicTriggerEvent { get; private set; }
+        public LogicEventCenter LogicEventCenter { get; private set; }
 
         // - Game Stage
         public BattleGameEntity GameEntity { get; private set; }
@@ -49,7 +49,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             ArbitrationService = new BattleArbitrationService();
             ArbitrationService.Inject(this);
 
-            LogicTriggerEvent = new LogicTriggerEvent();
+            LogicEventCenter = new LogicEventCenter();
 
             GameEntity = new BattleGameEntity();
 

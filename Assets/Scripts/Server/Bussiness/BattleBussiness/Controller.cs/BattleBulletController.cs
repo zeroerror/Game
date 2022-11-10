@@ -22,8 +22,8 @@ namespace Game.Server.Bussiness.BattleBussiness
             serverFacades = facades;
 
             var battleFacades = serverFacades.BattleFacades;
-            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
-            logicTriggerAPI.Regist_BulletHitFieldAction(LogicTrigger_BulletHit);
+            var logicEventCenter = battleFacades.LogicEventCenter;
+            logicEventCenter.Regist_BulletHitFieldAction(LogicEventCenter_BulletHitField);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -55,7 +55,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 if (bullet is GrenadeEntity grenadeEntity)
                 {
                     var bulletDomain = serverFacades.BattleFacades.Domain.BulletLogicDomain;
-                    bulletDomain.GrenadeExplode(grenadeEntity);
+                    bulletDomain.GrenadeExplodeTearDown(grenadeEntity);
                 }
 
                 if (bullet is HookerEntity hookerEntity)
@@ -101,19 +101,19 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
-        void LogicTrigger_BulletHit(int bulletID, Transform hitTF)
+        void LogicEventCenter_BulletHitField(int bulletID, Transform hitTF)
         {
             var battleFacades = serverFacades.BattleFacades;
-            var bulletDomain = battleFacades.Domain.BulletLogicDomain;
-            var bullet = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
-            bulletDomain.ApplyHitEffector(bullet, hitTF);
+            var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+            var bulletLogic = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
+            bulletLogicDomain.ApplyEffector_BulletHitField(bulletLogic, hitTF);
 
             var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             var bulletRqs = serverFacades.Network.BulletReqAndRes;
 
             ConnIDList.ForEach((connId) =>
             {
-                bulletRqs.SendRes_BulletHitField(connId, bullet);
+                bulletRqs.SendRes_BulletHitField(connId, bulletLogic);
             });
         }
 

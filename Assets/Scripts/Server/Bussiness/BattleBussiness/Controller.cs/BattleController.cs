@@ -83,9 +83,9 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             // Domain Handler
             var battleFacades = serverFacades.BattleFacades;
-            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
-            logicTriggerAPI.Regist_BattleStateAndStageChangeHandler(OnBattleStateAndStageChange);
-            logicTriggerAPI.Regist_BattleAirDropAction(OnBattleAirdrop);
+            var logicEventCenter = battleFacades.LogicEventCenter;
+            logicEventCenter.Regist_BattleStateAndStageChangeHandler(LogicEvent_BattleStateAndStageChange);
+            logicEventCenter.Regist_BattleAirDropAction(LogicEvent_BattleAirdrop);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -354,7 +354,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #endregion
 
-        void OnBattleAirdrop()
+        void LogicEvent_BattleAirdrop()
         {
             var battleFacades = serverFacades.BattleFacades;
 
@@ -377,7 +377,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
-        void OnBattleStateAndStageChange()
+        void LogicEvent_BattleStateAndStageChange()
         {
             var gameEntity = serverFacades.BattleFacades.GameEntity;
             var fsm = gameEntity.FSMComponent;

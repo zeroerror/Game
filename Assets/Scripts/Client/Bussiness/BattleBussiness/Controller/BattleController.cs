@@ -63,8 +63,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 battleRqs.ConnBattleServer(host, port);
             });
 
-            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
-            logicTriggerAPI.Regist_BattleStateAndStageChangeHandler(OnBattleStateAndStageChange);
+            var logicEventCenter = battleFacades.LogicEventCenter;
+            logicEventCenter.Regist_BattleStateAndStageChangeHandler(LogicEvent_BattleStateAndStageChange);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -256,7 +256,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Battle State]
 
-        void OnBattleStateAndStageChange()
+        void LogicEvent_BattleStateAndStageChange()
         {
             // - Sync With Server
             var battleRqs = battleFacades.Network.BattleReqAndRes;

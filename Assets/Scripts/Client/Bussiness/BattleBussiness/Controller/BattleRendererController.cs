@@ -19,7 +19,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public void Inject(BattleFacades facades)
         {
             battleFacades = facades;
-            battleFacades.LogicTriggerEvent.Regist_BattleDamageRecordAction(DamageRecord);
+            battleFacades.LogicEventCenter.Regist_BattleDamageRecordAction(LogicEvent_DamageRecord);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -61,7 +61,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             inputDomain.UpdateCameraByCameraView(inputAxis);
         }
 
-        void DamageRecord(DamageRecordArgs args)
+        void LogicEvent_DamageRecord(DamageRecordArgs args)
         {
             var atkEntityType = args.atkEntityType;
             var atkEntityID = args.atkEntityID;

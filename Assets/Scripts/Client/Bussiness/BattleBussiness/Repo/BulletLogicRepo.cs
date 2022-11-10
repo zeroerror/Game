@@ -35,6 +35,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             return all.Remove(entity);
         }
 
+        public void Remove(BulletEntity entity)
+        {
+            all.Remove(entity);
+        }
+
         public void Foreach(Action<BulletEntity> action)
         {
             if (action == null) return;
@@ -43,7 +48,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
                 action.Invoke(entity);
             });
         }
-       
+
         public void ForAll(Action<BulletEntity> action)
         {
             if (action == null) return;

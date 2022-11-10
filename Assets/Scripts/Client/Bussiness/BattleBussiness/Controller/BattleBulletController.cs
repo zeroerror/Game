@@ -31,8 +31,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletRqs.RegistRes_BulletHitEntity(OnBulletHitEntity);
             bulletRqs.RegistRes_BulletHitField(OnBulletHitField);
 
-            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
-            logicTriggerAPI.Regist_BulletHitFieldAction(LogicTrigger_BulletHitField);
+            var logicEventCenter = battleFacades.LogicEventCenter;
+            logicEventCenter.Regist_BulletHitFieldAction(LogicEvent_BulletHitField);
         }
 
         public void Tick(float fixedDeltaTime)
@@ -46,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             Tick_BulletSpawn(fixedDeltaTime);
             Tick_BulletHitEntity(fixedDeltaTime);
-            Tick_BulletHitWall(fixedDeltaTime);
+            Tick_BulletHitField(fixedDeltaTime);
         }
 
         void Tick_BulletSpawn(float fixedDeltaTime)
@@ -107,14 +107,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void Tick_BulletHitWall(float fixedDeltaTime)
+        void Tick_BulletHitField(float fixedDeltaTime)
         {
             while (bulletHitFieldQueue.TryDequeue(out var msg))
             {
-                // - 同步子弹位置
-                Vector3 pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
-                var bullet = battleFacades.Repo.BulletLogicRepo.Get(msg.bulletEntityID);
-                bullet.LocomotionComponent.SetPosition(pos);
+                var bulleID = msg.bulletEntityID;
+                var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+                bulletLogicDomain.TearDown(bulleID);
+                var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
+                bulletRendererDomain.TearDown(bulleID);
             }
         }
 
@@ -142,15 +143,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #endregion
 
-        void LogicTrigger_BulletHitField(int bulletID, Transform hitTF)
+        void LogicEvent_BulletHitField(int bulletID, Transform hitTF)
         {
-            var repo = battleFacades.Repo;
-            var bulletRendererRepo = repo.BulletRendererRepo;
-            var bulletRenderer = bulletRendererRepo.Get(bulletID);
+            var bulletRenderer = battleFacades.Repo.BulletRendererRepo.Get(bulletID);
+            var allDomains = battleFacades.Domain;
+            var bulletRendererDomain = allDomains.BulletRendererDomain;
+            bulletRendererDomain.ApplyEffector_BulletHitField(bulletRenderer, hitTF);
 
-            var domain = battleFacades.Domain;
-            var bulletRendererDomain = domain.BulletRendererDomain;
-            bulletRendererDomain.TearDownBulletRenderer(bulletRenderer);
+            // - vfx
+            var vfxGo = GameObject.Instantiate(bulletRenderer.vfxPrefab_hitField);
+            vfxGo.GetComponent<ParticleSystem>().Play();
         }
 
     }

@@ -12,11 +12,17 @@ namespace Game.Client.Bussiness.BattleBussiness
         public int EntityID => entityID;
         public void SetEntityID(int v) => entityID = v;
 
+        BulletType bulletType;
+        public BulletType BulletType => bulletType;
+        public void SetBulletType(BulletType v) => bulletType = v;
+
         public void SetPosition(Vector3 v) => transform.position = v;
         public void SetRotation(Quaternion v) => transform.rotation = v;
 
         public float posAdjust;
         public float rotAdjust;
+
+        public GameObject vfxPrefab_hitField;
 
         public void Ctor()
         {

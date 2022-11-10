@@ -75,14 +75,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             arbitService.AddHitRecord(atkIDC, victimIDC, receivedDamage, hasCausedDeath);
 
             // -  Logic Trigger
-            var logicTriggerAPI = battleFacades.LogicTriggerEvent;
+            var logicEventCenter = battleFacades.LogicEventCenter;
             DamageRecordArgs args;
             args.atkEntityType = atkEntityType;
             args.atkEntityID = atkEntityID;
             args.vicEntityType = victimEntityType;
             args.vicEntityID = victimEntityID;
             args.damage = receivedDamage;
-            logicTriggerAPI.Invoke_BattleDamageRecordAction(args);
+            logicEventCenter.Invoke_BattleDamageRecordAction(args);
 
             return;
         }

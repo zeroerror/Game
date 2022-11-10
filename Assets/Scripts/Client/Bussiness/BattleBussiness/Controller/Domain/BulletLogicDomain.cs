@@ -62,23 +62,30 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void TearDown(BulletEntity bullet)
         {
-            if (bullet.BulletType == BulletType.DefaultBullet)
+            if (bullet == null)
             {
-                bullet.TearDown();
+                return;
             }
 
             if (bullet is GrenadeEntity grenadeEntity)
             {
                 var bulletDomain = battleFacades.Domain.BulletLogicDomain;
-                bulletDomain.GrenadeExplode(grenadeEntity);
+                bulletDomain.GrenadeExplodeTearDown(grenadeEntity);
             }
-
-            if (bullet is HookerEntity hookerEntity)
+            else
             {
-                hookerEntity.TearDown();
+                bullet.TearDown();
             }
 
-            battleFacades.Repo.BulletLogicRepo.TryRemove(bullet);
+            battleFacades.Repo.BulletLogicRepo.Remove(bullet);
+        }
+
+        public void TearDown(int entityID)
+        {
+            var repo = battleFacades.Repo;
+            var bulletLogicRepo = repo.BulletLogicRepo;
+            var bulletLogic = bulletLogicRepo.Get(entityID);
+            TearDown(bulletLogic);
         }
 
         public void Tick_Physics_All(float fixedDeltaTime)
@@ -177,14 +184,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 if (hashit)
                 {
-                    ApplyHitEffector(bullet, hookedTrans);
+                    ApplyEffector_BulletHitField(bullet, hookedTrans);
                 }
             });
 
             return hitModelList;
         }
 
-        public void ApplyHitEffector(BulletEntity bullet, Transform hitTF)
+        public void ApplyEffector_BulletHitField(BulletEntity bullet, Transform hitTF)
         {
             // 普通子弹
             if (bullet.BulletType == BulletType.DefaultBullet)
@@ -210,7 +217,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         #region [Grenade]
 
-        public void GrenadeExplode(GrenadeEntity grenadeEntity)
+        public void GrenadeExplodeTearDown(GrenadeEntity grenadeEntity)
         {
             Debug.Log("爆炸");
             grenadeEntity.isExploded = true;

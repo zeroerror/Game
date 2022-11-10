@@ -56,8 +56,8 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                     hitTrans = ce.GetCollider().transform;
                     // - Logic Trigger
-                    var logicTriggerAPI = battleFacades.LogicTriggerEvent;
-                    logicTriggerAPI.Invoke_BulletHitFieldAction(bullet.IDComponent.EntityID, hitTrans);
+                    var logicTriggerEvent = battleFacades.LogicEventCenter;
+                    logicTriggerEvent.Invoke_BulletHitFieldAction(bullet.IDComponent.EntityID, hitTrans);
                 });
 
             });

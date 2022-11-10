@@ -29,8 +29,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             bulletLogicRepo.Foreach((bulletLogic) =>
             {
                 var bulletRenderer = bulletRendererRepo.Get(bulletLogic.IDComponent.EntityID);
-                bulletRenderer.SetPosition(Vector3.Lerp(bulletRenderer.transform.position, bulletLogic.Position, deltaTime * bulletRenderer.posAdjust));
-                bulletRenderer.SetRotation(Quaternion.Lerp(bulletRenderer.transform.rotation, bulletLogic.Rotation, deltaTime * bulletRenderer.rotAdjust));
+                if (bulletRenderer != null)
+                {
+                    bulletRenderer.SetPosition(Vector3.Lerp(bulletRenderer.transform.position, bulletLogic.Position, deltaTime * bulletRenderer.posAdjust));
+                    bulletRenderer.SetRotation(Quaternion.Lerp(bulletRenderer.transform.rotation, bulletLogic.Rotation, deltaTime * bulletRenderer.rotAdjust));
+                }
             });
         }
 
@@ -47,6 +50,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var bulletRenderer = prefabAsset.GetComponent<BulletRendererEntity>();
                 bulletRenderer.Ctor();
                 bulletRenderer.SetEntityID(entityID);
+                bulletRenderer.SetBulletType(bulletType);
 
                 repo.BulletRendererRepo.Add(bulletRenderer);
                 return bulletRenderer;
@@ -55,23 +59,37 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             return null;
         }
 
-        public void TearDownBulletRenderer(BulletRendererEntity entity)
+        public void TearDown(BulletRendererEntity entity)
         {
+            if(entity==null){
+                return;
+            }
+            
+            entity.TearDown();
             var repo = battleFacades.Repo;
             var bulletRendererRepo = repo.BulletRendererRepo;
-
-            entity.TearDown();
             bulletRendererRepo.TryRemove(entity);
         }
 
-        public void TearDownBulletRenderer(int entityID)
+        public void TearDown(int entityID)
         {
             var repo = battleFacades.Repo;
             var bulletRendererRepo = repo.BulletRendererRepo;
-            var entity = bulletRendererRepo.Get(entityID);
+            var bulletRenderer = bulletRendererRepo.Get(entityID);
+            TearDown(bulletRenderer);
+        }
 
-            entity.TearDown();
-            bulletRendererRepo.TryRemove(entity);
+        public void ApplyEffector_BulletHitField(BulletRendererEntity entity, Transform hitTF)
+        {
+            var bulletType = entity.BulletType;
+            if (bulletType == BulletType.DefaultBullet)
+            {
+                TearDown(entity);
+                // - TODO Visual Effect
+                return;
+            }
+
+            Debug.LogWarning($"Not Handler {entity.BulletType}");
         }
 
     }

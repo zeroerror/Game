@@ -49,7 +49,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             bulletRendererRepo.ForAll((bulletRenderer) =>
             {
                 var bulletDomain = domain.BulletRendererDomain;
-                bulletDomain.TearDownBulletRenderer(bulletRenderer);
+                bulletDomain.TearDown(bulletRenderer);
             });
             // - Weapon
             var weaponRepo = repo.WeaponRepo;
@@ -122,7 +122,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             if (entityType == EntityType.Bullet)
             {
                 var bulletRendererDomain = domain.BulletRendererDomain;
-                bulletRendererDomain.TearDownBulletRenderer(entityID);
+                bulletRendererDomain.TearDown(entityID);
                 return;
             }
 
