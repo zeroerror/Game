@@ -61,10 +61,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void TearDown(BulletRendererEntity entity)
         {
-            if(entity==null){
+            if (entity == null)
+            {
                 return;
             }
-            
+
             entity.TearDown();
             var repo = battleFacades.Repo;
             var bulletRendererRepo = repo.BulletRendererRepo;
@@ -79,17 +80,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             TearDown(bulletRenderer);
         }
 
-        public void ApplyEffector_BulletHitField(BulletRendererEntity entity, Transform hitTF)
+        public void ApplyEffector_BulletHitField(BulletRendererEntity bulletRenderer, Transform hitTF)
         {
-            var bulletType = entity.BulletType;
+            var bulletType = bulletRenderer.BulletType;
             if (bulletType == BulletType.DefaultBullet)
             {
-                TearDown(entity);
-                // - TODO Visual Effect
+                // - vfx
+                var vfxGo = GameObject.Instantiate(bulletRenderer.vfxPrefab_hitField);
+                vfxGo.transform.position = bulletRenderer.transform.position;
+                vfxGo.GetComponent<ParticleSystem>().Play();
+                
+                TearDown(bulletRenderer);
                 return;
             }
 
-            Debug.LogWarning($"Not Handler {entity.BulletType}");
+            Debug.LogWarning($"Not Handler {bulletRenderer.BulletType}");
         }
 
     }

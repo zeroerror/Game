@@ -62,7 +62,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public BattleAirdropRendererEntity SpawnRenderer(int entityId, BattleStage stage, Vector3 pos, Transform root = null)
         {
             string prefabName = $"Airdrop_Renderer_{stage.ToString()}";
-            Debug.Log($"生成 {prefabName}");
             if (battleFacades.Assets.ItemAsset.TryGetByName(prefabName, out GameObject prefab))
             {
                 var go = GameObject.Instantiate(prefab, root);
@@ -76,6 +75,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 airdropRenderer.transform.position = pos;
 
+                Debug.Log($"生成 {prefabName}");
                 return airdropRenderer;
             }
 

@@ -149,11 +149,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             var allDomains = battleFacades.Domain;
             var bulletRendererDomain = allDomains.BulletRendererDomain;
             bulletRendererDomain.ApplyEffector_BulletHitField(bulletRenderer, hitTF);
-
-            // - vfx
-            var vfxGo = GameObject.Instantiate(bulletRenderer.vfxPrefab_hitField);
-            vfxGo.transform.position = bulletRenderer.transform.position;
-            vfxGo.GetComponent<ParticleSystem>().Play();
         }
 
     }

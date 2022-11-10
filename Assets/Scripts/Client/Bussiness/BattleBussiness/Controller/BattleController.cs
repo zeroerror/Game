@@ -243,13 +243,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void OnItemSpawn(BattleAssetPointItemsSpawnResMsg msg)
         {
-            Debug.Log($"收到物件生成消息");
             itemSpawnQueue.Enqueue(msg);
         }
 
         void OnItemPickUp(FrameItemPickResMsg msg)
         {
-            Debug.Log($"收到物件拾取消息");
             itemPickQueue.Enqueue(msg);
         }
         #endregion
@@ -341,7 +339,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void OnRes_BattleAirdrop(BattleAirdropSpawnResMsg msg)
         {
-            Debug.Log($"收到空投生成消息");
             airdropSpawnQueue.Enqueue(msg);
         }
 
