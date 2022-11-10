@@ -211,7 +211,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     weaponShootMsgDic[key] = msg;
                 }
-                Debug.Log("收到武器射击请求");
             }
         }
 
@@ -226,8 +225,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                 {
                     weaponReloadMsgDic[key] = msg;
                 }
-
-                Debug.Log("收到武器换弹请求");
             }
         }
 

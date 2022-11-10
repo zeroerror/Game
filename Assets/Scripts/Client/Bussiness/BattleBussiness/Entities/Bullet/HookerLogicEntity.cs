@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class HookerEntity : BulletEntity
+    public class HookerLogicEntity : BulletLogicEntity
     {
 
         GameObject masterGrabEnd;//钩爪持有者一端

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Protocol.Battle;
-using Game.Client.Bussiness;
-using Game.Client.Bussiness.BattleBussiness;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Server.Bussiness.EventCenter;
 using Game.Server.Bussiness.BattleBussiness.Facades;
@@ -75,7 +73,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var roleRqs = v.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMoveReqMsg);
             roleRqs.RegistReq_RoleRotate(OnRoleRotateReqMsg);
-            roleRqs.RegistReq_Jump(OnRoleRoleReqMsg);
+            roleRqs.RegistReq_Jump(OnRoleRollReqMsg);
             roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawnReqMsg);
 
             var itemRqs = v.Network.ItemReqAndRes;
@@ -102,8 +100,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             // - Broadcast
             BroadcastAllRoleState();
         }
-
-        #region [Tick Request]
 
         #region [Role]
 
@@ -154,6 +150,18 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
+        void OnRoleSpawnReqMsg(int connID, BattleRoleSpawnReqMsg msg)
+        {
+            lock (roleSpawnMsgDic)
+            {
+                long key = GetCurFrameKey(connID);
+                if (!roleSpawnMsgDic.TryGetValue(key, out var _))
+                {
+                    roleSpawnMsgDic[key] = msg;
+                }
+            }
+        }
+        
         void Tick_RoleMoveRotateOpt()
         {
             ConnIDList.ForEach((connId) =>
@@ -190,6 +198,33 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
 
+        void OnRoleMoveReqMsg(int connId, BattleRoleMoveReqMsg msg)
+        {
+            lock (roleMoveMsgDic)
+            {
+                long key = GetCurFrameKey(connId);
+
+                if (!roleMoveMsgDic.TryGetValue(key, out var opt))
+                {
+                    roleMoveMsgDic[key] = msg;
+                }
+
+            }
+        }
+       
+        void OnRoleRotateReqMsg(int connId, BattleRoleRotateReqMsg msg)
+        {
+            lock (roleRotateMsgDic)
+            {
+                long key = GetCurFrameKey(connId);
+
+                if (!roleRotateMsgDic.TryGetValue(key, out var opt))
+                {
+                    roleRotateMsgDic[key] = msg;
+                }
+            }
+        }
+
         void Tick_RoleRollOpt()
         {
             ConnIDList.ForEach((connId) =>
@@ -214,6 +249,19 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
+        void OnRoleRollReqMsg(int connId, BattleRoleRollReqMsg msg)
+        {
+            lock (rollOptMsgDic)
+            {
+                long key = GetCurFrameKey(connId);
+                if (!rollOptMsgDic.TryGetValue(key, out var opt))
+                {
+                    rollOptMsgDic[key] = msg;
+                }
+
+            }
+        }
+
         void ApplyAllRoleState()
         {
             var roleStateDomain = serverFacades.BattleFacades.Domain.RoleStateDomain;
@@ -221,7 +269,6 @@ namespace Game.Server.Bussiness.BattleBussiness
         }
 
         #endregion
-
 
         #region [Item]
 
@@ -261,70 +308,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         }
 
-        #endregion
-
-        #endregion
-
-        #region [Network]
-
-        #region [Role]
-
-        void OnRoleMoveReqMsg(int connId, BattleRoleMoveReqMsg msg)
-        {
-            lock (roleMoveMsgDic)
-            {
-                long key = GetCurFrameKey(connId);
-
-                if (!roleMoveMsgDic.TryGetValue(key, out var opt))
-                {
-                    roleMoveMsgDic[key] = msg;
-                }
-
-            }
-        }
-
-        void OnRoleRoleReqMsg(int connId, BattleRoleRollReqMsg msg)
-        {
-            lock (rollOptMsgDic)
-            {
-                long key = GetCurFrameKey(connId);
-                Debug.Log($"OnRoleJump ServeFrame {ServerFrame} key {key}");
-                if (!rollOptMsgDic.TryGetValue(key, out var opt))
-                {
-                    rollOptMsgDic[key] = msg;
-                }
-
-            }
-        }
-
-        void OnRoleRotateReqMsg(int connId, BattleRoleRotateReqMsg msg)
-        {
-            lock (roleRotateMsgDic)
-            {
-                long key = GetCurFrameKey(connId);
-
-                if (!roleRotateMsgDic.TryGetValue(key, out var opt))
-                {
-                    roleRotateMsgDic[key] = msg;
-                }
-            }
-        }
-
-        void OnRoleSpawnReqMsg(int connID, BattleRoleSpawnReqMsg msg)
-        {
-            lock (roleSpawnMsgDic)
-            {
-                long key = GetCurFrameKey(connID);
-                if (!roleSpawnMsgDic.TryGetValue(key, out var _))
-                {
-                    roleSpawnMsgDic[key] = msg;
-                }
-            }
-        }
-        #endregion
-
-        #region [Item]
-
         void OnItemPickUpReqMsg(int connId, BattleItemPickReqMsg msg)
         {
             lock (itemPickUpMsgDic)
@@ -336,18 +319,6 @@ namespace Game.Server.Bussiness.BattleBussiness
                     itemPickUpMsgDic[key] = msg;
                 }
             }
-        }
-        #endregion
-
-        #endregion
-
-        #region [Private Func]
-
-        long GetCurFrameKey(int connId)
-        {
-            long key = (long)ServerFrame << 32;
-            key |= (long)connId;
-            return key;
         }
 
         #endregion
@@ -424,6 +395,13 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             var battleRqs = serverFacades.Network.BattleReqAndRes;
             battleRqs.SendRes_BattleGameStateAndStage(connID, state, stage, curMaintainFrame);
+        }
+
+        long GetCurFrameKey(int connId)
+        {
+            long key = (long)ServerFrame << 32;
+            key |= (long)connId;
+            return key;
         }
 
     }

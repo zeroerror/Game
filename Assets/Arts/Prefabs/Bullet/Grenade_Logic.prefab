@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3391090784171072412}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 5.760734, y: 2.5439322, z: 5.6266694}
+  m_LocalScale: {x: 5, y: 2, z: 7}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8888080743938306677}
@@ -129,7 +129,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.07102081, y: 0.40725988, z: 0.07102059}
+  m_Size: {x: 0.4, y: 0.79, z: 0.52}
   m_Center: {x: 0, y: 0.04534643, z: 0.00000007636845}
 --- !u!54 &2284298624245371635
 Rigidbody:
@@ -156,27 +156,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 8378453769205017415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b65cb65eb2da98a40bdcb20955ea5bab, type: 3}
+  m_Script: {fileID: 11500000, guid: 17d17864ac46da04ab5a4f5dfd0ae60c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletType: 1
+  bulletType: 0
   locomotionComponent:
-    basicMoveSpeed: 10
+    maxVelocity: 30
+    basicMoveSpeed: 8
     moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 1
-    gravity: 150
+    gravity: 50
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
-    frictionReduce: 20
+    frictionReduce: 15
     isGrounded: 0
     isHitWall: 0
   hitPowerModel:
     canHitRepeatly: 0
     attackTag: 1
-    damage: 150
+    damage: 250
     knockBackSpeed: 5
     blowUpSpeed: 5
-    freezeMaintainFrame: 30
-  lifeTime: 3
-  explosionRadius: 7
-  isExploded: 0
+    freezeMaintainFrame: 20
+  lifeTime: 1.8
+  explosionRadius: 5

@@ -80,11 +80,21 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             TearDown(bulletRenderer);
         }
 
-        public void LifeOver(BulletRendererEntity bullet)
+        public void LifeTimeOver(BulletRendererEntity bullet, Vector3 pos)
         {
             if (bullet == null)
             {
                 return;
+            }
+
+            bullet.transform.position = pos;
+            
+            if (bullet.BulletType == BulletType.Grenade)
+            {
+                // - vfx
+                var vfxGo = GameObject.Instantiate(bullet.vfxPrefab_explosion);
+                vfxGo.transform.position = bullet.transform.position;
+                vfxGo.GetComponentInChildren<ParticleSystem>().Play();
             }
 
             bullet.TearDown();
@@ -93,27 +103,40 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             Debug.Log($"Bullet LifeOver: {bullet.EntityID}");
         }
 
-        public void LifeOver(int bulletID)
+        public void LifeTimeOver(int bulletID, Vector3 pos)
         {
             var bullet = battleFacades.Repo.BulletRendererRepo.Get(bulletID);
-            LifeOver(bullet);
+            LifeTimeOver(bullet, pos);
         }
 
-        public void ApplyEffector_BulletHitField(BulletRendererEntity bulletRenderer, Transform hitTF)
+        public void ApplyEffector_BulletHitField(BulletRendererEntity bulletRenderer, Vector3 hitPos)
         {
+            if (bulletRenderer == null)
+            {
+                return;
+            }
+
+            bulletRenderer.transform.position = hitPos;
+
             var bulletType = bulletRenderer.BulletType;
             if (bulletType == BulletType.DefaultBullet)
             {
                 // - vfx
                 var vfxGo = GameObject.Instantiate(bulletRenderer.vfxPrefab_hitField);
-                vfxGo.transform.position = bulletRenderer.transform.position;
-                vfxGo.GetComponent<ParticleSystem>().Play();
+                vfxGo.transform.position = hitPos;
+                vfxGo.GetComponentInChildren<ParticleSystem>().Play();
 
                 TearDown(bulletRenderer);
                 return;
             }
 
             Debug.LogWarning($"Not Handler {bulletRenderer.BulletType}");
+        }
+
+        public void ApplyEffector_BulletHitField(int bulletID, Vector3 hitPos)
+        {
+            var bulletRenderer = battleFacades.Repo.BulletRendererRepo.Get(bulletID);
+            ApplyEffector_BulletHitField(bulletRenderer, hitPos);
         }
 
     }

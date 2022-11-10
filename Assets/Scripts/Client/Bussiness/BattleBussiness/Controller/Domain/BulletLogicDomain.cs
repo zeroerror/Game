@@ -20,7 +20,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletEntity SpawnLogic(BulletType bulletType, int bulletEntityID, Vector3 pos)
+        public BulletLogicEntity SpawnLogic(BulletType bulletType, int bulletEntityID, Vector3 pos)
         {
             string prefabName = bulletType.ToString() + "_Logic";
             if (!battleFacades.Assets.BulletAsset.TryGetByName(prefabName, out GameObject go))
@@ -33,7 +33,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             var parent = repo.FieldRepo.CurFieldEntity.transform;
             go = GameObject.Instantiate(go, parent);
 
-            var entity = go.GetComponent<BulletEntity>();
+            var entity = go.GetComponent<BulletLogicEntity>();
             entity.Ctor();
             entity.gameObject.SetActive(true);
             entity.SetBulletType(bulletType);
@@ -46,7 +46,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         }
 
-        public void ShootByWeapon(BulletEntity bulletEntity, int weaponEntityID, Vector3 fireDir)
+        public void ShootByWeapon(BulletLogicEntity bulletEntity, int weaponEntityID, Vector3 fireDir)
         {
             var repo = battleFacades.Repo;
             bulletEntity.SetWeaponID(weaponEntityID);
@@ -54,20 +54,20 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             bulletEntity.SetLeagueID(weapon.IDComponent.LeagueId);
             bulletEntity.FaceTo(fireDir);
             bulletEntity.LocomotionComponent.ApplyMoveVelocity(fireDir);
-            if (bulletEntity is HookerEntity hookerEntity)
+            if (bulletEntity is HookerLogicEntity hookerEntity)
             {
                 hookerEntity.SetMasterGrabPoint(weapon.transform);
             }
         }
 
-        public void TearDown(BulletEntity bullet)
+        public void TearDown(BulletLogicEntity bullet)
         {
             if (bullet == null)
             {
                 return;
             }
 
-            if (bullet is GrenadeEntity grenadeEntity)
+            if (bullet is GrenadeLogicEntity grenadeEntity)
             {
                 var bulletDomain = battleFacades.Domain.BulletLogicDomain;
                 bulletDomain.GrenadeExplodeTearDown(grenadeEntity);
@@ -88,23 +88,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             TearDown(bulletLogic);
         }
 
-        public void LifeOver(BulletEntity bullet)
+        public void LifeTimeOver(BulletLogicEntity bullet, Vector3 pos)
         {
             if (bullet == null)
             {
                 return;
             }
 
+            // bullet.LocomotionComponent.SetPosition(pos);
+
             var bulletType = bullet.BulletType;
             if (bulletType == BulletType.DefaultBullet)
             {
                 bullet.TearDown();
             }
-            else if (bullet is GrenadeEntity grenadeEntity)
+            else if (bullet is GrenadeLogicEntity grenadeEntity)
             {
                 GrenadeExplodeTearDown(grenadeEntity);
             }
-            else if (bullet is HookerEntity hookerEntity)
+            else if (bullet is HookerLogicEntity hookerEntity)
             {
                 hookerEntity.TearDown();
             }
@@ -114,10 +116,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             Debug.Log($"Bullet LifeOver: {bullet.IDComponent.EntityID}");
         }
 
-        public void LifeOver(int bulletID)
+        public void LifeTimeOver(int bulletID, Vector3 pos)
         {
             var bullet = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
-            LifeOver(bullet);
+            LifeTimeOver(bullet, pos);
         }
 
         public void Tick_Physics_All(float fixedDeltaTime)
@@ -133,10 +135,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             Tick_Physics_AllHookers(fixedDeltaTime);
         }
 
-        public List<BulletEntity> Tick_LifeTime_All(float deltaTime)
+        public List<BulletLogicEntity> Tick_LifeTime_All(float deltaTime)
         {
             var bulletRepo = battleFacades.Repo.BulletLogicRepo;
-            List<BulletEntity> removeList = new List<BulletEntity>();
+            List<BulletLogicEntity> removeList = new List<BulletLogicEntity>();
             bulletRepo.Foreach((bulletEntity) =>
             {
                 if (bulletEntity.LifeTime <= 0)
@@ -168,8 +170,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 }
 
                 Transform hookedTrans = null;
-                bool hashit = false;
-
                 hitCEList.ForEach((ce) =>
                 {
                     if (bullet.BulletType == BulletType.Grenade)
@@ -184,15 +184,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     }
 
                     IDComponent victimIDC = null;
+                    Vector3 hitPos = Vector3.zero;
                     if (hitEntityType == EntityType.BattleRole)
                     {
                         var role = ce.gameObject.GetComponentInParent<BattleRoleLogicEntity>();
                         victimIDC = role.IDComponent;
+                        hitPos = role.LocomotionComponent.Position;
                     }
                     else if (hitEntityType == EntityType.Aridrop)
                     {
                         var airdrop = ce.gameObject.GetComponentInParent<BattleAirdropEntity>();
                         victimIDC = airdrop.IDComponent;
+                        hitPos = airdrop.LocomotionComponent.Position;
                     }
                     else
                     {
@@ -211,32 +214,36 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                     model.attackerIDC = bulletIDC;
                     model.victimIDC = victimIDC;
                     hitModelList.Add(model);
-                    hashit = true;
+                    ApplyEffector_BulletHitField(bullet, hitPos, hookedTrans);
                 });
 
-                if (hashit)
-                {
-                    ApplyEffector_BulletHitField(bullet, hookedTrans);
-                }
             });
 
             return hitModelList;
         }
 
-        public void ApplyEffector_BulletHitField(BulletEntity bullet, Transform hitTF)
+        public void ApplyEffector_BulletHitField(BulletLogicEntity bullet, Vector3 hitPos, Transform hitTF = null)
         {
+            if (bullet == null)
+            {
+                return;
+            }
+
+            // var lc = bullet.LocomotionComponent;
+            // lc.SetPosition(hitPos);
+
             // 普通子弹
             if (bullet.BulletType == BulletType.DefaultBullet)
             {
                 TearDown(bullet);
             }
             // 爪钩
-            if (bullet is HookerEntity hookerEntity)
+            if (bullet is HookerLogicEntity hookerEntity)
             {
                 hookerEntity.TryGrabSomthing(hitTF);
             }
             // 手雷
-            else if (bullet is GrenadeEntity grenadeEntity)
+            else if (bullet is GrenadeLogicEntity grenadeEntity)
             {
                 var moveComponent = grenadeEntity.LocomotionComponent;
                 moveComponent.SetStatic();
@@ -247,12 +254,18 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
         }
 
+        public void ApplyEffector_BulletHitField(int bulletID, Vector3 hitPos, Transform hitTF = null)
+        {
+            var bullet = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
+            ApplyEffector_BulletHitField(bullet, hitPos, hitTF);
+        }
+
         #region [Grenade]
 
-        public void GrenadeExplodeTearDown(GrenadeEntity grenadeEntity)
+        public void GrenadeExplodeTearDown(GrenadeLogicEntity grenadeEntity)
         {
             Debug.Log("爆炸");
-            grenadeEntity.isExploded = true;
+            grenadeEntity.SetIsExploded(true);
 
             var roleRepo = battleFacades.Repo.RoleLogicRepo;
             roleRepo.Foreach((role) =>
@@ -306,13 +319,13 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             });
         }
 
-        List<HookerEntity> GetActivatedHookerList()
+        List<HookerLogicEntity> GetActivatedHookerList()
         {
-            List<HookerEntity> hookerEntities = new List<HookerEntity>();
+            List<HookerLogicEntity> hookerEntities = new List<HookerLogicEntity>();
             var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             bulletRepo.Foreach((bullet) =>
             {
-                if (bullet is HookerEntity hookerEntity && hookerEntity.GrabPoint != null)
+                if (bullet is HookerLogicEntity hookerEntity && hookerEntity.GrabPoint != null)
                 {
                     hookerEntities.Add(hookerEntity);
                 }

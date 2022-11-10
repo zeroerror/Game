@@ -119,10 +119,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (bulletHitFieldQueue.TryDequeue(out var msg))
             {
                 var bulleID = msg.bulletEntityID;
+                var pos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
                 var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
-                bulletLogicDomain.TearDown(bulleID);
+                bulletLogicDomain.ApplyEffector_BulletHitField(bulleID, pos);
+
                 var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
-                bulletRendererDomain.TearDown(bulleID);
+                bulletRendererDomain.ApplyEffector_BulletHitField(bulleID, pos);
             }
         }
 
@@ -136,10 +138,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             while (bulletLifeOverQueue.TryDequeue(out var msg))
             {
                 var bulletID = msg.entityID;
+                var bulletPos = new Vector3(msg.posX / 10000f, msg.posY / 10000f, msg.posZ / 10000f);
+
                 var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
-                bulletLogicDomain.LifeOver(bulletID);
+                bulletLogicDomain.LifeTimeOver(bulletID, bulletPos);
                 var bulletRendererDomain = battleFacades.Domain.BulletRendererDomain;
-                bulletRendererDomain.LifeOver(bulletID);
+                bulletRendererDomain.LifeTimeOver(bulletID, bulletPos);
             }
         }
 
@@ -148,12 +152,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             bulletLifeOverQueue.Enqueue(msg);
         }
 
-        void LogicEvent_BulletHitField(int bulletID, Transform hitTF)
+        void LogicEvent_BulletHitField(int bulletID, Vector3 hitPos, Transform hitTF)
         {
             var bulletRenderer = battleFacades.Repo.BulletRendererRepo.Get(bulletID);
             var allDomains = battleFacades.Domain;
             var bulletRendererDomain = allDomains.BulletRendererDomain;
-            bulletRendererDomain.ApplyEffector_BulletHitField(bulletRenderer, hitTF);
+            bulletRendererDomain.ApplyEffector_BulletHitField(bulletRenderer, hitPos);
         }
 
     }

@@ -97,12 +97,14 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             lifeOverList.ForEach((bullet) =>
             {
-                bulletLogicDomain.LifeOver(bullet);
+                bulletLogicDomain.LifeTimeOver(bullet, bullet.LocomotionComponent.Position);
+
+                var bulletPos = bullet.LocomotionComponent.Position;
                 var bulletRqs = serverFacades.Network.BulletReqAndRes;
                 ConnIDList.ForEach((connId) =>
                 {
                     int entityID = bullet.IDComponent.EntityID;
-                    bulletRqs.SendRes_BulletLifeTimeOver(connId, entityID);
+                    bulletRqs.SendRes_BulletLifeTimeOver(connId, entityID, bulletPos);
                 });
             });
         }

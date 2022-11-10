@@ -45,7 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Send]
 
-        public void SendRes_BulletSpawn(int connId, BulletEntity bulletEntity)
+        public void SendRes_BulletSpawn(int connId, BulletLogicEntity bulletEntity)
         {
             var bulletPos = bulletEntity.LocomotionComponent.Position;
             var fireDir = bulletEntity.LocomotionComponent.GetFaceDir();
@@ -82,7 +82,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"发送: 子弹击中Entity {entityType},{entityID} 消息");
         }
 
-        public void SendRes_BulletHitField(int connId, BulletEntity bulletEntity)
+        public void SendRes_BulletHitField(int connId, BulletLogicEntity bulletEntity)
         {
             var bulletPos = bulletEntity.LocomotionComponent.Position;
             bulletPos *= 10000f;
@@ -100,10 +100,13 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             Debug.Log($"发送: 子弹击中墙壁 ");
         }
 
-        public void SendRes_BulletLifeTimeOver(int connId, int entityID)
+        public void SendRes_BulletLifeTimeOver(int connId, int entityID, Vector3 pos)
         {
             BattleBulletLifeTimeOverResMsg msg = new BattleBulletLifeTimeOverResMsg();
             msg.entityID = entityID;
+            msg.posX = (int)(pos.x * 10000f);
+            msg.posY = (int)(pos.y * 10000f);
+            msg.posZ = (int)(pos.z * 10000f);
 
             battleServer.SendMsg(connId, msg);
             sendCount++;

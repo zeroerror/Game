@@ -106,19 +106,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         void OnWeaponShoot(BattleWeaponShootResMsg msg)
         {
-            Debug.Log($"加入武器射击队列");
             weaponShootQueue.Enqueue(msg);
         }
 
         void OnWeaponReload(BattleWeaponReloadResMsg msg)
         {
-            Debug.Log($"加入武器换弹结束队列");
             weaponReloadQueue.Enqueue(msg);
         }
 
         void OnWeaponDrop(BattleWeaponDropResMsg msg)
         {
-            Debug.Log($"加入武器丢弃队列");
             weaponDropQueue.Enqueue(msg);
         }
 

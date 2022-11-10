@@ -19,9 +19,9 @@ namespace Game.Client.Bussiness.BattleBussiness.API
         public void Regist_BattleAirDropAction(Action action) => battleAirDropAction += action;
         public void Invoke_BattleAirDropAction() => battleAirDropAction?.Invoke();
 
-        Action<int, Transform> bulletHitFieldAction;
-        public void Regist_BulletHitFieldAction(Action<int, Transform> action) => bulletHitFieldAction += action;
-        public void Invoke_BulletHitFieldAction(int bulleID, Transform hitTF) => bulletHitFieldAction?.Invoke(bulleID, hitTF);
+        Action<int, Vector3, Transform> bulletHitFieldAction;
+        public void Regist_BulletHitFieldAction(Action<int, Vector3, Transform> action) => bulletHitFieldAction += action;
+        public void Invoke_BulletHitFieldAction(int bulleID, Vector3 hitPos, Transform hitTF) => bulletHitFieldAction?.Invoke(bulleID, hitPos, hitTF);
 
         public LogicEventCenter() { }
 

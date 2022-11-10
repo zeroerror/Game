@@ -5,36 +5,31 @@ using UnityEngine;
 namespace Game.Client.Bussiness.BattleBussiness
 {
 
-    public class BulletEntity : PhysicsEntity
+    public class BulletLogicEntity : PhysicsEntity
     {
-        // ID Info
+
         IDComponent idComponent;
         public IDComponent IDComponent => idComponent;
         public void SetLeagueID(int v) => idComponent.SetLeagueID(v);
         public void SetEntityID(int v) => idComponent.SetEntityID(v);
 
-        // Master Info
+        // Master
         int weaponID;
         public int WeaponID => weaponID;
         public void SetWeaponID(int v) => this.weaponID = v;
 
-        // Bullet Info
-        [SerializeField]
-        BulletType bulletType = BulletType.DefaultBullet;
+        [SerializeField] BulletType bulletType = BulletType.DefaultBullet;
         public BulletType BulletType => bulletType;
         public void SetBulletType(BulletType bulletType) => this.bulletType = bulletType;
 
-        [SerializeField]
-        protected LocomotionComponent locomotionComponent;
+        [SerializeField] protected LocomotionComponent locomotionComponent;
         public LocomotionComponent LocomotionComponent => locomotionComponent;
 
-        [SerializeField]
-        protected HitPowerModel hitPowerModel;
+
+        [SerializeField] protected HitPowerModel hitPowerModel;
         public HitPowerModel HitPowerModel => hitPowerModel;
 
-        // Life 
-        [SerializeField]
-        float lifeTime;
+        [SerializeField][Header("单位/秒")] float lifeTime;
         public float LifeTime => lifeTime;
         public void SetLifeTime(float lifeTime) => this.lifeTime = lifeTime;
         public void ReduceLifeTime(float time) => this.lifeTime -= time;
@@ -56,7 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public virtual void TearDown()
         {
-            Debug.Log($"摧毁子弹Logic - {idComponent.EntityID}");
+            Debug.Log($"摧毁子弹Logic --- {idComponent.EntityID}");
             Destroy(gameObject);
             Destroy(this);
         }

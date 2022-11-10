@@ -82,15 +82,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 8378453769205017415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 014d119a6799cb1448c0eb6f4437e6a3, type: 3}
+  m_Script: {fileID: 11500000, guid: fa7a3f358d09a694ca7c6d54c447b23a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   bulletType: 0
   locomotionComponent:
-    basicMoveSpeed: 25
+    maxVelocity: 30
+    basicMoveSpeed: 30
     moveVelocity: {x: 0, y: 0, z: 0}
     isPersistentMove: 1
-    gravity: 0
+    gravity: 30
     gravityVelocity: 0
     extraVelocity: {x: 0, y: 0, z: 0}
     frictionReduce: 10
@@ -100,10 +101,10 @@ MonoBehaviour:
     canHitRepeatly: 0
     attackTag: 1
     damage: 40
-    knockBackSpeed: 2
+    knockBackSpeed: 1
     blowUpSpeed: 0
-    freezeMaintainFrame: 1
-  lifeTime: 10
+    freezeMaintainFrame: 0
+  lifeTime: 5
 --- !u!1001 &8100238415778686914
 PrefabInstance:
   m_ObjectHideFlags: 0

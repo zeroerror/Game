@@ -23,6 +23,7 @@ namespace Game.Client.Bussiness.BattleBussiness
         public float rotAdjust;
 
         public GameObject vfxPrefab_hitField;
+        public GameObject vfxPrefab_explosion;
 
         public void Ctor()
         {
@@ -30,7 +31,7 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public virtual void TearDown()
         {
-            Debug.Log($"摧毁子弹Renderer - {entityID}");
+            Debug.Log($"摧毁子弹Renderer --- {entityID}");
             Destroy(gameObject);
             Destroy(this);
         }

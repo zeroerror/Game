@@ -54,12 +54,12 @@ namespace Game.Server.Bussiness.BattleBussiness
             });
         }
 
-        void LogicEventCenter_BulletHitField(int bulletID, Transform hitTF)
+        void LogicEventCenter_BulletHitField(int bulletID, Vector3 hitPos, Transform hitTF)
         {
             var battleFacades = serverFacades.BattleFacades;
-            var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
             var bulletLogic = battleFacades.Repo.BulletLogicRepo.Get(bulletID);
-            bulletLogicDomain.ApplyEffector_BulletHitField(bulletLogic, hitTF);
+            var bulletLogicDomain = battleFacades.Domain.BulletLogicDomain;
+            bulletLogicDomain.ApplyEffector_BulletHitField(bulletLogic, hitPos, hitTF);
 
             var bulletRepo = battleFacades.Repo.BulletLogicRepo;
             var bulletRqs = serverFacades.Network.BulletReqAndRes;

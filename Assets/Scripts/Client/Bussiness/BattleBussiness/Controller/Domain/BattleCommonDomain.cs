@@ -63,7 +63,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public object SpawnEntity_Logic(EntityType entityType, byte subType, int entityID, Vector3 pos)
         {
-            Debug.Log($"SpawnEntity_Logic {entityType} {subType} {entityID} {pos} ");
             var allDomains = battleFacades.Domain;
             if (entityType == EntityType.BattleRole)
             {
@@ -145,7 +144,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         public void SpawnEntity_Renderer(EntityType entityType, byte subType, int entityID, Vector3 pos)
         {
-            Debug.Log($"SpawnEntity_Renderer {entityType} {subType} {entityID} {pos} ");
             var domain = battleFacades.Domain;
             if (entityType == EntityType.Aridrop)
             {
@@ -202,7 +200,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 var go = weaponItem.gameObject;
                 return go;
             }
-            if (obj is BulletEntity bulletLogic)
+            if (obj is BulletLogicEntity bulletLogic)
             {
                 var go = bulletLogic.gameObject;
                 return go;

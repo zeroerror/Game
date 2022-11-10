@@ -8,39 +8,39 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
     public class BulletLogicRepo
     {
 
-        List<BulletEntity> all;
+        List<BulletLogicEntity> all;
 
         public BulletLogicRepo()
         {
-            all = new List<BulletEntity>();
+            all = new List<BulletLogicEntity>();
         }
 
-        public BulletEntity Get(int bulletId)
+        public BulletLogicEntity Get(int bulletId)
         {
             return all.Find((entity) => entity.IDComponent.EntityID == bulletId);
         }
 
-        public BulletEntity[] GetAll()
+        public BulletLogicEntity[] GetAll()
         {
             return all.ToArray();
         }
 
-        public void Add(BulletEntity entity)
+        public void Add(BulletLogicEntity entity)
         {
             all.Add(entity);
         }
 
-        public bool TryRemove(BulletEntity entity)
+        public bool TryRemove(BulletLogicEntity entity)
         {
             return all.Remove(entity);
         }
 
-        public void Remove(BulletEntity entity)
+        public void Remove(BulletLogicEntity entity)
         {
             all.Remove(entity);
         }
 
-        public void Foreach(Action<BulletEntity> action)
+        public void Foreach(Action<BulletLogicEntity> action)
         {
             if (action == null) return;
             all.ForEach((entity) =>
@@ -49,7 +49,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Repo
             });
         }
 
-        public void ForAll(Action<BulletEntity> action)
+        public void ForAll(Action<BulletLogicEntity> action)
         {
             if (action == null) return;
             var array = all.ToArray();
