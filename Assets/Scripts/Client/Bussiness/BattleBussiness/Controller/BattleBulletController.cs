@@ -152,6 +152,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
             // - vfx
             var vfxGo = GameObject.Instantiate(bulletRenderer.vfxPrefab_hitField);
+            vfxGo.transform.position = bulletRenderer.transform.position;
             vfxGo.GetComponent<ParticleSystem>().Play();
         }
 
