@@ -12,17 +12,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         BattleFacades battleFacades;
 
         // 服务器下发的武器射击队列
-        Queue<FrameWeaponShootResMsg> weaponShootQueue;
+        Queue<BattleWeaponShootResMsg> weaponShootQueue;
         // 服务器下发的武器换弹队列
-        Queue<FrameWeaponReloadResMsg> weaponReloadQueue;
+        Queue<BattleWeaponReloadResMsg> weaponReloadQueue;
         // 服务器下发的武器丢弃队列
-        Queue<FrameWeaponDropResMsg> weaponDropQueue;
+        Queue<BattleWeaponDropResMsg> weaponDropQueue;
 
         public BattleWeaponController()
         {
-            weaponShootQueue = new Queue<FrameWeaponShootResMsg>();
-            weaponReloadQueue = new Queue<FrameWeaponReloadResMsg>();
-            weaponDropQueue = new Queue<FrameWeaponDropResMsg>();
+            weaponShootQueue = new Queue<BattleWeaponShootResMsg>();
+            weaponReloadQueue = new Queue<BattleWeaponReloadResMsg>();
+            weaponDropQueue = new Queue<BattleWeaponDropResMsg>();
         }
 
         public void Inject(BattleFacades battleFacades)
@@ -104,19 +104,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Server]
 
-        void OnWeaponShoot(FrameWeaponShootResMsg msg)
+        void OnWeaponShoot(BattleWeaponShootResMsg msg)
         {
             Debug.Log($"加入武器射击队列");
             weaponShootQueue.Enqueue(msg);
         }
 
-        void OnWeaponReload(FrameWeaponReloadResMsg msg)
+        void OnWeaponReload(BattleWeaponReloadResMsg msg)
         {
             Debug.Log($"加入武器换弹结束队列");
             weaponReloadQueue.Enqueue(msg);
         }
 
-        void OnWeaponDrop(FrameWeaponDropResMsg msg)
+        void OnWeaponDrop(BattleWeaponDropResMsg msg)
         {
             Debug.Log($"加入武器丢弃队列");
             weaponDropQueue.Enqueue(msg);

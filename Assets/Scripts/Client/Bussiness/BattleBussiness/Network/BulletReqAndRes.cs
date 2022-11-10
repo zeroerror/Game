@@ -41,17 +41,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         #region [Regist]
 
-        public void RegistRes_BulletSpawn(Action<FrameBulletSpawnResMsg> action)
+        public void RegistRes_BulletSpawn(Action<BattleBulletSpawnResMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistRes_BulletHitEntity(Action<FrameBulletHitEntityResMsg> action)
+        public void RegistRes_BulletHitEntity(Action<BattleBulletHitEntityResMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistRes_BulletHitField(Action<FrameBulletHitFieldResMsg> action)
+        public void RegistRes_BulletHitField(Action<BattleBulletHitFieldResMsg> action)
         {
             AddRegister(action);
         }

@@ -18,19 +18,19 @@ namespace Game.Server.Bussiness.BattleBussiness
         List<int> ConnIdList => serverFacades.Network.connIdList;
 
         // 记录所有武器射击帧
-        Dictionary<long, FrameWeaponShootReqMsg> weaponShootMsgDic;
+        Dictionary<long, BattleWeaponShootReqMsg> weaponShootMsgDic;
 
         // 记录所有武器装弹帧
-        Dictionary<long, FrameWeaponReloadReqMsg> weaponReloadMsgDic;
+        Dictionary<long, BattleWeaponReloadReqMsg> weaponReloadMsgDic;
 
         // 记录所有武器丢弃帧
-        Dictionary<long, FrameWeaponDropReqMsg> weaponDropMsgDic;
+        Dictionary<long, BattleWeaponDropReqMsg> weaponDropMsgDic;
 
         public BattleWeaponController()
         {
-            weaponShootMsgDic = new Dictionary<long, FrameWeaponShootReqMsg>();
-            weaponReloadMsgDic = new Dictionary<long, FrameWeaponReloadReqMsg>();
-            weaponDropMsgDic = new Dictionary<long, FrameWeaponDropReqMsg>();
+            weaponShootMsgDic = new Dictionary<long, BattleWeaponShootReqMsg>();
+            weaponReloadMsgDic = new Dictionary<long, BattleWeaponReloadReqMsg>();
+            weaponDropMsgDic = new Dictionary<long, BattleWeaponDropReqMsg>();
         }
 
         public void Inject(BattleServerFacades battleFacades)
@@ -201,7 +201,7 @@ namespace Game.Server.Bussiness.BattleBussiness
         #endregion
 
         #region [Req]
-        void OnWeaponShoot(int connId, FrameWeaponShootReqMsg msg)
+        void OnWeaponShoot(int connId, BattleWeaponShootReqMsg msg)
         {
             lock (weaponShootMsgDic)
             {
@@ -215,7 +215,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnWeaponReload(int connId, FrameWeaponReloadReqMsg msg)
+        void OnWeaponReload(int connId, BattleWeaponReloadReqMsg msg)
         {
             lock (weaponReloadMsgDic)
             {
@@ -231,7 +231,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnWeaponDrop(int connId, FrameWeaponDropReqMsg msg)
+        void OnWeaponDrop(int connId, BattleWeaponDropReqMsg msg)
         {
             lock (weaponDropMsgDic)
             {

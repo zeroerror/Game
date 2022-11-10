@@ -50,7 +50,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
             var bulletPos = bulletEntity.LocomotionComponent.Position;
             var fireDir = bulletEntity.LocomotionComponent.GetFaceDir();
 
-            FrameBulletSpawnResMsg msg = new FrameBulletSpawnResMsg
+            BattleBulletSpawnResMsg msg = new BattleBulletSpawnResMsg
             {
                 serverFrame = serverFrame,
                 bulletType = (byte)bulletEntity.BulletType,
@@ -69,7 +69,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_BulletHitEntity(int connId, int bulletEntityId, int entityID, EntityType entityType)
         {
-            FrameBulletHitEntityResMsg msg = new FrameBulletHitEntityResMsg
+            BattleBulletHitEntityResMsg msg = new BattleBulletHitEntityResMsg
             {
                 serverFrame = serverFrame,
                 bulletEntityID = (ushort)bulletEntityId,
@@ -86,7 +86,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         {
             var bulletPos = bulletEntity.LocomotionComponent.Position;
             bulletPos *= 10000f;
-            FrameBulletHitFieldResMsg msg = new FrameBulletHitFieldResMsg
+            BattleBulletHitFieldResMsg msg = new BattleBulletHitFieldResMsg
             {
                 serverFrame = serverFrame,
                 bulletEntityID = (ushort)bulletEntity.IDComponent.EntityID,

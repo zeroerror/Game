@@ -22,16 +22,16 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         // ====== 角色 ======
         // - 所有生成帧
-        Dictionary<long, FrameBattleRoleSpawnReqMsg> roleSpawnMsgDic;
+        Dictionary<long, BattleRoleSpawnReqMsg> roleSpawnMsgDic;
         // -所有操作帧
-        Dictionary<long, FrameRoleMoveReqMsg> roleMoveMsgDic;
-        Dictionary<long, FrameRoleRotateReqMsg> roleRotateMsgDic;
+        Dictionary<long, BattleRoleMoveReqMsg> roleMoveMsgDic;
+        Dictionary<long, BattleRoleRotateReqMsg> roleRotateMsgDic;
         // - 所有跳跃帧
-        Dictionary<long, FrameRollReqMsg> rollOptMsgDic;
+        Dictionary<long, BattleRoleRollReqMsg> rollOptMsgDic;
 
         // ====== 子弹 ======
         // - 所有拾取物件帧
-        Dictionary<long, FrameItemPickReqMsg> itemPickUpMsgDic;
+        Dictionary<long, BattleItemPickReqMsg> itemPickUpMsgDic;
 
         public BattleController()
         {
@@ -56,12 +56,12 @@ namespace Game.Server.Bussiness.BattleBussiness
                 }
             });
 
-            roleSpawnMsgDic = new Dictionary<long, FrameBattleRoleSpawnReqMsg>();
-            roleMoveMsgDic = new Dictionary<long, FrameRoleMoveReqMsg>();
-            roleRotateMsgDic = new Dictionary<long, FrameRoleRotateReqMsg>();
-            rollOptMsgDic = new Dictionary<long, FrameRollReqMsg>();
+            roleSpawnMsgDic = new Dictionary<long, BattleRoleSpawnReqMsg>();
+            roleMoveMsgDic = new Dictionary<long, BattleRoleMoveReqMsg>();
+            roleRotateMsgDic = new Dictionary<long, BattleRoleRotateReqMsg>();
+            rollOptMsgDic = new Dictionary<long, BattleRoleRollReqMsg>();
 
-            itemPickUpMsgDic = new Dictionary<long, FrameItemPickReqMsg>();
+            itemPickUpMsgDic = new Dictionary<long, BattleItemPickReqMsg>();
         }
 
         public void Inject(BattleServerFacades v)
@@ -75,7 +75,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             var roleRqs = v.Network.RoleReqAndRes;
             roleRqs.RegistReq_RoleMove(OnRoleMoveReqMsg);
             roleRqs.RegistReq_RoleRotate(OnRoleRotateReqMsg);
-            roleRqs.RegistReq_Jump(OnRoleJumpReqMsg);
+            roleRqs.RegistReq_Jump(OnRoleRoleReqMsg);
             roleRqs.RegistReq_BattleRoleSpawn(OnRoleSpawnReqMsg);
 
             var itemRqs = v.Network.ItemReqAndRes;
@@ -269,7 +269,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Role]
 
-        void OnRoleMoveReqMsg(int connId, FrameRoleMoveReqMsg msg)
+        void OnRoleMoveReqMsg(int connId, BattleRoleMoveReqMsg msg)
         {
             lock (roleMoveMsgDic)
             {
@@ -283,7 +283,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleJumpReqMsg(int connId, FrameRollReqMsg msg)
+        void OnRoleRoleReqMsg(int connId, BattleRoleRollReqMsg msg)
         {
             lock (rollOptMsgDic)
             {
@@ -297,7 +297,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleRotateReqMsg(int connId, FrameRoleRotateReqMsg msg)
+        void OnRoleRotateReqMsg(int connId, BattleRoleRotateReqMsg msg)
         {
             lock (roleRotateMsgDic)
             {
@@ -310,7 +310,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             }
         }
 
-        void OnRoleSpawnReqMsg(int connID, FrameBattleRoleSpawnReqMsg msg)
+        void OnRoleSpawnReqMsg(int connID, BattleRoleSpawnReqMsg msg)
         {
             lock (roleSpawnMsgDic)
             {
@@ -325,7 +325,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         #region [Item]
 
-        void OnItemPickUpReqMsg(int connId, FrameItemPickReqMsg msg)
+        void OnItemPickUpReqMsg(int connId, BattleItemPickReqMsg msg)
         {
             lock (itemPickUpMsgDic)
             {

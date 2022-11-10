@@ -12,16 +12,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         BattleFacades battleFacades;
 
         // 事件队列
-        Queue<FrameBulletSpawnResMsg> bulletSpawnQueue;
-        Queue<FrameBulletHitEntityResMsg> bulletHitEntityQueue;
-        Queue<FrameBulletHitFieldResMsg> bulletHitFieldQueue;
+        Queue<BattleBulletSpawnResMsg> bulletSpawnQueue;
+        Queue<BattleBulletHitEntityResMsg> bulletHitEntityQueue;
+        Queue<BattleBulletHitFieldResMsg> bulletHitFieldQueue;
         Queue<BattleBulletLifeTimeOverResMsg> bulletLifeOverQueue;
 
         public BattleBulletController()
         {
-            bulletSpawnQueue = new Queue<FrameBulletSpawnResMsg>();
-            bulletHitEntityQueue = new Queue<FrameBulletHitEntityResMsg>();
-            bulletHitFieldQueue = new Queue<FrameBulletHitFieldResMsg>();
+            bulletSpawnQueue = new Queue<BattleBulletSpawnResMsg>();
+            bulletHitEntityQueue = new Queue<BattleBulletHitEntityResMsg>();
+            bulletHitFieldQueue = new Queue<BattleBulletHitFieldResMsg>();
             bulletLifeOverQueue = new Queue<BattleBulletLifeTimeOverResMsg>();
         }
 
@@ -71,7 +71,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void OnBulletSpawn(FrameBulletSpawnResMsg msg)
+        void OnBulletSpawn(BattleBulletSpawnResMsg msg)
         {
             bulletSpawnQueue.Enqueue(msg);
         }
@@ -109,7 +109,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void OnBulletHitEntity(FrameBulletHitEntityResMsg msg)
+        void OnBulletHitEntity(BattleBulletHitEntityResMsg msg)
         {
             bulletHitEntityQueue.Enqueue(msg);
         }
@@ -126,7 +126,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             }
         }
 
-        void OnBulletHitField(FrameBulletHitFieldResMsg msg)
+        void OnBulletHitField(BattleBulletHitFieldResMsg msg)
         {
             bulletHitFieldQueue.Enqueue(msg);
         }

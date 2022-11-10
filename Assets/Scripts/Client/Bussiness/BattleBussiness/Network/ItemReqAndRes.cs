@@ -42,7 +42,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         // ====== Send ======
         public void SendReq_ItemPickUp(int roleEntityID, EntityType entityType, int entityId)
         {
-            FrameItemPickReqMsg msg = new FrameItemPickReqMsg
+            BattleItemPickReqMsg msg = new BattleItemPickReqMsg
             {
                 roleID = (byte)roleEntityID,
                 entityType = (byte)entityType,
@@ -53,7 +53,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Regist ======
-        public void RegistRes_ItemPickUp(Action<FrameItemPickResMsg> action)
+        public void RegistRes_ItemPickUp(Action<BattleItemPickResMsg> action)
         {
             AddRegister(action);
         }

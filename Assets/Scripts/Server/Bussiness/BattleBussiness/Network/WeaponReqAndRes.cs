@@ -45,7 +45,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_WeaponShoot(int connId, byte weaponID)
         {
-            FrameWeaponShootResMsg msg = new FrameWeaponShootResMsg
+            BattleWeaponShootResMsg msg = new BattleWeaponShootResMsg
             {
                 weaponID = weaponID,
             };
@@ -56,7 +56,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_WeaponReloaded(int connId, int serverFrame, int masterId, int reloadBulletNum)
         {
-            FrameWeaponReloadResMsg msg = new FrameWeaponReloadResMsg
+            BattleWeaponReloadResMsg msg = new BattleWeaponReloadResMsg
             {
                 masterId = (byte)masterId,
                 reloadBulletNum = (byte)reloadBulletNum
@@ -68,7 +68,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_WeaponDrop(int connId, int serverFrame, int masterId, ushort entityId)
         {
-            FrameWeaponDropResMsg msg = new FrameWeaponDropResMsg
+            BattleWeaponDropResMsg msg = new BattleWeaponDropResMsg
             {
                 weaponID = entityId,
                 masterID = (byte)masterId,
@@ -82,17 +82,17 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Regist]
 
-        public void RegistReq_WeaponShoot(Action<int, FrameWeaponShootReqMsg> action)
+        public void RegistReq_WeaponShoot(Action<int, BattleWeaponShootReqMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistReq_WeaponReload(Action<int, FrameWeaponReloadReqMsg> action)
+        public void RegistReq_WeaponReload(Action<int, BattleWeaponReloadReqMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistReq_WeaponDrop(Action<int, FrameWeaponDropReqMsg> action)
+        public void RegistReq_WeaponDrop(Action<int, BattleWeaponDropReqMsg> action)
         {
             AddRegister(action);
         }

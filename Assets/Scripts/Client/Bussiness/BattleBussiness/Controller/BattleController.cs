@@ -16,10 +16,10 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         public BattleController()
         {
             battleRoleSyncQueue = new Queue<BattleRoleSyncMsg>();
-            roleSpawnQueue = new Queue<FrameBattleRoleSpawnResMsg>();
+            roleSpawnQueue = new Queue<BattleRoleSpawnResMsg>();
 
             itemSpawnQueue = new Queue<BattleAssetPointItemsSpawnResMsg>();
-            itemPickQueue = new Queue<FrameItemPickResMsg>();
+            itemPickQueue = new Queue<BattleItemPickResMsg>();
 
             airdropSpawnQueue = new Queue<BattleAirdropSpawnResMsg>();
             airdropTearDownQueue = new Queue<BattleAirdropTearDownResMsg>();
@@ -93,7 +93,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         #region [Battle Role] 
 
         Queue<BattleRoleSyncMsg> battleRoleSyncQueue;
-        Queue<FrameBattleRoleSpawnResMsg> roleSpawnQueue;
+        Queue<BattleRoleSpawnResMsg> roleSpawnQueue;
 
         void Tick_RoleSync()
         {
@@ -170,7 +170,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             // DebugExtensions.LogWithColor($"人物状态同步帧 : {msg.serverFrame}  entityId:{msg.entityId} 角色状态:{msg.roleState.ToString()} 位置 :{new Vector3(msg.x, msg.y, msg.z)} ", "#008000");
         }
 
-        void OnRoleSpawn(FrameBattleRoleSpawnResMsg msg)
+        void OnRoleSpawn(BattleRoleSpawnResMsg msg)
         {
             Debug.Log("收到角色生成消息");
             roleSpawnQueue.Enqueue(msg);
@@ -179,7 +179,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
 
         #region [Item]
 
-        Queue<FrameItemPickResMsg> itemPickQueue;
+        Queue<BattleItemPickResMsg> itemPickQueue;
         Queue<BattleAssetPointItemsSpawnResMsg> itemSpawnQueue;
 
         void Tick_ItemAssetsSpawn()
@@ -241,7 +241,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             itemSpawnQueue.Enqueue(msg);
         }
 
-        void OnItemPickUp(FrameItemPickResMsg msg)
+        void OnItemPickUp(BattleItemPickResMsg msg)
         {
             itemPickQueue.Enqueue(msg);
         }

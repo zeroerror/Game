@@ -51,7 +51,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             msg |= (ulong)(ushort)(int)(dir.x * 100) << 32;
             msg |= (ulong)(ushort)(int)(dir.y * 100) << 16;
             msg |= (ulong)(ushort)(int)(dir.z * 100);
-            FrameRoleMoveReqMsg frameRoleMoveReqMsg = new FrameRoleMoveReqMsg
+            BattleRoleMoveReqMsg frameRoleMoveReqMsg = new BattleRoleMoveReqMsg
             {
                 msg = msg
             };
@@ -67,7 +67,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             msg |= (ulong)(ushort)eulerAngel.y << 16;
             msg |= (ulong)(ushort)eulerAngel.z;
 
-            FrameRoleRotateReqMsg frameRoleRotateReqMsg = new FrameRoleRotateReqMsg
+            BattleRoleRotateReqMsg frameRoleRotateReqMsg = new BattleRoleRotateReqMsg
             {
                 msg = msg
             };
@@ -81,7 +81,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
             int dirY = (int)(dir.y * 10000f);
             int dirZ = (int)(dir.z * 10000f);
 
-            FrameRollReqMsg frameJumpReqMsg = new FrameRollReqMsg
+            BattleRollReqMsg frameJumpReqMsg = new BattleRollReqMsg
             {
                 entityId = (byte)role.IDComponent.EntityID,
                 dirX = dirX,
@@ -94,7 +94,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void SendReq_RoleSpawn(ControlType controlType)
         {
-            FrameBattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new FrameBattleRoleSpawnReqMsg
+            BattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new BattleRoleSpawnReqMsg
             {
                 controlType = (byte)controlType,
             };
@@ -103,7 +103,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         // == Regist ==
 
-        public void RegistRes_BattleRoleSpawn(Action<FrameBattleRoleSpawnResMsg> action)
+        public void RegistRes_BattleRoleSpawn(Action<BattleRoleSpawnResMsg> action)
         {
             AddRegister(action);
         }

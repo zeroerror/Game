@@ -45,7 +45,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         public void SendReq_WeaponShoot(int masterId, Vector3 firePointPos, Vector2 fireDir)
         {
             fireDir.Normalize();
-            FrameWeaponShootReqMsg frameWeaponShootReqMsg = new FrameWeaponShootReqMsg
+            BattleWeaponShootReqMsg frameWeaponShootReqMsg = new BattleWeaponShootReqMsg
             {
                 weaponID = (byte)masterId,
                 firePointPosX = (int)(firePointPos.x * 10000f),
@@ -60,7 +60,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void SendReq_WeaponReload(BattleRoleLogicEntity role)
         {
-            FrameWeaponReloadReqMsg frameWeaponReloadReqMsg = new FrameWeaponReloadReqMsg
+            BattleWeaponReloadReqMsg frameWeaponReloadReqMsg = new BattleWeaponReloadReqMsg
             {
                 masterId = role.IDComponent.EntityID,
             };
@@ -72,7 +72,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         {
             if (role.WeaponComponent.CurWeapon == null) return;
 
-            FrameWeaponDropReqMsg frameWeaponDropReqMsg = new FrameWeaponDropReqMsg
+            BattleWeaponDropReqMsg frameWeaponDropReqMsg = new BattleWeaponDropReqMsg
             {
                 entityID = (ushort)role.WeaponComponent.CurWeapon.IDComponent.EntityID,
                 masterId = role.IDComponent.EntityID
@@ -82,17 +82,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         }
 
         // ====== Regist ======
-        public void RegistRes_WeaponShoot(Action<FrameWeaponShootResMsg> action)
+        public void RegistRes_WeaponShoot(Action<BattleWeaponShootResMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistRes_WeaponReload(Action<FrameWeaponReloadResMsg> action)
+        public void RegistRes_WeaponReload(Action<BattleWeaponReloadResMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistRes_WeaponDrop(Action<FrameWeaponDropResMsg> action)
+        public void RegistRes_WeaponDrop(Action<BattleWeaponDropResMsg> action)
         {
             AddRegister(action);
         }

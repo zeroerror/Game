@@ -88,13 +88,13 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_BattleRoleSpawn(int connId, int entityID, byte controlType)
         {
-            FrameBattleRoleSpawnResMsg frameResWRoleSpawnMsg = new FrameBattleRoleSpawnResMsg
+            BattleRoleSpawnResMsg frameResWRoleSpawnMsg = new BattleRoleSpawnResMsg
             {
                 serverFrame = serverFrame,
                 entityId = (byte)entityID,
                 controlType = controlType
             };
-            battleServer.SendMsg<FrameBattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
+            battleServer.SendMsg<BattleRoleSpawnResMsg>(connId, frameResWRoleSpawnMsg);
             Debug.Log($"SendRes_BattleRoleSpawn entityID:{entityID} controlType:{controlType} ---->人物生成");
             sendCount++;
         }
@@ -104,23 +104,23 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
         #region [Regist]
 
         // == OPT ==
-        public void RegistReq_RoleMove(Action<int, FrameRoleMoveReqMsg> action)
+        public void RegistReq_RoleMove(Action<int, BattleRoleMoveReqMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistReq_RoleRotate(Action<int, FrameRoleRotateReqMsg> action)
+        public void RegistReq_RoleRotate(Action<int, BattleRoleRotateReqMsg> action)
         {
             AddRegister(action);
         }
 
-        public void RegistReq_Jump(Action<int, FrameRollReqMsg> action)
+        public void RegistReq_Jump(Action<int, BattleRoleRollReqMsg> action)
         {
             AddRegister(action);
         }
 
         // == SPAWN ==
-        public void RegistReq_BattleRoleSpawn(Action<int, FrameBattleRoleSpawnReqMsg> action)
+        public void RegistReq_BattleRoleSpawn(Action<int, BattleRoleSpawnReqMsg> action)
         {
             AddRegister(action);
         }

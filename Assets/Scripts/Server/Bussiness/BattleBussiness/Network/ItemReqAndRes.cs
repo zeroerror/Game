@@ -46,7 +46,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         public void SendRes_ItemPickUp(int connId, int frameIndex, int roleID, EntityType itemType, int itemID)
         {
-            FrameItemPickResMsg msg = new FrameItemPickResMsg
+            BattleItemPickResMsg msg = new BattleItemPickResMsg
             {
                 serverFrame = frameIndex,
                 roleID = (byte)roleID,
@@ -81,7 +81,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Network
 
         #region [Regist]
 
-        public void RegistReq_ItemPickUp(Action<int, FrameItemPickReqMsg> action)
+        public void RegistReq_ItemPickUp(Action<int, BattleItemPickReqMsg> action)
         {
             AddRegister(action);
         }
