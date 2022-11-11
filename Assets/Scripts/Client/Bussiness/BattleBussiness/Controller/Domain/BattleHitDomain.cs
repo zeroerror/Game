@@ -42,18 +42,25 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 return;
             }
 
+            var repo = battleFacades.Repo;
+            var bullet = repo.BulletLogicRepo.Get(atkEntityID);
+            if (bullet == null)
+            {
+                return;
+            }
+
             EntityType victimEntityType = victimIDC.EntityType;
             int victimEntityID = victimIDC.EntityID;
             LocomotionComponent victimLC = null;
 
             if (victimEntityType == EntityType.BattleRole)
             {
-                var role = battleFacades.Repo.RoleLogicRepo.Get(victimEntityID);
+                var role = repo.RoleLogicRepo.Get(victimEntityID);
                 victimLC = role.LocomotionComponent;
             }
             else if (victimEntityType == EntityType.Aridrop)
             {
-                var airdrop = battleFacades.Repo.AirdropLogicRepo.Get(victimEntityID);
+                var airdrop = repo.AirdropLogicRepo.Get(victimEntityID);
                 victimLC = airdrop.LocomotionComponent;
             }
             else
@@ -61,14 +68,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 Debug.LogError("Not Handler");
             }
 
-            var bullet = battleFacades.Repo.BulletLogicRepo.Get(atkEntityID);
 
             // - Physics
             var bulletLC = bullet.LocomotionComponent;
             CausePhysics(bulletLC, victimLC, hitPowerModel.knockBackSpeed, hitPowerModel.blowUpSpeed);
 
             // - Damage
-            var repo = battleFacades.Repo;
             var weaponRepo = repo.WeaponRepo;
             var weapon = weaponRepo.Get(bullet.WeaponID);
             var bulletDamage = bullet.GetDamageByCoefficient(weapon.DamageCoefficient);
