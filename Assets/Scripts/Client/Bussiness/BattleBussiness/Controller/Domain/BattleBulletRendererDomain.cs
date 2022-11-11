@@ -6,12 +6,12 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
-    public class BulletRendererDomain
+    public class BattleBulletRendererDomain
     {
 
         BattleFacades battleFacades;
 
-        public BulletRendererDomain()
+        public BattleBulletRendererDomain()
         {
         }
 

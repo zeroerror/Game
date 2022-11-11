@@ -6,11 +6,11 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
-    public class PhysicsDomain
+    public class BattlePhysicsDomain
     {
         BattleFacades battleFacades;
 
-        public PhysicsDomain()
+        public BattlePhysicsDomain()
         {
         }
 

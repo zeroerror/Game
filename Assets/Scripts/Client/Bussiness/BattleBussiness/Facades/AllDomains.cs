@@ -13,16 +13,16 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleInputDomain InputDomain { get; private set; }
 
-        public PhysicsDomain PhysicsDomain { get; private set; }
+        public BattlePhysicsDomain PhysicsDomain { get; private set; }
 
-        public ItemDomain ItemDomain { get; private set; }
+        public BattleItemDomain ItemDomain { get; private set; }
 
-        public BulletLogicDomain BulletLogicDomain { get; private set; }
-        public BulletRendererDomain BulletRendererDomain { get; private set; }
-        public BulletItemDomain BulletItemDomain { get; private set; }
+        public BattleBulletLogicDomain BulletLogicDomain { get; private set; }
+        public BattleBulletRendererDomain BulletRendererDomain { get; private set; }
+        public BattleBulletItemDomain BulletItemDomain { get; private set; }
 
-        public WeaponDomain WeaponDomain { get; private set; }
-        public WeaponItemDomain WeaponItemDomain { get; private set; }
+        public BattleWeaponDomain WeaponDomain { get; private set; }
+        public BattleWeaponItemDomain WeaponItemDomain { get; private set; }
 
         public BattleArmorDomain ArmorDomain { get; private set; }
         public BattleArmorItemDomain ArmorItemDomain { get; private set; }
@@ -35,7 +35,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
         public BattleFieldDomain FieldDomain { get; private set; }
 
-        public BattleCommonDomain commonDomain { get; private set; }
+        public BattleCommonDomain CommonDomain { get; private set; }
 
         public BattleAirdropLogicDomain AirdropLogicDomain { get; private set; }
 
@@ -50,17 +50,17 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             InputDomain = new BattleInputDomain();
 
-            PhysicsDomain = new PhysicsDomain();
+            PhysicsDomain = new BattlePhysicsDomain();
 
-            ItemDomain = new ItemDomain();
+            ItemDomain = new BattleItemDomain();
 
-            BulletLogicDomain = new BulletLogicDomain();
+            BulletLogicDomain = new BattleBulletLogicDomain();
 
-            BulletRendererDomain = new BulletRendererDomain();
-            BulletItemDomain = new BulletItemDomain();
+            BulletRendererDomain = new BattleBulletRendererDomain();
+            BulletItemDomain = new BattleBulletItemDomain();
 
-            WeaponDomain = new WeaponDomain();
-            WeaponItemDomain = new WeaponItemDomain();
+            WeaponDomain = new BattleWeaponDomain();
+            WeaponItemDomain = new BattleWeaponItemDomain();
 
             ArmorDomain = new BattleArmorDomain();
             ArmorItemDomain = new BattleArmorItemDomain();
@@ -73,7 +73,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             FieldDomain = new BattleFieldDomain();
 
-            commonDomain = new BattleCommonDomain();
+            CommonDomain = new BattleCommonDomain();
 
             AirdropLogicDomain = new BattleAirdropLogicDomain();
 
@@ -112,7 +112,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
 
             FieldDomain.Inject(facades);
 
-            commonDomain.Inject(facades);
+            CommonDomain.Inject(facades);
 
             AirdropLogicDomain.Inject(facades);
         }

@@ -75,7 +75,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                     var spawnEntityID = idService.GetAutoIDByEntityType(spawnEntityType);
                     var airdropPos = airdrop.transform.position;
 
-                    var commonDomain = battleFacades.Domain.commonDomain;
+                    var commonDomain = battleFacades.Domain.CommonDomain;
                     var spawnObj = commonDomain.SpawnEntity_Logic(spawnEntityType, spawnSubType, spawnEntityID, airdropPos);
 
                     var airdropLogicDomain = battleFacades.Domain.AirdropLogicDomain;

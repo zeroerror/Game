@@ -202,7 +202,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                     byte subtype = subtypeArray[index];
 
                     // 生成资源
-                    var commonDomain = battleFacades.Domain.commonDomain;
+                    var commonDomain = battleFacades.Domain.CommonDomain;
                     var entityObj = commonDomain.SpawnEntity_Logic(entityType, subtype, entityID, parent.position);
                     var entityGo = commonDomain.UnpackEntityObjToGO(entityObj, entityType);
                     entityGo.transform.SetParent(parent);
@@ -349,7 +349,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
                 Vector3 spawnPos = new Vector3(msg.spawnPosX / 10000f, msg.spawnPosY / 10000f, msg.spawnPosZ / 10000f);
 
                 var domain = battleFacades.Domain;
-                var commonDomain = domain.commonDomain;
+                var commonDomain = domain.CommonDomain;
                 commonDomain.SpawnEntity_Logic(spawnEntityType, spawnSubType, spawnEntityID, spawnPos);
                 commonDomain.SpawnEntity_Renderer(spawnEntityType, spawnSubType, spawnEntityID, spawnPos);
 

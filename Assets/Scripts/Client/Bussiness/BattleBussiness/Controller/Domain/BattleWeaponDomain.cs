@@ -5,12 +5,12 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
-    public class WeaponDomain
+    public class BattleWeaponDomain
     {
 
         BattleFacades battleFacades;
 
-        public WeaponDomain()
+        public BattleWeaponDomain()
         {
         }
 

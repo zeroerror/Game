@@ -57,7 +57,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
                 entityIDList.Add(entityID);
 
                 // - 生成资源
-                var commonDomain = battleFacades.Domain.commonDomain;
+                var commonDomain = battleFacades.Domain.CommonDomain;
                 commonDomain.SpawnEntity_Logic(entityType, subtype, entityID, spawnPos);
             }
 

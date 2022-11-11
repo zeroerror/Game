@@ -5,12 +5,12 @@ using Game.Client.Bussiness.BattleBussiness.Generic;
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 {
 
-    public class BulletItemDomain
+    public class BattleWeaponItemDomain
     {
 
         BattleFacades battleFacades;
 
-        public BulletItemDomain()
+        public BattleWeaponItemDomain()
         {
         }
 
@@ -19,9 +19,9 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             this.battleFacades = facades;
         }
 
-        public BulletItemEntity Spawn(BulletType bulletType, int entityID, Vector3 pos)
+        public WeaponItemEntity Spawn(WeaponType weaponType, int entityID, Vector3 pos)
         {
-            string prefabName = $"Item_Bullet_{bulletType.ToString()}";
+            string prefabName = $"Item_Weapon_{weaponType.ToString()}";
             var asset = battleFacades.Assets.ItemAsset;
             if (!asset.TryGetByName(prefabName, out var prefab))
             {
@@ -30,24 +30,24 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
             }
 
             var go = GameObject.Instantiate(prefab);
-            var entity = go.GetComponent<BulletItemEntity>();
+            var entity = go.GetComponent<WeaponItemEntity>();
             entity.Ctor();
             entity.SetEntityID(entityID);
             entity.transform.position = pos;
 
             var repo = battleFacades.Repo;
-            var bulletItemRepo = repo.BulletItemRepo;
-            bulletItemRepo.Add(entity);
+            var weaponItemRepo = repo.WeaponItemRepo;
+            weaponItemRepo.Add(entity);
             return entity;
         }
 
-        public void TearDownBulletItem(BulletItemEntity bulletItem)
+        public void TearDownWeaponItem(WeaponItemEntity weaponItem)
         {
             var repo = battleFacades.Repo;
-            var bulletItemRepo = repo.BulletItemRepo;
-            bulletItemRepo.TryRemove(bulletItem);
-            GameObject.Destroy(bulletItem.gameObject);
-            GameObject.Destroy(bulletItem);
+            var weaponItemRepo = repo.WeaponItemRepo;
+            weaponItemRepo.TryRemove(weaponItem);
+            GameObject.Destroy(weaponItem.gameObject);
+            GameObject.Destroy(weaponItem);
         }
 
     }
