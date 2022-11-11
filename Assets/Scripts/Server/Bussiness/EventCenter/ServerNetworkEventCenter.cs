@@ -1,4 +1,5 @@
 using System;
+using Game.Infrastructure.Network.Server;
 using Game.Protocol.Login;
 
 namespace Game.Server.Bussiness.EventCenter
@@ -19,13 +20,13 @@ namespace Game.Server.Bussiness.EventCenter
         public static void Invoke_WorldDisconnection(int connId) => worldDisconnHandler.Invoke(connId);
 
         // == BattleServer
-        static Action battleServerCreateHandler;
-        public static void Regist_BattleServerNeedCreate(Action action) => battleServerCreateHandler += action;
-        public static void Invoke_BattleServerNeedCreate() => battleServerCreateHandler.Invoke();
+        static Action startBattleServerAction;
+        public static void Regist_StartBattleServer(Action action) => startBattleServerAction += action;
+        public static void Invoke_StartBattleServer() => startBattleServerAction.Invoke();
 
-        static Action<int> battleServerConnHandler;
-        public static Action<int> Regist_BattleServerConnHandler(Action<int> action) => battleServerConnHandler += action;
-        public static void Invoke_BattleServerConnect(int connID) => battleServerConnHandler.Invoke(connID);
+        static Action<int, NetworkServer> battleServerConnHandler;
+        public static void Regist_BattleServerConnHandler(Action<int, NetworkServer> action) => battleServerConnHandler += action;
+        public static void Invoke_BattleServerConnect(int connID, NetworkServer networkServer) => battleServerConnHandler.Invoke(connID, networkServer);
 
 
     }

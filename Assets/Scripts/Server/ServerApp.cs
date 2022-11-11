@@ -3,10 +3,15 @@ using UnityEngine;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Server.Facades;
 using Game.Server.Bussiness.LoginBussiness;
+using Game.Server.Bussiness.LoginBussiness.Facades;
 using Game.Server.Bussiness.BattleBussiness;
-using Game.Protocol.Client2World;
+using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Server.Bussiness.WorldBussiness;
+using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Server.Bussiness.EventCenter;
+using System.Collections.Generic;
+using Game.Client.Bussiness.BattleBussiness.Generic;
+using Game.Infrastructure.Network.Server;
 
 namespace Game.Server
 {
@@ -14,60 +19,114 @@ namespace Game.Server
     public class ServerApp : MonoBehaviour
     {
 
-        // Network
+        // ------ Network
         AllServerNetwork allServerNetwork;
         float fixedDeltaTime;
 
-        // Entry
-        BattleEntry battleEntry;
+        // ------ Entry
         LoginEntry loginEntry;
-        WorldEntry worldEntry;
+        Thread loginThread;
+        ServerLoginFacades loginFacades;
 
-        Thread _loginThread;
-        Thread _worldServerThread;
+        WorldEntry worldEntry;
+        Thread worldServerThread;
+        ServerWorldFacades worldFacades;
+
+        List<BattleEntry> battleEntryList;
+        List<Thread> battleServerThreadList;
 
         void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
+            fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;
+            battleEntryCreateQueue = new Queue<BattleEntryCtorModel>();
 
             // == Network ==
             allServerNetwork = new AllServerNetwork();
             StartLoginServer();
             StartWorldServer();
-            fixedDeltaTime = UnityEngine.Time.fixedDeltaTime;
-            //战斗服的启动是由客户端在世界服候创建战斗对局决定启动
 
             // == Event Center ==
             ServerNetworkEventCenter.Ctor();
+            ServerNetworkEventCenter.Regist_StartBattleServer(StartBattleServer);
+            ServerNetworkEventCenter.Regist_BattleServerConnHandler((connID, networkServer) =>
+            {
+                battleEntryCreateQueue.Enqueue(new BattleEntryCtorModel { connID = connID, networkServer = networkServer });
+            });
 
             // == Entry ==
-            // LoginEntry
+            // - Login Entry
+            loginFacades = new ServerLoginFacades();
+            loginFacades.Inject(allServerNetwork.LoginServer);
             loginEntry = new LoginEntry();
-            loginEntry.Inject(allServerNetwork.LoginServer);
-            // WorldEntry
+            loginEntry.Inject(loginFacades);
+
+            // - World Entry
+            worldFacades = new ServerWorldFacades();
+            worldFacades.Inject(allServerNetwork.WorldServer);
             worldEntry = new WorldEntry();
-            worldEntry.Inject(allServerNetwork.WorldServer);
-            // BattleEntry
-            battleEntry = new BattleEntry();
-            battleEntry.Inject(allServerNetwork.BattleServer);
+            worldEntry.Inject(worldFacades);
+
+            // - Battle Entry
+            battleEntryList = new List<BattleEntry>();
+            battleServerThreadList = new List<Thread>();
 
             // == Physics ==
             Physics.autoSimulation = false;
 
         }
 
+        struct BattleEntryCtorModel
+        {
+            public int connID;
+            public NetworkServer networkServer;
+        }
+
+        Queue<BattleEntryCtorModel> battleEntryCreateQueue;
+
         void FixedUpdate()
         {
             // == Entry ==
             loginEntry.Tick();
             worldEntry.Tick();
-            battleEntry.Tick(fixedDeltaTime);
+            battleEntryList.ForEach((battleEntry) =>
+            {
+                battleEntry.Tick(fixedDeltaTime);
+            });
+
+            while (battleEntryCreateQueue.TryDequeue(out var model))
+            {
+                var connID = model.connID;
+                var networkServer = model.networkServer;
+                Debug.Log($"battleEntryCreateQueue connID: {connID}");
+
+                // - Facades
+                var facades = new ServerBattleFacades();
+                facades.Inject(networkServer);
+                facades.Network.connIdList.Add(connID);
+
+                // - Entry
+                BattleEntry battleEntry = new BattleEntry();
+                battleEntry.Inject(facades);
+                battleEntryList.Add(battleEntry);
+
+                var battleFacades = facades.BattleFacades;
+                var gameEntity = battleFacades.GameEntity;
+                var gameStage = gameEntity.Stage;
+                var fsm = gameEntity.FSMComponent;
+                var gameState = fsm.BattleState;
+                if (!gameStage.HasStage(BattleStage.Level1) && gameState != BattleState.SpawningField)
+                {
+                    fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
+                }
+            }
+
         }
 
         void OnDestroy()
         {
-            _loginThread.Abort();
-            _worldServerThread.Abort();
+            loginThread.Abort();
+            worldServerThread.Abort();
         }
 
         void StartLoginServer()
@@ -76,14 +135,14 @@ namespace Game.Server
             Debug.Log($"登录服启动！端口:{port}");
             var networkServer = allServerNetwork.LoginServer;
             networkServer.StartListen(port);
-            _loginThread = new Thread(() =>
+            loginThread = new Thread(() =>
                         {
                             while (true)
                             {
                                 networkServer.Tick();
                             }
                         });
-            _loginThread.Start();
+            loginThread.Start();
             networkServer.OnConnectedHandle += (connID) =>
             {
                 Debug.Log($"[登录服]: connID:{connID} 客户端连接成功-------------------------");
@@ -97,14 +156,14 @@ namespace Game.Server
             Debug.Log($"世界服启动！端口:{port}");
             var worldServer = allServerNetwork.WorldServer;
             worldServer.StartListen(port);
-            _worldServerThread = new Thread(() =>
+            worldServerThread = new Thread(() =>
                         {
                             while (true)
                             {
                                 worldServer.Tick();
                             }
                         });
-            _worldServerThread.Start();
+            worldServerThread.Start();
 
             worldServer.OnConnectedHandle += (connID) =>
             {
@@ -117,6 +176,34 @@ namespace Game.Server
             };
         }
 
+        void StartBattleServer()
+        {
+            if (battleServerThreadList.Count >= NetworkConfig.BATTLE_SERVER_MAX)
+            {
+                Debug.LogWarning($"战斗服达到最大数量[{NetworkConfig.BATTLE_SERVER_MAX}]限制");
+                return;
+            }
+
+            var port = NetworkConfig.BATTLESERVER_PORT[0];
+            Debug.Log($"战斗服启动！端口:{port}");
+            var battleServer = allServerNetwork.BattleServerQueue.Dequeue();
+            battleServer.StartListen(port);
+            var thread = new Thread(() =>
+            {
+                while (true)
+                {
+                    battleServer.Tick();
+                }
+            });
+            thread.Start();
+            battleServerThreadList.Add(thread);
+
+            battleServer.OnConnectedHandle += (connID) =>
+            {
+                Debug.Log($"[战斗服]: ConnID:{connID} 客户端连接成功-------------------------");
+                ServerNetworkEventCenter.Invoke_BattleServerConnect(connID, battleServer);
+            };
+        }
     }
 
 }

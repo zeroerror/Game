@@ -37,7 +37,7 @@ namespace Game.Client.Bussiness.LoginBussiness.Controllers
 
             while (loginResQueue.TryDequeue(out var msg))
             {
-                NetworkEventCenter.Invoke_LoginSuccessHandler(msg);
+                NetworkEventCenter.Invoke_LoginSuccessAction(msg);
             }
 
         }

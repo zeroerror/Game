@@ -27,9 +27,10 @@ namespace Game.Client.Bussiness.EventCenter
         // UI Trigger
         public static Action<string, string> LoginAction;       // 登录
         public static Action<string, string> RegistAction;       // 注册
-        public static Action<string, ushort> ConnWorSerAction;// 连接世界服
-        public static Action<string> WorldRoomCreateAction;   // 创建世界服内的房间
-        public static Action<string, ushort> WorldRoomEnter;   // 进入战斗服房间
+        public static Action<string, ushort> World_ConAction;// 连接世界服
+        public static Action World_ReqAllRoomsBasicInfoAction;   // 请求获取世界服内所有房间基本信息
+        public static Action<string> World_CreateRoomAction;   // 创建世界服内的房间
+        public static Action<string, ushort> World_EnterRoom;   // 进入战斗服房间
         public static Action<Vector2> MoveAction;   // 战斗移动操作
         public static Action PickAction;   // 战斗拾取操作
         public static Action<Vector2> ShootAction;   // 战斗射击操作

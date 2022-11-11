@@ -19,11 +19,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
             list = new List<WorldRoomEntity>();
         }
 
-        public WorldRoomEntity GetByEntityId(int entityId)
-        {
-            return list.Find((r) => r.EntityId == entityId);
-        }
-
         public void Add(WorldRoomEntity entity)
         {
             EntityIdAutoIncrease++;
@@ -37,8 +32,36 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
 
         public void RemoveByEntityId(int entityId)
         {
-            var role = list.Find((r) => r.EntityId == entityId);
+            var role = list.Find((r) => r.EntityID == entityId);
             list.Remove(role);
+        }
+
+        public WorldRoomEntity GetByEntityId(int entityId)
+        {
+            return list.Find((r) => r.EntityID == entityId);
+        }
+
+        public WorldRoomEntity[] GetAll()
+        {
+            return list.ToArray();
+        }
+
+        public void RemoveByMasterID(int masterID)
+        {
+            var worldRoom = list.Find((v) => v.MasterID == masterID);
+            list.Remove(worldRoom);
+        }
+
+        public bool TryGetByMasterID(int masterID, out WorldRoomEntity worldRoom)
+        {
+            worldRoom = list.Find((v) => v.MasterID == masterID);
+            return worldRoom != null;
+        }
+
+        public bool TryGetAll(int masterID, out WorldRoomEntity worldRoom)
+        {
+            worldRoom = list.Find((v) => v.MasterID == masterID);
+            return worldRoom != null;
         }
 
         public void Foreach(Action<WorldRoomEntity> action)
@@ -50,6 +73,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Repo
                 action.Invoke(role);
             });
         }
+
 
     }
 

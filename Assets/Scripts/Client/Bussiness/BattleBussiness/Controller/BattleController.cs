@@ -33,7 +33,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             // --- Network Events3
             // - Battle
             var battleRqs = battleFacades.Network.BattleReqAndRes;
-            NetworkEventCenter.Regist_BattleSerConnectHandler(() =>
+            NetworkEventCenter.Regist_BattleSerConnectAction(() =>
             {
                 battleRqs.SendReq_BattleGameStateAndStage();
 
@@ -55,14 +55,14 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
             ItemReqAndRes.RegistRes_ItemPickUp(OnItemPickUp);
 
             // --- Local Events
-            UIEventCenter.WorldRoomEnter += ((host, port) =>
+            UIEventCenter.World_EnterRoom += ((host, port) =>
             {
                 var battleRqs = battleFacades.Network.BattleReqAndRes;
                 battleRqs.ConnBattleServer(host, port);
             });
 
             var logicEventCenter = battleFacades.LogicEventCenter;
-            logicEventCenter.Regist_BattleStateAndStageChangeHandler(LogicEvent_BattleStateAndStageChange);
+            logicEventCenter.Regist_BattleStateAndStageChangeAction(LogicEvent_BattleStateAndStageChange);
         }
 
         public void Tick(float fixedDeltaTime)

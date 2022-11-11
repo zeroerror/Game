@@ -1,12 +1,10 @@
 
-using System.Collections.Generic;
 using Game.Infrastructure.Network.Server;
-using Game.Client.Bussiness.BattleBussiness.Generic;
 
 namespace Game.Server.Bussiness.BattleBussiness.Facades
 {
 
-    public class BattleServerFacades
+    public class ServerBattleFacades
     {
 
         public Game.Client.Bussiness.BattleBussiness.Facades.BattleFacades BattleFacades { get; private set; }
@@ -14,7 +12,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
         public AllBattleNetwork Network { get; private set; }
         public LocalEventCenter LocalEventCenter { get; private set; }
 
-        public BattleServerFacades()
+        public ServerBattleFacades()
         {
             Network = new AllBattleNetwork();
             LocalEventCenter = new LocalEventCenter();

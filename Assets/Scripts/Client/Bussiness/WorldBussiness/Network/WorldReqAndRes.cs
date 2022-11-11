@@ -1,9 +1,7 @@
 using System;
 using UnityEngine;
 using Game.Infrastructure.Network.Client;
-using Game.Protocol.Battle;
 using Game.Protocol.Client2World;
-using System.Threading;
 using Game.Protocol.World;
 
 namespace Game.Client.Bussiness.WorldBussiness.Network
@@ -11,7 +9,7 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
     public class WorldReqAndRes
     {
-        NetworkClient _worldServClient;
+        NetworkClient worldClient;
 
         public WorldReqAndRes()
         {
@@ -20,42 +18,48 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
         public void Inject(NetworkClient client)
         {
-            _worldServClient = client;
+            worldClient = client;
         }
 
         public void ConnWorldServer(string host, ushort port)
         {
             Debug.Log($"尝试连接世界服:{host}:{port}");
-            _worldServClient.Connect(host, port);
+            worldClient.Connect(host, port);
         }
 
         // == Send ==
-        public void SendReq_WorldEnterMsg(string account)
+        public void SendReq_EnterWorld(string account)
         {
             WolrdEnterReqMessage msg = new WolrdEnterReqMessage
             {
                 account = account
             };
-            _worldServClient.SendMsg(msg);
+            worldClient.SendMsg(msg);
             Debug.Log($"发送进入世界请求: account:{account}");
         }
 
-        public void SendReq_WorldLeaveMsg()
+        public void SendReq_LeaveWorld()
         {
-            WolrdLeaveReqMessage msg = new WolrdLeaveReqMessage
+            WolrdLeaveReqMsg msg = new WolrdLeaveReqMsg
             {
             };
-            _worldServClient.SendMsg(msg);
+            worldClient.SendMsg(msg);
             Debug.Log($"发送离开世界请求");
         }
 
-        public void SendReq_CreateWorldRoomMsg(string roomName)
+        public void SendReq_GetAllWorldRoomsBasicInfo()
         {
-            WorldRoomCreateReqMessage msg = new WorldRoomCreateReqMessage
+            WorldAllRoomsBacisInfoReqMsg msg = new WorldAllRoomsBacisInfoReqMsg();
+            worldClient.SendMsg(msg);
+        }
+
+        public void SendReq_CreateWorldRoom(string roomName)
+        {
+            WorldCreateRoomReqMsg msg = new WorldCreateRoomReqMsg
             {
                 roomName = roomName
             };
-            _worldServClient.SendMsg(msg);
+            worldClient.SendMsg(msg);
             Debug.Log($"发送创建房间请求 roomName:{roomName}");
         }
 
@@ -63,17 +67,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Network
 
         public void RegistRes_WorldEnter(Action<WolrdEnterResMessage> action)
         {
-            _worldServClient.RegistMsg(action);
+            worldClient.RegistMsg(action);
         }
 
-        public void RegistRes_WorldLeave(Action<WolrdLeaveResMessage> action)
+        public void RegistRes_WorldGetAllRoomsBacisInfo(Action<WorldAllRoomsBacisInfoResMsg> action)
         {
-            _worldServClient.RegistMsg(action);
+            worldClient.RegistMsg(action);
         }
 
-        public void RegistRes_WorldRoomCreate(Action<WorldRoomCreateResMessage> action)
+        public void RegistRes_WorldLeave(Action<WolrdLeaveResMsg> action)
         {
-            _worldServClient.RegistMsg(action);
+            worldClient.RegistMsg(action);
+        }
+
+        public void RegistRes_WorldRoomCreate(Action<WorldCreateRoomResMsg> action)
+        {
+            worldClient.RegistMsg(action);
+        }
+
+        public void RegistRes_WorldRoomDismiss(Action<WorldRoomDismissResMsg> action)
+        {
+            worldClient.RegistMsg(action);
         }
 
     }

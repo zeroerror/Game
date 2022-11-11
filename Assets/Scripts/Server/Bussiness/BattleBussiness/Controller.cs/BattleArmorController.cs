@@ -6,9 +6,9 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleArmorController
     {
 
-        BattleServerFacades battleFacades;
+        ServerBattleFacades battleFacades;
 
-        public void Inject(BattleServerFacades battleFacades)
+        public void Inject(ServerBattleFacades battleFacades)
         {
             this.battleFacades = battleFacades;
         }

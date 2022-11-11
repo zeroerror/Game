@@ -99,7 +99,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // -  Logic Trigger
                 var logicEventCenter = battleFacades.LogicEventCenter;
-                logicEventCenter.Invoke_BattleStateAndStageChangeHandler();
+                logicEventCenter.Invoke_BattleStateAndStageChangeAction();
             }
         }
 
@@ -135,7 +135,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // -  Logic Trigger
                 var logicEventCenter = battleFacades.LogicEventCenter;
-                logicEventCenter.Invoke_BattleStateAndStageChangeHandler();
+                logicEventCenter.Invoke_BattleStateAndStageChangeAction();
             }
 
         }
@@ -179,7 +179,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // -  Logic Trigger
                 var logicEventCenter = battleFacades.LogicEventCenter;
-                logicEventCenter.Invoke_BattleStateAndStageChangeHandler();
+                logicEventCenter.Invoke_BattleStateAndStageChangeAction();
             }
         }
 
@@ -215,7 +215,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
                 // -  Logic Trigger
                 var logicEventCenter = battleFacades.LogicEventCenter;
-                logicEventCenter.Invoke_BattleStateAndStageChangeHandler();
+                logicEventCenter.Invoke_BattleStateAndStageChangeAction();
             }
         }
 

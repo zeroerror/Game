@@ -27,6 +27,8 @@ namespace Game.Infrastructure.Generic
 
         public static readonly float FIXED_DELTA_TIME = UnityEngine.Time.fixedDeltaTime;
 
+        public const int BATTLE_SERVER_MAX = 3;
+
         // public static readonly string LOGIN_HOST = "localhost";
         // public static readonly ushort LOGIN_PORT = 4000;
 

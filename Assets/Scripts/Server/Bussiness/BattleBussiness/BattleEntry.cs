@@ -11,7 +11,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
     public class BattleEntry
     {
-        BattleServerFacades serverFacades;
+        ServerBattleFacades serverFacades;
 
         BattleController battleController;
         BattlePhysicsController battlePhysicsController;
@@ -21,11 +21,8 @@ namespace Game.Server.Bussiness.BattleBussiness
         BattleArmorController battleArmorController;
         BattleBulletController battleBulletController;
 
-        Thread _battleServerThread;
-
         public BattleEntry()
         {
-            serverFacades = new BattleServerFacades();
             battleController = new BattleController();
             battlePhysicsController = new BattlePhysicsController();
             battleNetworkController = new BattleNetworkController();
@@ -33,15 +30,12 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleLifeController = new BattleLifeController();
             battleArmorController = new BattleArmorController();
             battleBulletController = new BattleBulletController();
-
-            ServerNetworkEventCenter.Regist_BattleServerNeedCreate(StartBattleServer);
         }
 
-        public void Inject(NetworkServer server)
+        public void Inject(ServerBattleFacades facades)
         {
             // Facades
-            serverFacades.Inject(server);
-
+            this.serverFacades = facades;
             // Conntroller
             battleController.Inject(serverFacades);
             battlePhysicsController.Inject(serverFacades);
@@ -73,34 +67,6 @@ namespace Game.Server.Bussiness.BattleBussiness
             battleLifeController.Tick(fixedDeltaTime);
             battleArmorController.Tick(fixedDeltaTime);
             battleBulletController.Tick(fixedDeltaTime);
-        }
-
-        void StartBattleServer()
-        {
-            if (_battleServerThread != null)
-            {
-                Debug.Log($"战斗服已经启动了！！！");
-                return;
-            }
-
-            var port = NetworkConfig.BATTLESERVER_PORT[0];
-            Debug.Log($"战斗服启动！端口:{port}");
-            var battleServer = serverFacades.Network.BattleServer;
-            battleServer.StartListen(port);
-            _battleServerThread = new Thread(() =>
-            {
-                while (true)
-                {
-                    battleServer.Tick();
-                }
-            });
-            _battleServerThread.Start();
-
-            battleServer.OnConnectedHandle += (connID) =>
-            {
-                Debug.Log($"[战斗服]: connID:{connID} 客户端连接成功-------------------------");
-                ServerNetworkEventCenter.Invoke_BattleServerConnect(connID);
-            };
         }
 
     }

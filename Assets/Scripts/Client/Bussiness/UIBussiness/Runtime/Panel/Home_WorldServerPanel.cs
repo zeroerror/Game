@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.UIBussiness.Panel
             int index = (int)argsArray[0];
             var host = worldSerHosts[index];
             var port = ports[index];
-            UIEventCenter.ConnWorSerAction.Invoke(host, port);
+            UIEventCenter.World_ConAction.Invoke(host, port);
         }
 
     }

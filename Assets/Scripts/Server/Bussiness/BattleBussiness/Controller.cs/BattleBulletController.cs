@@ -11,13 +11,13 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleBulletController
     {
 
-        BattleServerFacades serverFacades;
+        ServerBattleFacades serverFacades;
 
         List<int> ConnIDList => serverFacades.Network.connIdList;
 
         public BattleBulletController() { }
 
-        public void Inject(BattleServerFacades facades)
+        public void Inject(ServerBattleFacades facades)
         {
             serverFacades = facades;
 

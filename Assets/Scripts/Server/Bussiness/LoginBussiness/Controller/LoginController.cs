@@ -24,7 +24,7 @@ namespace Game.Server.Bussiness.LoginBussiness
             public string pwd;
         }
 
-        LoginFacades loginFacades;
+        ServerLoginFacades loginFacades;
         List<LoginEvent> loginEventList;
         List<RegistEvent> registEventList;
 
@@ -34,7 +34,7 @@ namespace Game.Server.Bussiness.LoginBussiness
             registEventList = new List<RegistEvent>();
         }
 
-        public void Inject(LoginFacades loginFacades)
+        public void Inject(ServerLoginFacades loginFacades)
         {
             this.loginFacades = loginFacades;
 

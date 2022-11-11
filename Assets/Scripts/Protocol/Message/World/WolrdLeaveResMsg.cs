@@ -3,7 +3,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 {
 
     [ZeroMessage]
-    public class WolrdLeaveResMessage :IZeroMessage<WolrdLeaveResMessage>{
+    public class WolrdLeaveResMsg :IZeroMessage<WolrdLeaveResMsg>{
         public string account;
         public int entityId;
 

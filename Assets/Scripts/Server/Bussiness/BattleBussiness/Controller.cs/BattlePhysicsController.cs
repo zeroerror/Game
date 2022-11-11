@@ -8,13 +8,13 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattlePhysicsController
     {
 
-        BattleServerFacades serverFacades;
+        ServerBattleFacades serverFacades;
 
         List<int> ConnIDList => serverFacades.Network.connIdList;
 
         public BattlePhysicsController() { }
 
-        public void Inject(BattleServerFacades facades)
+        public void Inject(ServerBattleFacades facades)
         {
             serverFacades = facades;
         }

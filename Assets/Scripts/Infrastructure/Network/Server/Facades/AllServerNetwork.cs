@@ -1,4 +1,5 @@
-using UnityEngine;
+using System.Collections.Generic;
+using Game.Infrastructure.Generic;
 
 namespace Game.Infrastructure.Network.Server.Facades
 {
@@ -7,15 +8,18 @@ namespace Game.Infrastructure.Network.Server.Facades
     {
         public NetworkServer LoginServer { get; private set; }
         public NetworkServer WorldServer { get; private set; }
-        public NetworkServer BattleServer { get; private set; }
+        public Queue<NetworkServer> BattleServerQueue { get; private set; }
 
         public AllServerNetwork()
         {
             LoginServer = new NetworkServer(4096);
             WorldServer = new NetworkServer(4096);
-            BattleServer = new NetworkServer(4096);
+            BattleServerQueue = new Queue<NetworkServer>();
+            for (int i = 0; i < NetworkConfig.BATTLE_SERVER_MAX; i++)
+            {
+                BattleServerQueue.Enqueue(new NetworkServer(4096));
+            }
         }
-
 
     }
 

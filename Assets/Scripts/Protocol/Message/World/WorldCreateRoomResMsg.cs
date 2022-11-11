@@ -3,7 +3,7 @@ using ZeroFrame.Buffer;namespace Game.Protocol.World
 {
 
     [ZeroMessage]
-    public class WorldRoomCreateResMessage :IZeroMessage<WorldRoomCreateResMessage>{
+    public class WorldCreateRoomResMsg :IZeroMessage<WorldCreateRoomResMsg>{
         public int roomEntityId;
         public string roomName;
         public string masterAccount;

@@ -133,9 +133,9 @@ namespace Game.Client
             });
             _loginServClientThread.Start();
             AllClientNetwork.loginSerClient.OnConnectedHandle += () =>
-           {
-               Debug.Log("连接登录服务器成功*************************************************************");
-           };
+            {
+                Debug.Log("连接登录服务器成功*************************************************************");
+            };
 
             Debug.Log("启动世界服客户端---------------------------------");
             _worldServClientThread = new Thread(() =>
@@ -147,10 +147,10 @@ namespace Game.Client
             });
             _worldServClientThread.Start();
             AllClientNetwork.worldSerClient.OnConnectedHandle += () =>
-           {
-               Debug.Log("连接世界服务器成功*************************************************************");
-               NetworkEventCenter.Invoke_ConnWorSerSuccessHandler();
-           };
+            {
+                Debug.Log("连接世界服务器成功*************************************************************");
+                NetworkEventCenter.Invoke_ConnWorSerSuccessAction();
+            };
 
             Debug.Log("启动战斗服客户端---------------------------------");
             _battleServClientThread = new Thread(() =>
@@ -162,11 +162,11 @@ namespace Game.Client
             });
             _battleServClientThread.Start();
             AllClientNetwork.battleSerClient.OnConnectedHandle += () =>
-           {
-               Debug.Log("连接战斗服务器成功*************************************************************");
-               NetworkEventCenter.Invoke_BattleSerConnectHandler();
-               AllClientNetwork.worldSerClient.Disconnect();//断开和世界服连接 
-           };
+            {
+                Debug.Log("连接战斗服务器成功*************************************************************");
+                NetworkEventCenter.Invoke_BattleSerConnectAction();
+                AllClientNetwork.worldSerClient.Disconnect();//断开和世界服连接 
+            };
         }
 
         async Task LoadAllAsset()

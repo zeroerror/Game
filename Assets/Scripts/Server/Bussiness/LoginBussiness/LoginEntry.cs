@@ -7,19 +7,17 @@ namespace Game.Server.Bussiness.LoginBussiness
     public class LoginEntry
     {
 
-        LoginFacades loginFacades;
+        ServerLoginFacades loginFacades;
         LoginController loginController;
 
         public LoginEntry()
         {
-            loginFacades = new LoginFacades();
             loginController = new LoginController();
         }
 
-        public void Inject(NetworkServer server)
+        public void Inject(ServerLoginFacades facades)
         {
-            loginFacades.Inject(server);
-
+            loginFacades = facades;
             loginController.Inject(loginFacades);
         }
 

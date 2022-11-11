@@ -10,10 +10,10 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleLifeController
     {
 
-        BattleServerFacades serverFacades;
+        ServerBattleFacades serverFacades;
         public List<int> ConnIDList => serverFacades.Network.connIdList;
 
-        public void Inject(BattleServerFacades battleFacades)
+        public void Inject(ServerBattleFacades battleFacades)
         {
             this.serverFacades = battleFacades;
         }

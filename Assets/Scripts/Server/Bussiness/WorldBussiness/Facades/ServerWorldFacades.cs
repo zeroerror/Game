@@ -6,16 +6,16 @@ using Game.Infrastructure.Network.Server;
 namespace Game.Server.Bussiness.WorldBussiness.Facades
 {
 
-    public class WorldFacades
+    public class ServerWorldFacades
     {
 
         public AllWorldNetwork Network { get; private set; }
-        public Game.Client.Bussiness.WorldBussiness.Facades.WorldFacades ClientWorldFacades { get; private set; }
+        public Game.Client.Bussiness.WorldBussiness.Facades.WorldFacades WorldFacades { get; private set; }
 
-        public WorldFacades()
+        public ServerWorldFacades()
         {
             Network = new AllWorldNetwork();
-            ClientWorldFacades = new Client.Bussiness.WorldBussiness.Facades.WorldFacades();
+            WorldFacades = new Client.Bussiness.WorldBussiness.Facades.WorldFacades();
         }
 
         public void Inject(NetworkServer server)

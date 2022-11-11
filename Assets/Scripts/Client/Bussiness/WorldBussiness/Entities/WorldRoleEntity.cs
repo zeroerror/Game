@@ -21,7 +21,7 @@ namespace Game.Client.Bussiness.WorldBussiness
 
         int connId;
         public int ConnId => this.connId;
-        public void SetConnId(int connId) => this.connId = connId;
+        public void SetConnID(int connId) => this.connId = connId;
 
     }
 

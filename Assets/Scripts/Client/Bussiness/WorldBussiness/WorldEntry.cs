@@ -43,7 +43,7 @@ namespace Game.Client.Bussiness.WorldBussiness
         public void TearDown()
         {
             // Send Disconnection
-            worldFacades.Network.WorldReqAndRes.SendReq_WorldLeaveMsg();
+            worldFacades.Network.WorldReqAndRes.SendReq_LeaveWorld();
         }
 
     }

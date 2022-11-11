@@ -15,21 +15,27 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
     {
 
         Queue<WolrdEnterResMessage> worldEnterQueue;
-        Queue<WolrdLeaveResMessage> worldLeaveQueue;
-        Queue<WorldRoomCreateResMessage> worldLRoomCreateQueue;
+        Queue<WolrdLeaveResMsg> worldLeaveQueue;
+        Queue<WorldCreateRoomResMsg> worldLRoomCreateQueue;
+        Queue<WorldRoomDismissResMsg> worldLRoomDismissQueue;
+        Queue<WorldAllRoomsBacisInfoResMsg> worldAllRoomsBacisInfoQueue;
 
         WorldFacades worldFacades;
 
         public WorldController()
         {
             NetworkEventCenter.Regist_LoginSuccess(OnLoginSuccess);
-            NetworkEventCenter.Regist_ConnWorSerSuccess(SendWorldEnterReq);
-            UIEventCenter.ConnWorSerAction += SendConnWorSer;
-            UIEventCenter.WorldRoomCreateAction += SendCreateWorldRoomReq;
+            NetworkEventCenter.Regist_ConnWorSerSuccess(OnConnWorSerSuccess);
+
+            UIEventCenter.World_ConAction += SendConnWorSer;
+            UIEventCenter.World_CreateRoomAction += SendReq_CreateWorldRoom;
+            UIEventCenter.World_ReqAllRoomsBasicInfoAction += SendReq_GetAllWorldRoomsBasicInfo;
 
             worldEnterQueue = new Queue<WolrdEnterResMessage>();
-            worldLeaveQueue = new Queue<WolrdLeaveResMessage>();
-            worldLRoomCreateQueue = new Queue<WorldRoomCreateResMessage>();
+            worldLeaveQueue = new Queue<WolrdLeaveResMsg>();
+            worldLRoomCreateQueue = new Queue<WorldCreateRoomResMsg>();
+            worldLRoomDismissQueue = new Queue<WorldRoomDismissResMsg>();
+            worldAllRoomsBacisInfoQueue = new Queue<WorldAllRoomsBacisInfoResMsg>();
 
         }
 
@@ -38,51 +44,18 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             this.worldFacades = worldFacades;
             worldFacades.Network.WorldReqAndRes.RegistRes_WorldEnter(OnEnterWorldRes);
             worldFacades.Network.WorldReqAndRes.RegistRes_WorldLeave(OnLeaveWorldRes);
+            worldFacades.Network.WorldReqAndRes.RegistRes_WorldGetAllRoomsBacisInfo(OnWorldGetAllRoomsBasicInfo);
             worldFacades.Network.WorldReqAndRes.RegistRes_WorldRoomCreate(OnWorldRoomCreate);
+            worldFacades.Network.WorldReqAndRes.RegistRes_WorldRoomDismiss(OnWorldRoomADismiss);
         }
 
         public void Tick()
         {
-            while (worldEnterQueue.TryDequeue(out var msg))
-            {
-                var entityId = msg.entityId;
-                var account = msg.account;
-                WorldRoleEntity roleEntity = new WorldRoleEntity();
-                roleEntity.SetAccount(msg.account);
-                roleEntity.SetEntityId(entityId);
-                var roleRepo = worldFacades.Repo.WorldRoleRepo;
-                roleRepo.Add(roleEntity);
-                if (msg.isOwner) roleRepo.SetOwner(roleEntity);
-
-                UIEventCenter.AddToTearDown("Home_WorldServerPanel");
-                UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_WorldRoomPanel" });
-                SpawnScene("world_scene");
-
-                Debug.Log($"entityId:{entityId}  account:{account} 进入世界 当前在线人数:{roleRepo.Count}");
-            }
-
-            while (worldLeaveQueue.TryDequeue(out var msg))
-            {
-                UIEventCenter.AddToTearDown("Home_WorldServerPanel");
-                var entityId = msg.entityId;
-                var account = msg.account;
-                var roleRepo = worldFacades.Repo.WorldRoleRepo;
-                roleRepo.RemoveByEntityId(entityId);
-                Debug.Log($"entityId:{entityId}  account:{account} 离开世界 当前在线人数:{roleRepo.Count}");
-            }
-
-            while (worldLRoomCreateQueue.TryDequeue(out var msg))
-            {
-                var roomEntityId = msg.roomEntityId;
-                var roomName = msg.roomName;
-                var masterAccount = msg.masterAccount;
-                var host = msg.host;
-                var port = msg.port;
-
-                NetworkEventCenter.Invoke_WorldRoomCreate(masterAccount, roomName, host, port);
-                Debug.Log($"玩家[{masterAccount}]创建了战斗房间:  roomName:{roomName}  roomEntityId:{roomEntityId} 战斗服 {host}:{port} ");
-            }
-
+            Tick_WorldEnter();
+            Tick_WorldLeave();
+            Tick_WorldRoomCreate();
+            Tick_WorldRoomDismiss();
+            Tick_WorldGetAllRoomsBasicInfo();
         }
 
         void OnLoginSuccess(string account, string[] worldSerHosts, ushort[] ports)
@@ -107,40 +80,119 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             rqs.ConnWorldServer(host, port);
         }
 
-        void SendWorldEnterReq()
+        void OnConnWorSerSuccess()
         {
             var rqs = worldFacades.Network.WorldReqAndRes;
-            rqs.SendReq_WorldEnterMsg(worldFacades.Repo.WorldRoleRepo.Account);
+            rqs.SendReq_EnterWorld(worldFacades.Repo.WorldRoleRepo.Account);
         }
 
-        void SendCreateWorldRoomReq(string roomName)
+        void SendReq_CreateWorldRoom(string roomName)
         {
             var rqs = worldFacades.Network.WorldReqAndRes;
-            rqs.SendReq_CreateWorldRoomMsg(roomName);
+            rqs.SendReq_CreateWorldRoom(roomName);
+        }
+
+        void SendReq_GetAllWorldRoomsBasicInfo()
+        {
+            var rqs = worldFacades.Network.WorldReqAndRes;
+            rqs.SendReq_GetAllWorldRoomsBasicInfo();
         }
 
         #endregion
 
-        #region [RESPONSE]
+        void Tick_WorldEnter()
+        {
+            while (worldEnterQueue.TryDequeue(out var msg))
+            {
+                var entityId = msg.entityId;
+                var account = msg.account;
+                WorldRoleEntity roleEntity = new WorldRoleEntity();
+                roleEntity.SetAccount(msg.account);
+                roleEntity.SetEntityId(entityId);
+                var roleRepo = worldFacades.Repo.WorldRoleRepo;
+                roleRepo.Add(roleEntity);
+                if (msg.isOwner) roleRepo.SetOwner(roleEntity);
+
+                UIEventCenter.AddToTearDown("Home_WorldServerPanel");
+                UIEventCenter.AddToOpen(new OpenEventModel { uiName = "Home_WorldRoomPanel" });
+                SpawnScene("world_scene");
+
+                Debug.Log($"entityId:{entityId}  account:{account} 进入世界 当前在线人数:{roleRepo.Count}");
+            }
+        }
 
         void OnEnterWorldRes(WolrdEnterResMessage msg)
         {
             worldEnterQueue.Enqueue(msg);
         }
 
-        void OnLeaveWorldRes(WolrdLeaveResMessage msg)
+        void Tick_WorldLeave()
+        {
+            while (worldLeaveQueue.TryDequeue(out var msg))
+            {
+                UIEventCenter.AddToTearDown("Home_WorldServerPanel");
+                var entityId = msg.entityId;
+                var account = msg.account;
+                var roleRepo = worldFacades.Repo.WorldRoleRepo;
+                roleRepo.RemoveByEntityId(entityId);
+                Debug.Log($"entityId:{entityId}  account:{account} 离开世界 当前在线人数:{roleRepo.Count}");
+            }
+        }
+
+        void OnLeaveWorldRes(WolrdLeaveResMsg msg)
         {
             worldLeaveQueue.Enqueue(msg);
         }
 
-        void OnWorldRoomCreate(WorldRoomCreateResMessage msg)
+        void Tick_WorldRoomCreate()
+        {
+            while (worldLRoomCreateQueue.TryDequeue(out var msg))
+            {
+                NetworkEventCenter.Invoke_WorldRoomCreate(msg);
+            }
+        }
+
+        void OnWorldRoomCreate(WorldCreateRoomResMsg msg)
         {
             worldLRoomCreateQueue.Enqueue(msg);
         }
 
-        #endregion
+        void Tick_WorldRoomDismiss()
+        {
+            while (worldLRoomDismissQueue.TryDequeue(out var msg))
+            {
+                NetworkEventCenter.Invoke_WorldRoomDismiss(msg);
+            }
+        }
 
-        #region [Private Func]
+        void OnWorldRoomADismiss(WorldRoomDismissResMsg msg)
+        {
+            Debug.Log("OnWorldRoomADismiss");
+            worldLRoomDismissQueue.Enqueue(msg);
+        }
+
+        void Tick_WorldGetAllRoomsBasicInfo()
+        {
+            while (worldAllRoomsBacisInfoQueue.TryDequeue(out var msg))
+            {
+                var wRoleRepo = worldFacades.Repo.WorldRoleRepo;
+                var allWRoles = wRoleRepo.GetAll();
+                var length = allWRoles.Length;
+                string[] accountArray = new string[length];
+                for (int i = 0; i < length; i++)
+                {
+                    accountArray[i] = allWRoles[i].Account;
+                }
+
+                NetworkEventCenter.Invoke_AllWorldRoomsBasicInfo(msg, accountArray);
+            }
+        }
+
+        void OnWorldGetAllRoomsBasicInfo(WorldAllRoomsBacisInfoResMsg msg)
+        {
+            worldAllRoomsBacisInfoQueue.Enqueue(msg);
+        }
+
         public async void SpawnScene(string sceneName)
         {
             Debug.Log($"开始加载世界:{sceneName}");
@@ -148,7 +200,6 @@ namespace Game.Client.Bussiness.WorldBussiness.Controller
             Debug.Log($"加载世界完成:{sceneName}");
             return;
         }
-        #endregion
 
     }
 

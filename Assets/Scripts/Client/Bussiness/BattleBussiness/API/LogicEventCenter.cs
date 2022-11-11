@@ -12,8 +12,8 @@ namespace Game.Client.Bussiness.BattleBussiness.API
         public void Invoke_BattleDamageRecordAction(DamageRecordArgs args) => damageRecordAction?.Invoke(args);
 
         Action battleStateAndStageChangeAction;
-        public void Regist_BattleStateAndStageChangeHandler(Action action) => battleStateAndStageChangeAction += action;
-        public void Invoke_BattleStateAndStageChangeHandler() => battleStateAndStageChangeAction?.Invoke();
+        public void Regist_BattleStateAndStageChangeAction(Action action) => battleStateAndStageChangeAction += action;
+        public void Invoke_BattleStateAndStageChangeAction() => battleStateAndStageChangeAction?.Invoke();
 
         Action battleAirDropAction;
         public void Regist_BattleAirDropAction(Action action) => battleAirDropAction += action;

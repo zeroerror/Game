@@ -10,7 +10,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
     public class BattleController
     {
-        BattleServerFacades serverFacades;
+        ServerBattleFacades serverFacades;
 
         // Scene Spawn Trigger
 
@@ -33,27 +33,6 @@ namespace Game.Server.Bussiness.BattleBussiness
 
         public BattleController()
         {
-            ServerNetworkEventCenter.Regist_BattleServerConnHandler((connID) =>
-            {
-                // - 添加至连接名单
-                lock (ConnIDList)
-                {
-                    ConnIDList.Add(connID);
-                    Debug.Log($"添加至连接名单 connID {connID}");
-                }
-
-                // - Battle Load
-                var battleFacades = serverFacades.BattleFacades;
-                var gameEntity = battleFacades.GameEntity;
-                var gameStage = gameEntity.Stage;
-                var fsm = gameEntity.FSMComponent;
-                var gameState = fsm.BattleState;
-                if (!gameStage.HasStage(BattleStage.Level1) && gameState != BattleState.SpawningField)
-                {
-                    fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
-                }
-            });
-
             roleSpawnMsgDic = new Dictionary<long, BattleRoleSpawnReqMsg>();
             roleMoveMsgDic = new Dictionary<long, BattleRoleMoveReqMsg>();
             roleRotateMsgDic = new Dictionary<long, BattleRoleRotateReqMsg>();
@@ -62,7 +41,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             itemPickUpMsgDic = new Dictionary<long, BattleItemPickReqMsg>();
         }
 
-        public void Inject(BattleServerFacades v)
+        public void Inject(ServerBattleFacades v)
         {
             serverFacades = v;
 
@@ -82,7 +61,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             // Domain Handler
             var battleFacades = serverFacades.BattleFacades;
             var logicEventCenter = battleFacades.LogicEventCenter;
-            logicEventCenter.Regist_BattleStateAndStageChangeHandler(LogicEvent_BattleStateAndStageChange);
+            logicEventCenter.Regist_BattleStateAndStageChangeAction(LogicEvent_BattleStateAndStageChange);
             logicEventCenter.Regist_BattleAirDropAction(LogicEvent_BattleAirdrop);
         }
 

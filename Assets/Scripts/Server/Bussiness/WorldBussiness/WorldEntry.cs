@@ -13,28 +13,26 @@ namespace Game.Server.Bussiness.WorldBussiness
     {
 
         // Facades
-        WorldFacades worldFacades;
+        ServerWorldFacades serverWorldFacades;
 
         // Controller
         WorldController worldController;
 
-        
+
         #region [Life Cycle]
 
         public WorldEntry()
         {
-            // == Facades ==
-            worldFacades = new WorldFacades();
             // == Controller ==
             worldController = new WorldController();
         }
 
-        public void Inject(NetworkServer server)
+        public void Inject(ServerWorldFacades facades)
         {
             // == Facades ==
-            worldFacades.Inject(server);
-            worldController.Inject(worldFacades);
+            serverWorldFacades = facades;
             // == Controller ==
+            worldController.Inject(serverWorldFacades);
         }
 
         public void Tick()
@@ -50,7 +48,7 @@ namespace Game.Server.Bussiness.WorldBussiness
 
         #endregion
 
-        
+
     }
 
 }

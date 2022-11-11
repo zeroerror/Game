@@ -16,120 +16,159 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
     public class WorldController
     {
 
-        List<int> connIdList;
-        WorldFacades worldFacades;
+        List<int> connIDList;
+
+        ServerWorldFacades serverWorldFacades;
 
         public WorldController()
         {
             ServerNetworkEventCenter.Regist_WorldConnection(OnWorldConnection);
             ServerNetworkEventCenter.Regist_WorldDisconnection(OnWorldDisconnection);
 
-            connIdList = new List<int>();
+            connIDList = new List<int>();
         }
 
-        public void Inject(WorldFacades worldFacades)
+        public void Inject(ServerWorldFacades worldFacades)
         {
-            this.worldFacades = worldFacades;
+            this.serverWorldFacades = worldFacades;
 
             var rqs = worldFacades.Network.WorldReqAndRes;
             rqs.RegistReq_WorldEnter(OnWorldEnterReq);
             rqs.RegistReq_WorldLeave(OnWorldLeaveReq);
             rqs.RegistReq_WorldRoomCreate(OnWorldRoomCreateReq);
+            rqs.RegistReq_WorldGetAllRoomsBacisInfo(OnReq_GetWorldAllRoomsBasicInfo);
         }
 
-        public void Tick()
-        {
+        public void Tick() { }
 
-        }
-
-        // Client Connection
         void OnWorldConnection(int connId)
         {
-            Debug.Log($"[世界服]: connID:{connId} 客户端连接成功-------------------------");
-            connIdList.Add(connId);
+            Debug.Log($"[世界服]: ConnID: {connId} 客户端连接成功-------------------------");
+            connIDList.Add(connId);
         }
+
         void OnWorldDisconnection(int connId)
         {
-            Debug.Log($"[世界服]: connID:{connId} 客户端断开连接-------------------------");
-            connIdList.Remove(connId);
-            var roleEntity = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo.RemoveByConnId(connId);
+            Debug.Log($"[世界服]: ConnID: {connId} 客户端断开连接-------------------------");
+            connIDList.Remove(connId);
+            var roleEntity = serverWorldFacades.WorldFacades.Repo.WorldRoleRepo.RemoveByConnId(connId);
 
-            var rqs = worldFacades.Network.WorldReqAndRes;
-            connIdList.ForEach((connId) =>
+            var rqs = serverWorldFacades.Network.WorldReqAndRes;
+            connIDList.ForEach((connId) =>
             {
                 rqs.SendRes_WorldDisconnection(connId, roleEntity.EntityId, roleEntity.Account);
             });
         }
 
-        #region [Client Request]
-        void OnWorldEnterReq(int connId, WolrdEnterReqMessage msg)
+        void OnWorldEnterReq(int connID, WolrdEnterReqMessage msg)
         {
-            var rqs = worldFacades.Network.WorldReqAndRes;
-            var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-            roleRepo.Foreach((r) =>
+            var worldRqs = serverWorldFacades.Network.WorldReqAndRes;
+            var repo = serverWorldFacades.WorldFacades.Repo;
+            var roleRepo = repo.WorldRoleRepo;
+            roleRepo.Foreach((otherWRole) =>
             {
-                rqs.SendRes_WorldConnection(connId, r.EntityId, r.Account, true);
+                worldRqs.SendRes_WorldConnection(connID, otherWRole.EntityId, otherWRole.Account, false);
             });
+            var entityID = roleRepo.EntityIdAutoIncrease;
+            var account = msg.account;
+            WorldRoleEntity wroleEntity = new WorldRoleEntity();
+            wroleEntity.SetAccount(account);
+            wroleEntity.SetEntityId(entityID);
+            wroleEntity.SetConnID(connID);
+            roleRepo.Add(wroleEntity);
+            worldRqs.SendRes_WorldConnection(connID, wroleEntity.EntityId, wroleEntity.Account, true);
 
-            WorldRoleEntity roleEntity = new WorldRoleEntity();
-            roleEntity.SetAccount(msg.account);
-            roleEntity.SetEntityId(roleRepo.EntityIdAutoIncrease);
-            roleEntity.SetConnId(connId);
-            roleRepo.Add(roleEntity);
-
-            Debug.Log($"[世界服]: connId:{connId} {roleEntity.EntityId},{roleEntity.Account} 客户端请求进入世界,通知当前世界所有人[数量:{connIdList.Count}]-------------------------");
-            connIdList.ForEach((broadcastConnId) =>
+            Debug.Log($"[世界服]: ConnID: {connID} EntityId: {wroleEntity.EntityId} Account: {wroleEntity.Account} 客户端进入世界服,当前人数:{connIDList.Count}]-------------------------");
+            connIDList.ForEach((broadcastConnId) =>
             {
-                rqs.SendRes_WorldConnection(broadcastConnId, roleEntity.EntityId, roleEntity.Account, false);
-            });
-        }
+                if (broadcastConnId == connID)
+                {
+                    return;
+                }
 
-        void OnWorldLeaveReq(int connId, WolrdLeaveReqMessage msg)
-        {
-            var rqs = worldFacades.Network.WorldReqAndRes;
-            var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-            var roleEntity = roleRepo.RemoveByConnId(connId);
-            connIdList.Remove(connId);
-
-            Debug.Log($"[世界服]: connID:{connId} {roleEntity.EntityId},{roleEntity.Account} 客户端离开了这个世界------------------------");
-            connIdList.ForEach((broadcastConnId) =>
-            {
-                rqs.SendRes_WorldDisconnection(broadcastConnId, roleEntity.EntityId, roleEntity.Account);
+                worldRqs.SendRes_WorldConnection(broadcastConnId, wroleEntity.EntityId, wroleEntity.Account, false);
             });
         }
 
-        void OnWorldRoomCreateReq(int connId, WorldRoomCreateReqMessage msg)
+        void OnWorldLeaveReq(int connID, WolrdLeaveReqMsg msg)
         {
-            var rqs = worldFacades.Network.WorldReqAndRes;
-            var roleRepo = worldFacades.ClientWorldFacades.Repo.WorldRoleRepo;
-            var roleEntity = roleRepo.GetByConnId(connId);
+            connIDList.Remove(connID);
+            var rqs = serverWorldFacades.Network.WorldReqAndRes;
 
-            // 创建房间Entity
-            //
-            //
-            var roomRepo = worldFacades.ClientWorldFacades.Repo.WorldRoomRepo;
+            var repo = serverWorldFacades.WorldFacades.Repo;
+            var wRoleRepo = repo.WorldRoleRepo;
+            var wRoleEntity = wRoleRepo.RemoveByConnId(connID);
+
+            var entityID = wRoleEntity.EntityId;
+            var account = wRoleEntity.Account;
+            var worldRoomRepo = repo.WorldRoomRepo;
+            if (worldRoomRepo.TryGetByMasterID(entityID, out var worldRoom))
+            {
+                worldRoomRepo.Remove(worldRoom);
+                var roomID = worldRoom.EntityID;
+                Debug.Log($"[世界服]: 房间解散 roomID: {roomID} ------------------------");
+                connIDList.ForEach((broadcastConnID) =>
+                {
+                    rqs.SendRes_WorldRoomDismiss(broadcastConnID, roomID);
+                });
+            }
+
+            Debug.Log($"[世界服]: ConnID:{connID} EntityID: {entityID} Account: {wRoleEntity.Account} 客户端离开世界服------------------------");
+            connIDList.ForEach((broadcastConnId) =>
+            {
+                rqs.SendRes_WorldDisconnection(broadcastConnId, entityID, account);
+            });
+        }
+
+        void OnWorldRoomCreateReq(int connID, WorldCreateRoomReqMsg msg)
+        {
+            var worldFacades = serverWorldFacades.WorldFacades;
+            var repo = worldFacades.Repo;
+            var rqs = serverWorldFacades.Network.WorldReqAndRes;
+            var roleRepo = repo.WorldRoleRepo;
+            var master = roleRepo.GetByConnId(connID);
+            var masterID = master.EntityId;
+            var masterAccount = master.Account;
+
+            // - TODO : GATEWAY 
+            var host = NetworkConfig.BATTLESERVER_HOST[0];
+            var port = NetworkConfig.BATTLESERVER_PORT[0];
+
+            var worldRoomRepo = repo.WorldRoomRepo;
+            var roomID = worldRoomRepo.EntityIdAutoIncrease;
             WorldRoomEntity roomEntity = new WorldRoomEntity();
-            roomEntity.SetEntityId(roomRepo.EntityIdAutoIncrease);
-            roomEntity.SetMasterAccount(roleEntity.Account);
+            roomEntity.SetEntityID(roomID);
+            roomEntity.SetMasterID(master.EntityId);
             roomEntity.SetRoomName(msg.roomName);
+            roomEntity.SetHost(host);
+            roomEntity.SetPort(port);
+            roomEntity.AddMember(masterID, masterAccount);
+            worldRoomRepo.Add(roomEntity);
 
-            roomRepo.Add(roomEntity);
-
-            connIdList.ForEach((broadcastConnId) =>
+            connIDList.ForEach((broadcastConnID) =>
             {
-                rqs.SendRes_WorldRoomCreate(broadcastConnId,
-                 roleEntity.Account,
-                  roomEntity.EntityId,
+                rqs.SendRes_WorldRoomCreate(broadcastConnID,
+                 master.Account,
+                  roomEntity.EntityID,
                    roomEntity.RoomName,
-                    NetworkConfig.BATTLESERVER_HOST[0],
-                     NetworkConfig.BATTLESERVER_PORT[0]);
+                   host,
+                   port);
             });
-            Debug.Log($"[世界服]: connID:{connId} 玩家{roleEntity.Account} 创建了房间 id:{roomEntity.EntityId} 名称:{roomEntity.RoomName}------------------------");
-            Debug.Log($"[世界服]:创建战斗服 Host:{NetworkConfig.BATTLESERVER_HOST[0]} Port:{NetworkConfig.BATTLESERVER_PORT[0]} ------------------------");
-            ServerNetworkEventCenter.Invoke_BattleServerNeedCreate();
+
+            Debug.Log($"[世界服]: 创建房间 ID: {roomEntity.EntityID} 名称: {roomEntity.RoomName} 房主: {masterAccount}------------------------");
+            Debug.Log($"[世界服]: 创建战斗服 Host: {host} Port: {port} ------------------------");
+            ServerNetworkEventCenter.Invoke_StartBattleServer();
         }
 
-        #endregion
+        void OnReq_GetWorldAllRoomsBasicInfo(int connID, WorldAllRoomsBacisInfoReqMsg _)
+        {
+            var repo = serverWorldFacades.WorldFacades.Repo;
+            var worldRoomRepo = repo.WorldRoomRepo;
+            var worldRoomArray = worldRoomRepo.GetAll();
+
+            var worldRqs = serverWorldFacades.Network.WorldReqAndRes;
+            worldRqs.SendRes_WorldAllRoomsBacisInfo(connID, worldRoomArray);
+        }
 
     }
 

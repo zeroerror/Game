@@ -11,7 +11,7 @@ namespace Game.Server.Bussiness.BattleBussiness
     public class BattleWeaponController
     {
 
-        BattleServerFacades serverFacades;
+        ServerBattleFacades serverFacades;
 
         // NetWorkd Info
         public int ServeFrame => serverFacades.Network.ServeFrame;
@@ -33,7 +33,7 @@ namespace Game.Server.Bussiness.BattleBussiness
             weaponDropMsgDic = new Dictionary<long, BattleWeaponDropReqMsg>();
         }
 
-        public void Inject(BattleServerFacades battleFacades)
+        public void Inject(ServerBattleFacades battleFacades)
         {
             this.serverFacades = battleFacades;
 

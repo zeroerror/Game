@@ -6,6 +6,7 @@ using System;
 using Game.Protocol.Client2World;
 using UnityEngine;
 using Game.Protocol.World;
+using Game.Client.Bussiness.WorldBussiness;
 
 namespace Game.Server.Bussiness.WorldBussiness.Facades
 {
@@ -38,9 +39,10 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
 
             _worldServer.SendMsg(connId, msg);
         }
+
         public void SendRes_WorldDisconnection(int connId, int entityId, string account)
         {
-            WolrdLeaveResMessage msg = new WolrdLeaveResMessage
+            WolrdLeaveResMsg msg = new WolrdLeaveResMsg
             {
                 entityId = entityId,
                 account = account,
@@ -49,9 +51,9 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
             _worldServer.SendMsg(connId, msg);
         }
 
-        public void SendRes_WorldRoomCreate(int connId, string masterAccount, int roomEntityId, string roomName, string host, ushort port)
+        public void SendRes_WorldRoomCreate(int connID, string masterAccount, int roomEntityId, string roomName, string host, ushort port)
         {
-            WorldRoomCreateResMessage msg = new WorldRoomCreateResMessage
+            WorldCreateRoomResMsg msg = new WorldCreateRoomResMsg
             {
                 masterAccount = masterAccount,
                 roomEntityId = roomEntityId,
@@ -59,6 +61,45 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
                 host = host,
                 port = port,
             };
+
+            _worldServer.SendMsg(connID, msg);
+        }
+
+        public void SendRes_WorldRoomDismiss(int connID, int roomEntityID)
+        {
+            Debug.Log("SendRes_WorldRoomDismiss");
+            WorldRoomDismissResMsg msg = new WorldRoomDismissResMsg();
+            msg.roomEntityID = roomEntityID;
+            _worldServer.SendMsg(connID, msg);
+        }
+
+        public void SendRes_WorldAllRoomsBacisInfo(int connId, WorldRoomEntity[] allWorldRoom)
+        {
+            WorldAllRoomsBacisInfoResMsg msg = new WorldAllRoomsBacisInfoResMsg();
+            var length = allWorldRoom.Length;
+            int[] worldRoomIDs = new int[length];
+            int[] worldRoomMemNums = new int[length];
+            string[] worldRoomNames = new string[length];
+            int[] masterIDs = new int[length];
+            string[] hosts = new string[length];
+            ushort[] ports = new ushort[length];
+            for (int i = 0; i < length; i++)
+            {
+                var worldRoom = allWorldRoom[i];
+                worldRoomIDs[i] = worldRoom.EntityID;
+                worldRoomNames[i] = worldRoom.RoomName;
+                worldRoomMemNums[i] = worldRoom.GetMemberNum();
+                hosts[i] = worldRoom.Host;
+                ports[i] = worldRoom.Port;
+                masterIDs[i] = worldRoom.MasterID;
+            }
+
+            msg.worldRoomIDArray = worldRoomIDs;
+            msg.worldRoomNameArray = worldRoomNames;
+            msg.worldRoomMemNums = worldRoomMemNums;
+            msg.masterIDArray = masterIDs;
+            msg.hosts = hosts;
+            msg.ports = ports;
 
             _worldServer.SendMsg(connId, msg);
         }
@@ -69,12 +110,17 @@ namespace Game.Server.Bussiness.WorldBussiness.Facades
             _worldServer.AddRegister(action);
         }
 
-        public void RegistReq_WorldLeave(Action<int, WolrdLeaveReqMessage> action)
+        public void RegistReq_WorldLeave(Action<int, WolrdLeaveReqMsg> action)
         {
             _worldServer.AddRegister(action);
         }
 
-        public void RegistReq_WorldRoomCreate(Action<int, WorldRoomCreateReqMessage> action)
+        public void RegistReq_WorldRoomCreate(Action<int, WorldCreateRoomReqMsg> action)
+        {
+            _worldServer.AddRegister(action);
+        }
+
+        public void RegistReq_WorldGetAllRoomsBacisInfo(Action<int, WorldAllRoomsBacisInfoReqMsg> action)
         {
             _worldServer.AddRegister(action);
         }

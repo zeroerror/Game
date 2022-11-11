@@ -41,10 +41,13 @@ Dictionary<Type, ushort> messageInfoDic;
             messageInfoDic.Add(typeof(LoginResMessage), 26);
             messageInfoDic.Add(typeof(RegisterAccountReqMessage), 27);
             messageInfoDic.Add(typeof(RegisterAccountResMessage), 28);
-            messageInfoDic.Add(typeof(WolrdLeaveReqMessage), 29);
-            messageInfoDic.Add(typeof(WolrdLeaveResMessage), 30);
-            messageInfoDic.Add(typeof(WorldRoomCreateReqMessage), 31);
-            messageInfoDic.Add(typeof(WorldRoomCreateResMessage), 32);
+            messageInfoDic.Add(typeof(WolrdLeaveReqMsg), 29);
+            messageInfoDic.Add(typeof(WolrdLeaveResMsg), 30);
+            messageInfoDic.Add(typeof(WorldAllRoomsBacisInfoReqMsg), 31);
+            messageInfoDic.Add(typeof(WorldAllRoomsBacisInfoResMsg), 32);
+            messageInfoDic.Add(typeof(WorldCreateRoomReqMsg), 33);
+            messageInfoDic.Add(typeof(WorldCreateRoomResMsg), 34);
+            messageInfoDic.Add(typeof(WorldRoomDismissResMsg), 35);
 
         }
 
