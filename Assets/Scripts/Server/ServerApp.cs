@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Collections.Generic;
 using UnityEngine;
 using Game.Infrastructure.Generic;
 using Game.Infrastructure.Network.Server.Facades;
@@ -9,7 +10,6 @@ using Game.Server.Bussiness.BattleBussiness.Facades;
 using Game.Server.Bussiness.WorldBussiness;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Server.Bussiness.EventCenter;
-using System.Collections.Generic;
 using Game.Client.Bussiness.BattleBussiness.Generic;
 using Game.Infrastructure.Network.Server;
 
@@ -73,7 +73,6 @@ namespace Game.Server
 
             // == Physics ==
             Physics.autoSimulation = false;
-
         }
 
         struct BattleEntryCtorModel
@@ -176,7 +175,7 @@ namespace Game.Server
             };
         }
 
-        void StartBattleServer()
+        void StartBattleServer(string host, ushort port)
         {
             if (battleServerThreadList.Count >= NetworkConfig.BATTLE_SERVER_MAX)
             {
@@ -184,8 +183,7 @@ namespace Game.Server
                 return;
             }
 
-            var port = NetworkConfig.BATTLESERVER_PORT[0];
-            Debug.Log($"战斗服启动！端口:{port}");
+            Debug.Log($"战斗服启动 Host: {host} Port: {port}");
             var battleServer = allServerNetwork.BattleServerQueue.Dequeue();
             battleServer.StartListen(port);
             var thread = new Thread(() =>
@@ -200,7 +198,7 @@ namespace Game.Server
 
             battleServer.OnConnectedHandle += (connID) =>
             {
-                Debug.Log($"[战斗服]: ConnID:{connID} 客户端连接成功-------------------------");
+                Debug.Log($"战斗服启动 Host: {host} Port: {port}  客户端[{connID}]连接成功-------------------------");
                 ServerNetworkEventCenter.Invoke_BattleServerConnect(connID, battleServer);
             };
         }

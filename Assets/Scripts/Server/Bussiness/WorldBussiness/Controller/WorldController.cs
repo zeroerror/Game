@@ -1,7 +1,4 @@
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.SceneManagement;
 using Game.Protocol.Client2World;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Server.Bussiness.EventCenter;
@@ -19,6 +16,8 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
         List<int> connIDList;
 
         ServerWorldFacades serverWorldFacades;
+
+        int curBattleSerIndex = 0;
 
         public WorldController()
         {
@@ -131,8 +130,15 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
             var masterAccount = master.Account;
 
             // - TODO : GATEWAY 
-            var host = NetworkConfig.BATTLESERVER_HOST[0];
-            var port = NetworkConfig.BATTLESERVER_PORT[0];
+            if (curBattleSerIndex >= NetworkConfig.BATTLE_SERVER_MAX)
+            {
+                Debug.LogWarning($"战斗房间数量达到上限[{curBattleSerIndex}]");
+                return;
+            }
+
+            var host = NetworkConfig.BATTLESERVER_HOST[curBattleSerIndex];
+            var port = NetworkConfig.BATTLESERVER_PORT[curBattleSerIndex];
+            curBattleSerIndex++;
 
             var worldRoomRepo = repo.WorldRoomRepo;
             var roomID = worldRoomRepo.EntityIdAutoIncrease;
@@ -157,7 +163,7 @@ namespace Game.Server.Bussiness.WorldBussiness.Controller
 
             Debug.Log($"[世界服]: 创建房间 ID: {roomEntity.EntityID} 名称: {roomEntity.RoomName} 房主: {masterAccount}------------------------");
             Debug.Log($"[世界服]: 创建战斗服 Host: {host} Port: {port} ------------------------");
-            ServerNetworkEventCenter.Invoke_StartBattleServer();
+            ServerNetworkEventCenter.Invoke_StartBattleServer(host, port);
         }
 
         void OnReq_GetWorldAllRoomsBasicInfo(int connID, WorldAllRoomsBacisInfoReqMsg _)

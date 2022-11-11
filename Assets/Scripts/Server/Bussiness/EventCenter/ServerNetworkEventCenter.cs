@@ -20,9 +20,9 @@ namespace Game.Server.Bussiness.EventCenter
         public static void Invoke_WorldDisconnection(int connId) => worldDisconnHandler.Invoke(connId);
 
         // == BattleServer
-        static Action startBattleServerAction;
-        public static void Regist_StartBattleServer(Action action) => startBattleServerAction += action;
-        public static void Invoke_StartBattleServer() => startBattleServerAction.Invoke();
+        static Action<string, ushort> startBattleServerAction;
+        public static void Regist_StartBattleServer(Action<string, ushort> action) => startBattleServerAction += action;
+        public static void Invoke_StartBattleServer(string host, ushort port) => startBattleServerAction.Invoke(host, port);
 
         static Action<int, NetworkServer> battleServerConnHandler;
         public static void Regist_BattleServerConnHandler(Action<int, NetworkServer> action) => battleServerConnHandler += action;

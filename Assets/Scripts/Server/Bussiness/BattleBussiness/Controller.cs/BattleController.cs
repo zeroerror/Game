@@ -12,8 +12,6 @@ namespace Game.Server.Bussiness.BattleBussiness
     {
         ServerBattleFacades serverFacades;
 
-        // Scene Spawn Trigger
-
         // NetWork Info
         public int ServerFrame => serverFacades.Network.ServeFrame;
         List<int> ConnIDList => serverFacades.Network.connIdList;
