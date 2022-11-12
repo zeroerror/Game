@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Game.Client.Bussiness.Assets;
 using Game.Client.Bussiness.BattleBussiness.Assets;
 
@@ -25,15 +26,19 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             ItemAsset = new ItemAsset();
         }
 
-        public void LoadAll()
+        public Task LoadAll()
         {
             Console.WriteLine("资源开始加载------------------------------------------");
-            BattleRoleAssets.LoadAssets();
-            WeaponAsset.LoadAssets();
-            ArmorAsset.LoadAssets();
-            BulletAsset.LoadAssets();
-            CameraAsset.LoadAssets();
-            ItemAsset.LoadAssets();
+            return new Task(() =>
+            {
+                BattleRoleAssets.LoadAssets();
+                WeaponAsset.LoadAssets();
+                ArmorAsset.LoadAssets();
+                BulletAsset.LoadAssets();
+                CameraAsset.LoadAssets();
+                ItemAsset.LoadAssets();
+            });
+
         }
 
     }

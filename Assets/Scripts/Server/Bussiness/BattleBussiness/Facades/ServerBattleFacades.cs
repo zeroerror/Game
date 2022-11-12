@@ -1,4 +1,5 @@
 
+using Game.Client.Bussiness.BattleBussiness.Facades;
 using Game.Infrastructure.Network.Server;
 
 namespace Game.Server.Bussiness.BattleBussiness.Facades
@@ -7,7 +8,7 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
     public class ServerBattleFacades
     {
 
-        public Game.Client.Bussiness.BattleBussiness.Facades.BattleFacades BattleFacades { get; private set; }
+        public BattleFacades BattleFacades { get; private set; }
 
         public AllBattleNetwork Network { get; private set; }
         public LocalEventCenter LocalEventCenter { get; private set; }
@@ -16,12 +17,12 @@ namespace Game.Server.Bussiness.BattleBussiness.Facades
         {
             Network = new AllBattleNetwork();
             LocalEventCenter = new LocalEventCenter();
-            BattleFacades = new Client.Bussiness.BattleBussiness.Facades.BattleFacades();
         }
 
-        public void Inject(NetworkServer server)
+        public void Inject(NetworkServer server, BattleFacades facades)
         {
             Network.Inject(server);
+            BattleFacades = facades;
         }
 
     }

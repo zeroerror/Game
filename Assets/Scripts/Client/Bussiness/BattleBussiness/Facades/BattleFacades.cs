@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+using System.Threading;
 using Game.Infrastructure.Network.Client;
 using Game.Client.Bussiness.BattleBussiness.API;
-using Game.Client.Bussiness.BattleBussiness.Generic;
+using System.Threading.Tasks;
 
 namespace Game.Client.Bussiness.BattleBussiness.Facades
 {
@@ -38,7 +38,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
             Repo = new AllBattleRepo();
 
             Assets = new AllBattleAssets();
-            Assets.LoadAll();
 
             Domain = new AllDomains();
             Domain.Inject(this);
@@ -59,6 +58,15 @@ namespace Game.Client.Bussiness.BattleBussiness.Facades
         {
             Network.Inject(client);
             InputComponent = inputComponent;
+        }
+
+        public Task Load()
+        {
+            Task task = new Task(() =>
+            {
+                Assets.LoadAll().Start();
+            });
+            return task;
         }
 
     }

@@ -15,9 +15,6 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
         List<Action> actionList;
         object lockObj;
 
-        int clientFrame;
-        public void SetClientFrame(int clienFrame) => this.clientFrame = clienFrame;
-
         public BattleRoleReqAndRes()
         {
             actionList = new List<Action>();
@@ -94,6 +91,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Network
 
         public void SendReq_RoleSpawn(ControlType controlType)
         {
+            Debug.Log("SendReq_RoleSpawn");
             BattleRoleSpawnReqMsg frameReqWRoleSpawnMsg = new BattleRoleSpawnReqMsg
             {
                 controlType = (byte)controlType,

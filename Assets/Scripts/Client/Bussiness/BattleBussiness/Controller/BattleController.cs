@@ -30,15 +30,12 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller
         {
             this.battleFacades = battleFacades;
 
-            // --- Network Events3
+            // --- Network Events
             // - Battle
             var battleRqs = battleFacades.Network.BattleReqAndRes;
             NetworkEventCenter.Regist_BattleSerConnectAction(() =>
             {
                 battleRqs.SendReq_BattleGameStateAndStage();
-
-                var rqs = battleFacades.Network.RoleReqAndRes;
-                rqs.SendReq_RoleSpawn(ControlType.Owner);
             });
             battleRqs.RegistRes_BattleGameStateAndStage(OnRes_BattleStateAndStageMsg);
             battleRqs.RegistRes_BattleAirdropSpawn(OnRes_BattleAirdropSpawn);

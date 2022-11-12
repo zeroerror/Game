@@ -26,8 +26,6 @@ namespace Game.Client.Bussiness.BattleBussiness
 
         public void Ctor()
         {
-            // == Facades ==
-            battleFacades = new BattleFacades();
             // == Controller ==
             battleController = new BattleController();
             BattleBulletController = new BattleBulletController();
@@ -39,10 +37,8 @@ namespace Game.Client.Bussiness.BattleBussiness
             battleArmorController = new BattleArmorController();
         }
 
-        public void Inject(NetworkClient client, PlayerInputComponent inputComponent)
+        public void Inject(BattleFacades battleFacades)
         {
-            // == Facades ==
-            battleFacades.Inject(client, inputComponent);
             // == Controller ==
             battleController.Inject(battleFacades);
             BattleBulletController.Inject(battleFacades);

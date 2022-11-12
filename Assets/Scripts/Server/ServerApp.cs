@@ -1,7 +1,9 @@
+using System;
 using System.Threading;
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Infrastructure.Generic;
+using Game.Infrastructure.Network.Server;
 using Game.Infrastructure.Network.Server.Facades;
 using Game.Server.Bussiness.LoginBussiness;
 using Game.Server.Bussiness.LoginBussiness.Facades;
@@ -11,7 +13,7 @@ using Game.Server.Bussiness.WorldBussiness;
 using Game.Server.Bussiness.WorldBussiness.Facades;
 using Game.Server.Bussiness.EventCenter;
 using Game.Client.Bussiness.BattleBussiness.Generic;
-using Game.Infrastructure.Network.Server;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Server
 {
@@ -95,31 +97,50 @@ namespace Game.Server
 
             while (battleEntryCreateQueue.TryDequeue(out var model))
             {
-                var connID = model.connID;
-                var networkServer = model.networkServer;
-                Debug.Log($"battleEntryCreateQueue connID: {connID}");
+                BattleEntryCtor_Asycn(model);
+            }
+        }
 
-                // - Facades
-                var facades = new ServerBattleFacades();
-                facades.Inject(networkServer);
-                facades.Network.connIdList.Add(connID);
+        async void BattleEntryCtor_Asycn(BattleEntryCtorModel model)
+        {
+            var connID = model.connID;
+            var networkServer = model.networkServer;
+            Debug.Log($"BattleEntry Create connID: {connID}");
 
-                // - Entry
-                BattleEntry battleEntry = new BattleEntry();
-                battleEntry.Inject(facades);
-                battleEntryList.Add(battleEntry);
+            // - Facades
+            var battleFacades = new BattleFacades();
+            await battleFacades.Load();
 
-                var battleFacades = facades.BattleFacades;
-                var gameEntity = battleFacades.GameEntity;
-                var gameStage = gameEntity.Stage;
-                var fsm = gameEntity.FSMComponent;
-                var gameState = fsm.BattleState;
-                if (!gameStage.HasStage(BattleStage.Level1) && gameState != BattleState.SpawningField)
-                {
-                    fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
-                }
+            var facades = new ServerBattleFacades();
+            facades.Inject(networkServer, battleFacades);
+
+            // - Entry
+            BattleEntry battleEntry = new BattleEntry();
+            battleEntry.Inject(facades);
+            battleEntryList.Add(battleEntry);
+
+            // - Network
+            var serNetwork = facades.Network;
+            serNetwork.connIdList.Add(connID);
+
+            // - Stage
+            var gameEntity = battleFacades.GameEntity;
+            var gameStage = gameEntity.Stage;
+            var fsm = gameEntity.FSMComponent;
+            var gameState = fsm.BattleState;
+            if (!gameStage.HasStage(BattleStage.Level1) && gameState != BattleState.SpawningField)
+            {
+                fsm.EnterGameState_BattleSpawningField(BattleStage.Level1);
             }
 
+            // - Battle Role Spawn
+            var idService = battleFacades.IDService;
+            var entityID = idService.GetAutoIDByEntityType(EntityType.BattleRole);
+            var roleLogicDomain = battleFacades.Domain.RoleLogicDomain;
+            var role = roleLogicDomain.SpawnLogic(entityID);
+            role.SetConnID(connID);
+            var roleRqs = serNetwork.RoleReqAndRes;
+            roleRqs.SendRes_BattleRoleSpawn(connID, role.IDComponent.EntityID, (byte)ControlType.Owner);
         }
 
         void OnDestroy()

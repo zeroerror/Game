@@ -11,6 +11,7 @@ using Game.Client.Bussiness.LoginBussiness;
 using Game.Client.Bussiness.BattleBussiness;
 using Game.Client.Bussiness.UIBussiness;
 using Game.Client.Bussiness.WorldBussiness;
+using Game.Client.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Client
 {
@@ -71,10 +72,13 @@ namespace Game.Client
             worldEntry.Inject(AllClientNetwork.worldSerClient);
 
             // Battle
+            BattleFacades battleFacades = new BattleFacades();
+            battleFacades.Inject(AllClientNetwork.battleSerClient, playerInputComponent);
+            await battleFacades.Load();
+
             battleEntry = new BattleEntry();
             battleEntry.Ctor();
-            battleEntry.Inject(AllClientNetwork.battleSerClient, playerInputComponent);
-
+            battleEntry.Inject(battleFacades);
             uiEntry = new UIEntry();
             uiEntry.Ctor();
 

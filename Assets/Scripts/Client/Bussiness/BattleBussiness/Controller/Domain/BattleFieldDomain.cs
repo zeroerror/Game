@@ -97,7 +97,7 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
 
         async Task<FieldEntity> SpawnField(string sceneName)
         {
-            var result = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive).Task;
+            var result = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).Task;
 
             var scene = result.Scene;
             var sceneObjs = scene.GetRootGameObjects();

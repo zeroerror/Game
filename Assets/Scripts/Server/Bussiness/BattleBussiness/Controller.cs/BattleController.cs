@@ -101,24 +101,28 @@ namespace Game.Server.Bussiness.BattleBussiness
 
                 if (roleSpawnMsgDic.TryGetValue(key, out var msg))
                 {
-                    if (msg == null)
-                    {
-                        return;
-                    }
+                    // if (msg == null)
+                    // {
+                    //     return;
+                    // }
 
-                    roleSpawnMsgDic[key] = null;
+                    // roleSpawnMsgDic[key] = null;
 
                     var battleFacades = serverFacades.BattleFacades;
                     var repo = battleFacades.Repo;
                     var roleRepo = repo.RoleLogicRepo;
-                    if (!roleRepo.TryGetByConnID(connID, out var role))
+                    var controlType = (ControlType)msg.controlType;
+                    if (controlType == ControlType.Owner && roleRepo.TryGetByConnID(connID, out var role))
                     {
-                        var idService = battleFacades.IDService;
-                        var entityID = idService.GetAutoIDByEntityType(EntityType.BattleRole);
-                        role = battleFacades.Domain.RoleLogicDomain.SpawnLogic(entityID);
-                        role.SetConnID(connID);
-                        Debug.Log($"服务器逻辑[生成角色] ServerFrame:{ServerFrame} EntityID:{entityID} ControlType {((ControlType)msg.controlType).ToString()}");
+                        return;
                     }
+
+                    var idService = battleFacades.IDService;
+                    var entityID = idService.GetAutoIDByEntityType(EntityType.BattleRole);
+                    var roleLogicDomain = battleFacades.Domain.RoleLogicDomain;
+                    role = roleLogicDomain.SpawnLogic(entityID);
+                    role.SetConnID(connID);
+                    Debug.Log($"生成角色 EntityID:{entityID} ControlType {controlType}");
 
                     var serNetwork = serverFacades.Network;
                     var roleRqs = serNetwork.RoleReqAndRes;
@@ -138,7 +142,7 @@ namespace Game.Server.Bussiness.BattleBussiness
                 }
             }
         }
-        
+
         void Tick_RoleMoveRotateOpt()
         {
             ConnIDList.ForEach((connId) =>
@@ -188,7 +192,7 @@ namespace Game.Server.Bussiness.BattleBussiness
 
             }
         }
-       
+
         void OnRoleRotateReqMsg(int connId, BattleRoleRotateReqMsg msg)
         {
             lock (roleRotateMsgDic)
