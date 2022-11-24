@@ -237,7 +237,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   quadLen: 256
-  quadTreeLayer: 8
+  quadTreeLayer: 3
   searchLayer: 1
   billboard: {fileID: 1738340374}
 --- !u!4 &730327919

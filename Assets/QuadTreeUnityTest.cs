@@ -55,27 +55,6 @@ public class QuadTreeUnityTest : MonoBehaviour
             unit.go = go;
             qTree.AddUnit(unit);
         }
-
-        if (Input.GetMouseButtonDown(1) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 1000))
-        {
-            var hitPoint = hit.point;
-            var quads = qTree.SearchQuad(hitPoint.x, hitPoint.y, searchLayer);
-            Debug.Log($"搜索Quad数量为: {quads.Count}   -------------------------------");
-            quads.ForEach((quad) =>
-            {
-                Debug.Log($" 原点: ({quad.quadOrigin.posX},{quad.quadOrigin.posY}) 象限: {quad.quadIndex}");
-                var origin = quad.quadOrigin;
-                if (qTree.TryGetAreaUnits(origin.posX, origin.posY, out var units))
-                {
-                    var len = units.Length;
-                    for (int i = 0; i < len; i++)
-                    {
-                        Debug.Log($"{units[i].go.name}");
-                    }
-                }
-            });
-
-        }
     }
 
     bool isRunning = false;
