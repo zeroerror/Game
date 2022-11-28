@@ -1,49 +1,74 @@
 using System.Collections.Generic;
+using Game.Generic;
 using UnityEngine;
 using ZeroFrame.QuadTree;
 
 public class QuadTreeUnityTest : MonoBehaviour
 {
 
-    struct Unit : IBounds
+    class Unit : IBounds
     {
 
         public GameObject go;
 
-        public System.Numerics.Vector2 LTPos => new System.Numerics.Vector2(go.transform.position.x, go.transform.position.y);
-        public System.Numerics.Vector2 RBPos => new System.Numerics.Vector2(go.transform.position.x, go.transform.position.y);
+        public System.Numerics.Vector2 LTPos => new System.Numerics.Vector2(go.transform.position.x - go.transform.localScale.x / 2f, go.transform.position.y + go.transform.localScale.y / 2f);
+        public System.Numerics.Vector2 RBPos => new System.Numerics.Vector2(go.transform.position.x + go.transform.localScale.x / 2f, go.transform.position.y - go.transform.localScale.y / 2f);
 
     }
 
-    QuadTree<Unit> qTree;
+    QuadTree<Unit> quadTree;
     public float quadLen;
     public int quadTreeLayer;
-    public int searchLayer;
     public GameObject billboard;
 
     void Start()
     {
-        qTree = new QuadTree<Unit>(quadLen, quadTreeLayer, System.Numerics.Vector2.Zero);
+        quadTree = new QuadTree<Unit>(quadLen, quadTreeLayer, System.Numerics.Vector2.Zero);
         billboard.transform.localScale = new Vector3(quadLen, quadLen, 1);
         Camera.main.orthographicSize = quadLen / 2f;
     }
 
     int index = 0;
+    bool unitCreated;
+    Unit unit;
+    Vector3 unitStartPos;
+    Vector3 unitEndPos;
+
     void Update()
     {
         isRunning = true;
-        qTree.Tick();
+        quadTree.Tick();
 
-        if (Input.GetMouseButtonDown(0) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1000))
+        if (Input.GetMouseButtonDown(0))
         {
-            Unit unit;
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            var pos = hit.point;
-            pos.z = 0;
-            go.transform.position = pos;
-            go.transform.name = $"unit_{index++}";
-            unit.go = go;
-            qTree.AddUnit(unit);
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit downHit, 1000))
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var pos = downHit.point;
+                pos.z = 0;
+                unitStartPos = pos;
+                go.transform.position = pos;
+                go.transform.name = $"unit_{index++}";
+                unit = new Unit();
+                unit.go = go;
+                quadTree.AddUnit(unit);
+                unitCreated = true;
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0) && unitCreated)
+        {
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit upHit, 1000))
+            {
+                var pos = upHit.point;
+                pos.z = 0;
+                unitEndPos = pos;
+                var tf = unit.go.transform;
+                tf.localScale = new Vector3(unitEndPos.x - unitStartPos.x, unitStartPos.y - unitEndPos.y, 1);
+                tf.position = (unitStartPos + unitEndPos) / 2f;
+                unitCreated = false;
+                Debug.Log(tf.transform.localScale);
+            }
         }
     }
 
@@ -56,12 +81,49 @@ public class QuadTreeUnityTest : MonoBehaviour
         }
 
         DrawQuadTree();
+        DrawSearchArea();
     }
+
+    public float searchWidth;
+    public float searchHeight;
+    void DrawSearchArea()
+    {
+        Gizmos.color = Color.red;
+        var widthOffset = searchWidth / 2f;
+        var heightOffset = searchHeight / 2f;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1000))
+        {
+            var mouseWorldPosX = hit.point.x;
+            var mouseWorldPosY = hit.point.y;
+            var ltPos = new Vector2(mouseWorldPosX - widthOffset, mouseWorldPosY + heightOffset);
+            var rbPos = new Vector2(mouseWorldPosX + widthOffset, mouseWorldPosY - heightOffset);
+            List<Quad<Unit>> quads = new List<Quad<Unit>>();
+            quadTree.GetAABBCollsionQuadList(ltPos.ToSystemVector2(), rbPos.ToSystemVector2(), quads, 0);
+            quads.ForEach((quad) =>
+            {
+                var units = quad.unitList;
+                units.ForEach((unit) =>
+                {
+                    var tf = unit.go.transform;
+                    Gizmos.DrawCube(tf.position, tf.localScale);
+                });
+            });
+
+            Gizmos.color = Color.white;
+            var lbPos = ltPos + new Vector2(0, -searchHeight);
+            var rtPos = rbPos + new Vector2(0, +searchHeight);
+            Gizmos.DrawLine(lbPos, rbPos);
+            Gizmos.DrawLine(ltPos, rtPos);
+            Gizmos.DrawLine(ltPos, lbPos);
+            Gizmos.DrawLine(rtPos, rbPos);
+
+        }
+    }
+
 
     void DrawQuadTree()
     {
-        Gizmos.color = Color.red;
-        var e = qTree.quadDic.GetEnumerator();
+        var e = quadTree.quadDic.GetEnumerator();
         while (e.MoveNext())
         {
             var kvp = e.Current;

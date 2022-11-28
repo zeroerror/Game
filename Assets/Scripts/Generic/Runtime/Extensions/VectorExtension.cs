@@ -6,7 +6,6 @@ namespace Game.Generic
     public static class VectorExtension
     {
 
-        #region [Vector3]
         public static bool Equals(this Vector3 v, Vector3 compareV, int decimalCount)
         {
             int num = 1;
@@ -27,6 +26,21 @@ namespace Game.Generic
             return posX1 == posX2 && posY1 == posY2 && posZ1 == posZ2;
         }
 
+        public static Vector2 FixDecimal(this Vector2 v, int num)
+        {
+            int multy = 1;
+            for (int i = 0; i < num; i++)
+            {
+                multy *= 10;
+            }
+            v *= multy;
+            int x = (int)v.x;
+            int y = (int)v.y;
+            v.x = 1f * x / multy;
+            v.y = 1f * y / multy;
+            return v;
+        }
+
         public static Vector3 FixDecimal(this Vector3 v, int num)
         {
             int multy = 1;
@@ -44,21 +58,6 @@ namespace Game.Generic
             return v;
         }
 
-        public static Vector2 FixDecimal(this Vector2 v, int num)
-        {
-            int multy = 1;
-            for (int i = 0; i < num; i++)
-            {
-                multy *= 10;
-            }
-            v *= multy;
-            int x = (int)v.x;
-            int y = (int)v.y;
-            v.x = 1f * x / multy;
-            v.y = 1f * y / multy;
-            return v;
-        }
-
         public static bool MostEqualsY(this Vector3 v1, Vector3 v2, float offset = 0.1f)
         {
             return (v1.y - v2.y) < offset;
@@ -69,21 +68,34 @@ namespace Game.Generic
             return (v1 - v2).sqrMagnitude < offset * offset;
         }
 
+        public static void Reset(this Vector2 v)
+        {
+            v.x = 0;
+            v.y = 0;
+        }
+
         public static void Reset(this ref Vector3 v)
         {
             v.x = 0;
             v.y = 0;
             v.z = 0;
         }
-        #endregion
 
-        #region [Vector2]
-        public static void Reset(this Vector2 v)
+        public static System.Numerics.Vector2 ToSystemVector2(this Vector2 v)
         {
-            v.x = 0;
-            v.y = 0;
+            return new System.Numerics.Vector2(v.x, v.y);
         }
-        #endregion
+
+        public static System.Numerics.Vector3 ToSystemVector3(this Vector2 v)
+        {
+            return new System.Numerics.Vector3(v.x, v.y, 0);
+        }
+
+        public static System.Numerics.Vector2 ToSystemVector3(this Vector3 v)
+        {
+            return new System.Numerics.Vector2(v.x, v.y);
+        }
+
     }
 
 }
