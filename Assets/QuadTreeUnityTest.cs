@@ -19,6 +19,8 @@ public class QuadTreeUnityTest : MonoBehaviour
     QuadTree<Unit> quadTree;
     public float quadLen;
     public int quadTreeLayer;
+    public float searchWidth;
+    public float searchHeight;
     public GameObject billboard;
 
     void Start()
@@ -64,7 +66,11 @@ public class QuadTreeUnityTest : MonoBehaviour
                 pos.z = 0;
                 unitEndPos = pos;
                 var tf = unit.go.transform;
-                tf.localScale = new Vector3(unitEndPos.x - unitStartPos.x, unitStartPos.y - unitEndPos.y, 1);
+                var scale_x = Mathf.Abs(unitEndPos.x - unitStartPos.x);
+                scale_x = scale_x == 0 ? 1 : scale_x;
+                var scale_y = Mathf.Abs(unitStartPos.y - unitEndPos.y);
+                scale_y = scale_y == 0 ? 1 : scale_y;
+                tf.localScale = new Vector3(scale_x, scale_y, 1);
                 tf.position = (unitStartPos + unitEndPos) / 2f;
                 unitCreated = false;
                 Debug.Log(tf.transform.localScale);
@@ -84,8 +90,6 @@ public class QuadTreeUnityTest : MonoBehaviour
         DrawSearchArea();
     }
 
-    public float searchWidth;
-    public float searchHeight;
     void DrawSearchArea()
     {
         Gizmos.color = Color.red;
