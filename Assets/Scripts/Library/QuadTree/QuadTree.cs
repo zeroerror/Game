@@ -103,6 +103,8 @@ public class QuadTree<T> where T : IBounds
             var key = keyArray[i];
             quadUnitCountDic[key] = 0;
         }
+
+        quadUnitDic.Clear();
     }
 
     public void ForeachUnit(Action<Unit<T>> action)
