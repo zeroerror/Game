@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c47386a4c76a04c94499758d0cb570, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  quadLen: 128
-  quadTreeLayer: 4
+  quadLen: 256
+  quadTreeLayer: 8
   searchWidth: 10
   searchHeight: 10
   billboard: {fileID: 1738340374}

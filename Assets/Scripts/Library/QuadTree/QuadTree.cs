@@ -53,6 +53,8 @@ public class QuadTree<T> where T : IBounds
     public int curLayer;
     public int maxNode;
 
+    ulong[] removeKeyArray;
+
     public QuadTree(float sideLen, int maxLayer, Vector2 rootPos, int quadUnitLimit = 4, int maxUnit = 1000)
     {
         maxLayer = maxLayer > 8 ? 8 : maxLayer;
@@ -76,6 +78,7 @@ public class QuadTree<T> where T : IBounds
         quad.ltPos = new Vector2(rootPos.X - halfLen, rootPos.Y + halfLen);
         quad.rbPos = new Vector2(rootPos.X + halfLen, rootPos.Y - halfLen);
         quadDic.TryAdd(QuadTree.GetLocationKey(0, 0), quad);
+        removeKeyArray = new ulong[maxNode];
     }
 
     public int Tick()
@@ -285,14 +288,20 @@ public class QuadTree<T> where T : IBounds
     {
         var unitID = unit.UnitID;
         var e = unitDic.Keys.GetEnumerator();
+        int count = 0;
         while (e.MoveNext())
         {
             var key = e.Current;
             var uid = (ushort)key;
             if (uid == unitID)
             {
-                unitDic.Remove(key);
+                removeKeyArray[count++] = key;
             }
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            unitDic.Remove(removeKeyArray[i]);
         }
     }
 
