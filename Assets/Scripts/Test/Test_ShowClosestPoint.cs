@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Attach this to a GameObject that has a Collider component attached
-public class ShowClosestPoint : MonoBehaviour
+public class Test_ShowClosestPoint : MonoBehaviour
 {
     public Transform location;
 

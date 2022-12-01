@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using ZeroFrame.ZeroMath;
+using ZeroFrame.AllMath;
 using ZeroFrame.ZeroPhysics;
 
 public interface IBounds
@@ -61,7 +61,7 @@ public class QuadTree<T> where T : IBounds
         this.curLayer = 0;
         this.quadUnitLimit = quadUnitLimit;
         this.rootPos = rootPos;
-        this.maxNode = (int)(Digit.Pow(4, maxLayer) - 4) / 3 + 1;
+        this.maxNode = (int)(AllDigit.Pow(4, maxLayer) - 4) / 3 + 1;
         Console.WriteLine($"Tree MaxNode: {maxNode}");
 
         quadDic = new Dictionary<uint, Quad<T>>();
@@ -235,7 +235,7 @@ public class QuadTree<T> where T : IBounds
     {
         for (int curLayer = 1; curLayer <= maxLayer; curLayer++)
         {
-            int n = (int)(Digit.Pow(4, curLayer) - 4) / 3;
+            int n = (int)(AllDigit.Pow(4, curLayer) - 4) / 3;
             if (nodeIndex <= n)
             {
                 return curLayer;

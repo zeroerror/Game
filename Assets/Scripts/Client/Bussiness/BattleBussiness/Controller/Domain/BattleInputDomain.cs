@@ -1,5 +1,5 @@
 using UnityEngine;
-using ZeroFrame.ZeroMath;
+using ZeroFrame.AllMath;
 using Game.Client.Bussiness.BattleBussiness.Facades;
 
 namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain

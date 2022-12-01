@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Game.Generic;
 using UnityEngine;
 
-public class QuadTreeUnityTest : MonoBehaviour
+public class Test_QuadTree : MonoBehaviour
 {
 
     class Unit : IBounds
@@ -16,8 +16,6 @@ public class QuadTreeUnityTest : MonoBehaviour
 
         public System.Numerics.Vector2 LTPos => ltPos;
         public System.Numerics.Vector2 RBPos => rbPos;
-        // public System.Numerics.Vector2 LTPos => new System.Numerics.Vector2(go.transform.position.x - go.transform.localScale.x / 2f, go.transform.position.y + go.transform.localScale.y / 2f);
-        // public System.Numerics.Vector2 RBPos => new System.Numerics.Vector2(go.transform.position.x + go.transform.localScale.x / 2f, go.transform.position.y - go.transform.localScale.y / 2f);
 
         public void UpdateBounds()
         {
