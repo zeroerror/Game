@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Game.Generic;
 using UnityEngine;
 
@@ -37,18 +39,18 @@ public class Test_QuadTree : MonoBehaviour
     public float searchHeight;
     public GameObject billboard;
 
+    int index = 0;
+    bool unitCreated;
+    Unit unit;
+    Vector3 unitStartPos;
+    Vector3 unitEndPos;
+
     void Start()
     {
         quadTree = new QuadTree<Unit>(quadLen, quadTreeLayer, System.Numerics.Vector2.Zero);
         billboard.transform.localScale = new Vector3(quadLen, quadLen, 1);
         Camera.main.orthographicSize = quadLen / 2f;
     }
-
-    int index = 0;
-    bool unitCreated;
-    Unit unit;
-    Vector3 unitStartPos;
-    Vector3 unitEndPos;
 
     void Update()
     {
@@ -93,8 +95,9 @@ public class Test_QuadTree : MonoBehaviour
                 quadTree.AddUnit(unit);
             }
         }
-        quadTree.Tick();
+
         TickUnitPosition();
+        quadTree.Tick();
     }
 
     public void TickUnitPosition()
@@ -133,9 +136,8 @@ public class Test_QuadTree : MonoBehaviour
             quadTree.GetAABBCollsionQuadList(ltPos.ToSystemVector2(), rbPos.ToSystemVector2(), quadList, 0);
             quadList.ForEach((quad) =>
             {
-                var locationKey = QuadTree.GetLocationKey(quad.nodeIndex, quad.quadIndex);
-                var units = quadTree.GetUnitArray(locationKey, out int count);
-                for (int i = 0; i < count; i++)
+                var units = quadTree.GetUnits(quad);
+                for (int i = 0; i < units.Count; i++)
                 {
                     var unit = units[i];
                     var tf = unit.Value.go.transform;

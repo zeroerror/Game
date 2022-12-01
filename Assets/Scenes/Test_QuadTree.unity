@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748171, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c47386a4c76a04c94499758d0cb570, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  quadLen: 256
-  quadTreeLayer: 8
+  quadLen: 512
+  quadTreeLayer: 4
   searchWidth: 10
   searchHeight: 10
   billboard: {fileID: 1738340374}
