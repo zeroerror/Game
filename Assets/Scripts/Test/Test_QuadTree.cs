@@ -93,7 +93,6 @@ public class Test_QuadTree : MonoBehaviour
                 quadTree.AddUnit(unit);
             }
         }
-
         quadTree.Tick();
         TickUnitPosition();
     }
@@ -118,6 +117,7 @@ public class Test_QuadTree : MonoBehaviour
         DrawSearchArea();
     }
 
+    List<Quad<Unit>> quadList = new List<Quad<Unit>>(1000);
     void DrawSearchArea()
     {
         Gizmos.color = Color.red;
@@ -129,17 +129,18 @@ public class Test_QuadTree : MonoBehaviour
             var mouseWorldPosY = hit.point.y;
             var ltPos = new Vector2(mouseWorldPosX - widthOffset, mouseWorldPosY + heightOffset);
             var rbPos = new Vector2(mouseWorldPosX + widthOffset, mouseWorldPosY - heightOffset);
-            List<Quad<Unit>> quadList = new List<Quad<Unit>>();
+            quadList.Clear();
             quadTree.GetAABBCollsionQuadList(ltPos.ToSystemVector2(), rbPos.ToSystemVector2(), quadList, 0);
             quadList.ForEach((quad) =>
             {
                 var locationKey = QuadTree.GetLocationKey(quad.nodeIndex, quad.quadIndex);
-                var units = quadTree.GetUnitList(locationKey);
-                units.ForEach((unit) =>
+                var units = quadTree.GetUnitArray(locationKey, out int count);
+                for (int i = 0; i < count; i++)
                 {
+                    var unit = units[i];
                     var tf = unit.Value.go.transform;
                     Gizmos.DrawCube(tf.position, tf.localScale);
-                });
+                }
             });
 
             Gizmos.color = Color.white;

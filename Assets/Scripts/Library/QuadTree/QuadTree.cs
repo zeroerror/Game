@@ -62,7 +62,7 @@ public class QuadTree<T> where T : IBounds
         this.quadUnitLimit = quadUnitLimit;
         this.rootPos = rootPos;
         this.maxNode = (int)(AllDigit.Pow(4, maxLayer) - 4) / 3 + 1;
-        Console.WriteLine($"Tree MaxNode: {maxNode}");
+        // Console.WriteLine($"Tree MaxNode: {maxNode}");
 
         quadDic = new Dictionary<uint, Quad<T>>();
         unitDic = new Dictionary<ulong, Unit<T>>();
@@ -78,17 +78,15 @@ public class QuadTree<T> where T : IBounds
         quadDic.TryAdd(QuadTree.GetLocationKey(0, 0), quad);
     }
 
-    public void Tick()
+    public int Tick()
     {
-        var values = unitDic.Values;
-        Unit<T>[] unitArray = new Unit<T>[values.Count];
-        values.CopyTo(unitArray, 0);
-        for (int i = 0; i < unitArray.Length; i++)
+        for (int i = 0; i < unitCount; i++)
         {
             var unit = unitArray[i];
             RemoveUnit(unit);
             TickUnitLocation(unit);
         }
+        return unitCount;
     }
 
     public void Clear()
@@ -179,29 +177,32 @@ public class QuadTree<T> where T : IBounds
 
             // - Check Limit
             var locationKey = QuadTree.GetLocationKey(nodeIndex, quadIndex);
-            var unitList = GetUnitList(locationKey);
-            if (unitList.Count >= quadUnitLimit && TrySplitQuad(quad))
+            var unitArray = GetUnitArray(locationKey, out int count);
+            if (count >= quadUnitLimit && TrySplitQuad(quad))
             {
-                Console.WriteLine($"------------------  Reach Quad's Unit Limit.");
-                unitList.ForEach((u) =>
+                // Console.WriteLine($"------------------  Reach Quad's Unit Limit.");
+                for (int i = 0; i < count; i++)
                 {
+                    var u = unitArray[i];
                     unitKey = QuadTree.GetUnitKey(nodeIndex, quadIndex, u.UnitID);
                     unitDic.Remove(unitKey);
                     TickUnitLocation(u);
-                });
+                }
+
                 TickUnitLocation(unit);
                 return;
             }
 
             // - Normal Add
             unitDic.TryAdd(unitKey, unit);
-            Console.WriteLine($"------------------ Add Unit: nodeIndex {nodeIndex} quadIndex {quadIndex}");
+            // Console.WriteLine($"------------------ Add Unit: nodeIndex {nodeIndex} quadIndex {quadIndex}");
         });
     }
 
-    public List<Unit<T>> GetUnitList(uint locationKey)
+    Unit<T>[] units = new Unit<T>[1000];
+    public Unit<T>[] GetUnitArray(uint locationKey, out int count)
     {
-        var unitList = new List<Unit<T>>();
+        count = 0;
         var e = unitDic.Keys.GetEnumerator();
         while (e.MoveNext())
         {
@@ -209,10 +210,10 @@ public class QuadTree<T> where T : IBounds
             var locKey = unitKey >> 32;
             if (locKey == locationKey)
             {
-                unitList.Add(unitDic[unitKey]);
+                units[count++] = unitDic[unitKey];
             }
         }
-        return unitList;
+        return units;
     }
 
     public List<ulong> GetUnitKeyList(uint locationKey)
@@ -245,27 +246,30 @@ public class QuadTree<T> where T : IBounds
         return 0;
     }
 
+    List<Quad<T>> quadList = new List<Quad<T>>(1000);
     void TickUnitLocation(Unit<T> unit)
     {
-        List<Quad<T>> quadList = new List<Quad<T>>();
+        quadList.Clear();
         GetAABBCollsionQuadList(unit.Value, quadList, 0);
-        quadList.ForEach((quad) =>
+        for (int i = 0; i < quadList.Count; i++)
         {
+            var quad = quadList[i];
             var nodeIndex = quad.nodeIndex;
             var quadIndex = quad.quadIndex;
 
             // - Check Limit Again
             var locationKey = QuadTree.GetLocationKey(nodeIndex, quadIndex);
-            var unitList = GetUnitList(locationKey);
-            if (unitList.Count >= quadUnitLimit && TrySplitQuad(quad))
+            var unitArray = GetUnitArray(locationKey, out int count);
+            if (count >= quadUnitLimit && TrySplitQuad(quad))
             {
-                Console.WriteLine($"------------------  Reach Quad's Unit Limit.");
-                unitList.ForEach((u) =>
+                // Console.WriteLine($"------------------  Reach Quad's Unit Limit.");
+                for (int j = 0; j < count; j++)
                 {
+                    var u = unitArray[j];
                     var unitKey = QuadTree.GetUnitKey(nodeIndex, quadIndex, u.UnitID);
                     unitDic.Remove(unitKey);
                     TickUnitLocation(u);
-                });
+                }
                 TickUnitLocation(unit);
                 return;
             }
@@ -273,19 +277,17 @@ public class QuadTree<T> where T : IBounds
             // - Final Set
             var newUnitKey = QuadTree.GetUnitKey(nodeIndex, quadIndex, unit.UnitID);
             unitDic.TryAdd(newUnitKey, unit);
-            Console.WriteLine($"------------------ TickUnitLocation[{unit.UnitID}]: nodeIndex {nodeIndex} quadIndex {quadIndex}");
-        });
+            // Console.WriteLine($"------------------ TickUnitLocation[{unit.UnitID}]: nodeIndex {nodeIndex} quadIndex {quadIndex}");
+        }
     }
 
     void RemoveUnit(Unit<T> unit)
     {
         var unitID = unit.UnitID;
-        var keys = unitDic.Keys;
-        var array = new ulong[keys.Count];
-        keys.CopyTo(array, 0);
-        for (int i = 0; i < array.Length; i++)
+        var e = unitDic.Keys.GetEnumerator();
+        while (e.MoveNext())
         {
-            var key = array[i];
+            var key = e.Current;
             var uid = (ushort)key;
             if (uid == unitID)
             {
@@ -299,7 +301,7 @@ public class QuadTree<T> where T : IBounds
         var quadNodeIndex = quad.nodeIndex;
         if (GetLayer(quadNodeIndex) >= maxLayer)
         {
-            Console.WriteLine($"########## Quad Split Max");
+            // Console.WriteLine($"########## Quad Split Max");
             return false;
         }
 
