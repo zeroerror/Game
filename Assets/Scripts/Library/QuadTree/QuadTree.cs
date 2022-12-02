@@ -39,9 +39,12 @@ public class QuadTree<T> where T : IBounds
 
     // -------------------------- Quad And Unit--------------------------
     public Dictionary<ushort, Quad<T>> quadDic;
-    public Dictionary<ushort, Unit<T>> unitDic;
-    public Dictionary<uint, Unit<T>> quadUnitDic;
     public Dictionary<ushort, int> quadUnitCountDic;
+    public Dictionary<ushort, List<Unit<T>>> quadUnitDic;
+
+    public Dictionary<ushort, Unit<T>> unitDic;
+    public Dictionary<ushort, List<Quad<T>>> unitQuadDic;
+
 
     ushort unitAutoID;
 
@@ -61,22 +64,25 @@ public class QuadTree<T> where T : IBounds
         this.quadUnitLimit = quadUnitLimit;
         this.rootPos = rootPos;
         this.maxNode = (int)(AllDigit.Pow(4, maxLayer) - 4) / 3 + 1;
-        // Console.WriteLine($"Tree MaxNode: {maxNode}");
+        this.unitAutoID = 0;
 
         quadDic = new Dictionary<ushort, Quad<T>>();
-        unitDic = new Dictionary<ushort, Unit<T>>();
-        quadUnitDic = new Dictionary<uint, Unit<T>>();
+        quadUnitDic = new Dictionary<ushort, List<Unit<T>>>();
         quadUnitCountDic = new Dictionary<ushort, int>();
 
-        unitAutoID = 0;
+        unitDic = new Dictionary<ushort, Unit<T>>();
+        unitQuadDic = new Dictionary<ushort, List<Quad<T>>>();
 
         var quad = new Quad<T>();
         var halfLen = sideLen / 2f;
         quad.quadID = 0;
         quad.ltPos = new Vector2(rootPos.X - halfLen, rootPos.Y + halfLen);
         quad.rbPos = new Vector2(rootPos.X + halfLen, rootPos.Y - halfLen);
+
         quadDic.TryAdd(0, quad);
+        quadUnitDic.TryAdd(0, new List<Unit<T>>(10));
         quadUnitCountDic.Add(0, 0);
+
         removeKeyArray = new ulong[maxNode];
     }
 
@@ -104,7 +110,19 @@ public class QuadTree<T> where T : IBounds
             quadUnitCountDic[key] = 0;
         }
 
-        quadUnitDic.Clear();
+        var e1 = quadUnitDic.Keys.GetEnumerator();
+        while (e1.MoveNext())
+        {
+            var key = e1.Current;
+            quadUnitDic[key].Clear();
+        }
+
+        var e2 = unitQuadDic.Keys.GetEnumerator();
+        while (e2.MoveNext())
+        {
+            var key = e2.Current;
+            unitQuadDic[key].Clear();
+        }
     }
 
     public void ForeachUnit(Action<Unit<T>> action)
@@ -116,22 +134,11 @@ public class QuadTree<T> where T : IBounds
         }
     }
 
-    public List<Unit<T>> GetUnits(Quad<T> quad)
+    public bool TryGetUnits(Quad<T> quad, out List<Unit<T>> list)
     {
         List<Unit<T>> units = new List<Unit<T>>();
-        var quadID = quad.quadID;
-        var e = quadUnitDic.GetEnumerator();
-        while (e.MoveNext())
-        {
-            var kvp = e.Current;
-            var k = kvp.Key;
-            var qid = k >> 16;
-            if (qid == quadID)
-            {
-                units.Add(kvp.Value);
-            }
-        }
-        return units;
+        var qid = quad.quadID;
+        return quadUnitDic.TryGetValue(qid, out list);
     }
 
     // 获取坐标区域内所有单位
@@ -191,14 +198,14 @@ public class QuadTree<T> where T : IBounds
         ushort unitID = unitAutoID++;
         unit.SetUnitID(unitID);
         unitDic.Add(unitID, unit);
+        unitQuadDic.Add(unitID, new List<Quad<T>>());
 
         List<Quad<T>> quadList = new List<Quad<T>>();
         GetAABBCollsionQuadList(val, quadList, 0);
         quadList.ForEach((quad) =>
         {
-            var quadID = quad.quadID;
-            var key = QuadTree.GetQuadUnitKey(quadID, unitID);
-            quadUnitDic.TryAdd(key, unit);
+            quadUnitDic.TryGetValue(quad.quadID, out var unitList);
+            unitList.Add(unit);
         });
     }
 
@@ -225,9 +232,11 @@ public class QuadTree<T> where T : IBounds
         {
             var quad = quadList[i];
             var qid = quad.quadID;
-            var key = QuadTree.GetQuadUnitKey(qid, uid);
-            quadUnitDic.TryAdd(key, unit);
+            quadUnitDic.TryGetValue(qid, out var unitList);
+            unitList.Add(unit);
             quadUnitCountDic[qid]++;
+
+            unitQuadDic[uid].Add(quad);
         }
     }
 
@@ -273,18 +282,22 @@ public class QuadTree<T> where T : IBounds
         var qID = (ushort)(index + 1);
         quadDic.TryAdd(qID, new Quad<T> { quadID = qID, ltPos = ltPos, rbPos = ltPos + new Vector2(halfLen, -halfLen) });
         quadUnitCountDic.Add(qID, 0);
+        quadUnitDic.TryAdd(qID, new List<Unit<T>>(10));
 
         qID = (ushort)(index + 2);
         quadDic.TryAdd(qID, new Quad<T> { quadID = qID, ltPos = ltPos + new Vector2(halfLen, 0), rbPos = ltPos + new Vector2(len, -halfLen) });
         quadUnitCountDic.Add(qID, 0);
+        quadUnitDic.TryAdd(qID, new List<Unit<T>>(10));
 
         qID = (ushort)(index + 3);
         quadDic.TryAdd(qID, new Quad<T> { quadID = qID, ltPos = ltPos + new Vector2(0, -halfLen), rbPos = ltPos + new Vector2(halfLen, -len) });
         quadUnitCountDic.Add(qID, 0);
+        quadUnitDic.TryAdd(qID, new List<Unit<T>>(10));
 
         qID = (ushort)(index + 4);
         quadDic.TryAdd(qID, new Quad<T> { quadID = qID, ltPos = ltPos + new Vector2(halfLen, -halfLen), rbPos = ltPos + new Vector2(len, -len) });
         quadUnitCountDic.Add(qID, 0);
+        quadUnitDic.TryAdd(qID, new List<Unit<T>>(10));
     }
 
     bool IsLeaf(ushort quadID)

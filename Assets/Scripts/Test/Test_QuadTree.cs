@@ -118,9 +118,10 @@ public class Test_QuadTree : MonoBehaviour
 
         DrawQuadTree();
         DrawSearchArea();
+        DrawUnitQuad();
     }
 
-    List<Quad<Unit>> quadList = new List<Quad<Unit>>(1000);
+    List<Quad<Unit>> quadListForSearch = new List<Quad<Unit>>(1000);
     void DrawSearchArea()
     {
         Gizmos.color = Color.red;
@@ -132,16 +133,18 @@ public class Test_QuadTree : MonoBehaviour
             var mouseWorldPosY = hit.point.y;
             var ltPos = new Vector2(mouseWorldPosX - widthOffset, mouseWorldPosY + heightOffset);
             var rbPos = new Vector2(mouseWorldPosX + widthOffset, mouseWorldPosY - heightOffset);
-            quadList.Clear();
-            quadTree.GetAABBCollsionQuadList(ltPos.ToSystemVector2(), rbPos.ToSystemVector2(), quadList, 0);
-            quadList.ForEach((quad) =>
+            quadListForSearch.Clear();
+            quadTree.GetAABBCollsionQuadList(ltPos.ToSystemVector2(), rbPos.ToSystemVector2(), quadListForSearch, 0);
+            quadListForSearch.ForEach((quad) =>
             {
-                var units = quadTree.GetUnits(quad);
-                for (int i = 0; i < units.Count; i++)
+                if (quadTree.TryGetUnits(quad, out var unitList))
                 {
-                    var unit = units[i];
-                    var tf = unit.Value.go.transform;
-                    Gizmos.DrawCube(tf.position, tf.localScale);
+                    for (int i = 0; i < unitList.Count; i++)
+                    {
+                        var unit = unitList[i];
+                        var tf = unit.Value.go.transform;
+                        Gizmos.DrawCube(tf.position, tf.localScale);
+                    }
                 }
             });
 
@@ -156,6 +159,31 @@ public class Test_QuadTree : MonoBehaviour
         }
     }
 
+    void DrawUnitQuad()
+    {
+        var unitQuadDic = quadTree.unitQuadDic;
+        var e = unitQuadDic.Values.GetEnumerator();
+        while (e.MoveNext())
+        {
+            var quadList = e.Current;
+            for (int i = 0; i < quadList.Count; i++)
+            {
+                var quad = quadList[i];
+                var ltPos = quad.ltPos;
+                var rbPos = quad.rbPos;
+                var width = rbPos.X - ltPos.X;
+                var lbPos = ltPos;
+                lbPos.Y -= width;
+                var rtPos = rbPos;
+                rtPos.Y += width;
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(VectorExtension.ToUnityVector3(ltPos), VectorExtension.ToUnityVector3(rtPos));
+                Gizmos.DrawLine(VectorExtension.ToUnityVector3(ltPos), VectorExtension.ToUnityVector3(lbPos));
+                Gizmos.DrawLine(VectorExtension.ToUnityVector3(lbPos), VectorExtension.ToUnityVector3(rbPos));
+                Gizmos.DrawLine(VectorExtension.ToUnityVector3(rtPos), VectorExtension.ToUnityVector3(rbPos));
+            }
+        }
+    }
 
     void DrawQuadTree()
     {
