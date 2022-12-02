@@ -1,148 +1,70 @@
 using UnityEngine;
+using ZeroFrame.AllPhysics;
+using Game.Generic;
 
 public class Test_Phsics_OBB : MonoBehaviour
 {
-    public Transform tf1;
-    public Transform tf2;
-
     public bool isRun = false;
+
+    Box2D box1;
+    Box2D box2;
+    public BoxCollider bc1;
+    public BoxCollider bc2;
+
+    public void Start()
+    {
+        var bc1TF = bc1.transform;
+        box1 = new Box2D(bc1TF.position.ToSysVector2(), bc1TF.localScale.x, bc1TF.localScale.y, bc1TF.rotation.eulerAngles.z);
+        var bc2TF = bc2.transform;
+        box2 = new Box2D(bc2TF.position.ToSysVector2(), bc2TF.localScale.x, bc2TF.localScale.y, bc2TF.rotation.eulerAngles.z);
+    }
 
     public void OnDrawGizmos()
     {
         if (!isRun) return;
-        if (tf1 == null || tf2 == null) return;
+        if (bc1 == null) return;
+        if (bc2 == null) return;
+        if (box1 == null) return;
 
-        var a1_tf = tf1.GetChild(0);
-        var b1_tf = tf1.GetChild(1);
-        var c1_tf = tf1.GetChild(2);
-        var d1_tf = tf1.GetChild(3);
+        UpdateBox(bc1.transform, box1);
+        UpdateBox(bc2.transform, box2);
 
-        var a2_tf = tf2.GetChild(0);
-        var b2_tf = tf2.GetChild(1);
-        var c2_tf = tf2.GetChild(2);
-        var d2_tf = tf2.GetChild(3);
-        if (a1_tf == null || b1_tf == null || c1_tf == null || d1_tf == null) return;
-        if (a2_tf == null || b2_tf == null || c2_tf == null || d2_tf == null) return;
-
-        // - Cude 1
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(a1_tf.position, b1_tf.position);
-        Gizmos.DrawLine(b1_tf.position, c1_tf.position);
-        Gizmos.DrawLine(c1_tf.position, d1_tf.position);
-        Gizmos.DrawLine(d1_tf.position, a1_tf.position);
-
-        var rotAngle1 = tf1.rotation.eulerAngles.z;
-        Vector3 leftPos = Vector3.zero;
-        Vector3 rightPos = Vector3.zero;
-        Vector3 topPos = Vector3.zero;
-        Vector3 downPos = Vector3.zero;
-        GetQuadLRTDPos(a1_tf.position, b1_tf.position, c1_tf.position, d1_tf.position, rotAngle1,
-        ref leftPos, ref rightPos, ref topPos, ref downPos);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(leftPos + Vector3.up * 10f, leftPos + Vector3.down * 10f);
-        Gizmos.DrawLine(rightPos + Vector3.up * 10f, rightPos + Vector3.down * 10f);
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(topPos + Vector3.left * 10f, topPos + Vector3.right * 10f);
-        Gizmos.DrawLine(downPos + Vector3.left * 10f, downPos + Vector3.right * 10f);
+        DrawBoxPoint(box1);
+        Gizmos.color = Color.green;
+        DrawBoxPoint(box2);
 
-        // - Cude 2
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(a2_tf.position, b2_tf.position);
-        Gizmos.DrawLine(b2_tf.position, c2_tf.position);
-        Gizmos.DrawLine(c2_tf.position, d2_tf.position);
-        Gizmos.DrawLine(d2_tf.position, a2_tf.position);
+        Gizmos.DrawLine(Vector3.zero + Vector3.up * 10f, Vector3.zero + Vector3.down * 10f);
+        Gizmos.DrawLine(Vector3.zero + Vector3.left * 10f, Vector3.zero + Vector3.right * 10f);
 
-        var rotAngle2 = tf2.rotation.eulerAngles.z;
-        GetQuadLRTDPos(a2_tf.position, b2_tf.position, c2_tf.position, d2_tf.position, rotAngle2,
-        ref leftPos, ref rightPos, ref topPos, ref downPos);
-
-        Gizmos.color = Color.black;
-        Gizmos.DrawLine(leftPos + Vector3.up * 10f, leftPos + Vector3.down * 10f);
-        Gizmos.DrawLine(rightPos + Vector3.up * 10f, rightPos + Vector3.down * 10f);
-        Gizmos.color = Color.white;
-        Gizmos.DrawLine(topPos + Vector3.left * 10f, topPos + Vector3.right * 10f);
-        Gizmos.DrawLine(downPos + Vector3.left * 10f, downPos + Vector3.right * 10f);
+        if (CollisionHelper2D.HasCollision_OBB(box1, box2)) Gizmos.color = Color.red;
+        DrawBoxBorder(box1);
+        DrawBoxBorder(box2);
     }
 
-    void GetQuadLRTDPos(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float rotAngle,
-    ref Vector3 leftPos, ref Vector3 rightPos, ref Vector3 topPos, ref Vector3 downPos)
+    void DrawBoxBorder(Box2D box)
     {
-        var count = (int)(rotAngle / 90);
-        bool isPositive = rotAngle > 0;
-        if (count == 0)
-        {
-            if (isPositive)
-            {
-                leftPos = a;
-                rightPos = c;
-                topPos = b;
-                downPos = d;
-            }
-            else
-            {
-                leftPos = d;
-                rightPos = b;
-                topPos = a;
-                downPos = c;
-            }
-        }
-        else if (count == 1)
-        {
-            if (isPositive)
-            {
-                leftPos = b;
-                rightPos = d;
-                topPos = c;
-                downPos = a;
-            }
-            else
-            {
-                leftPos = c;
-                rightPos = a;
-                topPos = d;
-                downPos = b;
-            }
-        }
-        else if (count == 2)
-        {
-            if (isPositive)
-            {
-                leftPos = c;
-                rightPos = a;
-                topPos = d;
-                downPos = b;
-            }
-            else
-            {
-                leftPos = b;
-                rightPos = d;
-                topPos = c;
-                downPos = a;
-            }
-        }
-        else if (count == 3)
-        {
-            if (isPositive)
-            {
-                leftPos = d;
-                rightPos = b;
-                topPos = a;
-                downPos = c;
-            }
-            else
-            {
-                leftPos = a;
-                rightPos = c;
-                topPos = b;
-                downPos = d;
-            }
-        }
+        Gizmos.DrawLine(box.GetA().ToUnityVector3(), (box.GetB().ToUnityVector3()));
+        Gizmos.DrawLine(box.GetB().ToUnityVector3(), (box.GetC().ToUnityVector3()));
+        Gizmos.DrawLine(box.GetC().ToUnityVector3(), (box.GetD().ToUnityVector3()));
+        Gizmos.DrawLine(box.GetD().ToUnityVector3(), (box.GetA().ToUnityVector3()));
     }
 
-    float GetProjection(Vector2 a, Vector2 b)
+    void DrawBoxPoint(Box2D box)
     {
-        return Vector2.Dot(a, b.normalized);
+        var a = box.GetA();
+        var b = box.GetB();
+        var c = box.GetC();
+        var d = box.GetD();
+        Gizmos.DrawSphere(a.ToUnityVector3(), 0.1f);
+        Gizmos.DrawSphere(b.ToUnityVector3(), 0.1f);
+        Gizmos.DrawSphere(c.ToUnityVector3(), 0.1f);
+        Gizmos.DrawSphere(d.ToUnityVector3(), 0.1f);
     }
 
+    void UpdateBox(Transform src, Box2D box)
+    {
+        box.SetCenter(src.position.ToSysVector2());
+        box.SetRotAngle(src.rotation.eulerAngles.z);
+    }
 }

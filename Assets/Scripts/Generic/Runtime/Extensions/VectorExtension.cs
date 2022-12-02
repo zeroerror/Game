@@ -86,9 +86,9 @@ namespace Game.Generic
             return new Vector2(v.X, v.Y);
         }
 
-        public static System.Numerics.Vector2 ToSystemVector2(this Vector2 v)
+        public static Vector2 ToSysVector3(this System.Numerics.Vector3 v)
         {
-            return new System.Numerics.Vector2(v.x, v.y);
+            return new Vector2(v.X, v.Y);
         }
 
         public static Vector3 ToUnityVector3(this System.Numerics.Vector2 v)
@@ -96,20 +96,27 @@ namespace Game.Generic
             return new Vector3(v.X, v.Y, 0);
         }
 
-        public static System.Numerics.Vector3 ToSystemVector3(this Vector2 v)
+
+        public static System.Numerics.Vector2 ToSysVector2(this Vector2 v)
+        {
+            return new System.Numerics.Vector2(v.x, v.y);
+        }
+
+        public static System.Numerics.Vector2 ToSysVector2(this Vector3 v)
+        {
+            return new System.Numerics.Vector2(v.x, v.y);
+        }
+
+        public static System.Numerics.Vector3 ToSysVector3(this Vector2 v)
         {
             return new System.Numerics.Vector3(v.x, v.y, 0);
         }
 
-        public static Vector2 ToSystemVector3(this System.Numerics.Vector3 v)
+        public static System.Numerics.Vector3 ToSysVector3(this Vector3 v)
         {
-            return new Vector2(v.X, v.Y);
+            return new System.Numerics.Vector3(v.x, v.y, v.z);
         }
 
-        public static System.Numerics.Vector2 ToSystemVector3(this Vector3 v)
-        {
-            return new System.Numerics.Vector2(v.x, v.y);
-        }
 
     }
 

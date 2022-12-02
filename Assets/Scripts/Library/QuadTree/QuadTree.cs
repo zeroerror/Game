@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using ZeroFrame.AllMath;
-using ZeroFrame.ZeroPhysics;
+using ZeroFrame.AllPhysics;
 
 public interface IBounds
 {
@@ -172,7 +172,7 @@ public class QuadTree<T> where T : IBounds
             return;
         }
 
-        if (!CollisionHelper.HasAABBCollision(quad.ltPos, quad.rbPos, ltPos, rbPos))
+        if (!CollisionHelper2D.HasCollision_AABB(quad.ltPos, quad.rbPos, ltPos, rbPos))
         {
             return;
         }

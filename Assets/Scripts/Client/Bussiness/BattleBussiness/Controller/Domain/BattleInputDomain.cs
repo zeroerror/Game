@@ -51,23 +51,11 @@ namespace Game.Client.Bussiness.BattleBussiness.Controller.Domain
         public Vector3 GetMoveDirByCameraView(BattleRoleLogicEntity owner, Vector3 moveAxis, CameraView cameraView)
         {
             Vector3 moveDir = Vector3.zero;
-            switch (cameraView)
+            if (cameraView == CameraView.ThirdView)
             {
-                case CameraView.FirstView:
-                    Vector3 roleForward = owner.transform.forward;
-                    roleForward.y = 0;
-                    VectorHelper2D.GetRotVector(roleForward.x, roleForward.z, -90, out float rightX, out float rightZ);
-                    Vector3 roleRight = new Vector3(rightX, 0, rightZ);
-                    moveDir = moveAxis;
-                    moveDir.x *= roleForward.x;
-                    moveDir = moveAxis.z * roleForward; //前后
-                    moveDir += moveAxis.x * roleRight;  //左右
-                    break;
-                case CameraView.ThirdView:
-                    moveDir = moveAxis;
-                    break;
-            }
+                moveDir = moveAxis;
 
+            }
             return moveDir.normalized;
         }
 
