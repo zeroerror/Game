@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.AllPhysics;
 using Game.Generic;
@@ -6,40 +7,68 @@ public class Test_Phsics_OBB : MonoBehaviour
 {
     public bool isRun = false;
 
-    Box2D box1;
-    Box2D box2;
-    public BoxCollider bc1;
-    public BoxCollider bc2;
+    Box2D[] boxes;
+    BoxCollider[] bcs;
+    public Transform Boxes;
 
     public void Start()
     {
-        var bc1TF = bc1.transform;
-        box1 = new Box2D(bc1TF.position.ToSysVector2(), bc1TF.localScale.x, bc1TF.localScale.y, bc1TF.rotation.eulerAngles.z);
-        var bc2TF = bc2.transform;
-        box2 = new Box2D(bc2TF.position.ToSysVector2(), bc2TF.localScale.x, bc2TF.localScale.y, bc2TF.rotation.eulerAngles.z);
+        if (Boxes == null) return;
+
+        var bcCount = Boxes.childCount;
+        bcs = new BoxCollider[bcCount];
+        for (int i = 0; i < bcCount; i++)
+        {
+            var bc = Boxes.GetChild(i);
+            bcs[i] = bc.GetComponent<BoxCollider>();
+        }
+
+        boxes = new Box2D[bcCount];
+        for (int i = 0; i < bcCount; i++)
+        {
+            var bcTF = bcs[i].transform;
+            boxes[i] = new Box2D(bcTF.position.ToSysVector2(), bcTF.localScale.x, bcTF.localScale.y, bcTF.rotation.eulerAngles.z);
+        }
     }
 
     public void OnDrawGizmos()
     {
         if (!isRun) return;
-        if (bc1 == null) return;
-        if (bc2 == null) return;
-        if (box1 == null) return;
+        if (bcs == null) return;
+        if (boxes == null) return;
 
-        UpdateBox(bc1.transform, box1);
-        UpdateBox(bc2.transform, box2);
-
-        Gizmos.color = Color.green;
-        DrawBoxPoint(box1);
-        Gizmos.color = Color.green;
-        DrawBoxPoint(box2);
+        Dictionary<int, Box2D> collisionBoxDic = new Dictionary<int, Box2D>();
+        for (int i = 0; i < boxes.Length - 1; i++)
+        {
+            for (int j = i + 1; j < boxes.Length; j++)
+            {
+                if (CollisionHelper2D.HasCollision_OBB(boxes[i], boxes[j]))
+                {
+                    collisionBoxDic[i] = boxes[i];
+                    if (!collisionBoxDic.ContainsKey(j))
+                    {
+                        collisionBoxDic[j] = boxes[j];
+                    }
+                }
+            }
+        }
 
         Gizmos.DrawLine(Vector3.zero + Vector3.up * 10f, Vector3.zero + Vector3.down * 10f);
         Gizmos.DrawLine(Vector3.zero + Vector3.left * 10f, Vector3.zero + Vector3.right * 10f);
+        for (int i = 0; i < boxes.Length; i++)
+        {
+            var bc = bcs[i];
+            var box = boxes[i];
+            UpdateBox(bc.transform, box);
+            Gizmos.color = Color.green;
+            DrawBoxPoint(box);
+            if (collisionBoxDic.ContainsKey(i))
+            {
+                Gizmos.color = Color.red;
+            }
+            DrawBoxBorder(box);
+        }
 
-        if (CollisionHelper2D.HasCollision_OBB(box1, box2)) Gizmos.color = Color.red;
-        DrawBoxBorder(box1);
-        DrawBoxBorder(box2);
     }
 
     void DrawBoxBorder(Box2D box)
