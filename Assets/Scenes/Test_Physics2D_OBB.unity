@@ -2352,7 +2352,7 @@ GameObject:
   - component: {fileID: 964948210}
   - component: {fileID: 964948211}
   m_Layer: 0
-  m_Name: OBBTest
+  m_Name: Test_Physics2D_OBB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2382,11 +2382,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 964948209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d13d8911bc2865f43a7a803905a970fb, type: 3}
+  m_Script: {fileID: 11500000, guid: cc5badd582d1a8142bb03ec93a32bfd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRun: 1
-  Boxes: {fileID: 1600269101}
+  isRun: 0
+  Boxes: {fileID: 0}
 --- !u!1 &1044096824
 GameObject:
   m_ObjectHideFlags: 0

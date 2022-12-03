@@ -86,7 +86,7 @@ namespace Game.Generic
             return new Vector2(v.X, v.Y);
         }
 
-        public static Vector2 ToSysVector3(this System.Numerics.Vector3 v)
+        public static Vector2 ToUnityVector2(this System.Numerics.Vector3 v)
         {
             return new Vector2(v.X, v.Y);
         }
@@ -96,6 +96,10 @@ namespace Game.Generic
             return new Vector3(v.X, v.Y, 0);
         }
 
+        public static Vector3 ToUnityVector3(this System.Numerics.Vector3 v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
 
         public static System.Numerics.Vector2 ToSysVector2(this Vector2 v)
         {

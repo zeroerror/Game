@@ -3,9 +3,10 @@ using UnityEngine;
 using ZeroFrame.AllPhysics;
 using Game.Generic;
 
-public class Test_Phsics_OBB : MonoBehaviour
+public class Test_Phsics2D_OBB : MonoBehaviour
 {
-    public bool isRun = false;
+
+    bool isRun = false;
 
     Box2D[] boxes;
     BoxCollider[] bcs;
@@ -14,6 +15,7 @@ public class Test_Phsics_OBB : MonoBehaviour
     public void Start()
     {
         if (Boxes == null) return;
+        isRun = true;
 
         var bcCount = Boxes.childCount;
         bcs = new BoxCollider[bcCount];
@@ -55,6 +57,7 @@ public class Test_Phsics_OBB : MonoBehaviour
 
         Gizmos.DrawLine(Vector3.zero + Vector3.up * 10f, Vector3.zero + Vector3.down * 10f);
         Gizmos.DrawLine(Vector3.zero + Vector3.left * 10f, Vector3.zero + Vector3.right * 10f);
+
         for (int i = 0; i < boxes.Length; i++)
         {
             var bc = bcs[i];
