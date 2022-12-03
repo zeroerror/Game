@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.AllPhysics;
 using Game.Generic;
+using ZeroFrame.AllMath;
 
 public class Test_Physics3D_OBB : MonoBehaviour
 {
@@ -63,13 +64,24 @@ public class Test_Physics3D_OBB : MonoBehaviour
             UpdateBox(bc.transform, box);
             Gizmos.color = Color.green;
             DrawBoxPoint(box);
-            if (collisionBoxDic.ContainsKey(i))
-            {
-                Gizmos.color = Color.red;
-            }
+            if (collisionBoxDic.ContainsKey(i)) Gizmos.color = Color.red;
             DrawBoxBorder(box);
+
+            Axis3D axis3D = new Axis3D();
+            axis3D.center = System.Numerics.Vector3.Zero;
+            axis3D.dir = System.Numerics.Vector3.UnitX;
+            DrawProjectionSub(axis3D, box);
         }
 
+    }
+
+    void DrawProjectionSub(Axis3D axis3D, Box3D box)
+    {
+        var proj = box.GetProjectionSub(axis3D);
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine((axis3D.center - 5f * axis3D.dir).ToUnityVector3(), (axis3D.center + 5f * axis3D.dir).ToUnityVector3());
+        Gizmos.color = Color.black;
+        Gizmos.DrawLine((axis3D.dir.Normalize() * proj.X + axis3D.center).ToUnityVector3(), (axis3D.dir.Normalize() * proj.Y + axis3D.center).ToUnityVector3());
     }
 
     void UpdateBox(Transform src, Box3D box)
