@@ -78,7 +78,7 @@ public class Test_Physics3D_AABB : MonoBehaviour
 
     void UpdateBox(Transform src, Box3D box)
     {
-        box.SetCenter(src.position.ToSysVector3());
+        box.UpdateCenter(src.position.ToSysVector3());
     }
 
     void DrawBoxPoint(Box3D box)

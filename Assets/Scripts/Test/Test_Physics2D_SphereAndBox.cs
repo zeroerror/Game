@@ -142,27 +142,27 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
         var proj = box.GetProjectionSub(axis2D);
         Gizmos.color = Color.white;
         Gizmos.color = Color.black;
-        Gizmos.DrawLine((axis2D.dir.Normalize() * proj.X + axis2D.center).ToUnityVector3(), (axis2D.dir.Normalize() * proj.Y + axis2D.center).ToUnityVector3());
+        Gizmos.DrawLine((axis2D.dir.GetNormalized() * proj.X + axis2D.center).ToUnityVector3(), (axis2D.dir.GetNormalized() * proj.Y + axis2D.center).ToUnityVector3());
     }
 
     void UpdateBox(Transform src, Box2D box)
     {
-        box.SetCenter(src.position.ToSysVector2());
-        box.SetRotAngle(src.rotation.eulerAngles.z);
+        box.UpdateCenter(src.position.ToSysVector2());
+        box.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 
     void UpdateSphere(Transform src, Sphere2D sphere)
     {
-        sphere.SetCenter(src.position.ToSysVector2());
-        sphere.SetRotAngle(src.rotation.eulerAngles.z);
+        sphere.UpdateCenter(src.position.ToSysVector2());
+        sphere.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 
     void DrawBoxPoint(Box2D box)
     {
-        var a = box.GetA().ToUnityVector3();
-        var b = box.GetB().ToUnityVector3();
-        var c = box.GetC().ToUnityVector3();
-        var d = box.GetD().ToUnityVector3();
+        var a = box.A.ToUnityVector3();
+        var b = box.B.ToUnityVector3();
+        var c = box.C.ToUnityVector3();
+        var d = box.D.ToUnityVector3();
         Gizmos.color = Color.red;
         float size = 0.02f;
         Gizmos.DrawSphere(a, size);
@@ -177,10 +177,10 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
 
     void DrawBoxBorder(Box2D box)
     {
-        var a = box.GetA().ToUnityVector3();
-        var b = box.GetB().ToUnityVector3();
-        var c = box.GetC().ToUnityVector3();
-        var d = box.GetD().ToUnityVector3();
+        var a = box.A.ToUnityVector3();
+        var b = box.B.ToUnityVector3();
+        var c = box.C.ToUnityVector3();
+        var d = box.D.ToUnityVector3();
         Gizmos.DrawLine(a, b);
         Gizmos.DrawLine(b, c);
         Gizmos.DrawLine(c, d);

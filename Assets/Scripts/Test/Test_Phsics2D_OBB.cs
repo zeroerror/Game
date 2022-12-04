@@ -76,18 +76,18 @@ public class Test_Phsics2D_OBB : MonoBehaviour
 
     void DrawBoxBorder(Box2D box)
     {
-        Gizmos.DrawLine(box.GetA().ToUnityVector3(), (box.GetB().ToUnityVector3()));
-        Gizmos.DrawLine(box.GetB().ToUnityVector3(), (box.GetC().ToUnityVector3()));
-        Gizmos.DrawLine(box.GetC().ToUnityVector3(), (box.GetD().ToUnityVector3()));
-        Gizmos.DrawLine(box.GetD().ToUnityVector3(), (box.GetA().ToUnityVector3()));
+        Gizmos.DrawLine(box.A.ToUnityVector3(), (box.B.ToUnityVector3()));
+        Gizmos.DrawLine(box.B.ToUnityVector3(), (box.C.ToUnityVector3()));
+        Gizmos.DrawLine(box.C.ToUnityVector3(), (box.D.ToUnityVector3()));
+        Gizmos.DrawLine(box.D.ToUnityVector3(), (box.A.ToUnityVector3()));
     }
 
     void DrawBoxPoint(Box2D box)
     {
-        var a = box.GetA();
-        var b = box.GetB();
-        var c = box.GetC();
-        var d = box.GetD();
+        var a = box.A;
+        var b = box.B;
+        var c = box.C;
+        var d = box.D;
         Gizmos.DrawSphere(a.ToUnityVector3(), 0.1f);
         Gizmos.DrawSphere(b.ToUnityVector3(), 0.1f);
         Gizmos.DrawSphere(c.ToUnityVector3(), 0.1f);
@@ -96,7 +96,7 @@ public class Test_Phsics2D_OBB : MonoBehaviour
 
     void UpdateBox(Transform src, Box2D box)
     {
-        box.SetCenter(src.position.ToSysVector2());
-        box.SetRotAngle(src.rotation.eulerAngles.z);
+        box.UpdateCenter(src.position.ToSysVector2());
+        box.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 }

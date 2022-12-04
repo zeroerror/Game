@@ -94,20 +94,20 @@ public class Test_Physics3D_OBB : MonoBehaviour
 
     void UpdateBox(Transform src, Box3D box)
     {
-        box.SetCenter(src.position.ToSysVector3());
-        box.SetRotAngle(src.rotation.eulerAngles.ToSysVector3());
+        box.UpdateCenter(src.position.ToSysVector3());
+        box.UpdateRotAngle(src.rotation.eulerAngles.ToSysVector3());
     }
 
     void DrawBoxPoint(Box3D box)
     {
-        var a = box.GetA().ToUnityVector3();
-        var b = box.GetB().ToUnityVector3();
-        var c = box.GetC().ToUnityVector3();
-        var d = box.GetD().ToUnityVector3();
-        var e = box.GetE().ToUnityVector3();
-        var f = box.GetF().ToUnityVector3();
-        var g = box.GetG().ToUnityVector3();
-        var h = box.GetH().ToUnityVector3();
+        var a = box.A.ToUnityVector3();
+        var b = box.B.ToUnityVector3();
+        var c = box.C.ToUnityVector3();
+        var d = box.D.ToUnityVector3();
+        var e = box.E.ToUnityVector3();
+        var f = box.F.ToUnityVector3();
+        var g = box.G.ToUnityVector3();
+        var h = box.H.ToUnityVector3();
         Gizmos.color = Color.red;
         float size = 0.02f;
         Gizmos.DrawSphere(a, size);
@@ -130,14 +130,14 @@ public class Test_Physics3D_OBB : MonoBehaviour
 
     void DrawBoxBorder(Box3D box)
     {
-        var a = box.GetA().ToUnityVector3();
-        var b = box.GetB().ToUnityVector3();
-        var c = box.GetC().ToUnityVector3();
-        var d = box.GetD().ToUnityVector3();
-        var e = box.GetE().ToUnityVector3();
-        var f = box.GetF().ToUnityVector3();
-        var g = box.GetG().ToUnityVector3();
-        var h = box.GetH().ToUnityVector3();
+        var a = box.A.ToUnityVector3();
+        var b = box.B.ToUnityVector3();
+        var c = box.C.ToUnityVector3();
+        var d = box.D.ToUnityVector3();
+        var e = box.E.ToUnityVector3();
+        var f = box.F.ToUnityVector3();
+        var g = box.G.ToUnityVector3();
+        var h = box.H.ToUnityVector3();
         Gizmos.DrawLine(a, b);
         Gizmos.DrawLine(b, c);
         Gizmos.DrawLine(c, d);
