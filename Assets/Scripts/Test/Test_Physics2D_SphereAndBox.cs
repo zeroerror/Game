@@ -152,6 +152,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
     {
         box.UpdateCenter(src.position.ToSysVector2());
         box.UpdateScale(src.localScale.ToSysVector2());
+        Debug.Log(src.localScale.ToSysVector2());
         box.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 
