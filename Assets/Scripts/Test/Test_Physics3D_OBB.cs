@@ -9,9 +9,11 @@ public class Test_Physics3D_OBB : MonoBehaviour
 
     bool isRun = false;
 
-    Box3D[] boxes;
+    Box3D[] boxs;
     Transform[] bcs;
     public Transform Boxes;
+
+    int[] collsionArray;
 
     public void Start()
     {
@@ -19,6 +21,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
         isRun = true;
 
         var bcCount = Boxes.childCount;
+        collsionArray = new int[bcCount];
         bcs = new Transform[bcCount];
         for (int i = 0; i < bcCount; i++)
         {
@@ -26,12 +29,12 @@ public class Test_Physics3D_OBB : MonoBehaviour
             bcs[i] = bc;
         }
 
-        boxes = new Box3D[bcCount];
+        boxs = new Box3D[bcCount];
         for (int i = 0; i < bcCount; i++)
         {
             var bcTF = bcs[i].transform;
-            boxes[i] = new Box3D(bcTF.position.ToSysVector3(), bcTF.localScale.x, bcTF.localScale.y, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3());
-            boxes[i].SetBoxType(BoxType.OBB);
+            boxs[i] = new Box3D(bcTF.position.ToSysVector3(), bcTF.localScale.x, bcTF.localScale.y, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3());
+            boxs[i].SetBoxType(BoxType.OBB);
         }
         Debug.Log($"Total Box: {bcCount}");
     }
@@ -40,20 +43,21 @@ public class Test_Physics3D_OBB : MonoBehaviour
     {
         if (!isRun) return;
         if (bcs == null) return;
-        if (boxes == null) return;
+        if (boxs == null) return;
 
-        Dictionary<int, Box3D> collisionBoxDic = new Dictionary<int, Box3D>();
-        for (int i = 0; i < boxes.Length - 1; i++)
+        for (int i = 0; i < collsionArray.Length; i++)
         {
-            for (int j = i + 1; j < boxes.Length; j++)
+            collsionArray[i] = 0;
+        }
+
+        for (int i = 0; i < boxs.Length - 1; i++)
+        {
+            for (int j = i + 1; j < boxs.Length; j++)
             {
-                if (CollisionHelper3D.HasCollision_OBB(boxes[i], boxes[j]))
+                if (CollisionHelper3D.HasCollision_OBB(boxs[i], boxs[j]))
                 {
-                    collisionBoxDic[i] = boxes[i];
-                    if (!collisionBoxDic.ContainsKey(j))
-                    {
-                        collisionBoxDic[j] = boxes[j];
-                    }
+                    collsionArray[i] = 1;
+                    collsionArray[j] = 1;
                 }
             }
         }
@@ -62,15 +66,19 @@ public class Test_Physics3D_OBB : MonoBehaviour
         axis3D.center = System.Numerics.Vector3.Zero;
         axis3D.dir = System.Numerics.Vector3.UnitX;
         Gizmos.DrawLine((axis3D.center - 100f * axis3D.dir).ToUnityVector3(), (axis3D.center + 100f * axis3D.dir).ToUnityVector3());
-        for (int i = 0; i < boxes.Length; i++)
+        for (int i = 0; i < boxs.Length; i++)
         {
             var bc = bcs[i];
-            var box = boxes[i];
+            var box = boxs[i];
             UpdateBox(bc.transform, box);
             Gizmos.color = Color.green;
             DrawBoxPoint(box);
-            if (collisionBoxDic.ContainsKey(i)) Gizmos.color = Color.red;
-            DrawBoxBorder(box);
+            if (collsionArray[i] == 1)
+            {
+                Gizmos.color = Color.red;
+                DrawBoxBorder(box);
+            }
+
             DrawProjectionSub(axis3D, box);
         }
 
