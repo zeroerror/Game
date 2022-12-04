@@ -40,7 +40,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (bcTF.GetComponent<BoxCollider>())
             {
                 allBoxes[i] = new Box2D(bcTF.position.ToSysVector2(), bcTF.localScale.x, bcTF.localScale.y, bcTF.rotation.eulerAngles.z);
-                allBoxes[i].SetBoxType(BoxType.OBB);
+                allBoxes[i].SetBoxType(BoxType.AABB);
                 boxCount++;
             }
             else if (bcTF.GetComponent<SphereCollider>())
