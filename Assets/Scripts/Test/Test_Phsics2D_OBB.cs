@@ -44,7 +44,7 @@ public class Test_Phsics2D_OBB : MonoBehaviour
         {
             for (int j = i + 1; j < boxes.Length; j++)
             {
-                if (CollisionHelper2D.HasCollision_OBB(boxes[i], boxes[j]))
+                if (CollisionHelper2D.HasCollision(boxes[i], boxes[j]))
                 {
                     collisionBoxDic[i] = boxes[i];
                     if (!collisionBoxDic.ContainsKey(j))

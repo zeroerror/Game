@@ -40,7 +40,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (bcTF.GetComponent<BoxCollider>())
             {
                 allBoxes[i] = new Box2D(bcTF.position.ToSysVector2(), bcTF.localScale.x, bcTF.localScale.y, bcTF.rotation.eulerAngles.z);
-                allBoxes[i].SetBoxType(BoxType.AABB);
+                allBoxes[i].SetBoxType(BoxType.OBB);
                 boxCount++;
             }
             else if (bcTF.GetComponent<SphereCollider>())
@@ -73,7 +73,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             {
                 var box2 = allBoxes[j];
                 if (box2 == null) continue;
-                if (CollisionHelper2D.HasCollision_OBB(box1, box2))
+                if (CollisionHelper2D.HasCollision(box1, box2))
                 {
                     collsionArray[i] = 1;
                     collsionArray[j] = 1;
@@ -120,7 +120,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (box == null) continue;
             UpdateBox(bc.transform, box);
             Gizmos.color = Color.green;
-            DrawBoxPoint(box);
+            // DrawBoxPoint(box);
             if (collsionArray[i] == 1) { Gizmos.color = Color.red; DrawBoxBorder(box); }
         }
 
@@ -131,8 +131,11 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (sphere == null) continue;
             UpdateSphere(bc.transform, sphere);
             Gizmos.color = Color.green;
-            if (collsionArray[i] == 1) Gizmos.color = Color.red;
-            DrawSphereBorder(sphere);
+            if (collsionArray[i] == 1)
+            {
+                Gizmos.color = Color.red;
+                DrawSphereBorder(sphere);
+            }
         }
 
     }
@@ -189,7 +192,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
 
     void DrawSphereBorder(Sphere2D sphere)
     {
-        Gizmos.DrawSphere(sphere.Center.ToUnityVector3(), sphere.Radius + 0.02f);
+        Gizmos.DrawSphere(sphere.Center.ToUnityVector3(), sphere.Radius);
     }
 
 }
