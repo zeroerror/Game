@@ -33,7 +33,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
         for (int i = 0; i < bcCount; i++)
         {
             var bcTF = bcs[i].transform;
-            boxs[i] = new Box3D(bcTF.position.ToSysVector3(), bcTF.localScale.x, bcTF.localScale.y, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3());
+            boxs[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
             boxs[i].SetBoxType(BoxType.OBB);
         }
         Debug.Log($"Total Box: {bcCount}");
@@ -95,6 +95,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
     void UpdateBox(Transform src, Box3D box)
     {
         box.UpdateCenter(src.position.ToSysVector3());
+        box.UpdateScale(src.localScale.ToSysVector3());
         box.UpdateRotAngle(src.rotation.eulerAngles.ToSysVector3());
     }
 

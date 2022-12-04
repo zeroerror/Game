@@ -39,13 +39,13 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             var bcTF = tfs[i].transform;
             if (bcTF.GetComponent<BoxCollider>())
             {
-                allBoxes[i] = new Box2D(bcTF.position.ToSysVector2(), bcTF.localScale.x, bcTF.localScale.y, bcTF.rotation.eulerAngles.z);
+                allBoxes[i] = new Box2D(bcTF.position.ToSysVector2(), 1, 1, bcTF.rotation.eulerAngles.z, bcTF.localScale.ToSysVector2());
                 allBoxes[i].SetBoxType(BoxType.OBB);
                 boxCount++;
             }
             else if (bcTF.GetComponent<SphereCollider>())
             {
-                allSpheres[i] = new Sphere2D(bcTF.position.ToSysVector2(), bcTF.GetComponent<SphereCollider>().radius, bcTF.rotation.eulerAngles.z);
+                allSpheres[i] = new Sphere2D(bcTF.position.ToSysVector2(), bcTF.GetComponent<SphereCollider>().radius, bcTF.rotation.eulerAngles.z, bcTF.localScale.x);
                 sphereCount++;
             }
 
@@ -151,12 +151,14 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
     void UpdateBox(Transform src, Box2D box)
     {
         box.UpdateCenter(src.position.ToSysVector2());
+        box.UpdateScale(src.localScale.ToSysVector2());
         box.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 
     void UpdateSphere(Transform src, Sphere2D sphere)
     {
         sphere.UpdateCenter(src.position.ToSysVector2());
+        sphere.UpdateScale(src.localScale.x);
         sphere.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 

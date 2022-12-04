@@ -29,7 +29,7 @@ public class Test_Phsics2D_OBB : MonoBehaviour
         for (int i = 0; i < bcCount; i++)
         {
             var bcTF = bcs[i].transform;
-            boxes[i] = new Box2D(bcTF.position.ToSysVector2(), bcTF.localScale.x, bcTF.localScale.y, bcTF.rotation.eulerAngles.z);
+            boxes[i] = new Box2D(bcTF.position.ToSysVector2(), 1, 1, bcTF.rotation.eulerAngles.z, bcTF.localScale.ToSysVector2());
         }
     }
 
@@ -97,6 +97,7 @@ public class Test_Phsics2D_OBB : MonoBehaviour
     void UpdateBox(Transform src, Box2D box)
     {
         box.UpdateCenter(src.position.ToSysVector2());
+        box.UpdateScale(src.localScale.ToSysVector2());
         box.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 }
