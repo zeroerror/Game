@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.AllPhysics;
-using Game.Generic;
 using ZeroFrame.AllMath;
+using Game.Generic;
 
 public class Test_Physics3D_OBB : MonoBehaviour
 {
@@ -33,6 +33,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
             boxes[i] = new Box3D(bcTF.position.ToSysVector3(), bcTF.localScale.x, bcTF.localScale.y, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3());
             boxes[i].SetBoxType(BoxType.OBB);
         }
+        Debug.Log($"Total Box: {bcCount}");
     }
 
     public void OnDrawGizmos()
@@ -42,21 +43,25 @@ public class Test_Physics3D_OBB : MonoBehaviour
         if (boxes == null) return;
 
         Dictionary<int, Box3D> collisionBoxDic = new Dictionary<int, Box3D>();
-        // for (int i = 0; i < boxes.Length - 1; i++)
-        // {
-        //     for (int j = i + 1; j < boxes.Length; j++)
-        //     {
-        //         if (CollisionHelper3D.HasCollision_AABB(boxes[i], boxes[j]))
-        //         {
-        //             collisionBoxDic[i] = boxes[i];
-        //             if (!collisionBoxDic.ContainsKey(j))
-        //             {
-        //                 collisionBoxDic[j] = boxes[j];
-        //             }
-        //         }
-        //     }
-        // }
+        for (int i = 0; i < boxes.Length - 1; i++)
+        {
+            for (int j = i + 1; j < boxes.Length; j++)
+            {
+                if (CollisionHelper3D.HasCollision_OBB(boxes[i], boxes[j]))
+                {
+                    collisionBoxDic[i] = boxes[i];
+                    if (!collisionBoxDic.ContainsKey(j))
+                    {
+                        collisionBoxDic[j] = boxes[j];
+                    }
+                }
+            }
+        }
 
+        Axis3D axis3D = new Axis3D();
+        axis3D.center = System.Numerics.Vector3.Zero;
+        axis3D.dir = System.Numerics.Vector3.UnitX;
+        Gizmos.DrawLine((axis3D.center - 100f * axis3D.dir).ToUnityVector3(), (axis3D.center + 100f * axis3D.dir).ToUnityVector3());
         for (int i = 0; i < boxes.Length; i++)
         {
             var bc = bcs[i];
@@ -66,10 +71,6 @@ public class Test_Physics3D_OBB : MonoBehaviour
             DrawBoxPoint(box);
             if (collisionBoxDic.ContainsKey(i)) Gizmos.color = Color.red;
             DrawBoxBorder(box);
-
-            Axis3D axis3D = new Axis3D();
-            axis3D.center = System.Numerics.Vector3.Zero;
-            axis3D.dir = System.Numerics.Vector3.UnitX;
             DrawProjectionSub(axis3D, box);
         }
 
@@ -79,7 +80,6 @@ public class Test_Physics3D_OBB : MonoBehaviour
     {
         var proj = box.GetProjectionSub(axis3D);
         Gizmos.color = Color.white;
-        Gizmos.DrawLine((axis3D.center - 5f * axis3D.dir).ToUnityVector3(), (axis3D.center + 5f * axis3D.dir).ToUnityVector3());
         Gizmos.color = Color.black;
         Gizmos.DrawLine((axis3D.dir.Normalize() * proj.X + axis3D.center).ToUnityVector3(), (axis3D.dir.Normalize() * proj.Y + axis3D.center).ToUnityVector3());
     }
@@ -101,26 +101,47 @@ public class Test_Physics3D_OBB : MonoBehaviour
         var g = box.GetG().ToUnityVector3();
         var h = box.GetH().ToUnityVector3();
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(a, 0.1f);
+        float size = 0.02f;
+        Gizmos.DrawSphere(a, size);
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(b, 0.1f);
+        Gizmos.DrawSphere(b, size);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(c, 0.1f);
+        Gizmos.DrawSphere(c, size);
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(d, 0.1f);
+        Gizmos.DrawSphere(d, size);
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(e, 0.1f);
+        Gizmos.DrawSphere(e, size);
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(f, 0.1f);
+        Gizmos.DrawSphere(f, size);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(g, 0.1f);
+        Gizmos.DrawSphere(g, size);
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(h, 0.1f);
+        Gizmos.DrawSphere(h, size);
     }
+
 
     void DrawBoxBorder(Box3D box)
     {
-
+        var a = box.GetA().ToUnityVector3();
+        var b = box.GetB().ToUnityVector3();
+        var c = box.GetC().ToUnityVector3();
+        var d = box.GetD().ToUnityVector3();
+        var e = box.GetE().ToUnityVector3();
+        var f = box.GetF().ToUnityVector3();
+        var g = box.GetG().ToUnityVector3();
+        var h = box.GetH().ToUnityVector3();
+        Gizmos.DrawLine(a, b);
+        Gizmos.DrawLine(b, c);
+        Gizmos.DrawLine(c, d);
+        Gizmos.DrawLine(d, a);
+        Gizmos.DrawLine(e, f);
+        Gizmos.DrawLine(f, g);
+        Gizmos.DrawLine(g, h);
+        Gizmos.DrawLine(h, e);
+        Gizmos.DrawLine(a, e);
+        Gizmos.DrawLine(b, f);
+        Gizmos.DrawLine(c, g);
+        Gizmos.DrawLine(d, h);
     }
 
 }
