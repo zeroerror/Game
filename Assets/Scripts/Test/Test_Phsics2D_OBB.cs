@@ -30,6 +30,7 @@ public class Test_Phsics2D_OBB : MonoBehaviour
         {
             var bcTF = bcs[i].transform;
             boxes[i] = new Box2D(bcTF.position.ToSysVector2(), 1, 1, bcTF.rotation.eulerAngles.z, bcTF.localScale.ToSysVector2());
+            boxes[i].SetBoxType(BoxType.OBB);
         }
     }
 
