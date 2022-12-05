@@ -29,7 +29,7 @@ public class Test_Physics3D_AABB : MonoBehaviour
         for (int i = 0; i < bcCount; i++)
         {
             var bcTF = bcs[i].transform;
-            boxes[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
+            boxes[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, 1, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
         }
     }
 

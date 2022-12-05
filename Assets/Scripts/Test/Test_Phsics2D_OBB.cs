@@ -46,11 +46,8 @@ public class Test_Phsics2D_OBB : MonoBehaviour
             {
                 if (CollisionHelper2D.HasCollision(boxes[i], boxes[j]))
                 {
-                    collisionBoxDic[i] = boxes[i];
-                    if (!collisionBoxDic.ContainsKey(j))
-                    {
-                        collisionBoxDic[j] = boxes[j];
-                    }
+                    if (!collisionBoxDic.ContainsKey(i)) collisionBoxDic[i] = boxes[i];
+                    if (!collisionBoxDic.ContainsKey(j)) collisionBoxDic[j] = boxes[j];
                 }
             }
         }

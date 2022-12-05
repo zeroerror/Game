@@ -33,7 +33,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
         for (int i = 0; i < bcCount; i++)
         {
             var bcTF = bcs[i].transform;
-            boxs[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, bcTF.localScale.z, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
+            boxs[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, 1, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
             boxs[i].SetBoxType(BoxType.OBB);
         }
         Debug.Log($"Total Box: {bcCount}");
@@ -110,7 +110,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
         var g = box.G.ToUnityVector3();
         var h = box.H.ToUnityVector3();
         Gizmos.color = Color.red;
-        float size = 0.02f;
+        float size = 0.1f;
         Gizmos.DrawSphere(a, size);
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(b, size);
