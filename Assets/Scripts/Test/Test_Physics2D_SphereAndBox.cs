@@ -50,7 +50,6 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
                 allSpheres[i] = new Sphere2D(bcTF.position.ToSysVector2(), bcTF.GetComponent<SphereCollider>().radius, bcTF.rotation.eulerAngles.z, bcTF.localScale.x);
                 sphereCount++;
             }
-
         }
         Debug.Log($"Total Box: {boxCount}");
         Debug.Log($"Total Sphere: {sphereCount}");
@@ -133,6 +132,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (sphere == null) continue;
             UpdateSphere(bc.transform, sphere);
             Gizmos.color = Color.green;
+            var b = sphere.Box;
             if (collsionArray[i] == 1)
             {
                 Gizmos.color = Color.red;
@@ -161,7 +161,6 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
     {
         sphere.UpdateCenter(src.position.ToSysVector2());
         sphere.UpdateScale(src.localScale.x);
-        sphere.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 
     void DrawBoxPoint(Box2D box)
