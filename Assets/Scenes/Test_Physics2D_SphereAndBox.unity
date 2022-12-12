@@ -671,7 +671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spheresAndBoxes: {fileID: 453184397}
-  boxType: 0
+  boxType: 1
 --- !u!4 &1047254121
 Transform:
   m_ObjectHideFlags: 0
