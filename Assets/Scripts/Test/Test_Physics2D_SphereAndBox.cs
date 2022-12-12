@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.AllPhysics;
+using ZeroFrame.AllPhysics.Physics2D;
 using ZeroFrame.AllMath;
 using Game.Generic;
 

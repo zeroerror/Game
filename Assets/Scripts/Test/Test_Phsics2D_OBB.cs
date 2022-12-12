@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.AllPhysics;
+using ZeroFrame.AllPhysics.Physics2D;
 using Game.Generic;
 
 public class Test_Phsics2D_OBB : MonoBehaviour

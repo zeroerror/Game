@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZeroFrame.AllPhysics;
+using ZeroFrame.AllPhysics.Physics3D;
 using Game.Generic;
 
 public class Test_Physics3D_AABB : MonoBehaviour
@@ -30,6 +31,7 @@ public class Test_Physics3D_AABB : MonoBehaviour
         {
             var bcTF = bcs[i].transform;
             boxes[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, 1, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
+            boxes[i].SetBoxType(BoxType.AABB);
         }
     }
 
@@ -48,7 +50,7 @@ public class Test_Physics3D_AABB : MonoBehaviour
         {
             for (int j = i + 1; j < boxes.Length; j++)
             {
-                if (CollisionHelper3D.HasCollision_AABB(boxes[i], boxes[j]))
+                if (CollisionHelper3D.HasCollision(boxes[i], boxes[j]))
                 {
                     collisionBoxDic[i] = boxes[i];
                     if (!collisionBoxDic.ContainsKey(j))
@@ -84,33 +86,34 @@ public class Test_Physics3D_AABB : MonoBehaviour
 
     void DrawBoxPoint(Box3D box)
     {
-        var a = box.GetMaxPos().ToUnityVector3();
-        var b = box.GetMinPos().ToUnityVector3();
+        var a = box.A.ToUnityVector3();
+        var g = box.G.ToUnityVector3();
         Gizmos.DrawSphere(a, 0.1f);
-        Gizmos.DrawSphere(b, 0.1f);
+        Gizmos.DrawSphere(g, 0.1f);
     }
 
     void DrawBoxBorder(Box3D box)
     {
-        var a = box.GetMaxPos().ToUnityVector3();
-        Gizmos.DrawLine(a, a + Vector3.right * box.Width);
-        Gizmos.DrawLine(a, a + Vector3.back * box.length);
-        Gizmos.DrawLine(a, a + Vector3.down * box.height);
-
-        var b = box.GetMinPos().ToUnityVector3();
-        Gizmos.DrawLine(b, b + Vector3.left * box.Width);
-        Gizmos.DrawLine(b, b + Vector3.forward * box.length);
-        Gizmos.DrawLine(b, b + Vector3.up * box.height);
-
-        var c = a + Vector3.right * box.Width;
-        Gizmos.DrawLine(c, c + Vector3.left * box.Width);
-        Gizmos.DrawLine(c, c + Vector3.back * box.length);
-        Gizmos.DrawLine(c, c + Vector3.down * box.height);
-
-        var d = b + Vector3.left * box.Width;
-        Gizmos.DrawLine(d, d + Vector3.right * box.Width);
-        Gizmos.DrawLine(d, d + Vector3.forward * box.length);
-        Gizmos.DrawLine(d, d + Vector3.up * box.height);
+        var a = box.A.ToUnityVector3();
+        var b = box.B.ToUnityVector3();
+        var c = box.C.ToUnityVector3();
+        var d = box.D.ToUnityVector3();
+        var e = box.E.ToUnityVector3();
+        var f = box.F.ToUnityVector3();
+        var g = box.G.ToUnityVector3();
+        var h = box.H.ToUnityVector3();
+        Gizmos.DrawLine(a, b);
+        Gizmos.DrawLine(b, c);
+        Gizmos.DrawLine(c, d);
+        Gizmos.DrawLine(d, a);
+        Gizmos.DrawLine(e, f);
+        Gizmos.DrawLine(f, g);
+        Gizmos.DrawLine(g, h);
+        Gizmos.DrawLine(h, e);
+        Gizmos.DrawLine(a, e);
+        Gizmos.DrawLine(b, f);
+        Gizmos.DrawLine(c, g);
+        Gizmos.DrawLine(d, h);
     }
 
 }

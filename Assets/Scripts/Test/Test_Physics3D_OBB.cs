@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine;
-using ZeroFrame.AllPhysics;
 using ZeroFrame.AllMath;
+using ZeroFrame.AllPhysics;
+using ZeroFrame.AllPhysics.Physics3D;
 using Game.Generic;
 
 public class Test_Physics3D_OBB : MonoBehaviour
@@ -54,7 +54,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
         {
             for (int j = i + 1; j < boxs.Length; j++)
             {
-                if (CollisionHelper3D.HasCollision_OBB(boxs[i], boxs[j]))
+                if (CollisionHelper3D.HasCollision(boxs[i], boxs[j]))
                 {
                     collsionArray[i] = 1;
                     collsionArray[j] = 1;
@@ -63,9 +63,9 @@ public class Test_Physics3D_OBB : MonoBehaviour
         }
 
         Axis3D axis3D = new Axis3D();
-        axis3D.center = System.Numerics.Vector3.Zero;
+        axis3D.origin = System.Numerics.Vector3.Zero;
         axis3D.dir = System.Numerics.Vector3.UnitX;
-        Gizmos.DrawLine((axis3D.center - 100f * axis3D.dir).ToUnityVector3(), (axis3D.center + 100f * axis3D.dir).ToUnityVector3());
+        Gizmos.DrawLine((axis3D.origin - 100f * axis3D.dir).ToUnityVector3(), (axis3D.origin + 100f * axis3D.dir).ToUnityVector3());
         for (int i = 0; i < boxs.Length; i++)
         {
             var bc = bcs[i];
@@ -89,7 +89,7 @@ public class Test_Physics3D_OBB : MonoBehaviour
         var proj = box.GetProjectionSub(axis3D);
         Gizmos.color = Color.white;
         Gizmos.color = Color.black;
-        Gizmos.DrawLine((axis3D.dir.Normalize() * proj.X + axis3D.center).ToUnityVector3(), (axis3D.dir.Normalize() * proj.Y + axis3D.center).ToUnityVector3());
+        Gizmos.DrawLine((axis3D.dir.Normalize() * proj.X + axis3D.origin).ToUnityVector3(), (axis3D.dir.Normalize() * proj.Y + axis3D.origin).ToUnityVector3());
     }
 
     void UpdateBox(Transform src, Box3D box)
@@ -127,7 +127,6 @@ public class Test_Physics3D_OBB : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(h, size);
     }
-
 
     void DrawBoxBorder(Box3D box)
     {

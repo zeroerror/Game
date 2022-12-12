@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using ZeroFrame.AllMath;
-using ZeroFrame.AllPhysics;
+using ZeroFrame.AllPhysics.Physics2D;
 
 public interface IBounds
 {
