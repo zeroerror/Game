@@ -213,7 +213,7 @@ public class Test_Physics3D_Raycast : MonoBehaviour
 
     void DrawSphere3D(Sphere3D sphere)
     {
-        Gizmos.DrawSphere(sphere.Center.ToUnityVector3(), sphere.Radius + 0.01f);
+        Gizmos.DrawSphere(sphere.Center.ToUnityVector3(), sphere.Radius_scaled);
     }
 
     void UpdateSphere3D(Transform src, Sphere3D sphere)
