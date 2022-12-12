@@ -14,6 +14,8 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
     Transform[] tfs;
     public Transform spheresAndBoxes;
 
+    public BoxType boxType;
+
     int[] collsionArray;
 
     public void Start()
@@ -40,7 +42,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (bcTF.GetComponent<BoxCollider>())
             {
                 allBoxes[i] = new Box2D(bcTF.position.ToSysVector2(), 1, 1, bcTF.rotation.eulerAngles.z, bcTF.localScale.ToSysVector2());
-                allBoxes[i].SetBoxType(BoxType.OBB);
+                allBoxes[i].SetBoxType(boxType);
                 boxCount++;
             }
             else if (bcTF.GetComponent<SphereCollider>())
@@ -120,7 +122,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
             if (box == null) continue;
             UpdateBox(bc.transform, box);
             Gizmos.color = Color.green;
-            // DrawBoxPoint(box);
+            DrawBoxPoint(box);
             if (collsionArray[i] == 1) { Gizmos.color = Color.red; DrawBoxBorder(box); }
         }
 
@@ -152,7 +154,6 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
     {
         box.UpdateCenter(src.position.ToSysVector2());
         box.UpdateScale(src.localScale.ToSysVector2());
-        Debug.Log(src.localScale.ToSysVector2());
         box.UpdateRotAngle(src.rotation.eulerAngles.z);
     }
 
@@ -170,7 +171,7 @@ public class Test_Physics2D_SphereAndBox : MonoBehaviour
         var c = box.C.ToUnityVector3();
         var d = box.D.ToUnityVector3();
         Gizmos.color = Color.red;
-        float size = 0.02f;
+        float size = 0.08f;
         Gizmos.DrawSphere(a, size);
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(b, size);

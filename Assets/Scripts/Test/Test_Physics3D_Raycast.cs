@@ -10,36 +10,58 @@ public class Test_Physics3D_Raycast : MonoBehaviour
     public Transform rayStart;
     public Transform rayEnd;
 
-    Ray3D ray;
-    Box3D[] boxes;
-    Transform[] tfs;
-    public Transform Boxes;
 
+    public Transform boxRoot;
     public BoxType boxType;
+    Transform[] box_tfs;
+    Box3D[] boxes;
+
+    public Transform sphereRoot;
+    Transform[] sphere_tfs;
+    Sphere3D[] spheres;
+
+    Ray3D ray;
 
     void Start()
     {
-        if (Boxes == null) return;
+        if (boxRoot == null) return;
+        if (sphereRoot == null) return;
         isRun = true;
 
-        var bcCount = Boxes.childCount;
-        tfs = new Transform[bcCount];
-        for (int i = 0; i < bcCount; i++)
+        var count = boxRoot.childCount;
+        box_tfs = new Transform[count];
+        for (int i = 0; i < count; i++)
         {
-            tfs[i] = Boxes.GetChild(i);
+            box_tfs[i] = boxRoot.GetChild(i);
         }
-
-        boxes = new Box3D[bcCount];
-        for (int i = 0; i < bcCount; i++)
+        boxes = new Box3D[count];
+        for (int i = 0; i < count; i++)
         {
-            var bcTF = tfs[i].transform;
-            var pos = bcTF.position.ToSysVector3();
-            var eulerAngles = bcTF.rotation.eulerAngles.ToSysVector3();
-            var localScale = bcTF.localScale.ToSysVector3();
+            var tf = box_tfs[i].transform;
+            var pos = tf.position.ToSysVector3();
+            var eulerAngles = tf.rotation.eulerAngles.ToSysVector3();
+            var localScale = tf.localScale.ToSysVector3();
             boxes[i] = new Box3D(pos, 1, 1, 1, eulerAngles, localScale);
             boxes[i].SetBoxType(boxType);
         }
-        Debug.Log($"Total Box: {bcCount}");
+        Debug.Log($"Total Box: {count}");
+
+        count = sphereRoot.childCount;
+        sphere_tfs = new Transform[count];
+        for (int i = 0; i < count; i++)
+        {
+            sphere_tfs[i] = sphereRoot.GetChild(i);
+        }
+        spheres = new Sphere3D[count];
+        for (int i = 0; i < count; i++)
+        {
+            var tf = sphere_tfs[i].transform;
+            var pos = tf.position.ToSysVector3();
+            var eulerAngles = tf.rotation.eulerAngles.ToSysVector3();
+            var localScale = tf.localScale.ToSysVector3();
+            spheres[i] = new Sphere3D(pos, 0.5f, localScale.X);
+        }
+        Debug.Log($"Total Sphere: {count}");
 
         var rayStartPos = rayStart.position;
         var rayEndPos = rayEnd.position;
@@ -48,17 +70,16 @@ public class Test_Physics3D_Raycast : MonoBehaviour
     }
 
     bool isRun = false;
-    bool[] collisionArray = new bool[100];
-    List<Vector3> hitPoints = new List<Vector3>();
+    bool[] collisionList_box = new bool[100];
+    bool[] collisionList_sphere = new bool[100];
+    List<Vector3> hitPointList = new List<Vector3>();
 
     public void OnDrawGizmos()
     {
         if (!isRun) return;
-        for (int i = 0; i < collisionArray.Length; i++)
-        {
-            collisionArray[i] = false;
-        }
-        hitPoints.Clear();
+        for (int i = 0; i < collisionList_box.Length; i++) { collisionList_box[i] = false; }
+        for (int i = 0; i < collisionList_sphere.Length; i++) { collisionList_sphere[i] = false; }
+        hitPointList.Clear();
 
         var rayStartPos = rayStart.position;
         var rayEndPos = rayEnd.position;
@@ -68,37 +89,65 @@ public class Test_Physics3D_Raycast : MonoBehaviour
         ray = new Ray3D(rayStartPos.ToSysVector3(), posDiff.normalized.ToSysVector3(), posDiff.magnitude);
 
         bool hasCollision = false;
+
+        // - Box
         for (int i = 0; i < boxes.Length; i++)
         {
             var b = boxes[i];
-            UpdateBox(tfs[i], b);
+            UpdateBox(box_tfs[i], b);
             if (b.HasCollision(ray, out var hps))
             {
-                collisionArray[i] = true;
+                collisionList_box[i] = true;
                 hps.ForEach((p) =>
                 {
-                    hitPoints.Add(p.ToUnityVector3());
+                    hitPointList.Add(p.ToUnityVector3());
+                });
+                hasCollision = true;
+            }
+        }
+        for (int i = 0; i < boxes.Length; i++)
+        {
+            Gizmos.color = Color.green;
+            if (collisionList_box[i]) Gizmos.color = Color.red;
+            DrawBoxBorders(boxes[i]);
+            // DrawBoxPoints(boxes[i]);
+        }
+
+        // - Sphere
+        for (int i = 0; i < spheres.Length; i++)
+        {
+            var s = spheres[i];
+            UpdateSphere3D(sphere_tfs[i], s);
+            if (s.HasCollision(ray, out var hps))
+            {
+                collisionList_sphere[i] = true;
+                hps.ForEach((p) =>
+                {
+                    hitPointList.Add(p.ToUnityVector3());
                 });
                 hasCollision = true;
             }
         }
 
+        Gizmos.color = Color.red;
+        for (int i = 0; i < spheres.Length; i++)
+        {
+            if (collisionList_sphere[i])
+            {
+                DrawSphere3D(spheres[i]);
+            }
+        }
+
+        // - Ray
         Gizmos.color = Color.green;
         if (hasCollision) Gizmos.color = Color.red;
         Gizmos.DrawLine(ray.origin.ToUnityVector3(), ray.origin.ToUnityVector3() + (ray.dir.ToUnityVector3() * ray.length));
 
-        for (int i = 0; i < boxes.Length; i++)
+        // - Hit Points
+        Gizmos.color = Color.white;
+        hitPointList.ForEach((p) =>
         {
-            Gizmos.color = Color.green;
-            if (collisionArray[i]) Gizmos.color = Color.red;
-            DrawBoxBorders(boxes[i]);
-            // DrawBoxPoints(boxes[i]);
-        }
-
-        Gizmos.color = Color.magenta;
-        hitPoints.ForEach((p) =>
-        {
-            Gizmos.DrawSphere(p, 0.07f);
+            Gizmos.DrawSphere(p, 0.08f);
         });
     }
 
@@ -160,6 +209,17 @@ public class Test_Physics3D_Raycast : MonoBehaviour
         box.UpdateCenter(src.position.ToSysVector3());
         box.UpdateScale(src.localScale.ToSysVector3());
         box.UpdateRotAngle(src.rotation.eulerAngles.ToSysVector3());
+    }
+
+    void DrawSphere3D(Sphere3D sphere)
+    {
+        Gizmos.DrawSphere(sphere.Center.ToUnityVector3(), sphere.Radius + 0.01f);
+    }
+
+    void UpdateSphere3D(Transform src, Sphere3D sphere)
+    {
+        sphere.UpdateCenter(src.position.ToSysVector3());
+        sphere.UpdateScale(src.localScale.x);
     }
 
 }
