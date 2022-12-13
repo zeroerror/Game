@@ -10,7 +10,6 @@ public class Test_Physics3D_Raycast : MonoBehaviour
     public Transform rayStart;
     public Transform rayEnd;
 
-
     public Transform boxRoot;
     public BoxType boxType;
     Transform[] box_tfs;
@@ -95,7 +94,7 @@ public class Test_Physics3D_Raycast : MonoBehaviour
         {
             var b = boxes[i];
             UpdateBox(box_tfs[i], b);
-            if (b.HasCollision(ray, out var hps))
+            if (CollisionHelper3D.HasCollision(b, ray, out var hps))
             {
                 collisionList_box[i] = true;
                 hps.ForEach((p) =>
@@ -118,7 +117,7 @@ public class Test_Physics3D_Raycast : MonoBehaviour
         {
             var s = spheres[i];
             UpdateSphere3D(sphere_tfs[i], s);
-            if (s.HasCollision(ray, out var hps))
+            if (CollisionHelper3D.HasCollision(s, ray, out var hps))
             {
                 collisionList_sphere[i] = true;
                 hps.ForEach((p) =>

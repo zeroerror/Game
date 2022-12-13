@@ -1,47 +1,28 @@
 using UnityEngine;
-using ZeroFrame.AllMath;
-using ZeroFrame.AllPhysics;
 using ZeroFrame.AllPhysics.Physics3D;
 using Game.Generic;
+using ZeroFrame.AllPhysics;
+using ZeroFrame.AllMath;
 
-public class Test_Physics3D_OBB : MonoBehaviour
+public class Test_Physics3D_PenetrationCorrection : MonoBehaviour
 {
 
-    bool canRun = false;
+    public BoxType boxType;
 
     public Transform Boxes;
     Box3D[] boxes;
     Transform[] boxTfs;
 
     int[] collsionArray;
+    bool canRun = false;
 
-    public void Start()
+    void Start()
     {
-        if (Boxes == null) return;
-        canRun = true;
+        canRun = Boxes != null;
+        if (!canRun) return;
         InitBox3Ds();
     }
 
-    void InitBox3Ds()
-    {
-        var bcCount = Boxes.childCount;
-        collsionArray = new int[bcCount];
-        boxTfs = new Transform[bcCount];
-        for (int i = 0; i < bcCount; i++)
-        {
-            var bc = Boxes.GetChild(i);
-            boxTfs[i] = bc;
-        }
-
-        boxes = new Box3D[bcCount];
-        for (int i = 0; i < bcCount; i++)
-        {
-            var bcTF = boxTfs[i].transform;
-            boxes[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, 1, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
-            boxes[i].SetBoxType(BoxType.OBB);
-        }
-        Debug.Log($"Total Box: {bcCount}");
-    }
 
     public void OnDrawGizmos()
     {
@@ -77,7 +58,6 @@ public class Test_Physics3D_OBB : MonoBehaviour
             DrawBoxBorder(box);
             DrawProjectionSub(axis3D, box);
         }
-
     }
 
     void DrawProjectionSub(Axis3D axis3D, Box3D box)
@@ -86,6 +66,80 @@ public class Test_Physics3D_OBB : MonoBehaviour
         Gizmos.color = Color.white;
         Gizmos.color = Color.black;
         Gizmos.DrawLine((axis3D.dir.Normalize() * proj.X + axis3D.origin).ToUnityVector3(), (axis3D.dir.Normalize() * proj.Y + axis3D.origin).ToUnityVector3());
+    }
+
+    void OnGUI()
+    {
+        if (GUILayout.Button("穿透恢复"))
+        {
+            UpdateAllBoxes();
+            CollisionUpdate();
+            for (int i = 0; i < boxes.Length - 1; i++)
+            {
+                var c1 = collsionArray[i];
+                var b1 = boxes[i];
+                var btf1 = boxTfs[i];
+                for (int j = i + 1; j < boxes.Length; j++)
+                {
+                    var c2 = collsionArray[j];
+                    var b2 = boxes[j];
+                    if (c1 == 1 && c2 == 1)
+                    {
+                        // - Penetration
+                        var mtv = CollisionHelper3D.PenetrationCorrection(b1, b2);
+                        btf1.position = b1.Center.ToUnityVector3();
+                    }
+                }
+            }
+        }
+    }
+
+    void InitBox3Ds()
+    {
+        var bcCount = Boxes.childCount;
+        collsionArray = new int[bcCount];
+        boxTfs = new Transform[bcCount];
+        for (int i = 0; i < bcCount; i++)
+        {
+            var bc = Boxes.GetChild(i);
+            boxTfs[i] = bc;
+        }
+
+        boxes = new Box3D[bcCount];
+        for (int i = 0; i < bcCount; i++)
+        {
+            var bcTF = boxTfs[i].transform;
+            boxes[i] = new Box3D(bcTF.position.ToSysVector3(), 1, 1, 1, bcTF.rotation.eulerAngles.ToSysVector3(), bcTF.localScale.ToSysVector3());
+            boxes[i].SetBoxType(boxType);
+            Debug.Log($"BoxType: {boxes[i].BoxType}");
+        }
+        Debug.Log($"Total Box: {bcCount}");
+    }
+
+    void UpdateAllBoxes()
+    {
+        for (int i = 0; i < boxes.Length; i++)
+        {
+            var bc = boxTfs[i];
+            var box = boxes[i];
+            UpdateBox(bc.transform, box);
+        }
+    }
+
+    void CollisionUpdate()
+    {
+        for (int i = 0; i < collsionArray.Length; i++) { collsionArray[i] = 0; }
+        for (int i = 0; i < boxes.Length - 1; i++)
+        {
+            for (int j = i + 1; j < boxes.Length; j++)
+            {
+                if (CollisionHelper3D.HasCollision(boxes[i], boxes[j]))
+                {
+                    collsionArray[i] = 1;
+                    collsionArray[j] = 1;
+                }
+            }
+        }
     }
 
     void UpdateBox(Transform src, Box3D box)
@@ -147,5 +201,6 @@ public class Test_Physics3D_OBB : MonoBehaviour
         Gizmos.DrawLine(c, g);
         Gizmos.DrawLine(d, h);
     }
+
 
 }
