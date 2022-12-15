@@ -85,7 +85,8 @@ public class Test_Physics3D_OBB : MonoBehaviour
         var proj = box.GetProjectionSub(axis3D);
         Gizmos.color = Color.white;
         Gizmos.color = Color.black;
-        Gizmos.DrawLine((axis3D.dir.Normalize() * proj.X + axis3D.origin).ToUnityVector3(), (axis3D.dir.Normalize() * proj.Y + axis3D.origin).ToUnityVector3());
+        axis3D.dir.Normalize();
+        Gizmos.DrawLine((axis3D.dir * proj.X + axis3D.origin).ToUnityVector3(), (axis3D.dir * proj.Y + axis3D.origin).ToUnityVector3());
     }
 
     void UpdateBox(Transform src, Box3D box)
