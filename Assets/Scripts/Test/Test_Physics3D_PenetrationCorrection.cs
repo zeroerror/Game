@@ -82,13 +82,15 @@ public class Test_Physics3D_PenetrationCorrection : MonoBehaviour
                 var btf1 = boxTfs[i];
                 for (int j = i + 1; j < boxes.Length; j++)
                 {
+                    var btf2 = boxTfs[j];
                     var c2 = collsionArray[j];
                     var b2 = boxes[j];
                     if (c1 == 1 && c2 == 1)
                     {
                         // - Penetration
-                        var mtv = CollisionHelper3D.PenetrationCorrection(b1, b2);
+                        CollisionHelper3D.PenetrationCorrection(b1, 0.5f, b2, 0.5f);
                         btf1.position = b1.Center.ToUnityVector3();
+                        btf2.position = b2.Center.ToUnityVector3();
                     }
                 }
             }
